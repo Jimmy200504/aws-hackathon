@@ -284,6 +284,7 @@ Compact AWS judge/demo 的 SAM runbook：[`docs/deployment.md`](docs/deployment.
 - Graph coverage／subgroup guardrails：[`docs/graph-coverage.md`](docs/graph-coverage.md)
 - Business case／A/B design：[`docs/business-case.md`](docs/business-case.md)
 - Five-minute judge pitch：[`docs/judge-pitch.md`](docs/judge-pitch.md)
+- Reproducible five-minute video：[`video/README.md`](video/README.md)
 - Rubric-to-artifact evidence index：[`docs/evidence-index.md`](docs/evidence-index.md)
 
 原始 CSV 不應提交到公開 GitHub。請保留 `data/dataset/` 在 `.gitignore`，只提供取得方式、schema、fingerprint 與重現指令。
@@ -301,8 +302,10 @@ scripts/run_ablation.sh
 scripts/run_ltr_ablation.sh
 scripts/report_graph_coverage.py
 scripts/verify_release.py    release evidence audit
+scripts/render_demo_video.py reproducible 5-minute judge video
 tests/                     contract / leakage / ranking invariants
 docs/                      graph、GenAI、AWS、data card、提交稽核
+video/                     tracked deck、narration、captions
 artifacts/                 可重建的本機 demo / benchmark artifacts
 reports/                   真實 ablation 輸出
 ```

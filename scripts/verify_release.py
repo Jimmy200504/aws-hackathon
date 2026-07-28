@@ -524,13 +524,14 @@ class ReleaseVerifier:
         blockers = set(report.get("blockers", []))
         required_blockers = {
             "R1a_public_cloud_demo_url",
-            "R1b_five_minute_video",
+            "R1c_public_demo_video_url",
             "R5a_actual_aws_deployment",
             "R6_public_github",
             "R2a_full_train_only_bedrock_graph_executed",
         }
         local_required = {
             "R1_local_live_demo",
+            "R1b_five_minute_video_artifact",
             "R2_genai_method_and_failure_modes",
             "R3_data_application_explained",
             "R4_system_graph_schema_and_trace",
@@ -569,6 +570,82 @@ class ReleaseVerifier:
                 requirements.get("E2_recommended_five_percent_lift") is False,
                 "Recommended 5% gap remains honestly false.",
                 "Submission audit fabricates the recommended 5% result.",
+            ),
+        ]
+        for check_id, condition, success, failure in conditions:
+            self.add(group, check_id, condition, success, failure)
+
+    def check_demo_video(self, report: dict[str, Any] | None = None) -> None:
+        group = "G12_demo_video"
+        report = report or self.load_json("reports/demo-video.json")
+        manifest = self.load_json("release-manifest.json")
+        metadata = report.get("metadata", {})
+        checks = report.get("checks", {})
+        artifact = report.get("artifact", {})
+        relative = str(artifact.get("path", ""))
+        expected = str(artifact.get("sha256", ""))
+        path = self.root / relative if relative else self.root / "__missing__"
+        registered = manifest.get("sha256", {}).get(relative)
+        conditions = [
+            (
+                "G12.1",
+                metadata.get("schema") == "skillweave-demo-video-v1"
+                and metadata.get("language") == "zh-TW"
+                and metadata.get("release") == manifest.get("release"),
+                "Demo video schema, language, and release are registered.",
+                "Demo video metadata differs from the release contract.",
+            ),
+            (
+                "G12.2",
+                report.get("passed") is True
+                and len(checks) >= 6
+                and all(value is True for value in checks.values()),
+                "Five-minute Full HD video, audio, scenes, and subtitles passed.",
+                "Demo video media checks are incomplete or failed.",
+            ),
+            (
+                "G12.3",
+                299.0 <= float(artifact.get("duration_seconds", 0.0)) <= 301.0
+                and relative == "dist/skillweave-demo-5min.mp4"
+                and len(expected) == 64
+                and registered == expected,
+                "Demo video duration, path, and immutable hash are registered.",
+                "Demo video duration, path, or manifest hash is invalid.",
+            ),
+            (
+                "G12.4",
+                not path.is_file()
+                or hashlib.sha256(path.read_bytes()).hexdigest() == expected,
+                (
+                    "Local demo video hash matches the report."
+                    if path.is_file()
+                    else "Absent rebuildable video is covered by its source and report hash."
+                ),
+                "Local demo video hash differs from the registered artifact.",
+            ),
+            (
+                "G12.5",
+                bool(
+                    manifest.get("external_deliverables", {}).get(
+                        "demo_video_url"
+                    )
+                )
+                or report.get("external_url_registered") is False,
+                "Local video is complete without claiming an unregistered public URL.",
+                "Video report fabricates external registration.",
+            ),
+            (
+                "G12.6",
+                all(
+                    (self.root / relative).is_file()
+                    for relative in (
+                        "video/scenes.json",
+                        "video/pitch-deck.html",
+                        "scripts/render_demo_video.py",
+                    )
+                ),
+                "Tracked deck, scene contract, and renderer make the video reproducible.",
+                "A required demo-video source file is missing.",
             ),
         ]
         for check_id, condition, success, failure in conditions:
@@ -687,6 +764,7 @@ class ReleaseVerifier:
             self.check_graph_coverage,
             self.check_business_impact,
             self.check_sam_local_smoke,
+            self.check_demo_video,
             self.check_submission_audit,
             self.check_manifest,
         ]

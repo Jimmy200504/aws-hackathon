@@ -1,0 +1,50 @@
+[
+  {
+    "slide": 1,
+    "duration": 22,
+    "caption": "SkillWeave：不是找得到，是第一個就對。",
+    "narration": "大家好，這是 SkillWeave。1111 不缺職缺，也不缺搜尋；真正昂貴的是第一頁不準。我們把職缺文字編成可查詢的技能關係，目標不是讓使用者勉強找得到，而是讓第一個結果就更接近真正意圖。"
+  },
+  {
+    "slide": 2,
+    "duration": 34,
+    "caption": "七日資料：614 萬次搜尋、824 萬次瀏覽、22.6 萬次應徵。",
+    "narration": "主辦資料涵蓋七天、六百一十四萬次搜尋、八百二十四萬次職缺瀏覽，以及二十二萬六千次主動應徵。同一技能有 React、ReactJS、React 點 JS 等不同寫法，結構化技能欄位又大量缺漏。傳統關鍵字很難同時處理別名、技能關係、新職缺與曝光偏差。"
+  },
+  {
+    "slide": 3,
+    "duration": 42,
+    "caption": "LLM 提出圖譜邊；deterministic validator 決定能否發布。",
+    "narration": "SkillWeave 把生成式 AI 放在索引前面。Bedrock 從訓練期 JD 提出技能、別名、分類與關係；每一條邊必須附原文 evidence、來源時間、模型與 prompt 版本。Deterministic validator 再檢查 evidence substring、時間 cutoff、關係白名單、同義詞碰撞與 confidence。線上只走一跳，沒有足夠證據就拒絕圖譜並回退。"
+  },
+  {
+    "slide": 4,
+    "duration": 60,
+    "caption": "真實 Live Demo：Graph ON/OFF 會改變 Top-10，且每條路徑可追溯。",
+    "narration": "現在看真實的本機 Live Demo。查詢 AWS、Docker、Kubernetes 時，圖譜模式會解析 canonical skills，並讓帶有已驗證 Kubernetes 或雲端關係的職缺往前。切換成無圖譜 baseline，Top 10 真的會改變，不只是按鈕換顏色。右側 trace 顯示 Query 到 Skill 再到 Job 的節點、邊、權重與原文 evidence。查詢較新的職缺時，系統仍能用文字返回結果，但會清楚標記 cold start，不會偷用 cutoff 之後的 JD 建邊。"
+  },
+  {
+    "slide": 5,
+    "duration": 36,
+    "caption": "防洩漏：JD cutoff、title escrow、rolling graph、disjoint buckets。",
+    "narration": "技術可行性的核心是防止漂亮但無效的離線分數。圖譜只讀六月五日以前的 JD；若職缺後來被修改，只能使用訓練期應徵事件保存的職稱快照。訓練列只讀更早日期的 rolling 行為圖，validation、失敗 holdout 與 confirmation 使用固定 hash bucket。匿名 talent 零不做跨事件串接，未互動也不當成真負例。"
+  },
+  {
+    "slide": 6,
+    "duration": 48,
+    "caption": "Locked 1,993 queries：NDCG +1.34%，MRR +1.72%，Hit@1 +2.70%。",
+    "narration": "最終模型是 XGBoost Unbiased LambdaMART，二十棵樹、深度二、固定 seed 一一一一。同一模型在 graph off 時只歸零 graph feature family，避免用不同容量製造假 lift。鎖定的一千九百九十三個 confirmation queries 上，NDCG 提升百分之一點三四，MRR 提升百分之一點七二，Hit at one 提升百分之二點七，paired confidence interval 完全大於零。整體仍沒有達到建議的百分之五，我們也保留第一個負向 holdout。事後診斷顯示 gate active 的二百八十五個 queries 提升百分之十一點四一，但不拿 subgroup 偷換整體成績。"
+  },
+  {
+    "slide": 7,
+    "duration": 28,
+    "caption": "商業驗證：先量化 Top-1 relevance，再用 search-to-apply A/B 證明因果。",
+    "narration": "商業價值先從第一名品質開始。Hit at one 的絕對差異套到七日搜尋量，約是每週四萬零五十次額外的 Top one relevance events。這不是轉換、應徵或營收預測，所以收入刻意留白。正式 rollout 會從 shadow、百分之五 A B，到二十五、五十與百分之百，primary metric 是 search to apply，並監控延遲、零結果、新職缺曝光與 subgroup gap。"
+  },
+  {
+    "slide": 8,
+    "duration": 30,
+    "caption": "可消融、可追溯、可拒絕的生成式 AI 排名資產。",
+    "narration": "AWS production path 由 Step Functions 串接 S3、Glue、Bedrock batch、validator、OpenSearch 與 Neptune，再由 SageMaker 排序，API Gateway 和 WAF 提供評審入口。Exact Lambda bundle 已通過 SAM Python 三點十三 arm sixty four 的 validate、build 與 local invoke。Kiro session、失敗實驗、hash 與 release verifier 都保存在 repo。多數系統讓 LLM 解釋結果；SkillWeave 讓 LLM 產生可消融、可追溯、也可以被拒絕的排名資產。謝謝。"
+  }
+]

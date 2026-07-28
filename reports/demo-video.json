@@ -1,0 +1,25 @@
+{
+  "metadata": {
+    "schema": "skillweave-demo-video-v1",
+    "generated_at_utc": "2026-07-28T13:33:10Z",
+    "language": "zh-TW",
+    "release": "skillweave-2026.07.28-rc4"
+  },
+  "passed": true,
+  "checks": {
+    "duration_five_minutes": true,
+    "full_hd": true,
+    "h264_video": true,
+    "audio_present": true,
+    "embedded_zh_subtitles": true,
+    "eight_scenes": true
+  },
+  "artifact": {
+    "path": "dist/skillweave-demo-5min.mp4",
+    "subtitle_sidecar": "dist/skillweave-demo-5min.zh-TW.srt",
+    "duration_seconds": 300.04644,
+    "size_bytes": 7520250,
+    "sha256": "9dde00612194ffbda94ebd70bab568f8a92cd8003a6999b5525e3a5718964c32"
+  },
+  "external_url_registered": false
+}

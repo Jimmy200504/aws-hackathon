@@ -1,7 +1,7 @@
 # 評審證據索引
 
 本頁只列可由目前 release 直接核對的證據。`完成` 不代表已部署；AWS URL、
-GitHub URL 與影片仍以 release manifest 的 null 為準。
+GitHub URL 與公開影片 URL 仍以 release manifest 的 null 為準。
 
 Machine-readable completion status：`reports/submission-audit.json`。
 
@@ -22,7 +22,8 @@ Machine-readable completion status：`reports/submission-audit.json`。
 | Load smoke | `reports/load-smoke.json`、verifier G6 | Compact container 完成；AWS production 未跑 |
 | Kiro +5% | `docs/kiro-evidence.md` | 可驗證 session，待評審認定 |
 | Reproducibility | `scripts/release_gate.sh`、GitHub Actions、`release-manifest.json` | 完成 |
-| Public AWS / GitHub / video | verifier G7 warnings | 未完成 |
+| Five-minute video artifact | `video/`、`reports/demo-video.json`、verifier G12 | 完成 |
+| Public AWS / GitHub / video URL | verifier G7 warnings | 未完成 |
 
 ## 現場 90 秒證據路徑
 

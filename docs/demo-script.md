@@ -67,4 +67,17 @@ weight + evidence + edge type
 
 > SkillWeave 讓生成式 AI 成為可量測、可消融、可追溯的索引資產；如果移除圖譜不會退化，我們就不宣稱它有價值。
 
-畫面停在 API URL、GitHub release tag、正式 NDCG report QR code（完成後補）。
+畫面停在 RC4 release 狀態與誠實的 5% gate。公開 AWS、GitHub 與影片 URL
+尚未產生，因此影片不顯示 placeholder 或假 QR code。
+
+## 可重現影片
+
+tracked source 位於 `video/pitch-deck.html` 與 `video/scenes.json`：
+
+```bash
+python3 scripts/render_demo_video.py
+```
+
+輸出 `dist/skillweave-demo-5min.mp4`、繁中 SRT sidecar 與
+`reports/demo-video.json`。公開上傳後，才以 `scripts/update_release_urls.py`
+登錄真實 HTTPS URL。

@@ -1,7 +1,7 @@
 {
   "metadata": {
     "schema": "skillweave-submission-audit-v1",
-    "release": "skillweave-2026.07.28-rc3",
+    "release": "skillweave-2026.07.28-rc4",
     "source": "binding brief + workshop contract + current release evidence"
   },
   "local_release_evidence_passed": true,
@@ -9,7 +9,8 @@
   "requirements": {
     "R1_local_live_demo": true,
     "R1a_public_cloud_demo_url": false,
-    "R1b_five_minute_video": false,
+    "R1b_five_minute_video_artifact": true,
+    "R1c_public_demo_video_url": false,
     "R2_genai_method_and_failure_modes": true,
     "R2a_full_train_only_bedrock_graph_executed": false,
     "R3_data_application_explained": true,
@@ -28,11 +29,11 @@
   },
   "blockers": [
     "R1a_public_cloud_demo_url",
-    "R1b_five_minute_video",
+    "R1c_public_demo_video_url",
     "R5a_actual_aws_deployment",
     "R6_public_github",
     "R2a_full_train_only_bedrock_graph_executed"
   ],
   "recommended_not_mandatory_gap": "Locked NDCG@10 lift is positive but below the recommended 5%.",
-  "interpretation": "Local evidence can be release-ready while the binding public deployment, video, GitHub, and executed Bedrock graph remain incomplete."
+  "interpretation": "Local evidence can be release-ready while the binding public deployment, hosted video URL, GitHub, and executed Bedrock graph remain incomplete."
 }

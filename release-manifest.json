@@ -1,5 +1,5 @@
 {
-  "release": "skillweave-2026.07.28-rc3",
+  "release": "skillweave-2026.07.28-rc4",
   "status": "local_release_candidate",
   "random_seed": 1111,
   "dataset_version": "1111-2026-06-01_2026-06-07",
@@ -29,6 +29,7 @@
   },
   "sha256": {
     "dist/skillweave-lambda.zip": "47da18fd589059b285374b4f7bd3f484349abe3348f9ef155273f5169003aaba",
+    "dist/skillweave-demo-5min.mp4": "9dde00612194ffbda94ebd70bab568f8a92cd8003a6999b5525e3a5718964c32",
     "artifacts/models/ltr-graph-final.ubj": "d90693ac66358b847ba74cfb4dd0b1f3a4895fd28ecb061563d107f89ca1366e",
     "artifacts/models/ltr-graph-final.manifest.json": "f857cb7f05afbbaa7498a4f687a8fccce6d773074f1fd2870544fb1acf053f26",
     "artifacts/demo-index.json": "c5353f934b5c34bef021ab5541acddd617190f0755fdbf4524c4d8dbbb6c84f0",
@@ -37,7 +38,8 @@
     "reports/graph-coverage.json": "13246d0dea3240cef6196a3f40fab7c5e28d479420b0a62e183ec0c6d0d8a808",
     "reports/business-impact.json": "e994f190628bf4bc342271d32adb64af31766b6445c62c97c32331171556c10d",
     "reports/sam-local-smoke.json": "5845e045527302c9b79b7fc656fd875db87096a974dd70b39623e295edeec801",
-    "reports/submission-audit.json": "2d42079f4b173d9dee75dee5f4ddbea7e6204841aa8f9f631a109d29eb9d5842",
+    "reports/demo-video.json": "590d3912ffe2b9ce7bdb3b70bb69881955e6b3eb27c610f851a7dc1f0556d54b",
+    "reports/submission-audit.json": "2ded51f87eac07bc629e593c3d073e437fd3468009d237085ea4958a8c694ef1",
     "reports/load-smoke.json": "d476cafd0e62204c488495bc3f4ecdcd685b7ac10c9a6b6d89e5df1399d5c89c"
   },
   "external_deliverables": {

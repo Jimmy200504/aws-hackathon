@@ -4,7 +4,8 @@
 
 - [x] 本機 Live Demo：完整搜尋路徑
 - [ ] AWS 上可公開存取的 Demo URL
-- [ ] 5 分鐘中文或英文錄影
+- [x] 5 分鐘繁中錄影 artifact（1080p、語音、內嵌字幕、SHA-256）
+- [ ] 公開可觀看的 Demo video URL
 - [x] 生成式 AI 方法與設計依據文件
 - [x] 已知 LLM 失敗模式與防護
 - [x] 數據與資料應用說明
@@ -44,7 +45,8 @@
 - [x] OOV、新職缺、空結果、未知 code 測試
 - [ ] AWS URL 從外網 clean session 可開
 - [ ] API WAF 不會擋評審 burst
-- [ ] Demo video 內的 URL／版本與 release tag 相同
+- [x] Demo video 版本與 release tag 相同
+- [ ] 公開 URL 上傳後從 clean session 播放驗證
 
 ## 決賽前 contract smoke
 

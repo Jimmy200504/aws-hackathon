@@ -1,11 +1,11 @@
 {
   "verifier_version": "1",
-  "verified_at_utc": "2026-07-28T13:10:37Z",
-  "release": "skillweave-2026.07.28-rc3",
+  "verified_at_utc": "2026-07-28T13:35:41Z",
+  "release": "skillweave-2026.07.28-rc4",
   "passed": true,
   "summary": {
-    "total": 57,
-    "passed": 54,
+    "total": 63,
+    "passed": 60,
     "failed": 0,
     "warnings": 3
   },
@@ -280,6 +280,41 @@
         }
       ]
     },
+    "G12_demo_video": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G12.1",
+          "status": "PASS",
+          "message": "Demo video schema, language, and release are registered."
+        },
+        {
+          "id": "G12.2",
+          "status": "PASS",
+          "message": "Five-minute Full HD video, audio, scenes, and subtitles passed."
+        },
+        {
+          "id": "G12.3",
+          "status": "PASS",
+          "message": "Demo video duration, path, and immutable hash are registered."
+        },
+        {
+          "id": "G12.4",
+          "status": "PASS",
+          "message": "Local demo video hash matches the report."
+        },
+        {
+          "id": "G12.5",
+          "status": "PASS",
+          "message": "Local video is complete without claiming an unregistered public URL."
+        },
+        {
+          "id": "G12.6",
+          "status": "PASS",
+          "message": "Tracked deck, scene contract, and renderer make the video reproducible."
+        }
+      ]
+    },
     "G11_submission_audit": {
       "passed": true,
       "checks": [
@@ -321,7 +356,7 @@
         {
           "id": "G7.3",
           "status": "PASS",
-          "message": "Verified 11 artifact hashes."
+          "message": "Verified 13 artifact hashes."
         },
         {
           "id": "G7.4",

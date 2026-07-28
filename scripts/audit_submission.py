@@ -25,11 +25,20 @@ def main() -> None:
     manifest = load_object("release-manifest.json")
     verifier = load_object("reports/verify-release.json")
     ablation = load_object("reports/ltr-ablation-test.json")
+    video = (
+        load_object("reports/demo-video.json")
+        if exists("reports/demo-video.json")
+        else {}
+    )
     external = manifest.get("external_deliverables", {})
     requirements = {
         "R1_local_live_demo": exists("web/index.html") and verifier.get("passed") is True,
         "R1a_public_cloud_demo_url": bool(external.get("aws_url")),
-        "R1b_five_minute_video": bool(external.get("demo_video_url")),
+        "R1b_five_minute_video_artifact": (
+            video.get("passed") is True
+            and video.get("metadata", {}).get("release") == manifest.get("release")
+        ),
+        "R1c_public_demo_video_url": bool(external.get("demo_video_url")),
         "R2_genai_method_and_failure_modes": (
             exists("pipeline/bedrock_extract.py")
             and exists("pipeline/graph_validation.py")
@@ -82,7 +91,7 @@ def main() -> None:
     }
     mandatory_external = [
         "R1a_public_cloud_demo_url",
-        "R1b_five_minute_video",
+        "R1c_public_demo_video_url",
         "R5a_actual_aws_deployment",
         "R6_public_github",
     ]
@@ -108,7 +117,8 @@ def main() -> None:
         ),
         "interpretation": (
             "Local evidence can be release-ready while the binding public "
-            "deployment, video, GitHub, and executed Bedrock graph remain incomplete."
+            "deployment, hosted video URL, GitHub, and executed Bedrock graph "
+            "remain incomplete."
         ),
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
