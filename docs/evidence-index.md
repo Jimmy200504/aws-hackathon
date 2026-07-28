@@ -23,7 +23,8 @@ Machine-readable completion status：`reports/submission-audit.json`。
 | Kiro +5% | `docs/kiro-evidence.md` | 可驗證 session，待評審認定 |
 | Reproducibility | `scripts/release_gate.sh`、GitHub Actions、`release-manifest.json` | 完成 |
 | Five-minute video artifact | `video/`、`reports/demo-video.json`、verifier G12 | 完成 |
-| Public AWS / GitHub / video URL | verifier G7 warnings | 未完成 |
+| Public GitHub + video URL | release manifest、verifier G7 | 完成 |
+| Public AWS URL | verifier G7 warning | 未完成 |
 
 ## 現場 90 秒證據路徑
 

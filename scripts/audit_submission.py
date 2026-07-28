@@ -105,6 +105,16 @@ def main() -> None:
     ]
     if not requirements["R2a_full_train_only_bedrock_graph_executed"]:
         blockers.append("R2a_full_train_only_bedrock_graph_executed")
+    blocker_labels = {
+        "R1a_public_cloud_demo_url": "public cloud demo URL",
+        "R1c_public_demo_video_url": "hosted video URL",
+        "R5a_actual_aws_deployment": "actual AWS deployment",
+        "R6_public_github": "public GitHub release",
+        "R2a_full_train_only_bedrock_graph_executed": (
+            "executed train-only Bedrock graph"
+        ),
+    }
+    remaining = ", ".join(blocker_labels[name] for name in blockers)
     report = {
         "metadata": {
             "schema": "skillweave-submission-audit-v1",
@@ -121,9 +131,9 @@ def main() -> None:
             else "Locked NDCG@10 lift is positive but below the recommended 5%."
         ),
         "interpretation": (
-            "Local evidence can be release-ready while the binding public "
-            "deployment, hosted video URL, GitHub, and executed Bedrock graph "
-            "remain incomplete."
+            f"Local release evidence is complete; remaining blockers: {remaining}."
+            if blockers
+            else "All binding submission requirements are complete."
         ),
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)

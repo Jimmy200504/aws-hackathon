@@ -68,7 +68,7 @@ substring、temporal cutoff、type whitelist 與 confidence gate 的邊才能發
 | Relevant-row graph coverage | 40.53% | Coverage 是下一個瓶頸 |
 | Gate-active subgroup | 285 queries；NDCG +11.41% | Post-hoc，不能取代整體 |
 | 七日規模換算 | 約 40,050 次額外 Top-1 relevance events | 非 conversion、apply、hire 或營收 |
-| Release verifier | 60 PASS / 0 FAIL / 3 WARN | WARN 僅代表尚未登錄的外部 URL |
+| Release verifier | 62 PASS / 0 FAIL / 1 WARN | WARN 僅代表尚未登錄的外部 URL |
 
 ## 商業應用
 
@@ -88,8 +88,8 @@ gap。目前沒有因果轉換或單次相關曝光的貨幣價值，因此**不
 ## 公開交付 URL
 
 - AWS Demo：**PENDING — 不可填 placeholder**
-- GitHub Release：**PENDING — 不可填 placeholder**
-- 5 分鐘影片：**PENDING — 不可填 placeholder**
+- GitHub Release：https://github.com/Jimmy200504/aws-hackathon/releases/tag/skillweave-2026.07.28-rc6
+- 5 分鐘影片：https://github.com/Jimmy200504/aws-hackathon/releases/download/skillweave-2026.07.28-rc6/skillweave-demo-5min.mp4
 
 本機影片證據：300.046 秒、1080p H.264、AAC、
 繁中字幕；SHA-256 `2c7ee08c5851ac8e3673d7f94d7116108846515edaa4ad47188d56cf17f8509a`。

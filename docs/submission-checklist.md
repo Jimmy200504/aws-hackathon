@@ -5,7 +5,7 @@
 - [x] 本機 Live Demo：完整搜尋路徑
 - [ ] AWS 上可公開存取的 Demo URL
 - [x] 5 分鐘繁中錄影 artifact（1080p、語音、內嵌字幕、SHA-256）
-- [ ] 公開可觀看的 Demo video URL
+- [x] 公開可觀看的 Demo video URL
 - [x] 生成式 AI 方法與設計依據文件
 - [x] 已知 LLM 失敗模式與防護
 - [x] 數據與資料應用說明
@@ -14,7 +14,7 @@
 - [x] 至少一個 traversal / aggregation trace
 - [x] AWS 部署架構圖
 - [ ] 實際 AWS 部署驗證
-- [ ] 公開 GitHub URL
+- [x] 公開 GitHub URL
 - [x] 環境設定
 - [x] 執行範例
 - [x] Benchmark 重現步驟

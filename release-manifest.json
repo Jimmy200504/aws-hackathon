@@ -42,13 +42,13 @@
     "reports/business-impact.json": "e994f190628bf4bc342271d32adb64af31766b6445c62c97c32331171556c10d",
     "reports/sam-local-smoke.json": "5845e045527302c9b79b7fc656fd875db87096a974dd70b39623e295edeec801",
     "reports/demo-video.json": "4d174b4e3904e5bce5de12f7d48bb8e18efeef310ab1d8cf19504adc2230ad45",
-    "reports/submission-audit.json": "d3260dba51263d722eee3f986006a1cb74cdcd985010f7ab2c98d7e681a6c30e",
+    "reports/submission-audit.json": "ad63f4fbdb3a3c265194fd5de07b6c3f8c676f19418e1cbad80c90bcba81644b",
     "reports/load-smoke.json": "d476cafd0e62204c488495bc3f4ecdcd685b7ac10c9a6b6d89e5df1399d5c89c",
-    "docs/submission-packet.md": "fcb6b592ffde65e87c0e2933536b66971a8bcf04dc100111e6ab2f80188f8c68"
+    "docs/submission-packet.md": "44c7f5cd6d1d6757be3dd3c9bbe0245d55a53b725a9be4e7304e6ff752142c75"
   },
   "external_deliverables": {
     "aws_url": null,
-    "github_url": null,
-    "demo_video_url": null
+    "github_url": "https://github.com/Jimmy200504/aws-hackathon/releases/tag/skillweave-2026.07.28-rc6",
+    "demo_video_url": "https://github.com/Jimmy200504/aws-hackathon/releases/download/skillweave-2026.07.28-rc6/skillweave-demo-5min.mp4"
   }
 }

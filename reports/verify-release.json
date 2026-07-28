@@ -1,13 +1,13 @@
 {
   "verifier_version": "1",
-  "verified_at_utc": "2026-07-28T14:06:25Z",
+  "verified_at_utc": "2026-07-28T16:06:00Z",
   "release": "skillweave-2026.07.28-rc6",
   "passed": true,
   "summary": {
     "total": 63,
-    "passed": 60,
+    "passed": 62,
     "failed": 0,
-    "warnings": 3
+    "warnings": 1
   },
   "groups": {
     "G1_api_contract": {
@@ -375,13 +375,13 @@
         },
         {
           "id": "G7.7",
-          "status": "WARN",
-          "message": "External deliverable github_url is still null."
+          "status": "PASS",
+          "message": "External deliverable github_url is a public HTTPS URL."
         },
         {
           "id": "G7.8",
-          "status": "WARN",
-          "message": "External deliverable demo_video_url is still null."
+          "status": "PASS",
+          "message": "External deliverable demo_video_url is a public HTTPS URL."
         }
       ]
     }

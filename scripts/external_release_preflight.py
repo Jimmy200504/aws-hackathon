@@ -98,6 +98,11 @@ def main() -> int:
     tracked = command(["git", "ls-files"])
     sensitive = tracked_sensitive_paths(tracked.stdout.splitlines())
     external = manifest.get("external_deliverables", {})
+    aws_action_needed = not external.get("aws_url")
+    github_action_needed = (
+        not external.get("github_url")
+        or not external.get("demo_video_url")
+    )
 
     checks = {
         "required_tools": all(tools.values()),
@@ -119,17 +124,17 @@ def main() -> int:
         and not sensitive,
     }
     actions: list[str] = []
-    if not checks["aws_authenticated"]:
+    if aws_action_needed and not checks["aws_authenticated"]:
         actions.append("Authenticate AWS: aws login (or aws configure sso).")
-    if not checks["github_authenticated"]:
+    if github_action_needed and not checks["github_authenticated"]:
         actions.append("Authenticate GitHub: gh auth login.")
-    if origin.returncode != 0:
+    if github_action_needed and origin.returncode != 0:
         actions.append(
             "Choose OWNER/REPO; after review, create the public GitHub repository."
         )
-    if not external.get("aws_url"):
+    if aws_action_needed:
         actions.append("Deploy: ./scripts/deploy_compact_aws.sh")
-    if not external.get("github_url") or not external.get("demo_video_url"):
+    if github_action_needed:
         actions.append(
             "Publish the RC tag and MP4 as a public GitHub release, then register both URLs."
         )
@@ -148,7 +153,23 @@ def main() -> int:
     report = {
         "schema": "skillweave-external-release-preflight-v1",
         "release": release,
-        "ready_for_external_actions": all(checks.values()),
+        "ready_for_external_actions": (
+            all(
+                checks[name]
+                for name in (
+                    "required_tools",
+                    "worktree_clean",
+                    "release_tag_at_head",
+                    "video_present_and_hashed",
+                    "no_sensitive_data_tracked",
+                )
+            )
+            and (checks["aws_authenticated"] or not aws_action_needed)
+            and (
+                checks["github_authenticated"]
+                or not github_action_needed
+            )
+        ),
         "external_urls_complete": all(
             external.get(name)
             for name in ("aws_url", "github_url", "demo_video_url")
