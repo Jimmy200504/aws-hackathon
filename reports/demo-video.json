@@ -1,9 +1,9 @@
 {
   "metadata": {
     "schema": "skillweave-demo-video-v1",
-    "generated_at_utc": "2026-07-28T13:56:01Z",
+    "generated_at_utc": "2026-07-28T14:03:18Z",
     "language": "zh-TW",
-    "release": "skillweave-2026.07.28-rc5"
+    "release": "skillweave-2026.07.28-rc6"
   },
   "passed": true,
   "checks": {
@@ -18,8 +18,8 @@
     "path": "dist/skillweave-demo-5min.mp4",
     "subtitle_sidecar": "dist/skillweave-demo-5min.zh-TW.srt",
     "duration_seconds": 300.04644,
-    "size_bytes": 7520383,
-    "sha256": "f316f546f3cbf30ee20b3091ba5ed4caff522ce5940718ef208af8bff7deb900"
+    "size_bytes": 7520385,
+    "sha256": "2c7ee08c5851ac8e3673d7f94d7116108846515edaa4ad47188d56cf17f8509a"
   },
   "external_url_registered": false
 }

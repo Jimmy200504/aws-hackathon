@@ -1,7 +1,7 @@
 {
   "verifier_version": "1",
-  "verified_at_utc": "2026-07-28T13:58:09Z",
-  "release": "skillweave-2026.07.28-rc5",
+  "verified_at_utc": "2026-07-28T14:06:25Z",
+  "release": "skillweave-2026.07.28-rc6",
   "passed": true,
   "summary": {
     "total": 63,
@@ -356,7 +356,7 @@
         {
           "id": "G7.3",
           "status": "PASS",
-          "message": "Verified 13 artifact hashes."
+          "message": "Verified 14 artifact hashes."
         },
         {
           "id": "G7.4",

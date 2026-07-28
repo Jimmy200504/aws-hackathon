@@ -552,6 +552,7 @@ class ReleaseVerifier:
             "E5_api_contract_verified",
             "B1_business_case_and_ab_design",
             "K1_kiro_activity_evidence",
+            "S1_copy_ready_submission_packet",
         }
         conditions = [
             (
@@ -714,6 +715,8 @@ class ReleaseVerifier:
             "docs/kiro-evidence.md",
             "docs/deployment.md",
             "docs/submission-checklist.md",
+            "docs/submission-packet.md",
+            "scripts/build_submission_packet.py",
             "scripts/external_release_preflight.py",
             "infra/template.yaml",
         ]

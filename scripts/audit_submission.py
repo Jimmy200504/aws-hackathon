@@ -89,6 +89,10 @@ def main() -> None:
             is True
         ),
         "K1_kiro_activity_evidence": exists("docs/kiro-evidence.md"),
+        "S1_copy_ready_submission_packet": (
+            exists("docs/submission-packet.md")
+            and exists("scripts/build_submission_packet.py")
+        ),
     }
     mandatory_external = [
         "R1a_public_cloud_demo_url",

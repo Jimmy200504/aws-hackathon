@@ -1,7 +1,7 @@
 {
   "metadata": {
     "schema": "skillweave-submission-audit-v1",
-    "release": "skillweave-2026.07.28-rc5",
+    "release": "skillweave-2026.07.28-rc6",
     "source": "binding brief + workshop contract + current release evidence"
   },
   "local_release_evidence_passed": true,
@@ -25,7 +25,8 @@
     "E4_position_bias_status_reported": true,
     "E5_api_contract_verified": true,
     "B1_business_case_and_ab_design": true,
-    "K1_kiro_activity_evidence": true
+    "K1_kiro_activity_evidence": true,
+    "S1_copy_ready_submission_packet": true
   },
   "blockers": [
     "R1a_public_cloud_demo_url",

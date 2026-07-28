@@ -62,6 +62,11 @@ def main() -> None:
     )
     print(json.dumps(external, ensure_ascii=False, indent=2))
     subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "build_submission_packet.py")],
+        cwd=ROOT,
+        check=True,
+    )
+    subprocess.run(
         [sys.executable, str(ROOT / "scripts" / "audit_submission.py")],
         cwd=ROOT,
         check=True,

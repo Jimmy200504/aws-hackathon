@@ -102,11 +102,11 @@ SHA-256，避免 URL 已完成但 audit 仍顯示舊 blocker。
 
 ```bash
 gh repo create OWNER/REPO --public --source=. --remote=origin --push
-git push origin skillweave-2026.07.28-rc5
-gh release create skillweave-2026.07.28-rc5 \
+git push origin skillweave-2026.07.28-rc6
+gh release create skillweave-2026.07.28-rc6 \
   dist/skillweave-demo-5min.mp4 \
   --repo OWNER/REPO \
-  --title "SkillWeave RC5" \
+  --title "SkillWeave RC6" \
   --notes "Verified AWS hackathon judge release."
 ```
 
@@ -114,8 +114,8 @@ GitHub release asset 同時作為公開影片 URL：
 
 ```bash
 python3 scripts/update_release_urls.py \
-  --github-url "https://github.com/OWNER/REPO/releases/tag/skillweave-2026.07.28-rc5" \
-  --demo-video-url "https://github.com/OWNER/REPO/releases/download/skillweave-2026.07.28-rc5/skillweave-demo-5min.mp4"
+  --github-url "https://github.com/OWNER/REPO/releases/tag/skillweave-2026.07.28-rc6" \
+  --demo-video-url "https://github.com/OWNER/REPO/releases/download/skillweave-2026.07.28-rc6/skillweave-demo-5min.mp4"
 ```
 
 接著執行 AWS deploy。三個 URL 都通過 clean-session smoke 後，將更新後的
