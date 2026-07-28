@@ -13,6 +13,15 @@
 `2.96.0`。工具已就緒，但 release manifest 不會把「已安裝」誤寫成「已登入／
 已部署」。
 
+先用唯讀 preflight 檢查 credentials、release tag、影片 hash、Git remote 與
+敏感資料：
+
+```bash
+python3 scripts/external_release_preflight.py
+# 登入後需要把未通過狀態視為錯誤時：
+python3 scripts/external_release_preflight.py --require-ready
+```
+
 ## Package
 
 ```bash
@@ -83,6 +92,34 @@ python3 scripts/update_release_urls.py \
   --demo-video-url "https://VIDEO_HOST/VIDEO_ID"
 python3 scripts/verify_release.py
 ```
+
+`update_release_urls.py` 會同步重建 submission audit 與它在 manifest 內的
+SHA-256，避免 URL 已完成但 audit 仍顯示舊 blocker。
+
+## Public GitHub release + video
+
+確認原始競賽 CSV 與 PDF 沒有被 Git tracked 後，以選定的 `OWNER/REPO` 發布：
+
+```bash
+gh repo create OWNER/REPO --public --source=. --remote=origin --push
+git push origin skillweave-2026.07.28-rc5
+gh release create skillweave-2026.07.28-rc5 \
+  dist/skillweave-demo-5min.mp4 \
+  --repo OWNER/REPO \
+  --title "SkillWeave RC5" \
+  --notes "Verified AWS hackathon judge release."
+```
+
+GitHub release asset 同時作為公開影片 URL：
+
+```bash
+python3 scripts/update_release_urls.py \
+  --github-url "https://github.com/OWNER/REPO/releases/tag/skillweave-2026.07.28-rc5" \
+  --demo-video-url "https://github.com/OWNER/REPO/releases/download/skillweave-2026.07.28-rc5/skillweave-demo-5min.mp4"
+```
+
+接著執行 AWS deploy。三個 URL 都通過 clean-session smoke 後，將更新後的
+manifest、audit 與 verifier report commit 並 push 到 `main`。
 
 ## External smoke
 

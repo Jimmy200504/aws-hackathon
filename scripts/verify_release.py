@@ -522,13 +522,22 @@ class ReleaseVerifier:
         metadata = report.get("metadata", {})
         requirements = report.get("requirements", {})
         blockers = set(report.get("blockers", []))
-        required_blockers = {
+        mandatory = {
             "R1a_public_cloud_demo_url",
             "R1c_public_demo_video_url",
             "R5a_actual_aws_deployment",
             "R6_public_github",
-            "R2a_full_train_only_bedrock_graph_executed",
         }
+        expected_blockers = {
+            name for name in mandatory if requirements.get(name) is not True
+        }
+        if (
+            requirements.get("R2a_full_train_only_bedrock_graph_executed")
+            is not True
+        ):
+            expected_blockers.add(
+                "R2a_full_train_only_bedrock_graph_executed"
+            )
         local_required = {
             "R1_local_live_demo",
             "R1b_five_minute_video_artifact",
@@ -560,10 +569,11 @@ class ReleaseVerifier:
             ),
             (
                 "G11.3",
-                report.get("submission_ready") is False
-                and required_blockers.issubset(blockers),
-                "Submission audit preserves all unresolved binding blockers.",
-                "Submission audit overclaims final readiness.",
+                report.get("submission_ready")
+                == (not bool(expected_blockers))
+                and blockers == expected_blockers,
+                "Submission readiness and blockers match current requirements.",
+                "Submission audit is stale or overclaims final readiness.",
             ),
             (
                 "G11.4",
@@ -704,6 +714,7 @@ class ReleaseVerifier:
             "docs/kiro-evidence.md",
             "docs/deployment.md",
             "docs/submission-checklist.md",
+            "scripts/external_release_preflight.py",
             "infra/template.yaml",
         ]
         missing = [item for item in required if not (self.root / item).is_file()]

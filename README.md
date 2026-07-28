@@ -303,6 +303,7 @@ scripts/run_ltr_ablation.sh
 scripts/report_graph_coverage.py
 scripts/verify_release.py    release evidence audit
 scripts/render_demo_video.py reproducible 5-minute judge video
+scripts/external_release_preflight.py credentials/tag/privacy preflight
 tests/                     contract / leakage / ranking invariants
 docs/                      graph、GenAI、AWS、data card、提交稽核
 video/                     tracked deck、narration、captions

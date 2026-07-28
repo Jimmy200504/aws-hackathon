@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
+import sys
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -59,6 +61,11 @@ def main() -> None:
         encoding="utf-8",
     )
     print(json.dumps(external, ensure_ascii=False, indent=2))
+    subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "audit_submission.py")],
+        cwd=ROOT,
+        check=True,
+    )
 
 
 if __name__ == "__main__":

@@ -67,7 +67,7 @@ weight + evidence + edge type
 
 > SkillWeave 讓生成式 AI 成為可量測、可消融、可追溯的索引資產；如果移除圖譜不會退化，我們就不宣稱它有價值。
 
-畫面停在 RC4 release 狀態與誠實的 5% gate。公開 AWS、GitHub 與影片 URL
+畫面停在 RC5 release 狀態與誠實的 5% gate。公開 AWS、GitHub 與影片 URL
 尚未產生，因此影片不顯示 placeholder 或假 QR code。
 
 ## 可重現影片

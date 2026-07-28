@@ -1,7 +1,7 @@
 {
   "metadata": {
     "schema": "skillweave-submission-audit-v1",
-    "release": "skillweave-2026.07.28-rc4",
+    "release": "skillweave-2026.07.28-rc5",
     "source": "binding brief + workshop contract + current release evidence"
   },
   "local_release_evidence_passed": true,

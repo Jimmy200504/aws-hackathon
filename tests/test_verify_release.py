@@ -265,6 +265,56 @@ class ReleaseVerifierIntegrityTests(unittest.TestCase):
             "FAIL",
         )
 
+    def test_submission_audit_accepts_only_current_blockers(self) -> None:
+        requirements = {
+            name: True
+            for name in (
+                "R1_local_live_demo",
+                "R1a_public_cloud_demo_url",
+                "R1b_five_minute_video_artifact",
+                "R1c_public_demo_video_url",
+                "R2_genai_method_and_failure_modes",
+                "R3_data_application_explained",
+                "R4_system_graph_schema_and_trace",
+                "R5_aws_architecture",
+                "R5a_actual_aws_deployment",
+                "R6_public_github",
+                "R6a_reproducible_source_and_ablation",
+                "E1_quantifiable_ndcg_improvement",
+                "E3_hit1_and_hit10_reported",
+                "E4_position_bias_status_reported",
+                "E5_api_contract_verified",
+                "B1_business_case_and_ab_design",
+                "K1_kiro_activity_evidence",
+            )
+        }
+        requirements.update(
+            {
+                "R2a_full_train_only_bedrock_graph_executed": False,
+                "E2_recommended_five_percent_lift": False,
+            }
+        )
+        verifier = ReleaseVerifier()
+        verifier.check_submission_audit(
+            {
+                "metadata": {"schema": "skillweave-submission-audit-v1"},
+                "local_release_evidence_passed": True,
+                "submission_ready": False,
+                "requirements": requirements,
+                "blockers": [
+                    "R2a_full_train_only_bedrock_graph_executed"
+                ],
+            }
+        )
+        self.assertTrue(
+            all(
+                status == "PASS"
+                for status in self.checks(
+                    verifier, "G11_submission_audit"
+                ).values()
+            )
+        )
+
     def test_manifest_hash_mismatch_is_detected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

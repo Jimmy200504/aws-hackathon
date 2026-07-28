@@ -305,7 +305,7 @@ def main() -> None:
             .isoformat()
             .replace("+00:00", "Z"),
             "language": "zh-TW",
-            "release": "skillweave-2026.07.28-rc4",
+            "release": "skillweave-2026.07.28-rc5",
         },
         "passed": all(checks.values()),
         "checks": checks,

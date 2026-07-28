@@ -1,5 +1,5 @@
 {
-  "release": "skillweave-2026.07.28-rc4",
+  "release": "skillweave-2026.07.28-rc5",
   "status": "local_release_candidate",
   "random_seed": 1111,
   "dataset_version": "1111-2026-06-01_2026-06-07",
@@ -24,12 +24,15 @@
   "confirmation": {
     "queries": 1993,
     "ndcg_at_10_relative_lift": 0.013447251090391354,
-    "paired_ci95": [0.002264541892583815, 0.009054346875994488],
+    "paired_ci95": [
+      0.002264541892583815,
+      0.009054346875994488
+    ],
     "aspirational_five_percent_gate_passed": false
   },
   "sha256": {
     "dist/skillweave-lambda.zip": "47da18fd589059b285374b4f7bd3f484349abe3348f9ef155273f5169003aaba",
-    "dist/skillweave-demo-5min.mp4": "9dde00612194ffbda94ebd70bab568f8a92cd8003a6999b5525e3a5718964c32",
+    "dist/skillweave-demo-5min.mp4": "f316f546f3cbf30ee20b3091ba5ed4caff522ce5940718ef208af8bff7deb900",
     "artifacts/models/ltr-graph-final.ubj": "d90693ac66358b847ba74cfb4dd0b1f3a4895fd28ecb061563d107f89ca1366e",
     "artifacts/models/ltr-graph-final.manifest.json": "f857cb7f05afbbaa7498a4f687a8fccce6d773074f1fd2870544fb1acf053f26",
     "artifacts/demo-index.json": "c5353f934b5c34bef021ab5541acddd617190f0755fdbf4524c4d8dbbb6c84f0",
@@ -38,8 +41,8 @@
     "reports/graph-coverage.json": "13246d0dea3240cef6196a3f40fab7c5e28d479420b0a62e183ec0c6d0d8a808",
     "reports/business-impact.json": "e994f190628bf4bc342271d32adb64af31766b6445c62c97c32331171556c10d",
     "reports/sam-local-smoke.json": "5845e045527302c9b79b7fc656fd875db87096a974dd70b39623e295edeec801",
-    "reports/demo-video.json": "590d3912ffe2b9ce7bdb3b70bb69881955e6b3eb27c610f851a7dc1f0556d54b",
-    "reports/submission-audit.json": "2ded51f87eac07bc629e593c3d073e437fd3468009d237085ea4958a8c694ef1",
+    "reports/demo-video.json": "dc1dacb4d9e295931678a6b1405080210397cbdcf1a31ef71d8ccdc2b3be553d",
+    "reports/submission-audit.json": "bfa245e189e2cfdb0cf737728a3dde1da2ea55008ab82492538062e414d57c14",
     "reports/load-smoke.json": "d476cafd0e62204c488495bc3f4ecdcd685b7ac10c9a6b6d89e5df1399d5c89c"
   },
   "external_deliverables": {
