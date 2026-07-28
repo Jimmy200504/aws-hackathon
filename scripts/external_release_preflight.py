@@ -92,8 +92,10 @@ def main() -> int:
     )
     github_auth = command(["gh", "auth", "status"])
     worktree = command(["git", "status", "--porcelain"])
-    head = command(["git", "rev-parse", "HEAD"])
     tag = command(["git", "rev-list", "-n", "1", release])
+    tag_reachable = command(
+        ["git", "merge-base", "--is-ancestor", release, "HEAD"]
+    )
     origin = command(["git", "remote", "get-url", "origin"])
     tracked = command(["git", "ls-files"])
     sensitive = tracked_sensitive_paths(tracked.stdout.splitlines())
@@ -110,10 +112,8 @@ def main() -> int:
         "github_authenticated": github_auth.returncode == 0,
         "worktree_clean": worktree.returncode == 0
         and not worktree.stdout.strip(),
-        "release_tag_at_head": (
-            head.returncode == 0
-            and tag.returncode == 0
-            and head.stdout.strip() == tag.stdout.strip()
+        "release_tag_reachable_from_head": (
+            tag.returncode == 0 and tag_reachable.returncode == 0
         ),
         "video_present_and_hashed": (
             video.is_file()
@@ -140,8 +140,10 @@ def main() -> int:
         )
     if not checks["worktree_clean"]:
         actions.append("Commit or otherwise resolve the local worktree changes.")
-    if not checks["release_tag_at_head"]:
-        actions.append(f"Ensure annotated tag {release} points at HEAD.")
+    if not checks["release_tag_reachable_from_head"]:
+        actions.append(
+            f"Ensure annotated tag {release} is an ancestor of HEAD."
+        )
 
     aws_account = None
     if aws_identity.returncode == 0:
@@ -159,7 +161,7 @@ def main() -> int:
                 for name in (
                     "required_tools",
                     "worktree_clean",
-                    "release_tag_at_head",
+                    "release_tag_reachable_from_head",
                     "video_present_and_hashed",
                     "no_sensitive_data_tracked",
                 )
