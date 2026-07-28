@@ -1,0 +1,30 @@
+{
+  "framework": "SageMaker AI XGBoost",
+  "framework_version": "3.0-5",
+  "objective": "rank:ndcg",
+  "eval_metric": "ndcg@10",
+  "random_seed": 1111,
+  "selected_hyperparameters": {
+    "n_estimators": 20,
+    "max_depth": 2,
+    "learning_rate": 0.1,
+    "min_child_weight": 8,
+    "subsample": 0.8,
+    "colsample_bytree": 0.82
+  },
+  "position_bias_correction": {
+    "method": "Unbiased LambdaMART",
+    "lambdarank_unbiased": true,
+    "pair_method": "topk",
+    "pairs_per_sample": 12
+  },
+  "selection_split": "2026-06-06",
+  "confirmation_split": {
+    "date": "2026-06-07",
+    "hash_bucket_start": 400,
+    "hash_bucket_end_exclusive": 1400,
+    "queries": 1993
+  },
+  "confidence_gate": "behavior_job_edge",
+  "selection_forbidden_on_confirmation": true
+}

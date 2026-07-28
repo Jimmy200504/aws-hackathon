@@ -1,0 +1,16 @@
+{
+  "environment": "local Docker, python:3.13.5-slim, 12,000-job scan artifact",
+  "date": "2026-07-28",
+  "request": {
+    "query": "行政助理",
+    "top_k": 10
+  },
+  "requests": 50,
+  "concurrency": 10,
+  "http_200": 50,
+  "top_10_responses": 50,
+  "median_ms": 1678.06,
+  "p95_ms": 1759.71,
+  "max_ms": 1771.29,
+  "interpretation": "Contract-safe under burst smoke; compact linear scan is for judging only. Production replaces it with OpenSearch retrieval and bounded Neptune/SageMaker calls."
+}

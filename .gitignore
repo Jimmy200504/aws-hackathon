@@ -1,0 +1,25 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.coverage
+
+# Organizer-provided data must not be published.
+data/dataset/*.csv
+docs/*.pdf
+
+# Rebuildable / potentially sensitive evaluation material.
+artifacts/benchmark-index.json
+artifacts/temporal-eval.json
+artifacts/ltr/
+artifacts/models/*
+!artifacts/models/ltr-graph-final.ubj
+!artifacts/models/ltr-graph-final.manifest.json
+
+# Local and deployment state.
+.env
+.aws-sam/
+cdk.out/
+dist/
+*.log

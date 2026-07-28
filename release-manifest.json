@@ -1,0 +1,39 @@
+{
+  "release": "skillweave-2026.07.28-rc1",
+  "status": "local_release_candidate",
+  "random_seed": 1111,
+  "dataset_version": "1111-2026-06-01_2026-06-07",
+  "schema_fingerprint": "105f60c88cdef8a3",
+  "graph_cutoff": "2026-06-05 23:59:59.999",
+  "demo_index_version": "demo-2026.06.05-v1",
+  "benchmark_index_version": "benchmark-2026.06.05-v1",
+  "graph_schema": "skillgraph-v1",
+  "model": {
+    "framework": "XGBoost 3.2.0",
+    "objective": "rank:ndcg",
+    "lambdarank_unbiased": true,
+    "n_estimators": 20,
+    "max_depth": 2,
+    "confidence_gate": "behavior_job_edge"
+  },
+  "confirmation": {
+    "queries": 1993,
+    "ndcg_at_10_relative_lift": 0.013447251090391354,
+    "paired_ci95": [0.002264541892583815, 0.009054346875994488],
+    "aspirational_five_percent_gate_passed": false
+  },
+  "sha256": {
+    "dist/skillweave-lambda.zip": "7c34abca2c5b780ed67417c67693f238fc52c33bd3030fa2d2d9017b37eff56d",
+    "artifacts/models/ltr-graph-final.ubj": "d90693ac66358b847ba74cfb4dd0b1f3a4895fd28ecb061563d107f89ca1366e",
+    "artifacts/models/ltr-graph-final.manifest.json": "f857cb7f05afbbaa7498a4f687a8fccce6d773074f1fd2870544fb1acf053f26",
+    "artifacts/demo-index.json": "c5353f934b5c34bef021ab5541acddd617190f0755fdbf4524c4d8dbbb6c84f0",
+    "reports/ltr-ablation-test.json": "76af3080dbb569860ada4e42fa72ab313bda450b6f54bc5a8e51c54d4e211daa",
+    "reports/ltr-ablation-holdout-1-failed.json": "a9bd07f7436c27bf3eb1140c788b265005e5cd4c599536b31674ce2135c2c1d9",
+    "reports/load-smoke.json": "d476cafd0e62204c488495bc3f4ecdcd685b7ac10c9a6b6d89e5df1399d5c89c"
+  },
+  "external_deliverables": {
+    "aws_url": null,
+    "github_url": null,
+    "demo_video_url": null
+  }
+}

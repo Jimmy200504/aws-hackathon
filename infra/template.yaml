@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: SkillWeave judge/demo API — compact serverless deployment
+
+Parameters:
+  StageName:
+    Type: String
+    Default: prod
+  ReservedConcurrency:
+    Type: Number
+    Default: 10
+    MinValue: 1
+    MaxValue: 100
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Architectures: [arm64]
+    MemorySize: 2048
+    Timeout: 10
+    Tracing: Active
+    Environment:
+      Variables:
+        INDEX_PATH: /var/task/artifacts/demo-index.json
+
+Resources:
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Ref StageName
+      CorsConfiguration:
+        AllowOrigins: ["*"]
+        AllowHeaders: ["content-type"]
+        AllowMethods: [GET, POST, OPTIONS]
+        MaxAge: 600
+      AccessLogSettings:
+        DestinationArn: !GetAtt ApiAccessLogs.Arn
+        Format: >-
+          {"requestId":"$context.requestId","routeKey":"$context.routeKey",
+          "status":"$context.status","responseLatency":"$context.responseLatency"}
+
+  ApiAccessLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 14
+
+  SearchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../dist/skillweave-lambda.zip
+      Handler: app.lambda_handler.handler
+      ReservedConcurrentExecutions: !Ref ReservedConcurrency
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        Root:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /
+            Method: ANY
+        Proxy:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /{proxy+}
+            Method: ANY
+
+  SearchFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${SearchFunction}
+      RetentionInDays: 14
+
+  SearchErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: SkillWeave Lambda errors
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref SearchFunction
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+
+Outputs:
+  DemoUrl:
+    Description: Public SkillWeave demo and judge API
+    Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${StageName}/
+  SearchEndpoint:
+    Description: Judge endpoint
+    Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${StageName}/api/v1/jobs/search

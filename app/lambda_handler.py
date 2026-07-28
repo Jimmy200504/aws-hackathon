@@ -1,0 +1,161 @@
+from __future__ import annotations
+
+import base64
+import json
+import mimetypes
+import os
+import time
+import uuid
+from pathlib import Path
+from typing import Any
+from urllib.parse import unquote
+
+from app.ranker import SkillWeaveRanker
+
+
+ROOT = Path(__file__).resolve().parents[1]
+WEB_ROOT = ROOT / "web"
+INDEX_PATH = Path(os.getenv("INDEX_PATH", ROOT / "artifacts" / "demo-index.json"))
+RANKER = SkillWeaveRanker(INDEX_PATH)
+
+
+def response(
+    status: int,
+    body: str | bytes | dict[str, Any],
+    content_type: str = "application/json; charset=utf-8",
+) -> dict[str, Any]:
+    if isinstance(body, dict):
+        payload = json.dumps(body, ensure_ascii=False, separators=(",", ":"))
+        encoded = False
+    elif isinstance(body, bytes):
+        payload = base64.b64encode(body).decode()
+        encoded = True
+    else:
+        payload = body
+        encoded = False
+    return {
+        "statusCode": status,
+        "headers": {
+            "content-type": content_type,
+            "cache-control": "no-store" if content_type.startswith("application/json") else "no-cache",
+            "x-content-type-options": "nosniff",
+            "content-security-policy": "default-src 'self'; style-src 'self' 'unsafe-inline'",
+        },
+        "isBase64Encoded": encoded,
+        "body": payload,
+    }
+
+
+def parse_body(event: dict[str, Any]) -> dict[str, Any]:
+    raw = event.get("body") or ""
+    if event.get("isBase64Encoded"):
+        raw = base64.b64decode(raw).decode()
+    value = json.loads(raw)
+    if not isinstance(value, dict):
+        raise ValueError("request body must be a JSON object")
+    return value
+
+
+def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
+    started = time.perf_counter()
+    body = parse_body(event)
+    query = body.get("query", body.get("ks", ""))
+    if not isinstance(query, str) or not query.strip():
+        return response(
+            400,
+            {
+                "error": {
+                    "code": "invalid_query",
+                    "message": "query (or ks) is required and must be non-empty",
+                }
+            },
+        )
+    location = body.get("location_code", body.get("c0"))
+    duty = body.get("duty_code", body.get("d0"))
+    include_graph = body.get("use_graph", True)
+    if not isinstance(include_graph, bool):
+        return response(
+            400, {"error": {"code": "invalid_request", "message": "use_graph must be boolean"}}
+        )
+    ranked = RANKER.search(
+        query,
+        location_code=location,
+        duty_code=duty,
+        top_k=body.get("top_k", 20),
+        include_graph=include_graph,
+    )
+    rows = ranked["results"]
+    payload: dict[str, Any] = {
+        "request_id": "req_" + uuid.uuid4().hex[:16],
+        "result": rows,
+        "empStr": ",".join(row["job_id"] for row in rows),
+        "meta": {
+            "count": len(rows),
+            "latency_ms": round((time.perf_counter() - started) * 1000, 2),
+            "graph_enabled": include_graph,
+            "resolved_skills": list(ranked["intent"].skills),
+            "index_version": RANKER.metadata.get("index_version"),
+        },
+    }
+    if trace:
+        payload["trace"] = [
+            {"job_id": row["job_id"], "rank": row["rank"], "paths": row["graph_trace"]}
+            for row in rows[:5]
+        ]
+    return response(200, payload)
+
+
+def static(path: str) -> dict[str, Any]:
+    relative = unquote(path).lstrip("/") or "index.html"
+    file_path = (WEB_ROOT / relative).resolve()
+    if WEB_ROOT.resolve() not in file_path.parents or not file_path.is_file():
+        file_path = WEB_ROOT / "index.html"
+    content_type = mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
+    if content_type.startswith("text/") or content_type == "application/javascript":
+        content_type += "; charset=utf-8"
+    payload = file_path.read_bytes()
+    if content_type.startswith("text/") or content_type.startswith("application/javascript"):
+        return response(200, payload.decode("utf-8"), content_type)
+    return response(200, payload, content_type)
+
+
+def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
+    request = event.get("requestContext", {}).get("http", {})
+    method = request.get("method", event.get("httpMethod", "GET"))
+    path = request.get("path", event.get("path", "/"))
+    try:
+        if method == "GET" and path == "/health":
+            return response(
+                200,
+                {
+                    "status": "ok",
+                    "service": "skillweave-search",
+                    "index_version": RANKER.metadata.get("index_version"),
+                    "jobs": len(RANKER.jobs),
+                },
+            )
+        if method == "GET" and path == "/api/v1/meta":
+            return response(
+                200,
+                {
+                    "metadata": RANKER.metadata,
+                    "job_count": len(RANKER.jobs),
+                    "skill_count": len(RANKER.skills),
+                },
+            )
+        if method == "POST" and path == "/api/v1/jobs/search":
+            return search(event)
+        if method == "POST" and path == "/api/v1/graph/trace":
+            return search(event, trace=True)
+        if method == "GET":
+            return static(path)
+        return response(404, {"error": {"code": "not_found", "message": "endpoint not found"}})
+    except (ValueError, TypeError, json.JSONDecodeError) as exc:
+        return response(
+            400, {"error": {"code": "invalid_request", "message": str(exc)}}
+        )
+    except Exception:
+        # Detailed exception is emitted to CloudWatch by the Lambda runtime.
+        return response(
+            500, {"error": {"code": "internal_error", "message": "search failed safely"}}
+        )

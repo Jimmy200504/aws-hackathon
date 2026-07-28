@@ -1,0 +1,1 @@
+"""SkillWeave search service."""

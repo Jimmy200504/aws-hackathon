@@ -1,0 +1,74 @@
+# 決賽提交稽核
+
+## 必交
+
+- [x] 本機 Live Demo：完整搜尋路徑
+- [ ] AWS 上可公開存取的 Demo URL
+- [ ] 5 分鐘中文或英文錄影
+- [x] 生成式 AI 方法與設計依據文件
+- [x] 已知 LLM 失敗模式與防護
+- [x] 數據與資料應用說明
+- [x] 系統功能說明
+- [x] Graph schema
+- [x] 至少一個 traversal / aggregation trace
+- [x] AWS 部署架構圖
+- [ ] 實際 AWS 部署驗證
+- [ ] 公開 GitHub URL
+- [x] 環境設定
+- [x] 執行範例
+- [x] Benchmark 重現步驟
+- [x] Random seed
+- [x] 資料／模型／索引版本
+- [x] Release manifest 與 artifact SHA-256
+- [x] 依賴鎖定策略（demo 無第三方 runtime dependency；container tag 固定）
+- [x] 有圖譜／無圖譜一鍵 ablation
+- [x] NDCG@10、MRR、Hit@1、Hit@10、Precision@10 報告
+- [x] Position bias correction 狀態明示
+
+## 尚未通過的品質 gate
+
+- [ ] Bedrock 完整 train-only graph 已產出
+- [ ] NDCG@10 相對 baseline ≥5%
+- [x] Paired CI 不支持明顯退化（confirmation CI 全為正）
+- [x] Unbiased LambdaMART 已訓練並保存 model manifest
+- [x] Gate/model 鎖定後的 disjoint confirmation holdout 已跑
+- [ ] 主辦方統一 evaluation script 已跑
+- [x] Compact container：50 requests / concurrency 10，50/50 HTTP 200，p95 1.76 s
+- [ ] AWS production p95 / timeout / concurrency 負載測試
+- [ ] OOV、新職缺、空結果、未知 code 測試
+- [ ] AWS URL 從外網 clean session 可開
+- [ ] API WAF 不會擋評審 burst
+- [ ] Demo video 內的 URL／版本與 release tag 相同
+
+## 決賽前 contract smoke
+
+```bash
+curl -i -X POST "$DEMO_URL/api/v1/jobs/search" \
+  -H 'content-type: application/json' \
+  -d '{"query":"後端工程師"}'
+
+curl -i -X POST "$DEMO_URL/api/v1/jobs/search" \
+  -H 'content-type: application/json' \
+  -d '{"query":"後端工程師","location_code":["100100"],"duty_code":["140200"]}'
+```
+
+人工確認：
+
+- HTTP 200
+- 至少 10 筆（資料有足夠結果時）
+- rank 1 起連續
+- job ID 皆存在職缺主檔
+- 無 duplicate
+- p95 合理
+- 未知 code 不造成 500
+- query only 可執行
+- 空 query 回明確 client error
+
+## 不可在簡報宣稱
+
+- 未經主辦 holdout 證實的「提升 ≥5%」
+- 只展示成功 confirmation、隱藏第一個失敗 holdout
+- bootstrap fixture 是 Bedrock 產物
+- 內部 30 分鐘 attribution 是正式 relevance ground truth
+- 尚未部署的 AWS URL／服務
+- 使用 Kiro 加分（除非有實際 activity／commit evidence）

@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools==75.1.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "skillweave"
+version = "0.1.0"
+description = "Evidence-grounded skill graph job search for AWS x 1111 Hackathon"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.setuptools.packages.find]
+include = ["app*", "pipeline*"]

@@ -1,0 +1,88 @@
+openapi: 3.1.0
+info:
+  title: SkillWeave Search API
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      operationId: health
+      responses:
+        "200":
+          description: Healthy service
+  /api/v1/jobs/search:
+    post:
+      operationId: searchJobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+      responses:
+        "200":
+          description: Ranked jobs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResponse"
+        "400":
+          description: Invalid request
+  /api/v1/graph/trace:
+    post:
+      operationId: traceSearch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+      responses:
+        "200":
+          description: Ranked jobs with top-five traversal traces
+components:
+  schemas:
+    SearchRequest:
+      type: object
+      additionalProperties: true
+      properties:
+        query:
+          type: string
+          minLength: 1
+        location_code:
+          type: array
+          items: { type: string }
+        duty_code:
+          type: array
+          items: { type: string }
+        top_k:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+        use_graph:
+          type: boolean
+          default: true
+      required: [query]
+    RankedJob:
+      type: object
+      required: [job_id, rank]
+      properties:
+        job_id: { type: string }
+        rank: { type: integer, minimum: 1 }
+        title: { type: string }
+        matched_skills:
+          type: array
+          items: { type: string }
+        graph_trace:
+          type: array
+          items: { type: object }
+    SearchResponse:
+      type: object
+      required: [request_id, result]
+      properties:
+        request_id: { type: string }
+        result:
+          type: array
+          items:
+            $ref: "#/components/schemas/RankedJob"
+        empStr: { type: string }

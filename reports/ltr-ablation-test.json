@@ -1,0 +1,121 @@
+{
+  "metadata": {
+    "schema": "skillweave-ltr-ablation-v1",
+    "split": "test",
+    "queries": 1993,
+    "random_seed": 1111,
+    "position_bias_correction": "XGBoost Unbiased LambdaMART",
+    "ablation_design": "same trained model; graph feature family zeroed at inference",
+    "confidence_gate": "behavior_job_edge",
+    "baseline_model": {
+      "model": "ltr-graph-final.ubj",
+      "objective": "rank:ndcg",
+      "eval_metric": "ndcg@10",
+      "lambdarank_unbiased": true,
+      "feature_set": "behavior_graph",
+      "features": [
+        "lexical",
+        "exact_title",
+        "title_phrase",
+        "category_phrase",
+        "description_phrase",
+        "query_unit_overlap",
+        "title_unit_overlap",
+        "location",
+        "duty",
+        "behavior",
+        "freshness",
+        "post_cutoff_jd",
+        "seed_graph_raw",
+        "seed_direct_match_count",
+        "seed_related_path_count",
+        "seed_job_skill_count",
+        "behavior_query_job_seen",
+        "behavior_query_job_positive_rate",
+        "behavior_query_job_grade_rate",
+        "behavior_query_job_exposures",
+        "behavior_query_skill_seen_count",
+        "behavior_query_skill_positive_rate",
+        "behavior_query_skill_grade_rate",
+        "behavior_query_skill_max_positive_rate"
+      ],
+      "random_seed": 1111,
+      "n_estimators": 20,
+      "max_depth": 2,
+      "learning_rate": 0.1,
+      "best_iteration": 19,
+      "xgboost_version": "3.2.0"
+    },
+    "graph_model": {
+      "model": "ltr-graph-final.ubj",
+      "objective": "rank:ndcg",
+      "eval_metric": "ndcg@10",
+      "lambdarank_unbiased": true,
+      "feature_set": "behavior_graph",
+      "features": [
+        "lexical",
+        "exact_title",
+        "title_phrase",
+        "category_phrase",
+        "description_phrase",
+        "query_unit_overlap",
+        "title_unit_overlap",
+        "location",
+        "duty",
+        "behavior",
+        "freshness",
+        "post_cutoff_jd",
+        "seed_graph_raw",
+        "seed_direct_match_count",
+        "seed_related_path_count",
+        "seed_job_skill_count",
+        "behavior_query_job_seen",
+        "behavior_query_job_positive_rate",
+        "behavior_query_job_grade_rate",
+        "behavior_query_job_exposures",
+        "behavior_query_skill_seen_count",
+        "behavior_query_skill_positive_rate",
+        "behavior_query_skill_grade_rate",
+        "behavior_query_skill_max_positive_rate"
+      ],
+      "random_seed": 1111,
+      "n_estimators": 20,
+      "max_depth": 2,
+      "learning_rate": 0.1,
+      "best_iteration": 19,
+      "xgboost_version": "3.2.0"
+    }
+  },
+  "baseline_no_graph": {
+    "ndcg@10": 0.41684481173587884,
+    "mrr": 0.40312621954618943,
+    "hit@1": 0.2413447064726543,
+    "hit@10": 0.8148519819367788,
+    "precision@10": 0.16031108881083794
+  },
+  "skill_graph": {
+    "ndcg@10": 0.4224502285850181,
+    "mrr": 0.4100568258746884,
+    "hit@1": 0.24786753637732062,
+    "hit@10": 0.8138484696437531,
+    "precision@10": 0.16246864024084295
+  },
+  "relative_lift": {
+    "ndcg@10": 0.013447251090391354,
+    "mrr": 0.017192149734891915,
+    "hit@1": 0.027027027027026973,
+    "hit@10": -0.0012315270935960854,
+    "precision@10": 0.013458528951486581
+  },
+  "paired_bootstrap_ndcg": {
+    "mean": 0.005605416849139232,
+    "ci95_low": 0.002264541892583815,
+    "ci95_high": 0.009054346875994488
+  },
+  "release_gates": {
+    "minimum_queries_100": true,
+    "ndcg_relative_lift_at_least_5pct": false,
+    "paired_ci_excludes_zero": true,
+    "theme_gate_passed": false
+  }
+}
