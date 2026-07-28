@@ -1,11 +1,11 @@
 {
   "verifier_version": "1",
-  "verified_at_utc": "2026-07-28T12:08:59Z",
-  "release": "skillweave-2026.07.28-rc2",
+  "verified_at_utc": "2026-07-28T13:10:37Z",
+  "release": "skillweave-2026.07.28-rc3",
   "passed": true,
   "summary": {
-    "total": 43,
-    "passed": 40,
+    "total": 57,
+    "passed": 54,
     "failed": 0,
     "warnings": 3
   },
@@ -42,6 +42,11 @@
           "id": "G1.6",
           "status": "PASS",
           "message": "Unknown filter codes degrade safely."
+        },
+        {
+          "id": "G1.7",
+          "status": "PASS",
+          "message": "Live graph toggle changes ranking with non-zero graph contribution."
         }
       ]
     },
@@ -220,6 +225,86 @@
         }
       ]
     },
+    "G9_business_impact": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G9.1",
+          "status": "PASS",
+          "message": "Business report is registered as a non-causal scale translation."
+        },
+        {
+          "id": "G9.2",
+          "status": "PASS",
+          "message": "Business report uses the documented data and confirmation populations."
+        },
+        {
+          "id": "G9.3",
+          "status": "PASS",
+          "message": "Top-1 scale translation is arithmetically consistent."
+        },
+        {
+          "id": "G9.4",
+          "status": "PASS",
+          "message": "Unsupported monetary value and revenue remain null."
+        },
+        {
+          "id": "G9.5",
+          "status": "PASS",
+          "message": "Business report carries an explicit causal/revenue guardrail."
+        }
+      ]
+    },
+    "G10_sam_local_smoke": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G10.1",
+          "status": "PASS",
+          "message": "SAM smoke used the deployment runtime and architecture."
+        },
+        {
+          "id": "G10.2",
+          "status": "PASS",
+          "message": "SAM validate, build, invoke, contract, and provenance checks passed."
+        },
+        {
+          "id": "G10.3",
+          "status": "PASS",
+          "message": "Packaged Lambda returned Top 10 with graph provenance."
+        },
+        {
+          "id": "G10.4",
+          "status": "PASS",
+          "message": "Local Lambda invocation completed below the 10-second timeout."
+        }
+      ]
+    },
+    "G11_submission_audit": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G11.1",
+          "status": "PASS",
+          "message": "Submission audit schema is registered."
+        },
+        {
+          "id": "G11.2",
+          "status": "PASS",
+          "message": "All locally achievable binding evidence is recorded complete."
+        },
+        {
+          "id": "G11.3",
+          "status": "PASS",
+          "message": "Submission audit preserves all unresolved binding blockers."
+        },
+        {
+          "id": "G11.4",
+          "status": "PASS",
+          "message": "Recommended 5% gap remains honestly false."
+        }
+      ]
+    },
     "G7_manifest_hashes": {
       "passed": true,
       "checks": [
@@ -236,7 +321,7 @@
         {
           "id": "G7.3",
           "status": "PASS",
-          "message": "Verified 8 artifact hashes."
+          "message": "Verified 11 artifact hashes."
         },
         {
           "id": "G7.4",

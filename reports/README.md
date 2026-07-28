@@ -8,6 +8,9 @@ Authoritative release evidence:
 - `load-smoke.json` — compact Docker API concurrency smoke.
 - `graph-coverage.json` — aggregate-only post-hoc coverage/subgroup diagnostic; never a replacement for the locked overall result.
 - `verify-release.json` — machine audit of contracts, cutoff, model, reports, hashes, and remaining external warnings.
+- `business-impact.json` — bounded scale translation from locked Hit@1 lift; explicitly not a causal conversion or revenue estimate.
+- `sam-local-smoke.json` — exact Lambda ZIP invoked through SAM's Python 3.13 arm64 runtime image.
+- `submission-audit.json` — binding-deliverable completion audit; intentionally false until external and Bedrock execution blockers are resolved.
 
 Development evidence, not release claims:
 

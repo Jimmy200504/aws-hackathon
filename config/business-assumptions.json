@@ -1,0 +1,8 @@
+{
+  "schema": "skillweave-business-assumptions-v1",
+  "measurement_window": "2026-06-01/2026-06-07",
+  "searches_in_window": 6139952,
+  "source": "organizer userSearchLog row count; docs/data-card.md",
+  "currency_value_per_incremental_top1": null,
+  "guardrail": "The scale translation is an offline relevance proxy, not causal conversions, applications, hires, or revenue."
+}

@@ -6,6 +6,7 @@ from pathlib import Path
 
 from scripts.verify_release import ReleaseVerifier
 from scripts.update_release_urls import validate_public_https_url
+from scripts.report_business_impact import build_report
 
 
 class ReleaseVerifierIntegrityTests(unittest.TestCase):
@@ -144,6 +145,126 @@ class ReleaseVerifierIntegrityTests(unittest.TestCase):
             "FAIL",
         )
 
+    def test_business_impact_is_bounded_and_has_no_revenue_claim(self) -> None:
+        report = build_report(
+            {
+                "measurement_window": "2026-06-01/2026-06-07",
+                "searches_in_window": 1000,
+                "currency_value_per_incremental_top1": None,
+                "guardrail": (
+                    "The scale translation is not causal and is not revenue."
+                ),
+            },
+            {
+                "metadata": {"queries": 1993},
+                "baseline_no_graph": {"hit@1": 0.20, "mrr": 0.30},
+                "skill_graph": {"hit@1": 0.25, "mrr": 0.35},
+            },
+        )
+        self.assertEqual(
+            report["scale_translation"][
+                "rounded_incremental_top1_relevance_events"
+            ],
+            50,
+        )
+        self.assertIsNone(report["financial_claim"]["estimated_revenue"])
+
+    def test_business_verifier_rejects_monetary_fabrication(self) -> None:
+        report = {
+            "metadata": {
+                "schema": "skillweave-business-impact-v1",
+                "analysis_status": "offline_scale_translation_not_causal",
+                "source_searches": 6_139_952,
+                "source_ablation_queries": 1993,
+            },
+            "observed_offline_metrics": {
+                "baseline_hit_at_1": 0.20,
+                "skill_graph_hit_at_1": 0.21,
+                "absolute_hit_at_1_lift": 0.01,
+            },
+            "scale_translation": {
+                "weekly_searches": 6_139_952,
+                "rounded_incremental_top1_relevance_events": 61_400,
+            },
+            "financial_claim": {
+                "currency_value_per_incremental_top1": 10,
+                "estimated_revenue": 614_000,
+            },
+            "guardrail": "This is not causal and is not revenue.",
+        }
+        verifier = ReleaseVerifier()
+        verifier.check_business_impact(report)
+        self.assertEqual(
+            self.checks(verifier, "G9_business_impact")["G9.4"],
+            "FAIL",
+        )
+
+    def test_sam_smoke_rejects_missing_provenance(self) -> None:
+        report = {
+            "metadata": {
+                "schema": "skillweave-sam-local-smoke-v1",
+                "runtime": "python3.13",
+                "architecture": "arm64",
+            },
+            "passed": True,
+            "checks": {
+                "sam_validate_lint": True,
+                "sam_build": True,
+                "sam_local_invoke": True,
+                "http_200": True,
+                "top_10": True,
+                "contiguous_ranks": True,
+                "unique_job_ids": True,
+                "index_version": True,
+                "graph_provenance": False,
+            },
+            "observed": {
+                "result_count": 10,
+                "graph_path_count": 0,
+                "duration_ms": 500,
+            },
+        }
+        verifier = ReleaseVerifier()
+        verifier.check_sam_local_smoke(report)
+        checks = self.checks(verifier, "G10_sam_local_smoke")
+        self.assertEqual(checks["G10.2"], "FAIL")
+        self.assertEqual(checks["G10.3"], "FAIL")
+
+    def test_submission_audit_rejects_false_readiness(self) -> None:
+        local = {
+            name: True
+            for name in (
+                "R1_local_live_demo",
+                "R2_genai_method_and_failure_modes",
+                "R3_data_application_explained",
+                "R4_system_graph_schema_and_trace",
+                "R5_aws_architecture",
+                "R6a_reproducible_source_and_ablation",
+                "E1_quantifiable_ndcg_improvement",
+                "E3_hit1_and_hit10_reported",
+                "E4_position_bias_status_reported",
+                "E5_api_contract_verified",
+                "B1_business_case_and_ab_design",
+                "K1_kiro_activity_evidence",
+            )
+        }
+        report = {
+            "metadata": {"schema": "skillweave-submission-audit-v1"},
+            "local_release_evidence_passed": True,
+            "submission_ready": True,
+            "requirements": {
+                **local,
+                "E2_recommended_five_percent_lift": False,
+            },
+            "blockers": [],
+        }
+        verifier = ReleaseVerifier()
+        verifier.check_submission_audit(report)
+        self.assertEqual(
+            self.checks(verifier, "G11_submission_audit")["G11.3"],
+            "FAIL",
+        )
+
     def test_manifest_hash_mismatch_is_detected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -167,6 +288,9 @@ class ReleaseVerifierIntegrityTests(unittest.TestCase):
                 "docs/openapi.yaml",
                 "docs/graph-schema.md",
                 "docs/graph-coverage.md",
+                "docs/business-case.md",
+                "docs/judge-pitch.md",
+                "docs/evidence-index.md",
                 "docs/aws-architecture.md",
                 "docs/genai-safety.md",
                 "docs/kiro-evidence.md",

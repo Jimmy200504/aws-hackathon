@@ -73,7 +73,7 @@ class SkillWeaveRanker:
     """
 
     def __init__(
-        self, artifact_path: str | Path, graph_novelty_threshold: float = 1.0
+        self, artifact_path: str | Path, graph_novelty_threshold: float = 10.0
     ):
         self.artifact_path = Path(artifact_path)
         self.graph_novelty_threshold = max(0.1, float(graph_novelty_threshold))

@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "schema": "skillweave-submission-audit-v1",
+    "release": "skillweave-2026.07.28-rc3",
+    "source": "binding brief + workshop contract + current release evidence"
+  },
+  "local_release_evidence_passed": true,
+  "submission_ready": false,
+  "requirements": {
+    "R1_local_live_demo": true,
+    "R1a_public_cloud_demo_url": false,
+    "R1b_five_minute_video": false,
+    "R2_genai_method_and_failure_modes": true,
+    "R2a_full_train_only_bedrock_graph_executed": false,
+    "R3_data_application_explained": true,
+    "R4_system_graph_schema_and_trace": true,
+    "R5_aws_architecture": true,
+    "R5a_actual_aws_deployment": false,
+    "R6_public_github": false,
+    "R6a_reproducible_source_and_ablation": true,
+    "E1_quantifiable_ndcg_improvement": true,
+    "E2_recommended_five_percent_lift": false,
+    "E3_hit1_and_hit10_reported": true,
+    "E4_position_bias_status_reported": true,
+    "E5_api_contract_verified": true,
+    "B1_business_case_and_ab_design": true,
+    "K1_kiro_activity_evidence": true
+  },
+  "blockers": [
+    "R1a_public_cloud_demo_url",
+    "R1b_five_minute_video",
+    "R5a_actual_aws_deployment",
+    "R6_public_github",
+    "R2a_full_train_only_bedrock_graph_executed"
+  ],
+  "recommended_not_mandatory_gap": "Locked NDCG@10 lift is positive but below the recommended 5%.",
+  "interpretation": "Local evidence can be release-ready while the binding public deployment, video, GitHub, and executed Bedrock graph remain incomplete."
+}

@@ -9,6 +9,10 @@
 - AWS SAM CLI
 - region 支援 `python3.13` Lambda runtime
 
+本機已驗證工具版本：AWS CLI `2.36.9`、SAM CLI `1.164.0`、GitHub CLI
+`2.96.0`。工具已就緒，但 release manifest 不會把「已安裝」誤寫成「已登入／
+已部署」。
+
 ## Package
 
 ```bash
@@ -24,6 +28,15 @@ Package 只包含：
 - `artifacts/demo-index.json`
 
 不會把 3.8 GB 原始 CSV 上傳。
+
+本機以正式 Lambda Python 3.13 arm64 emulation image 驗證 bundle：
+
+```bash
+python3 scripts/run_sam_local_smoke.py
+```
+
+結果保存為 `reports/sam-local-smoke.json`，並檢查 HTTP 200、Top 10、rank
+連續、job ID 去重、index version 與 graph provenance。
 
 ## Validate and deploy
 

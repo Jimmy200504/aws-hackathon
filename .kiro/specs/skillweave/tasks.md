@@ -15,6 +15,7 @@
 - [x] Freeze and evaluate a disjoint confirmation holdout; retain the earlier failed holdout.
 - [x] Kiro-review and implement a machine-verifiable release evidence audit.
 - [x] Add deterministic packaging, local release gate, deployment automation, and CI.
+- [x] Add business/A-B evidence and invoke the exact bundle through SAM runtime emulation.
 - [ ] Reach and verify NDCG@10 relative lift ≥5%.
 - [ ] Deploy AWS judge endpoint.
 - [x] Run compact-container p95/concurrency/timeout smoke tests.

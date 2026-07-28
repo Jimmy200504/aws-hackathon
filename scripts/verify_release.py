@@ -190,6 +190,47 @@ class ReleaseVerifier:
             "Unknown filter codes caused a request failure.",
         )
 
+        graph_on = handler(
+            self.lambda_event(
+                "POST",
+                "/api/v1/jobs/search",
+                {
+                    "query": "AWS Docker Kubernetes",
+                    "top_k": 10,
+                    "use_graph": True,
+                },
+            ),
+            None,
+        )
+        graph_off = handler(
+            self.lambda_event(
+                "POST",
+                "/api/v1/jobs/search",
+                {
+                    "query": "AWS Docker Kubernetes",
+                    "top_k": 10,
+                    "use_graph": False,
+                },
+            ),
+            None,
+        )
+        graph_on_rows = self.response_body(graph_on).get("result", [])
+        graph_off_rows = self.response_body(graph_off).get("result", [])
+        self.add(
+            group,
+            "G1.7",
+            (
+                [row.get("job_id") for row in graph_on_rows]
+                != [row.get("job_id") for row in graph_off_rows]
+                and any(
+                    float(row.get("features", {}).get("graph", 0.0)) > 0.0
+                    for row in graph_on_rows
+                )
+            ),
+            "Live graph toggle changes ranking with non-zero graph contribution.",
+            "Live graph toggle does not affect the compact ranking.",
+        )
+
         graph_group = "G2_graph_cutoff"
         manifest = self.load_json("release-manifest.json")
         self.add(
@@ -368,6 +409,171 @@ class ReleaseVerifier:
         for check_id, condition, success, failure in conditions:
             self.add(group, check_id, condition, success, failure)
 
+    def check_business_impact(self, report: dict[str, Any] | None = None) -> None:
+        group = "G9_business_impact"
+        report = report or self.load_json("reports/business-impact.json")
+        metadata = report.get("metadata", {})
+        observed = report.get("observed_offline_metrics", {})
+        scale = report.get("scale_translation", {})
+        financial = report.get("financial_claim", {})
+        searches = int(scale.get("weekly_searches", 0))
+        absolute_lift = float(observed.get("absolute_hit_at_1_lift", 0.0))
+        conditions = [
+            (
+                "G9.1",
+                metadata.get("schema") == "skillweave-business-impact-v1"
+                and metadata.get("analysis_status")
+                == "offline_scale_translation_not_causal",
+                "Business report is registered as a non-causal scale translation.",
+                "Business report is missing its non-causal analysis status.",
+            ),
+            (
+                "G9.2",
+                int(metadata.get("source_searches", 0)) == 6_139_952
+                and int(metadata.get("source_ablation_queries", 0)) == 1993,
+                "Business report uses the documented data and confirmation populations.",
+                "Business report populations differ from release evidence.",
+            ),
+            (
+                "G9.3",
+                abs(
+                    float(observed.get("skill_graph_hit_at_1", 0.0))
+                    - float(observed.get("baseline_hit_at_1", 0.0))
+                    - absolute_lift
+                )
+                < 1e-12
+                and int(scale.get("rounded_incremental_top1_relevance_events", -1))
+                == round(searches * absolute_lift),
+                "Top-1 scale translation is arithmetically consistent.",
+                "Top-1 scale translation is inconsistent.",
+            ),
+            (
+                "G9.4",
+                financial.get("currency_value_per_incremental_top1") is None
+                and financial.get("estimated_revenue") is None,
+                "Unsupported monetary value and revenue remain null.",
+                "Business report contains an unsupported monetary claim.",
+            ),
+            (
+                "G9.5",
+                "not causal" in str(report.get("guardrail", "")).lower()
+                and "revenue" in str(report.get("guardrail", "")).lower(),
+                "Business report carries an explicit causal/revenue guardrail.",
+                "Business report lacks its causal/revenue guardrail.",
+            ),
+        ]
+        for check_id, condition, success, failure in conditions:
+            self.add(group, check_id, condition, success, failure)
+
+    def check_sam_local_smoke(self, report: dict[str, Any] | None = None) -> None:
+        group = "G10_sam_local_smoke"
+        report = report or self.load_json("reports/sam-local-smoke.json")
+        metadata = report.get("metadata", {})
+        checks = report.get("checks", {})
+        observed = report.get("observed", {})
+        required = {
+            "sam_validate_lint",
+            "sam_build",
+            "sam_local_invoke",
+            "http_200",
+            "top_10",
+            "contiguous_ranks",
+            "unique_job_ids",
+            "index_version",
+            "graph_provenance",
+        }
+        conditions = [
+            (
+                "G10.1",
+                metadata.get("schema") == "skillweave-sam-local-smoke-v1"
+                and metadata.get("runtime") == "python3.13"
+                and metadata.get("architecture") == "arm64",
+                "SAM smoke used the deployment runtime and architecture.",
+                "SAM smoke runtime or architecture differs from the template.",
+            ),
+            (
+                "G10.2",
+                report.get("passed") is True
+                and required.issubset(checks)
+                and all(checks.get(name) is True for name in required),
+                "SAM validate, build, invoke, contract, and provenance checks passed.",
+                "SAM local smoke is incomplete or contains a failed check.",
+            ),
+            (
+                "G10.3",
+                int(observed.get("result_count", 0)) == 10
+                and int(observed.get("graph_path_count", 0)) > 0,
+                "Packaged Lambda returned Top 10 with graph provenance.",
+                "Packaged Lambda lacks Top 10 or graph provenance.",
+            ),
+            (
+                "G10.4",
+                0.0 < float(observed.get("duration_ms", 0.0)) < 10_000.0,
+                "Local Lambda invocation completed below the 10-second timeout.",
+                "Local Lambda invocation exceeded the configured timeout.",
+            ),
+        ]
+        for check_id, condition, success, failure in conditions:
+            self.add(group, check_id, condition, success, failure)
+
+    def check_submission_audit(self, report: dict[str, Any] | None = None) -> None:
+        group = "G11_submission_audit"
+        report = report or self.load_json("reports/submission-audit.json")
+        metadata = report.get("metadata", {})
+        requirements = report.get("requirements", {})
+        blockers = set(report.get("blockers", []))
+        required_blockers = {
+            "R1a_public_cloud_demo_url",
+            "R1b_five_minute_video",
+            "R5a_actual_aws_deployment",
+            "R6_public_github",
+            "R2a_full_train_only_bedrock_graph_executed",
+        }
+        local_required = {
+            "R1_local_live_demo",
+            "R2_genai_method_and_failure_modes",
+            "R3_data_application_explained",
+            "R4_system_graph_schema_and_trace",
+            "R5_aws_architecture",
+            "R6a_reproducible_source_and_ablation",
+            "E1_quantifiable_ndcg_improvement",
+            "E3_hit1_and_hit10_reported",
+            "E4_position_bias_status_reported",
+            "E5_api_contract_verified",
+            "B1_business_case_and_ab_design",
+            "K1_kiro_activity_evidence",
+        }
+        conditions = [
+            (
+                "G11.1",
+                metadata.get("schema") == "skillweave-submission-audit-v1",
+                "Submission audit schema is registered.",
+                "Submission audit schema is unexpected.",
+            ),
+            (
+                "G11.2",
+                report.get("local_release_evidence_passed") is True
+                and all(requirements.get(name) is True for name in local_required),
+                "All locally achievable binding evidence is recorded complete.",
+                "A locally achievable binding requirement is incomplete.",
+            ),
+            (
+                "G11.3",
+                report.get("submission_ready") is False
+                and required_blockers.issubset(blockers),
+                "Submission audit preserves all unresolved binding blockers.",
+                "Submission audit overclaims final readiness.",
+            ),
+            (
+                "G11.4",
+                requirements.get("E2_recommended_five_percent_lift") is False,
+                "Recommended 5% gap remains honestly false.",
+                "Submission audit fabricates the recommended 5% result.",
+            ),
+        ]
+        for check_id, condition, success, failure in conditions:
+            self.add(group, check_id, condition, success, failure)
+
     def check_manifest(self) -> None:
         group = "G7_manifest_hashes"
         manifest = self.load_json("release-manifest.json")
@@ -413,6 +619,9 @@ class ReleaseVerifier:
             "docs/openapi.yaml",
             "docs/graph-schema.md",
             "docs/graph-coverage.md",
+            "docs/business-case.md",
+            "docs/judge-pitch.md",
+            "docs/evidence-index.md",
             "docs/aws-architecture.md",
             "docs/genai-safety.md",
             "docs/kiro-evidence.md",
@@ -476,6 +685,9 @@ class ReleaseVerifier:
             self.check_failed_holdout,
             self.check_load_smoke,
             self.check_graph_coverage,
+            self.check_business_impact,
+            self.check_sam_local_smoke,
+            self.check_submission_audit,
             self.check_manifest,
         ]
         for check in checks:

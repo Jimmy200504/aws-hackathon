@@ -1,0 +1,16 @@
+{
+  "version": "2.0",
+  "routeKey": "POST /api/v1/jobs/search",
+  "rawPath": "/api/v1/jobs/search",
+  "requestContext": {
+    "http": {
+      "method": "POST",
+      "path": "/api/v1/jobs/search"
+    }
+  },
+  "headers": {
+    "content-type": "application/json"
+  },
+  "body": "{\"query\":\"React 前端工程師\",\"top_k\":10}",
+  "isBase64Encoded": false
+}

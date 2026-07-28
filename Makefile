@@ -1,4 +1,4 @@
-.PHONY: demo test verify release coverage index benchmark package
+.PHONY: demo test verify release audit coverage business sam-smoke index benchmark package
 
 demo:
 	python3 -m app.server --port 8080
@@ -13,8 +13,17 @@ verify:
 release:
 	./scripts/release_gate.sh
 
+audit:
+	python3 scripts/audit_submission.py
+
 coverage:
 	.venv/bin/python scripts/report_graph_coverage.py
+
+business:
+	python3 scripts/report_business_impact.py
+
+sam-smoke:
+	python3 scripts/run_sam_local_smoke.py
 
 index:
 	python3 scripts/build_demo_index.py

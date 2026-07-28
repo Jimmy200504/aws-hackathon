@@ -5,10 +5,10 @@
 | 評分類別 | 權重 | 拿高分需要的證據 | 現況 | 判定 | 最高價值下一步 |
 |---|---:|---|---|---|---|
 | 創意度 | 25% | 原創圖譜建構、融合機制、可展示 trace | Train-time title evidence escrow、rolling Query→Skill/Job graph、confidence abstention、cold-start quarantine、可點選 trace 已實作 | 接近完成 | 以 Bedrock 完整建圖，加入 ambiguity nodes 與 uncertainty calibration |
-| 技術可行性 | 25% | 可落地；處理 leakage、OOV、曝光偏差與失敗模式 | Unbiased LambdaMART、strictly-earlier-day graph snapshots、disjoint hash buckets、alias boundary、OOV/cold-start、paired bootstrap 均已執行；AWS managed path 尚未部署 | 接近完成 | 負載測試、完整 Bedrock batch、AWS deploy |
-| 商業應用性 | 20% | 清楚解決真實問題、有 KPI 與 rollout | 搜尋首位品質、可解釋推薦、零結果/OOV/新職缺監控均有產品路徑 | 接近完成 | 補 A/B experiment design、GMV 等價商業 KPI、營運 dashboard |
+| 技術可行性 | 25% | 可落地；處理 leakage、OOV、曝光偏差與失敗模式 | Unbiased LambdaMART、strictly-earlier-day graph、OOV/cold-start、paired bootstrap 已執行；exact ZIP 已由 SAM Python 3.13 arm64 validate/build/invoke；AWS managed path 尚未部署 | 接近完成，runtime 證據加強 | 完整 Bedrock batch、AWS deploy 與 production load |
+| 商業應用性 | 20% | 清楚解決真實問題、有 KPI 與 rollout | 已定義三方價值、north-star、guardrails、因果 A/B、coverage dashboard；Hit@1 絕對 lift 的七日規模 proxy 約 40,050，明示非轉換／營收 | **本機證據完成** | 部署後收集真實 search-to-apply A/B，不預估營收 |
 | 主題切合度 | 20% | 生成式 AI 是必要核心；移除圖譜 NDCG 明顯退化 | 1,993-query locked confirmation：NDCG +1.34%、paired CI 排除 0；gate-active 285-query post-hoc subgroup +11.41%，顯示瓶頸是安全 coverage，但整體仍低於建議 5% | **部分通過，證據加強** | 用完整 Bedrock graph 提升 40.53% relevant-row coverage，再接受新的預註冊 holdout |
-| 完成度 | 10% | 功能順、API 正確、AWS URL、5 分鐘影片、GitHub 可重現 | 本機 UI/API/26 tests、holdout、portable deterministic SAM package、CI/release gate 完成；沒有 AWS URL、影片、公開 GitHub | 未完成 | 安裝 AWS/SAM CLI 並取得 credentials 後一鍵部署、錄影、publish release |
+| 完成度 | 10% | 功能順、API 正確、AWS URL、5 分鐘影片、GitHub 可重現 | 本機 UI/API/30 tests、live graph toggle、portable deterministic SAM package、CI/release gate、SAM runtime smoke 完成；沒有 AWS URL、影片、公開 GitHub | 未完成 | AWS/GitHub 登入後一鍵部署、錄影、publish release |
 | AWS Kiro 加分 | +5% | 可驗證採用 Kiro | 已登入 Kiro CLI session 完成 verifier contract 設計與實作後 review；session ID、tracked task、產物與機器報告均保存 | **可主張，待評審認定** | 在簡報連結 `docs/kiro-evidence.md`，現場列出 session metadata 並執行 verifier |
 
 ## 阻擋滿分的三件事

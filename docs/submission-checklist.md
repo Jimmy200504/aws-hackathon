@@ -27,6 +27,9 @@
 - [x] Kiro session、tracked task、review 與機器報告證據
 - [x] Aggregate-only graph coverage／subgroup report 與 post-hoc guardrail
 - [x] Portable deterministic Lambda bundle、單指令 release gate、GitHub Actions
+- [x] SAM validate/build + Python 3.13 arm64 local invoke
+- [x] 商業 case、A/B 設計、規模換算與無營收宣稱 guardrail
+- [x] Live graph toggle 確實改變排序且 graph contribution 非零
 
 ## 尚未通過的品質 gate
 

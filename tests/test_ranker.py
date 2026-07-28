@@ -51,6 +51,23 @@ class RankerTests(unittest.TestCase):
     def test_empty_query_returns_no_results(self) -> None:
         self.assertEqual(self.ranker.search("   ")["results"], [])
 
+    def test_graph_toggle_changes_cloud_skill_ranking(self) -> None:
+        baseline = self.ranker.search(
+            "AWS Docker Kubernetes",
+            top_k=10,
+            include_graph=False,
+        )["results"]
+        graph = self.ranker.search(
+            "AWS Docker Kubernetes",
+            top_k=10,
+            include_graph=True,
+        )["results"]
+        self.assertNotEqual(
+            [row["job_id"] for row in baseline],
+            [row["job_id"] for row in graph],
+        )
+        self.assertTrue(any(row["features"]["graph"] > 0 for row in graph))
+
 
 class GraphIsolationTests(unittest.TestCase):
     def setUp(self) -> None:

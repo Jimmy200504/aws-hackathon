@@ -282,6 +282,9 @@ Compact AWS judge/demo 的 SAM runbook：[`docs/deployment.md`](docs/deployment.
 - Immutable artifact hashes／external-deliverable status：[`release-manifest.json`](release-manifest.json)
 - Kiro activity／review evidence：[`docs/kiro-evidence.md`](docs/kiro-evidence.md)
 - Graph coverage／subgroup guardrails：[`docs/graph-coverage.md`](docs/graph-coverage.md)
+- Business case／A/B design：[`docs/business-case.md`](docs/business-case.md)
+- Five-minute judge pitch：[`docs/judge-pitch.md`](docs/judge-pitch.md)
+- Rubric-to-artifact evidence index：[`docs/evidence-index.md`](docs/evidence-index.md)
 
 原始 CSV 不應提交到公開 GitHub。請保留 `data/dataset/` 在 `.gitignore`，只提供取得方式、schema、fingerprint 與重現指令。
 
@@ -314,7 +317,11 @@ python3 scripts/verify_release.py
 ./scripts/release_gate.sh
 ```
 
-目前測試涵蓋：短縮寫邊界、連續 rank、job ID 去重、地區條件、Node.js 直接證據、future JD 無 graph edge、空 query。
+目前測試涵蓋：短縮寫邊界、連續 rank、job ID 去重、地區條件、Node.js
+直接證據、future JD 無 graph edge、空 query、live graph toggle、release
+evidence anti-tampering。Compact heuristic 的 graph contribution 在 lexical score
+10 時歸零；正式 LTR benchmark 明確 pin 自己的 threshold 並使用 raw graph
+feature，因此 demo 修正不改寫 locked metrics。
 
 ## License / privacy
 
