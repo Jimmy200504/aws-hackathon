@@ -23,15 +23,15 @@ def main() -> None:
     if missing:
         raise SystemExit("Missing package inputs: " + ", ".join(map(str, missing)))
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(
-        args.output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
-    ) as archive:
+    # ZIP_DEFLATED output can differ across zlib releases. The compact artifact
+    # stays well below Lambda's limit, so store fixed bytes for a portable hash.
+    with zipfile.ZipFile(args.output, "w", compression=zipfile.ZIP_STORED) as archive:
         for path in include:
             relative = path.relative_to(ROOT)
             info = zipfile.ZipInfo(str(relative), date_time=(2026, 6, 7, 0, 0, 0))
-            info.compress_type = zipfile.ZIP_DEFLATED
+            info.compress_type = zipfile.ZIP_STORED
             info.external_attr = 0o644 << 16
-            archive.writestr(info, path.read_bytes(), compresslevel=9)
+            archive.writestr(info, path.read_bytes())
     print(f"Wrote {args.output} ({args.output.stat().st_size / 1_048_576:.1f} MiB)")
 
 

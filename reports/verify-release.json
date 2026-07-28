@@ -1,0 +1,269 @@
+{
+  "verifier_version": "1",
+  "verified_at_utc": "2026-07-28T12:08:59Z",
+  "release": "skillweave-2026.07.28-rc2",
+  "passed": true,
+  "summary": {
+    "total": 43,
+    "passed": 40,
+    "failed": 0,
+    "warnings": 3
+  },
+  "groups": {
+    "G1_api_contract": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G1.1",
+          "status": "PASS",
+          "message": "Health endpoint returned 200/ok."
+        },
+        {
+          "id": "G1.2",
+          "status": "PASS",
+          "message": "Query-only search returned unique jobs with contiguous ranks."
+        },
+        {
+          "id": "G1.3",
+          "status": "PASS",
+          "message": "Legacy ks/c0/d0 aliases are accepted."
+        },
+        {
+          "id": "G1.4",
+          "status": "PASS",
+          "message": "Empty query returns a client error."
+        },
+        {
+          "id": "G1.5",
+          "status": "PASS",
+          "message": "Graph trace endpoint returned a trace list."
+        },
+        {
+          "id": "G1.6",
+          "status": "PASS",
+          "message": "Unknown filter codes degrade safely."
+        }
+      ]
+    },
+    "G2_graph_cutoff": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G2.1",
+          "status": "PASS",
+          "message": "Release graph cutoff matches the registered cutoff."
+        },
+        {
+          "id": "G2.2",
+          "status": "PASS",
+          "message": "Every cold-start demo job has an empty skill edge list."
+        },
+        {
+          "id": "G2.3",
+          "status": "PASS",
+          "message": "Runtime graph paths contain nodes, edges, and evidence."
+        }
+      ]
+    },
+    "G3_model_manifest": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G3.1",
+          "status": "PASS",
+          "message": "Final model manifest is valid JSON."
+        },
+        {
+          "id": "G3.2",
+          "status": "PASS",
+          "message": "Unbiased LambdaMART is enabled."
+        },
+        {
+          "id": "G3.3",
+          "status": "PASS",
+          "message": "Ranking objective is rank:ndcg."
+        },
+        {
+          "id": "G3.4",
+          "status": "PASS",
+          "message": "Registered 20-tree/depth-2 capacity is intact."
+        },
+        {
+          "id": "G3.5",
+          "status": "PASS",
+          "message": "Model seed is 1111."
+        }
+      ]
+    },
+    "G4_ablation_report": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G4.1",
+          "status": "PASS",
+          "message": "Ablation schema is registered."
+        },
+        {
+          "id": "G4.2",
+          "status": "PASS",
+          "message": "Confirmation contains at least 1,900 queries."
+        },
+        {
+          "id": "G4.3",
+          "status": "PASS",
+          "message": "Registered confidence gate is active."
+        },
+        {
+          "id": "G4.4",
+          "status": "PASS",
+          "message": "Paired NDCG CI is entirely positive."
+        },
+        {
+          "id": "G4.5",
+          "status": "PASS",
+          "message": "The unmet 5% gate remains honestly false."
+        },
+        {
+          "id": "G4.6",
+          "status": "PASS",
+          "message": "Report records a positive paired CI."
+        },
+        {
+          "id": "G4.7",
+          "status": "PASS",
+          "message": "Graph-on NDCG lift is positive."
+        }
+      ]
+    },
+    "G5_failed_holdout": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G5.1",
+          "status": "PASS",
+          "message": "Failed holdout report is preserved."
+        },
+        {
+          "id": "G5.2",
+          "status": "PASS",
+          "message": "Failed holdout did not pass the 5% gate."
+        },
+        {
+          "id": "G5.3",
+          "status": "PASS",
+          "message": "Failed holdout CI remains non-significant."
+        },
+        {
+          "id": "G5.4",
+          "status": "PASS",
+          "message": "Failed holdout retains negative NDCG lift."
+        },
+        {
+          "id": "G5.5",
+          "status": "PASS",
+          "message": "Failed holdout contains at least 100 queries."
+        }
+      ]
+    },
+    "G6_load_smoke": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G6.1",
+          "status": "PASS",
+          "message": "Every load-smoke request returned HTTP 200."
+        },
+        {
+          "id": "G6.2",
+          "status": "PASS",
+          "message": "Compact demo p95 is below 3,000 ms."
+        },
+        {
+          "id": "G6.3",
+          "status": "PASS",
+          "message": "Every load-smoke response returned Top 10."
+        }
+      ]
+    },
+    "G8_graph_coverage": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G8.1",
+          "status": "PASS",
+          "message": "Coverage report is explicitly registered as post-hoc."
+        },
+        {
+          "id": "G8.2",
+          "status": "PASS",
+          "message": "Coverage report uses all 1,993 locked confirmation queries."
+        },
+        {
+          "id": "G8.3",
+          "status": "PASS",
+          "message": "Coverage report preserves the authoritative overall result."
+        },
+        {
+          "id": "G8.4",
+          "status": "PASS",
+          "message": "Gate-active subgroup has positive, >5% descriptive NDCG lift."
+        },
+        {
+          "id": "G8.5",
+          "status": "PASS",
+          "message": "Coverage counts respect their population bounds."
+        },
+        {
+          "id": "G8.6",
+          "status": "PASS",
+          "message": "Coverage artifact contains aggregate evidence only."
+        }
+      ]
+    },
+    "G7_manifest_hashes": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G7.1",
+          "status": "PASS",
+          "message": "Manifest registers the large confirmation split."
+        },
+        {
+          "id": "G7.2",
+          "status": "PASS",
+          "message": "Manifest keeps the 5% gate false."
+        },
+        {
+          "id": "G7.3",
+          "status": "PASS",
+          "message": "Verified 8 artifact hashes."
+        },
+        {
+          "id": "G7.4",
+          "status": "PASS",
+          "message": "All required API/graph/AWS/submission files exist."
+        },
+        {
+          "id": "G7.5",
+          "status": "PASS",
+          "message": "Runtime demo index version matches the release manifest."
+        },
+        {
+          "id": "G7.6",
+          "status": "WARN",
+          "message": "External deliverable aws_url is still null."
+        },
+        {
+          "id": "G7.7",
+          "status": "WARN",
+          "message": "External deliverable github_url is still null."
+        },
+        {
+          "id": "G7.8",
+          "status": "WARN",
+          "message": "External deliverable demo_video_url is still null."
+        }
+      ]
+    }
+  }
+}

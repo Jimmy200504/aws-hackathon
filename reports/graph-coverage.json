@@ -1,0 +1,116 @@
+{
+  "metadata": {
+    "schema": "skillweave-graph-coverage-v1",
+    "split": "test",
+    "queries": 1993,
+    "random_seed": 1111,
+    "confidence_gate": "behavior_job_edge",
+    "analysis_status": "post_hoc_descriptive",
+    "privacy": "aggregate counts only; no query, user, or job identifiers"
+  },
+  "authoritative_overall": {
+    "report": "reports/ltr-ablation-test.json",
+    "ndcg_at_10_relative_lift": 0.013447251090391354,
+    "paired_ci95": [
+      0.002264541892583815,
+      0.009054346875994488
+    ],
+    "five_percent_gate_passed": false
+  },
+  "graph_inventory": {
+    "requested_candidates": 60122,
+    "materialized_candidates": 59610,
+    "train_apply_title_snapshots": 27559,
+    "seed_skill_nodes": 45,
+    "duty_occupation_nodes": 691,
+    "behavior_query_nodes": 1025,
+    "behavior_query_job_edges": 27952,
+    "behavior_query_skill_edges": 12937
+  },
+  "coverage": {
+    "queries_total": 1993,
+    "queries_with_any_graph_feature": 1712,
+    "queries_with_any_graph_feature_rate": 0.8590065228299046,
+    "queries_with_relevant_graph_covered": 1115,
+    "queries_with_relevant_graph_covered_rate": 0.5594581033617662,
+    "confidence_gate_active_queries": 285,
+    "confidence_gate_active_rate": 0.1430005017561465,
+    "candidate_rows_total": 40704,
+    "candidate_rows_with_graph_feature": 15690,
+    "candidate_row_graph_coverage_rate": 0.38546580188679247,
+    "relevant_rows_total": 6121,
+    "relevant_rows_with_graph_feature": 2481,
+    "relevant_row_graph_coverage_rate": 0.4053259271360889
+  },
+  "post_hoc_subgroups": {
+    "confidence_gate_active": {
+      "queries": 285,
+      "baseline_no_graph": {
+        "ndcg@10": 0.34339801496736455,
+        "mrr": 0.34884294068504595,
+        "hit@1": 0.19298245614035087,
+        "hit@10": 0.8175438596491228,
+        "precision@10": 0.16035087719298247
+      },
+      "skill_graph": {
+        "ndcg@10": 0.3825965966527487,
+        "mrr": 0.3973085491506544,
+        "hit@1": 0.23859649122807017,
+        "hit@10": 0.8105263157894737,
+        "precision@10": 0.1754385964912281
+      },
+      "ndcg_at_10_relative_lift": 0.11414912136026611,
+      "paired_bootstrap_ndcg": {
+        "mean": 0.039198581685384176,
+        "ci95_low": 0.01608992719539655,
+        "ci95_high": 0.06378149456149253
+      },
+      "query_outcomes": {
+        "improved": 106,
+        "regressed": 93,
+        "unchanged": 86
+      }
+    },
+    "relevant_graph_covered": {
+      "queries": 1115,
+      "baseline_no_graph": {
+        "ndcg@10": 0.3901890064268609,
+        "mrr": 0.41910918926613994,
+        "hit@1": 0.26367713004484306,
+        "hit@10": 0.8116591928251121,
+        "precision@10": 0.18170403587443948
+      },
+      "skill_graph": {
+        "ndcg@10": 0.40422687016314024,
+        "mrr": 0.4352121147412627,
+        "hit@1": 0.27802690582959644,
+        "hit@10": 0.8179372197309417,
+        "precision@10": 0.18645739910313902
+      },
+      "ndcg_at_10_relative_lift": 0.03597708675810862,
+      "paired_bootstrap_ndcg": {
+        "mean": 0.014037863736279384,
+        "ci95_low": 0.008179654564906205,
+        "ci95_high": 0.020227126785540374
+      },
+      "query_outcomes": {
+        "improved": 106,
+        "regressed": 70,
+        "unchanged": 939
+      }
+    }
+  },
+  "model_reliance": {
+    "measure": "XGBoost normalized gain; descriptive, not causal",
+    "graph_feature_gain_share": 0.5004156306385994,
+    "nonzero_graph_features": {
+      "behavior_query_skill_max_positive_rate": 0.15664012730121613,
+      "behavior_query_job_positive_rate": 0.09316721558570862,
+      "seed_job_skill_count": 0.07192511111497879,
+      "behavior_query_skill_positive_rate": 0.07106421887874603,
+      "behavior_query_skill_seen_count": 0.06952037662267685,
+      "seed_related_path_count": 0.03809858113527298
+    }
+  },
+  "interpretation_guardrail": "Subgroup results explain dilution and may guide coverage work. They are post-hoc diagnostics and do not replace the locked overall confirmation or make the unmet overall 5% gate pass."
+}

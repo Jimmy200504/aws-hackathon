@@ -1,0 +1,49 @@
+name: release-evidence
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-evidence-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Test, package, and verify release evidence
+        run: ./scripts/release_gate.sh
+      - name: Build compact container
+        run: docker build --tag skillweave:ci .
+      - name: Smoke compact container
+        run: |
+          docker run --detach --rm --name skillweave-ci --publish 18080:8080 skillweave:ci
+          trap 'docker stop skillweave-ci' EXIT
+          for attempt in $(seq 1 30); do
+            curl --fail --silent http://127.0.0.1:18080/health && break
+            sleep 1
+          done
+          curl --fail --silent --show-error \
+            --request POST http://127.0.0.1:18080/api/v1/jobs/search \
+            --header "content-type: application/json" \
+            --data '{"query":"後端工程師 Node.js","top_k":10}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-evidence
+          path: |
+            reports/verify-release.json
+            dist/skillweave-lambda.zip
+          if-no-files-found: error

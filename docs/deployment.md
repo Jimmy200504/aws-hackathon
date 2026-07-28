@@ -27,6 +27,20 @@ Package 只包含：
 
 ## Validate and deploy
 
+完整 release gate 與一鍵部署：
+
+```bash
+./scripts/release_gate.sh
+./scripts/deploy_compact_aws.sh
+```
+
+第二個指令會 package、驗證、部署、讀取 CloudFormation `DemoUrl`、執行
+external health/search smoke，最後把真實 AWS URL 寫入 `release-manifest.json`。
+可用 `SKILLWEAVE_STACK_NAME`、`AWS_REGION`、`SKILLWEAVE_STAGE_NAME` 與
+`SKILLWEAVE_RESERVED_CONCURRENCY` 覆寫預設值。
+
+等價的逐步指令：
+
 ```bash
 sam validate --lint --template-file infra/template.yaml
 sam build --template-file infra/template.yaml
@@ -43,8 +57,18 @@ sam deploy \
 ```bash
 aws cloudformation describe-stacks \
   --stack-name skillweave-demo \
+  --region ap-northeast-1 \
   --query 'Stacks[0].Outputs' \
   --output table
+```
+
+GitHub 與影片完成後只接受 public HTTPS URL：
+
+```bash
+python3 scripts/update_release_urls.py \
+  --github-url "https://github.com/ORG/REPO/releases/tag/TAG" \
+  --demo-video-url "https://VIDEO_HOST/VIDEO_ID"
+python3 scripts/verify_release.py
 ```
 
 ## External smoke

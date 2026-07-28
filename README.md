@@ -203,6 +203,13 @@ macOS 若 XGBoost 回報缺少 OpenMP，另安裝 `libomp`。接著：
 
 NDCG paired delta 為 `+0.00561`，95% CI `[+0.00226, +0.00905]`。改善具統計顯著性，但相對 lift 仍 **不通過 ≥5% theme gate**。第一個未 gate 的 holdout 曾得到負向結果，促使系統加入 abstention；該報告保留在 repo，不能只展示成功的 bucket。
 
+Post-hoc coverage 診斷顯示：confidence gate 實際啟用的 285 queries 上，
+NDCG@10 從 0.3434 到 0.3826（相對 `+11.41%`；paired CI
+`[+0.01609, +0.06378]`）；其餘 1,708 queries 完全 abstain。這指出主要瓶頸
+是可安全使用的 graph coverage，但不取代 locked overall result，也不是新的
+release gate。完整 aggregate-only 報告與限制見
+[`docs/graph-coverage.md`](docs/graph-coverage.md)。
+
 Position bias 狀態：
 
 - Heuristic UI smoke benchmark：`position_bias_correction=false`
@@ -273,6 +280,8 @@ Compact AWS judge/demo 的 SAM runbook：[`docs/deployment.md`](docs/deployment.
 - Python runtime：3.11+
 - Demo dependencies：Python standard library only
 - Immutable artifact hashes／external-deliverable status：[`release-manifest.json`](release-manifest.json)
+- Kiro activity／review evidence：[`docs/kiro-evidence.md`](docs/kiro-evidence.md)
+- Graph coverage／subgroup guardrails：[`docs/graph-coverage.md`](docs/graph-coverage.md)
 
 原始 CSV 不應提交到公開 GitHub。請保留 `data/dataset/` 在 `.gitignore`，只提供取得方式、schema、fingerprint 與重現指令。
 
@@ -287,6 +296,8 @@ scripts/build_benchmark_fixture.py
 scripts/benchmark.py
 scripts/run_ablation.sh
 scripts/run_ltr_ablation.sh
+scripts/report_graph_coverage.py
+scripts/verify_release.py    release evidence audit
 tests/                     contract / leakage / ranking invariants
 docs/                      graph、GenAI、AWS、data card、提交稽核
 artifacts/                 可重建的本機 demo / benchmark artifacts
@@ -298,6 +309,9 @@ reports/                   真實 ablation 輸出
 ```bash
 python3 -m unittest discover -s tests -v
 python3 -m py_compile app/*.py scripts/*.py tests/*.py
+python3 scripts/verify_release.py
+# 或一次執行 tests + deterministic package + release audit
+./scripts/release_gate.sh
 ```
 
 目前測試涵蓋：短縮寫邊界、連續 rank、job ID 去重、地區條件、Node.js 直接證據、future JD 無 graph edge、空 query。

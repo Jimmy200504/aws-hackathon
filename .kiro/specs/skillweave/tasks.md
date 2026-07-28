@@ -13,8 +13,10 @@
 - [ ] Train clipped-IPS LambdaMART on train split.
 - [ ] Select model only on validation split.
 - [x] Freeze and evaluate a disjoint confirmation holdout; retain the earlier failed holdout.
+- [x] Kiro-review and implement a machine-verifiable release evidence audit.
+- [x] Add deterministic packaging, local release gate, deployment automation, and CI.
 - [ ] Reach and verify NDCG@10 relative lift ≥5%.
 - [ ] Deploy AWS judge endpoint.
-- [ ] Run p95/concurrency/timeout tests.
+- [x] Run compact-container p95/concurrency/timeout smoke tests.
 - [ ] Record five-minute demo video.
 - [ ] Publish GitHub release and immutable version manifest.

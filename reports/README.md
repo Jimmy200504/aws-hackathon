@@ -6,6 +6,8 @@ Authoritative release evidence:
 - `ltr-ablation-validation-gated.json` — validation result for the same final model/gate.
 - `ltr-ablation-holdout-1-failed.json` — first holdout failure retained to disclose the full iteration history.
 - `load-smoke.json` — compact Docker API concurrency smoke.
+- `graph-coverage.json` — aggregate-only post-hoc coverage/subgroup diagnostic; never a replacement for the locked overall result.
+- `verify-release.json` — machine audit of contracts, cutoff, model, reports, hashes, and remaining external warnings.
 
 Development evidence, not release claims:
 

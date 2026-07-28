@@ -39,7 +39,7 @@ weight + evidence + edge type
 
 講稿：
 
-> 同一個已訓練模型可以把 graph feature family 歸零，避免拿兩個不同容量的模型製造假 lift。鎖定後的 1,993-query confirmation 中，NDCG 提升 1.34%、MRR 1.72%，paired CI 排除 0。它是顯著改善，但沒有到 5%；第一個失敗 holdout 也完整留在 repo。
+> 同一個已訓練模型可以把 graph feature family 歸零，避免拿兩個不同容量的模型製造假 lift。鎖定後的 1,993-query confirmation 中，NDCG 提升 1.34%、MRR 1.72%，paired CI 排除 0。它是顯著改善，但沒有到 5%；第一個失敗 holdout 也完整留在 repo。事後 coverage 診斷顯示，嚴格 confidence gate 真正啟用的 285 queries 提升 11.41%，其餘完全 abstain；這解釋 coverage 瓶頸，但不拿 subgroup 偷換整體成績。
 
 ## 2:45–3:30 — Leakage / cold-start
 

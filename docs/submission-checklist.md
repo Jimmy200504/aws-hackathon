@@ -24,6 +24,9 @@
 - [x] 有圖譜／無圖譜一鍵 ablation
 - [x] NDCG@10、MRR、Hit@1、Hit@10、Precision@10 報告
 - [x] Position bias correction 狀態明示
+- [x] Kiro session、tracked task、review 與機器報告證據
+- [x] Aggregate-only graph coverage／subgroup report 與 post-hoc guardrail
+- [x] Portable deterministic Lambda bundle、單指令 release gate、GitHub Actions
 
 ## 尚未通過的品質 gate
 
@@ -35,7 +38,7 @@
 - [ ] 主辦方統一 evaluation script 已跑
 - [x] Compact container：50 requests / concurrency 10，50/50 HTTP 200，p95 1.76 s
 - [ ] AWS production p95 / timeout / concurrency 負載測試
-- [ ] OOV、新職缺、空結果、未知 code 測試
+- [x] OOV、新職缺、空結果、未知 code 測試
 - [ ] AWS URL 從外網 clean session 可開
 - [ ] API WAF 不會擋評審 burst
 - [ ] Demo video 內的 URL／版本與 release tag 相同
@@ -71,4 +74,4 @@ curl -i -X POST "$DEMO_URL/api/v1/jobs/search" \
 - bootstrap fixture 是 Bedrock 產物
 - 內部 30 分鐘 attribution 是正式 relevance ground truth
 - 尚未部署的 AWS URL／服務
-- 使用 Kiro 加分（除非有實際 activity／commit evidence）
+- 將 Kiro 直接寫檔的失敗嘗試宣稱為 Kiro 產生的 commit
