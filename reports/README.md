@@ -7,7 +7,7 @@ Authoritative release evidence:
 - `ltr-ablation-holdout-1-failed.json` — first holdout failure retained to disclose the full iteration history.
 - `load-smoke.json` — compact Docker API concurrency smoke.
 - `graph-coverage.json` — aggregate-only post-hoc coverage/subgroup diagnostic; never a replacement for the locked overall result.
-- `verify-release.json` — machine audit of contracts, cutoff, model, reports, hashes, and remaining external warnings.
+- `verify-release.json` — machine audit of contracts, cutoff, model, reports, hashes, and registered external deliverables.
 - `business-impact.json` — bounded scale translation from locked Hit@1 lift; explicitly not a causal conversion or revenue estimate.
 - `sam-local-smoke.json` — exact Lambda ZIP invoked through SAM's Python 3.13 arm64 runtime image.
 - `aws-production-smoke.json` — public HTTPS UI/API/trace checks plus bounded AWS concurrency and latency evidence.

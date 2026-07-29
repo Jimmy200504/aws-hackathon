@@ -11,7 +11,12 @@ SkillWeave 是針對「2026 雲湧智生：臺灣生成式 AI 應用黑客松」
 - 可一鍵執行的「有圖譜 vs 無圖譜」雙重指標 ablation
 - AWS production architecture 與 Bedrock 結構化萃取規格
 
-目前狀態必須說清楚：本機 demo、雙合約 API、train-only graph pipeline 與 XGBoost Unbiased LambdaMART 都已可執行。最終鎖定的 confidence-gated graph 在 **1,993 筆未參與調參的 disjoint confirmation queries** 上得到 **NDCG@10 +1.34%、MRR +1.72%、Hit@1 +2.70%**；paired NDCG 95% CI 為 `[+0.00226, +0.00905]`，排除 0。這是顯著正向結果，但仍未達題目建議的 `≥5%`。repo 同時保留一個失敗 holdout，不隱藏負面實驗；完整結果見 [`reports/ltr-ablation-test.json`](reports/ltr-ablation-test.json) 與 [`reports/ltr-ablation-holdout-1-failed.json`](reports/ltr-ablation-holdout-1-failed.json)。
+目前狀態必須說清楚：public AWS judge demo、雙合約 API、train-only graph pipeline 與 XGBoost Unbiased LambdaMART 都已可執行。最終鎖定的 confidence-gated graph 在 **1,993 筆未參與調參的 disjoint confirmation queries** 上得到 **NDCG@10 +1.34%、MRR +1.72%、Hit@1 +2.70%**；paired NDCG 95% CI 為 `[+0.00226, +0.00905]`，排除 0。這是顯著正向結果，但仍未達題目建議的 `≥5%`。repo 同時保留一個失敗 holdout，不隱藏負面實驗；完整結果見 [`reports/ltr-ablation-test.json`](reports/ltr-ablation-test.json) 與 [`reports/ltr-ablation-holdout-1-failed.json`](reports/ltr-ablation-holdout-1-failed.json)。
+
+Public demo：<https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/>。無 AWS
+session 的 production smoke 已驗證 UI、assets、API、graph on/off 與 trace；
+30-request／concurrency-5 結果為 30/30 HTTP 200、p95 3.62 秒，詳見
+[`reports/aws-production-smoke.json`](reports/aws-production-smoke.json)。
 
 ## 一分鐘啟動
 
@@ -263,7 +268,10 @@ Production path：
 
 Compact AWS judge/demo 的 SAM runbook：[`docs/deployment.md`](docs/deployment.md)；5 分鐘錄影腳本：[`docs/demo-script.md`](docs/demo-script.md)。
 
-目前 repo 沒有 AWS credentials，也沒有可驗證的 AWS URL，所以交付清單中的「實際 AWS 部署網址」仍是 blocker，不能填假連結。部署前須完成 [`docs/submission-checklist.md`](docs/submission-checklist.md) 的 production gates。
+Compact judge path 已實際部署為 API Gateway HTTP API + Lambda Python 3.13
+arm64 + CloudWatch，公開 URL 與 production smoke 均已登錄。這不代表上方完整
+OpenSearch／Neptune／SageMaker production path 已部署；兩者不可混為一談。
+部署與驗證步驟見 [`docs/deployment.md`](docs/deployment.md)。
 
 ## 版本與重現資訊
 
