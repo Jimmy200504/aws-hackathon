@@ -1,4 +1,4 @@
-.PHONY: demo test verify release audit coverage business sam-smoke video submission external-preflight index benchmark package
+.PHONY: demo test verify release audit coverage business sam-smoke aws-smoke video submission external-preflight index benchmark package
 
 demo:
 	python3 -m app.server --port 8080
@@ -24,6 +24,9 @@ business:
 
 sam-smoke:
 	python3 scripts/run_sam_local_smoke.py
+
+aws-smoke:
+	python3 scripts/run_aws_production_smoke.py
 
 video:
 	python3 scripts/render_demo_video.py

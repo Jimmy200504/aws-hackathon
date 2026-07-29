@@ -1,7 +1,7 @@
 # 評審證據索引
 
-本頁只列可由目前 release 直接核對的證據。`完成` 不代表已部署；AWS URL、
-GitHub URL 與公開影片 URL 仍以 release manifest 的 null 為準。
+本頁只列可由目前 release 直接核對的證據。AWS、GitHub release 與公開影片
+URL 均已登錄於 release manifest；完整 Bedrock batch 仍未執行。
 
 Machine-readable completion status：`reports/submission-audit.json`。
 
@@ -19,12 +19,13 @@ Machine-readable completion status：`reports/submission-audit.json`。
 | 商業應用／A/B | `docs/business-case.md`、`reports/business-impact.json`、verifier G9 | 完成，無虛構營收 |
 | AWS architecture | `docs/aws-architecture.md`、`infra/template.yaml` | 完成 |
 | Lambda runtime proof | `reports/sam-local-smoke.json`、verifier G10 | Python 3.13 arm64 本機 emulation 完成 |
-| Load smoke | `reports/load-smoke.json`、verifier G6 | Compact container 完成；AWS production 未跑 |
+| Load smoke | `reports/load-smoke.json`、verifier G6 | Compact container 完成 |
+| AWS public runtime | `reports/aws-production-smoke.json`、verifier G13 | UI/assets/API/trace 完成；30/30、concurrency 5、p95 3.62 s |
 | Kiro +5% | `docs/kiro-evidence.md` | 可驗證 session，待評審認定 |
 | Reproducibility | `scripts/release_gate.sh`、GitHub Actions、`release-manifest.json` | 完成 |
 | Five-minute video artifact | `video/`、`reports/demo-video.json`、verifier G12 | 完成 |
 | Public GitHub + video URL | release manifest、verifier G7 | 完成 |
-| Public AWS URL | verifier G7 warning | 未完成 |
+| Public AWS URL | release manifest、verifier G7、verifier G13 | 完成 |
 
 ## 現場 90 秒證據路徑
 
@@ -32,4 +33,5 @@ Machine-readable completion status：`reports/submission-audit.json`。
 2. UI 搜尋 `React 前端工程師`，點開 Query→Skill→Job evidence。
 3. 開 `reports/ltr-ablation-test.json` 與失敗 holdout，說明 locked overall。
 4. 開 `reports/graph-coverage.json`，說明 coverage bottleneck，不偷換 subgroup。
-5. 執行 `./scripts/release_gate.sh`，展示 verifier 全綠與三個 external warnings。
+5. 開 `reports/aws-production-smoke.json`，展示外網 30/30、p95 與 graph toggle。
+6. 執行 `./scripts/release_gate.sh`，展示 verifier 全綠、零 warning。

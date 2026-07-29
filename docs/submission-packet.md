@@ -68,7 +68,8 @@ substring、temporal cutoff、type whitelist 與 confidence gate 的邊才能發
 | Relevant-row graph coverage | 40.53% | Coverage 是下一個瓶頸 |
 | Gate-active subgroup | 285 queries；NDCG +11.41% | Post-hoc，不能取代整體 |
 | 七日規模換算 | 約 40,050 次額外 Top-1 relevance events | 非 conversion、apply、hire 或營收 |
-| Release verifier | 62 PASS / 0 FAIL / 1 WARN | WARN 僅代表尚未登錄的外部 URL |
+| Release verifier | 67 PASS / 0 FAIL / 0 WARN | WARN 僅代表尚未登錄的外部 URL |
+| AWS production smoke | 30/30 HTTP 200；concurrency 5；p95 3.62s | Public HTTPS；低於 10s Lambda timeout |
 
 ## 商業應用
 
@@ -87,7 +88,7 @@ gap。目前沒有因果轉換或單次相關曝光的貨幣價值，因此**不
 
 ## 公開交付 URL
 
-- AWS Demo：**PENDING — 不可填 placeholder**
+- AWS Demo：https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/
 - GitHub Release：https://github.com/Jimmy200504/aws-hackathon/releases/tag/skillweave-2026.07.28-rc6
 - 5 分鐘影片：https://github.com/Jimmy200504/aws-hackathon/releases/download/skillweave-2026.07.28-rc6/skillweave-demo-5min.mp4
 
@@ -100,7 +101,8 @@ gap。目前沒有因果轉換或單次相關曝光的貨幣價值，因此**不
 2. 切換 baseline，確認不是按鈕換色，而是排序與 graph contribution 改變。
 3. 搜尋 `React 前端工程師`，展開 Query → Skill → Job evidence。
 4. 查看 cold-start 職缺，確認 cutoff 後 JD 沒有 graph edge。
-5. 執行 `./scripts/release_gate.sh`，核對 tests、hash、ablation 與失敗實驗。
+5. 開 `reports/aws-production-smoke.json`，核對 public UI/API、30/30 與 p95。
+6. 執行 `./scripts/release_gate.sh`，核對 tests、hash、ablation 與失敗實驗。
 
 ## 不可誇大的限制
 
@@ -111,4 +113,4 @@ gap。目前沒有因果轉換或單次相關曝光的貨幣價值，因此**不
 - 不可把 bootstrap fixture 說成完整 Bedrock batch 產物。
 - 不可把 30 分鐘 attribution qrels 說成主辦方正式 relevance ground truth。
 - 不可把約 40,050 次 Top-1 relevance proxy 說成應徵、錄取或營收。
-- 未完成 clean-session 驗證前，不可填入或展示 placeholder URL。
+- AWS production smoke 是 bounded judge-demo 證據，不等同大規模壓力測試。

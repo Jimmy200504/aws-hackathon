@@ -1,6 +1,6 @@
 {
   "release": "skillweave-2026.07.28-rc6",
-  "status": "local_release_candidate",
+  "status": "public_aws_demo_deployed",
   "random_seed": 1111,
   "dataset_version": "1111-2026-06-01_2026-06-07",
   "schema_fingerprint": "105f60c88cdef8a3",
@@ -31,7 +31,7 @@
     "aspirational_five_percent_gate_passed": false
   },
   "sha256": {
-    "dist/skillweave-lambda.zip": "47da18fd589059b285374b4f7bd3f484349abe3348f9ef155273f5169003aaba",
+    "dist/skillweave-lambda.zip": "e87def737f6ec5923a8a333d1ec92de70098bea27411d342d4a8b507f0fa39d1",
     "dist/skillweave-demo-5min.mp4": "2c7ee08c5851ac8e3673d7f94d7116108846515edaa4ad47188d56cf17f8509a",
     "artifacts/models/ltr-graph-final.ubj": "d90693ac66358b847ba74cfb4dd0b1f3a4895fd28ecb061563d107f89ca1366e",
     "artifacts/models/ltr-graph-final.manifest.json": "f857cb7f05afbbaa7498a4f687a8fccce6d773074f1fd2870544fb1acf053f26",
@@ -42,12 +42,13 @@
     "reports/business-impact.json": "e994f190628bf4bc342271d32adb64af31766b6445c62c97c32331171556c10d",
     "reports/sam-local-smoke.json": "5845e045527302c9b79b7fc656fd875db87096a974dd70b39623e295edeec801",
     "reports/demo-video.json": "4d174b4e3904e5bce5de12f7d48bb8e18efeef310ab1d8cf19504adc2230ad45",
-    "reports/submission-audit.json": "ad63f4fbdb3a3c265194fd5de07b6c3f8c676f19418e1cbad80c90bcba81644b",
+    "reports/submission-audit.json": "d8712e8917504d0e2eb08e7a482002e8fc6f9f5ecb6e77b17ae188b7bda348a8",
     "reports/load-smoke.json": "d476cafd0e62204c488495bc3f4ecdcd685b7ac10c9a6b6d89e5df1399d5c89c",
-    "docs/submission-packet.md": "44c7f5cd6d1d6757be3dd3c9bbe0245d55a53b725a9be4e7304e6ff752142c75"
+    "docs/submission-packet.md": "108d4aa89031d902197a8b66ead23e01503f9d649e905f56c3d7a86e269e84cf",
+    "reports/aws-production-smoke.json": "592fbda4d5dcd465b5d6aba34f8612825c173329862073e3918acfe8a0407abc"
   },
   "external_deliverables": {
-    "aws_url": null,
+    "aws_url": "https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/",
     "github_url": "https://github.com/Jimmy200504/aws-hackathon/releases/tag/skillweave-2026.07.28-rc6",
     "demo_video_url": "https://github.com/Jimmy200504/aws-hackathon/releases/download/skillweave-2026.07.28-rc6/skillweave-demo-5min.mp4"
   }

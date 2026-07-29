@@ -1,0 +1,71 @@
+{
+  "metadata": {
+    "schema": "skillweave-aws-production-smoke-v1",
+    "verified_at_utc": "2026-07-28T16:28:23Z",
+    "base_url": "https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/",
+    "index_version": "demo-2026.06.05-v1",
+    "client": "stdlib urllib; public HTTPS; no AWS session"
+  },
+  "passed": true,
+  "checks": {
+    "public_ui": true,
+    "relative_css_asset": true,
+    "relative_javascript_asset": true,
+    "health_contract": true,
+    "metadata_contract": true,
+    "graph_on_contract": true,
+    "graph_off_contract": true,
+    "graph_toggle_changes_ranking": true,
+    "graph_trace_provenance": true,
+    "load_all_http_200": true,
+    "load_all_top_10": true,
+    "load_index_version": true,
+    "load_p95_below_timeout": true
+  },
+  "observed": {
+    "job_count": 12000,
+    "skill_count": 45,
+    "graph_on_job_ids": [
+      "132469993",
+      "132488749",
+      "130404234",
+      "130404249",
+      "98782183",
+      "98836873",
+      "130196795",
+      "130270236",
+      "130280356",
+      "103895506"
+    ],
+    "graph_off_job_ids": [
+      "132446961",
+      "132438691",
+      "132469993",
+      "132481149",
+      "132481157",
+      "98836873",
+      "132209785",
+      "131987268",
+      "103766259",
+      "130249640"
+    ],
+    "graph_trace_path_count": 4
+  },
+  "load": {
+    "requests": 30,
+    "concurrency": 5,
+    "http_200": 30,
+    "top_10_responses": 30,
+    "matching_index_version": 30,
+    "elapsed_ms": 10458.88,
+    "throughput_requests_per_second": 2.87,
+    "latency_ms": {
+      "min": 1303.28,
+      "p50": 1402.99,
+      "p95": 3620.98,
+      "p99": 3663.83,
+      "max": 3663.83
+    },
+    "errors": []
+  }
+}

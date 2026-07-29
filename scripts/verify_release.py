@@ -545,6 +545,7 @@ class ReleaseVerifier:
             "R3_data_application_explained",
             "R4_system_graph_schema_and_trace",
             "R5_aws_architecture",
+            "R5b_aws_production_smoke",
             "R6a_reproducible_source_and_ablation",
             "E1_quantifiable_ndcg_improvement",
             "E3_hit1_and_hit10_reported",
@@ -657,6 +658,60 @@ class ReleaseVerifier:
                 ),
                 "Tracked deck, scene contract, and renderer make the video reproducible.",
                 "A required demo-video source file is missing.",
+            ),
+        ]
+        for check_id, condition, success, failure in conditions:
+            self.add(group, check_id, condition, success, failure)
+
+    def check_aws_production_smoke(
+        self, report: dict[str, Any] | None = None
+    ) -> None:
+        group = "G13_aws_production_smoke"
+        report = report or self.load_json("reports/aws-production-smoke.json")
+        manifest = self.load_json("release-manifest.json")
+        metadata = report.get("metadata", {})
+        checks = report.get("checks", {})
+        load = report.get("load", {})
+        requests = int(load.get("requests", 0))
+        latency = load.get("latency_ms", {})
+        registered_url = str(
+            manifest.get("external_deliverables", {}).get("aws_url", "")
+        ).rstrip("/")
+        conditions = [
+            (
+                "G13.1",
+                metadata.get("schema")
+                == "skillweave-aws-production-smoke-v1"
+                and str(metadata.get("base_url", "")).rstrip("/")
+                == registered_url
+                and metadata.get("index_version")
+                == manifest.get("demo_index_version"),
+                "AWS smoke schema, URL, and index version match the release.",
+                "AWS smoke metadata differs from the release contract.",
+            ),
+            (
+                "G13.2",
+                report.get("passed") is True
+                and len(checks) >= 10
+                and all(value is True for value in checks.values()),
+                "Public UI, assets, API, graph toggle, and trace checks passed.",
+                "A public AWS deployment check is incomplete or failed.",
+            ),
+            (
+                "G13.3",
+                requests >= 30
+                and int(load.get("concurrency", 0)) >= 5
+                and int(load.get("http_200", -1)) == requests
+                and int(load.get("top_10_responses", -1)) == requests,
+                "AWS concurrency smoke returned HTTP 200 and Top 10 for every request.",
+                "AWS concurrency evidence is too small or contains failed responses.",
+            ),
+            (
+                "G13.4",
+                0.0 < float(latency.get("p95", 0.0)) < 10_000.0
+                and not load.get("errors"),
+                "AWS p95 remained below the Lambda timeout with no client errors.",
+                "AWS smoke exceeded the timeout or recorded client errors.",
             ),
         ]
         for check_id, condition, success, failure in conditions:
@@ -779,6 +834,7 @@ class ReleaseVerifier:
             self.check_business_impact,
             self.check_sam_local_smoke,
             self.check_demo_video,
+            self.check_aws_production_smoke,
             self.check_submission_audit,
             self.check_manifest,
         ]

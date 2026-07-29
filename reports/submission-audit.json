@@ -8,7 +8,7 @@
   "submission_ready": false,
   "requirements": {
     "R1_local_live_demo": true,
-    "R1a_public_cloud_demo_url": false,
+    "R1a_public_cloud_demo_url": true,
     "R1b_five_minute_video_artifact": true,
     "R1c_public_demo_video_url": true,
     "R2_genai_method_and_failure_modes": true,
@@ -16,7 +16,8 @@
     "R3_data_application_explained": true,
     "R4_system_graph_schema_and_trace": true,
     "R5_aws_architecture": true,
-    "R5a_actual_aws_deployment": false,
+    "R5a_actual_aws_deployment": true,
+    "R5b_aws_production_smoke": true,
     "R6_public_github": true,
     "R6a_reproducible_source_and_ablation": true,
     "E1_quantifiable_ndcg_improvement": true,
@@ -29,10 +30,8 @@
     "S1_copy_ready_submission_packet": true
   },
   "blockers": [
-    "R1a_public_cloud_demo_url",
-    "R5a_actual_aws_deployment",
     "R2a_full_train_only_bedrock_graph_executed"
   ],
   "recommended_not_mandatory_gap": "Locked NDCG@10 lift is positive but below the recommended 5%.",
-  "interpretation": "Local release evidence is complete; remaining blockers: public cloud demo URL, actual AWS deployment, executed train-only Bedrock graph."
+  "interpretation": "Local release evidence is complete; remaining blockers: executed train-only Bedrock graph."
 }

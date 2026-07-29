@@ -54,6 +54,11 @@ def main() -> None:
         ),
         "R5_aws_architecture": exists("docs/aws-architecture.md"),
         "R5a_actual_aws_deployment": bool(external.get("aws_url")),
+        "R5b_aws_production_smoke": (
+            exists("reports/aws-production-smoke.json")
+            and load_object("reports/aws-production-smoke.json").get("passed")
+            is True
+        ),
         "R6_public_github": bool(external.get("github_url")),
         "R6a_reproducible_source_and_ablation": (
             exists("scripts/run_ltr_ablation.sh")

@@ -3,7 +3,7 @@
 ## 必交
 
 - [x] 本機 Live Demo：完整搜尋路徑
-- [ ] AWS 上可公開存取的 Demo URL
+- [x] AWS 上可公開存取的 Demo URL
 - [x] 5 分鐘繁中錄影 artifact（1080p、語音、內嵌字幕、SHA-256）
 - [x] 公開可觀看的 Demo video URL
 - [x] 生成式 AI 方法與設計依據文件
@@ -13,7 +13,7 @@
 - [x] Graph schema
 - [x] 至少一個 traversal / aggregation trace
 - [x] AWS 部署架構圖
-- [ ] 實際 AWS 部署驗證
+- [x] 實際 AWS 部署驗證
 - [x] 公開 GitHub URL
 - [x] 環境設定
 - [x] 執行範例
@@ -41,12 +41,12 @@
 - [x] Gate/model 鎖定後的 disjoint confirmation holdout 已跑
 - [ ] 主辦方統一 evaluation script 已跑
 - [x] Compact container：50 requests / concurrency 10，50/50 HTTP 200，p95 1.76 s
-- [ ] AWS production p95 / timeout / concurrency 負載測試
+- [x] AWS production p95 / timeout / concurrency 負載測試（30 requests、concurrency 5、30/30 HTTP 200、p95 3.62 s）
 - [x] OOV、新職缺、空結果、未知 code 測試
-- [ ] AWS URL 從外網 clean session 可開
-- [ ] API WAF 不會擋評審 burst
+- [x] AWS URL 從無 AWS session 的 public HTTPS client 可開
+- [x] Compact demo 無 WAF；bounded concurrency 5 未被擋，評審不需登入
 - [x] Demo video 版本與 release tag 相同
-- [ ] 公開 URL 上傳後從 clean session 播放驗證
+- [x] 公開 URL 上傳後以 unauthenticated HTTP 驗證 200 與完整影片 bytes
 
 ## 決賽前 contract smoke
 
@@ -78,5 +78,5 @@ curl -i -X POST "$DEMO_URL/api/v1/jobs/search" \
 - 只展示成功 confirmation、隱藏第一個失敗 holdout
 - bootstrap fixture 是 Bedrock 產物
 - 內部 30 分鐘 attribution 是正式 relevance ground truth
-- 尚未部署的 AWS URL／服務
+- 尚未部署的完整 OpenSearch／Neptune／SageMaker production path
 - 將 Kiro 直接寫檔的失敗嘗試宣稱為 Kiro 產生的 commit

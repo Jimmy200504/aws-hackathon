@@ -32,6 +32,12 @@ def build_packet(root: Path = ROOT) -> str:
     coverage = load_object(root, "reports/graph-coverage.json")
     business = load_object(root, "reports/business-impact.json")
     video = load_object(root, "reports/demo-video.json")
+    aws_smoke_path = root / "reports" / "aws-production-smoke.json"
+    aws_smoke = (
+        load_object(root, "reports/aws-production-smoke.json")
+        if aws_smoke_path.is_file()
+        else {}
+    )
     verifier = load_object(root, "reports/verify-release.json")
     external = manifest.get("external_deliverables", {})
     baseline = ablation["baseline_no_graph"]
@@ -47,6 +53,15 @@ def build_packet(root: Path = ROOT) -> str:
     ]
     video_artifact = video["artifact"]
     summary = verifier["summary"]
+    aws_load = aws_smoke.get(
+        "load",
+        {
+            "http_200": 0,
+            "requests": 0,
+            "concurrency": 0,
+            "latency_ms": {"p95": 0.0},
+        },
+    )
 
     return f"""# SkillWeave 決賽提交包
 
@@ -119,6 +134,7 @@ substring、temporal cutoff、type whitelist 與 confidence gate 的邊才能發
 | Gate-active subgroup | {active["queries"]} queries；NDCG {percent(active["ndcg_at_10_relative_lift"])} | Post-hoc，不能取代整體 |
 | 七日規模換算 | 約 {scale:,} 次額外 Top-1 relevance events | 非 conversion、apply、hire 或營收 |
 | Release verifier | {summary["passed"]} PASS / {summary["failed"]} FAIL / {summary["warnings"]} WARN | WARN 僅代表尚未登錄的外部 URL |
+| AWS production smoke | {aws_load["http_200"]}/{aws_load["requests"]} HTTP 200；concurrency {aws_load["concurrency"]}；p95 {aws_load["latency_ms"]["p95"] / 1000:.2f}s | Public HTTPS；低於 10s Lambda timeout |
 
 ## 商業應用
 
@@ -150,7 +166,8 @@ gap。目前沒有因果轉換或單次相關曝光的貨幣價值，因此**不
 2. 切換 baseline，確認不是按鈕換色，而是排序與 graph contribution 改變。
 3. 搜尋 `React 前端工程師`，展開 Query → Skill → Job evidence。
 4. 查看 cold-start 職缺，確認 cutoff 後 JD 沒有 graph edge。
-5. 執行 `./scripts/release_gate.sh`，核對 tests、hash、ablation 與失敗實驗。
+5. 開 `reports/aws-production-smoke.json`，核對 public UI/API、30/30 與 p95。
+6. 執行 `./scripts/release_gate.sh`，核對 tests、hash、ablation 與失敗實驗。
 
 ## 不可誇大的限制
 
@@ -161,7 +178,7 @@ gap。目前沒有因果轉換或單次相關曝光的貨幣價值，因此**不
 - 不可把 bootstrap fixture 說成完整 Bedrock batch 產物。
 - 不可把 30 分鐘 attribution qrels 說成主辦方正式 relevance ground truth。
 - 不可把約 {scale:,} 次 Top-1 relevance proxy 說成應徵、錄取或營收。
-- 未完成 clean-session 驗證前，不可填入或展示 placeholder URL。
+- AWS production smoke 是 bounded judge-demo 證據，不等同大規模壓力測試。
 """
 
 

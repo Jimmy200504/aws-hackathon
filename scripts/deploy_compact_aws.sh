@@ -3,9 +3,9 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 STACK_NAME="${SKILLWEAVE_STACK_NAME:-skillweave-demo}"
-AWS_REGION_NAME="${AWS_REGION:-ap-northeast-1}"
+AWS_REGION_NAME="${AWS_REGION:-us-east-1}"
 STAGE_NAME="${SKILLWEAVE_STAGE_NAME:-prod}"
-RESERVED_CONCURRENCY="${SKILLWEAVE_RESERVED_CONCURRENCY:-10}"
+RESERVED_CONCURRENCY="${SKILLWEAVE_RESERVED_CONCURRENCY:-0}"
 
 ./scripts/release_gate.sh
 sam validate --lint --template-file infra/template.yaml

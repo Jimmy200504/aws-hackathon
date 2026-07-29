@@ -119,10 +119,24 @@ def static(path: str) -> dict[str, Any]:
     return response(200, payload, content_type)
 
 
+def normalized_path(event: dict[str, Any]) -> str:
+    context = event.get("requestContext", {})
+    request = context.get("http", {})
+    path = request.get("path", event.get("path", "/"))
+    stage = context.get("stage")
+    if isinstance(stage, str) and stage and stage != "$default":
+        prefix = f"/{stage}"
+        if path == prefix or path == f"{prefix}/":
+            return "/"
+        if path.startswith(f"{prefix}/"):
+            return path[len(prefix) :]
+    return path
+
+
 def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     request = event.get("requestContext", {}).get("http", {})
     method = request.get("method", event.get("httpMethod", "GET"))
-    path = request.get("path", event.get("path", "/"))
+    path = normalized_path(event)
     try:
         if method == "GET" and path == "/health":
             return response(

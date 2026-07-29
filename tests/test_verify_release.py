@@ -230,6 +230,34 @@ class ReleaseVerifierIntegrityTests(unittest.TestCase):
         self.assertEqual(checks["G10.2"], "FAIL")
         self.assertEqual(checks["G10.3"], "FAIL")
 
+    def test_aws_smoke_requires_complete_bounded_load(self) -> None:
+        verifier = ReleaseVerifier()
+        verifier.check_aws_production_smoke(
+            {
+                "metadata": {
+                    "schema": "skillweave-aws-production-smoke-v1",
+                    "base_url": (
+                        "https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/"
+                    ),
+                    "index_version": "demo-2026.06.05-v1",
+                },
+                "passed": True,
+                "checks": {f"check_{index}": True for index in range(10)},
+                "load": {
+                    "requests": 30,
+                    "concurrency": 5,
+                    "http_200": 29,
+                    "top_10_responses": 30,
+                    "latency_ms": {"p95": 1000},
+                    "errors": [],
+                },
+            }
+        )
+        self.assertEqual(
+            self.checks(verifier, "G13_aws_production_smoke")["G13.3"],
+            "FAIL",
+        )
+
     def test_submission_audit_rejects_false_readiness(self) -> None:
         local = {
             name: True
@@ -239,6 +267,7 @@ class ReleaseVerifierIntegrityTests(unittest.TestCase):
                 "R3_data_application_explained",
                 "R4_system_graph_schema_and_trace",
                 "R5_aws_architecture",
+                "R5b_aws_production_smoke",
                 "R6a_reproducible_source_and_ablation",
                 "E1_quantifiable_ndcg_improvement",
                 "E3_hit1_and_hit10_reported",
@@ -279,6 +308,7 @@ class ReleaseVerifierIntegrityTests(unittest.TestCase):
                 "R4_system_graph_schema_and_trace",
                 "R5_aws_architecture",
                 "R5a_actual_aws_deployment",
+                "R5b_aws_production_smoke",
                 "R6_public_github",
                 "R6a_reproducible_source_and_ablation",
                 "E1_quantifiable_ndcg_improvement",

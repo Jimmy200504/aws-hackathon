@@ -59,7 +59,9 @@ python3 scripts/run_sam_local_smoke.py
 第二個指令會 package、驗證、部署、讀取 CloudFormation `DemoUrl`、執行
 external health/search smoke，最後把真實 AWS URL 寫入 `release-manifest.json`。
 可用 `SKILLWEAVE_STACK_NAME`、`AWS_REGION`、`SKILLWEAVE_STAGE_NAME` 與
-`SKILLWEAVE_RESERVED_CONCURRENCY` 覆寫預設值。
+`SKILLWEAVE_RESERVED_CONCURRENCY` 覆寫預設值。Reserved concurrency 預設
+為 `0`（不建立 function-level reservation，使用帳號共用 concurrency），以支援
+新帳號的最低 quota；提高 account quota 後可設為 `10` 或更高。
 
 等價的逐步指令：
 
@@ -68,10 +70,10 @@ sam validate --lint --template-file infra/template.yaml
 sam build --template-file infra/template.yaml
 sam deploy \
   --stack-name skillweave-demo \
-  --region ap-northeast-1 \
+  --region us-east-1 \
   --resolve-s3 \
   --capabilities CAPABILITY_IAM \
-  --parameter-overrides StageName=prod ReservedConcurrency=10
+  --parameter-overrides StageName=prod ReservedConcurrency=0
 ```
 
 取得網址：
@@ -79,10 +81,14 @@ sam deploy \
 ```bash
 aws cloudformation describe-stacks \
   --stack-name skillweave-demo \
-  --region ap-northeast-1 \
+  --region us-east-1 \
   --query 'Stacks[0].Outputs' \
   --output table
 ```
+
+目前已驗證的 public judge URL：
+
+`https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/`
 
 GitHub 與影片完成後只接受 public HTTPS URL：
 
@@ -140,6 +146,16 @@ curl -fsS -X POST "$DEMO_URL/api/v1/jobs/search" \
 - rank 1～20 連續
 - Top result 有合理職稱／地區
 - response latency 被 CloudWatch access log 記錄
+
+可重現的 bounded production smoke：
+
+```bash
+python3 scripts/run_aws_production_smoke.py --requests 30 --concurrency 5
+```
+
+它以無 AWS session 的 public HTTPS client 檢查 UI、relative assets、health、
+metadata、graph on/off、trace provenance，以及 30 個 concurrency-5 搜尋請求；
+結果與 latency 分位數保存於 `reports/aws-production-smoke.json`。
 
 ## Production migration
 

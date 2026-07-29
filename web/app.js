@@ -14,7 +14,7 @@ const escapeText = (value) => String(value ?? "");
 
 async function loadMeta() {
   try {
-    const response = await fetch("/api/v1/meta");
+    const response = await fetch("api/v1/meta");
     const body = await response.json();
     document.querySelector("#job-count").textContent = Number(body.job_count).toLocaleString("zh-TW");
     document.querySelector("#index-version").textContent =
@@ -108,7 +108,7 @@ async function search(event) {
       use_graph: graphEnabled,
     };
     if (locationSelect.value) payload.location_code = [locationSelect.value];
-    const response = await fetch("/api/v1/jobs/search", {
+    const response = await fetch("api/v1/jobs/search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
