@@ -22,7 +22,7 @@ Machine-readable completion status：`reports/submission-audit.json`。
 | Lambda runtime proof | `reports/sam-local-smoke.json`、verifier G10 | Python 3.13 arm64 本機 emulation 完成 |
 | Portable LTR parity | `reports/portable-ltr-parity.json`、`app/tree_ranker.py` | 40,218 rows；centered score 最大誤差 1.08e-7 |
 | Load smoke | `reports/load-smoke.json`、verifier G6 | Compact container 完成 |
-| AWS public runtime | `reports/aws-production-smoke.json`、verifier G13 | UI/assets/API/trace 完成；30/30、concurrency 5、p95 4.40 s；frozen LTR 與 Bedrock provenance 均在線 |
+| AWS public runtime | `reports/aws-production-smoke.json`、verifier G13 | UI/assets/API/trace 完成；30/30、concurrency 5、p95 4.46 s；frozen LTR 與 Bedrock provenance 均在線 |
 | Kiro +5% | `docs/kiro-evidence.md` | 可驗證 session，待評審認定 |
 | Reproducibility | `scripts/release_gate.sh`、GitHub Actions、`release-manifest.json` | 完成 |
 | Five-minute video artifact | `video/`、`reports/demo-video.json`、verifier G12 | 完成 |

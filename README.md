@@ -32,7 +32,7 @@ Aggregate-only 證據見
 
 Public demo：<https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/>。無 AWS
 session 的 production smoke 已驗證 UI、assets、API、graph on/off 與 trace；
-30-request／concurrency-5 結果為 30/30 HTTP 200、p95 4.40 秒，詳見
+30-request／concurrency-5 結果為 30/30 HTTP 200、p95 4.46 秒，詳見
 [`reports/aws-production-smoke.json`](reports/aws-production-smoke.json)。
 
 ## 一分鐘啟動

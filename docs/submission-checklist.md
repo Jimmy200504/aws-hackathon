@@ -44,7 +44,7 @@
 - [x] 模型鎖定後的兩個互斥 confirmation holdouts 已跑
 - [ ] 主辦方統一 evaluation script 已跑
 - [x] Compact container：50 requests / concurrency 10，50/50 HTTP 200，p95 1.76 s
-- [x] AWS production p95 / timeout / concurrency 負載測試（30 requests、concurrency 5、30/30 HTTP 200、p95 4.40 s）
+- [x] AWS production p95 / timeout / concurrency 負載測試（30 requests、concurrency 5、30/30 HTTP 200、p95 4.46 s）
 - [x] OOV、新職缺、空結果、未知 code 測試
 - [x] AWS URL 從無 AWS session 的 public HTTPS client 可開
 - [x] Compact demo 無 WAF；bounded concurrency 5 未被擋，評審不需登入

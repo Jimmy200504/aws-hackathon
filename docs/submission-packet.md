@@ -79,8 +79,8 @@ pilot，不冒充完整 production corpus。
 | Relevant-row graph coverage | 40.53% | Coverage 是下一個瓶頸 |
 | Gate-active subgroup | 285 queries；NDCG +11.41% | Post-hoc，不能取代整體 |
 | 七日規模換算 | 約 160,360 次額外 Top-1 relevance events | 非 conversion、apply、hire 或營收 |
-| Release verifier | 88 PASS / 0 FAIL / 0 WARN | WARN 僅代表尚未登錄的外部 URL |
-| AWS production smoke | 30/30 HTTP 200；concurrency 5；p95 4.40s | Public HTTPS；低於 10s Lambda timeout |
+| Release verifier | 89 PASS / 0 FAIL / 0 WARN | WARN 僅代表尚未登錄的外部 URL |
+| AWS production smoke | 30/30 HTTP 200；concurrency 5；p95 4.46s | Public HTTPS；低於 10s Lambda timeout |
 
 ## 商業應用
 

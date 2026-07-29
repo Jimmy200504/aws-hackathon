@@ -74,8 +74,8 @@
     "reports/demo-video.json": "4d174b4e3904e5bce5de12f7d48bb8e18efeef310ab1d8cf19504adc2230ad45",
     "reports/submission-audit.json": "5deff83203be01ce16803ab5aaa38061ff6b3afa24312626090d86f77a90efc3",
     "reports/load-smoke.json": "d476cafd0e62204c488495bc3f4ecdcd685b7ac10c9a6b6d89e5df1399d5c89c",
-    "docs/submission-packet.md": "67af446dee98e84691a31b7610d069c748bd42157dc93d9b9deed247b1fb025f",
-    "reports/aws-production-smoke.json": "619f5478b3dfd00357ce4a83ffd555b00ec1503d39eb064bcded25b65555d064"
+    "docs/submission-packet.md": "257ebdbbeb481c1df176a5c4e9ea97bd71538c25826ea66747f3ee816eda7b1a",
+    "reports/aws-production-smoke.json": "a75eb681a894cf9528cda050d08e56a4abbf5bf5b836ccadfd501d1345a60d7c"
   },
   "external_deliverables": {
     "aws_url": "https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/",
