@@ -1,6 +1,6 @@
 {
   "release": "skillweave-2026.07.28-rc6",
-  "status": "public_aws_demo_deployed",
+  "status": "public_aws_demo_deployed_quality_gate_passed",
   "random_seed": 1111,
   "dataset_version": "1111-2026-06-01_2026-06-07",
   "schema_fingerprint": "105f60c88cdef8a3",
@@ -12,9 +12,12 @@
     "framework": "XGBoost 3.2.0",
     "objective": "rank:ndcg",
     "lambdarank_unbiased": true,
-    "n_estimators": 20,
-    "max_depth": 2,
-    "confidence_gate": "behavior_job_edge"
+    "feature_set": "quality_minimal",
+    "n_estimators": 40,
+    "max_depth": 4,
+    "min_child_weight": 12,
+    "learning_rate": 0.05,
+    "confidence_gate": "none"
   },
   "kiro": {
     "cli_version": "2.15.0",
@@ -22,30 +25,57 @@
     "evidence": "docs/kiro-evidence.md"
   },
   "confirmation": {
-    "queries": 1993,
-    "ndcg_at_10_relative_lift": 0.013447251090391354,
-    "paired_ci95": [
-      0.002264541892583815,
-      0.009054346875994488
+    "queries": 1991,
+    "hash_bucket": [
+      2400,
+      3400
     ],
-    "aspirational_five_percent_gate_passed": false
+    "ndcg_at_10_relative_lift": 0.05718023510343073,
+    "paired_ci95": [
+      0.014909498927261473,
+      0.03606651131679442
+    ],
+    "aspirational_five_percent_gate_passed": true
+  },
+  "replication": {
+    "queries": 1992,
+    "hash_bucket": [
+      3400,
+      4400
+    ],
+    "ndcg_at_10_relative_lift": 0.05067678634656092,
+    "paired_ci95": [
+      0.012182405969284028,
+      0.032721610820001704
+    ],
+    "five_percent_gate_passed": true
   },
   "sha256": {
-    "dist/skillweave-lambda.zip": "e87def737f6ec5923a8a333d1ec92de70098bea27411d342d4a8b507f0fa39d1",
+    "dist/skillweave-lambda.zip": "8d98fbab29a4c9318449acef48e045ca6ff0aca61d1a843b30f0b45c6e22ee62",
     "dist/skillweave-demo-5min.mp4": "2c7ee08c5851ac8e3673d7f94d7116108846515edaa4ad47188d56cf17f8509a",
     "artifacts/models/ltr-graph-final.ubj": "d90693ac66358b847ba74cfb4dd0b1f3a4895fd28ecb061563d107f89ca1366e",
     "artifacts/models/ltr-graph-final.manifest.json": "f857cb7f05afbbaa7498a4f687a8fccce6d773074f1fd2870544fb1acf053f26",
-    "artifacts/demo-index.json": "c5353f934b5c34bef021ab5541acddd617190f0755fdbf4524c4d8dbbb6c84f0",
+    "artifacts/models/ltr-quality-final.ubj": "d280a0952e7604934d669eee3aacb1a2f158793f0187e35ef34ce1725656bced",
+    "artifacts/models/ltr-quality-final.manifest.json": "c4ec92c3f94e5affb3769d8cf89de9716aeb491a197f389f4aa2932b13d00c07",
+    "artifacts/models/ltr-quality-final.trees.json": "df02f5ddbed46617ce40e0813fd0608c7883136a08cc9249d99da9c332b68d44",
+    "artifacts/demo-index.json": "c8184d4b814b0ba1af9f18de07c460d3636cb75c8fc3f68db326449861de21fa",
     "reports/ltr-ablation-test.json": "76af3080dbb569860ada4e42fa72ab313bda450b6f54bc5a8e51c54d4e211daa",
     "reports/ltr-ablation-holdout-1-failed.json": "a9bd07f7436c27bf3eb1140c788b265005e5cd4c599536b31674ce2135c2c1d9",
+    "reports/ltr-quality-confirmation.json": "93271b00dc6765c2ff01179c089598f1bd142c49be7458dd32288c63d06d13cf",
+    "reports/ltr-quality-replication.json": "3e260f3771b9a9b18de92d3464e00dd6b8013a293a0016805f82895d2d0b1dd2",
+    "reports/ltr-quality-company-holdout.json": "6096db8499fb7eee48bf60055cdd5aaba8da4bacb1624be49b4f1cd7363f9d2a",
+    "reports/ltr-quality-component-ablation.json": "1f3f1f38eea18b9a8ccf910ac16ed13997e659a4393fe2d4ca30fb3c9d367fe6",
+    "reports/verify-quality-release.json": "4a7b759ab799ff423feb36943ee8892dd72ca887a4ff7332dba19689e43fb173",
+    "reports/portable-ltr-parity.json": "c49010675316f4419b370f430f0deca477c58ae9dc6688e3ce637a84bff5f981",
     "reports/graph-coverage.json": "13246d0dea3240cef6196a3f40fab7c5e28d479420b0a62e183ec0c6d0d8a808",
-    "reports/business-impact.json": "e994f190628bf4bc342271d32adb64af31766b6445c62c97c32331171556c10d",
-    "reports/sam-local-smoke.json": "5845e045527302c9b79b7fc656fd875db87096a974dd70b39623e295edeec801",
+    "reports/business-impact.json": "2c80c8c7b5a9b6f72c75dda12e9fafab7c4f2d9ddbd57750822b6b3cd4825ae3",
+    "reports/sam-local-smoke.json": "416e17229e9c8e6eb1aaddd8506a2d09fa6450827c559d7de94d405081c7365e",
+    "reports/bedrock-pilot.json": "aba2f738a954ac1f3da494352d175741f0a98477080c0d8bb423be0192082c17",
     "reports/demo-video.json": "4d174b4e3904e5bce5de12f7d48bb8e18efeef310ab1d8cf19504adc2230ad45",
-    "reports/submission-audit.json": "d8712e8917504d0e2eb08e7a482002e8fc6f9f5ecb6e77b17ae188b7bda348a8",
+    "reports/submission-audit.json": "5deff83203be01ce16803ab5aaa38061ff6b3afa24312626090d86f77a90efc3",
     "reports/load-smoke.json": "d476cafd0e62204c488495bc3f4ecdcd685b7ac10c9a6b6d89e5df1399d5c89c",
-    "docs/submission-packet.md": "108d4aa89031d902197a8b66ead23e01503f9d649e905f56c3d7a86e269e84cf",
-    "reports/aws-production-smoke.json": "592fbda4d5dcd465b5d6aba34f8612825c173329862073e3918acfe8a0407abc"
+    "docs/submission-packet.md": "67af446dee98e84691a31b7610d069c748bd42157dc93d9b9deed247b1fb025f",
+    "reports/aws-production-smoke.json": "619f5478b3dfd00357ce4a83ffd555b00ec1503d39eb064bcded25b65555d064"
   },
   "external_deliverables": {
     "aws_url": "https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/",

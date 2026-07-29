@@ -35,8 +35,13 @@ Package 只包含：
 - `app/`
 - `web/`
 - `artifacts/demo-index.json`
+- `artifacts/models/ltr-quality-final.trees.json`
 
 不會把 3.8 GB 原始 CSV 上傳。
+
+Portable model 是 frozen XGBoost 的 40 棵樹，不含 XGBoost runtime dependency。
+`reports/portable-ltr-parity.json` 在 40,218 rows 上驗證純 Python 與原生
+XGBoost 的 centered score 最大誤差為 `1.08e-7`。
 
 本機以正式 Lambda Python 3.13 arm64 emulation image 驗證 bundle：
 

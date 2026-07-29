@@ -18,6 +18,12 @@ def main() -> None:
         *sorted((ROOT / "app").glob("*.py")),
         *sorted((ROOT / "web").glob("*")),
         ROOT / "artifacts" / "demo-index.json",
+        (
+            ROOT
+            / "artifacts"
+            / "models"
+            / "ltr-quality-final.trees.json"
+        ),
     ]
     missing = [path for path in include if not path.is_file()]
     if missing:

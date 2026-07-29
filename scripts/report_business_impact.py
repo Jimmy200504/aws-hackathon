@@ -80,7 +80,7 @@ def main() -> None:
     parser.add_argument(
         "--ablation",
         type=Path,
-        default=ROOT / "reports" / "ltr-ablation-test.json",
+        default=ROOT / "reports" / "ltr-quality-confirmation.json",
     )
     parser.add_argument(
         "--output",

@@ -13,9 +13,18 @@ docs/*.pdf
 artifacts/benchmark-index.json
 artifacts/temporal-eval.json
 artifacts/ltr/
+artifacts/quality/
+artifacts/bedrock-pilot/
 artifacts/models/*
 !artifacts/models/ltr-graph-final.ubj
 !artifacts/models/ltr-graph-final.manifest.json
+!artifacts/models/ltr-quality-final.ubj
+!artifacts/models/ltr-quality-final.manifest.json
+!artifacts/models/ltr-quality-final.trees.json
+
+# Local model-selection traces are retained for diagnosis, not submitted as
+# authoritative evidence. Locked confirmations are tracked explicitly.
+reports/ltr-tuning-*.json
 
 # Local and deployment state.
 .env

@@ -13,9 +13,9 @@
 
 ## 有界的規模換算
 
-鎖定 confirmation 的 Hit@1 從 `0.24134` 到 `0.24787`，絕對增加
-`0.00652`。若只把這個離線比例機械式套到資料中的 6,139,952 次七日搜尋，
-相當於每週約 **40,050 次「第一名為 relevant」的額外事件**。
+鎖定 confirmation 的 Hit@1 從 `0.27926` 到 `0.30537`，絕對增加
+`0.02612`。若只把這個離線比例機械式套到資料中的 6,139,952 次七日搜尋，
+相當於每週約 **160,360 次「第一名為 relevant」的額外事件**。
 
 這不是轉換、應徵、錄取或營收預測。它只是讓評審理解一個看似小的離線絕對
 差異在平台流量尺度上的量級。可重現計算在
@@ -68,6 +68,6 @@ all searches
   → view / apply outcome
 ```
 
-目前 locked evidence 顯示 confidence gate 只覆蓋 14.30% queries；因此下一個
-投資假設很清楚：用 train-only Bedrock extraction 提升 relevant-row coverage，
-而不是放寬 evidence gate 來追求表面 lift。
+目前 locked evidence 顯示同一個 frozen model 在兩個互斥 confirmation
+buckets 都通過 5% NDCG gate。下一個投資假設是用 train-only Bedrock
+extraction 擴大可驗證的靜態技能邊，而不是放寬 evidence 規則來追求表面 lift。

@@ -4,22 +4,22 @@
     "analysis_status": "offline_scale_translation_not_causal",
     "measurement_window": "2026-06-01/2026-06-07",
     "source_searches": 6139952,
-    "source_ablation_queries": 1993
+    "source_ablation_queries": 1991
   },
   "observed_offline_metrics": {
-    "baseline_hit_at_1": 0.2413447064726543,
-    "skill_graph_hit_at_1": 0.24786753637732062,
-    "absolute_hit_at_1_lift": 0.006522829904666322,
-    "relative_hit_at_1_lift": 0.027027027027026973,
-    "baseline_mrr": 0.40312621954618943,
-    "skill_graph_mrr": 0.4100568258746884
+    "baseline_hit_at_1": 0.2792566549472627,
+    "skill_graph_hit_at_1": 0.3053741838272225,
+    "absolute_hit_at_1_lift": 0.026117528879959773,
+    "relative_hit_at_1_lift": 0.09352517985611497,
+    "baseline_mrr": 0.43487678681048847,
+    "skill_graph_mrr": 0.46293479387402037
   },
   "scale_translation": {
     "weekly_searches": 6139952,
-    "baseline_top1_relevance_events": 1481844.9131961868,
-    "skill_graph_top1_relevance_events": 1521894.7757150026,
-    "incremental_top1_relevance_events": 40049.86251881579,
-    "rounded_incremental_top1_relevance_events": 40050
+    "baseline_top1_relevance_events": 1714622.4570567554,
+    "skill_graph_top1_relevance_events": 1874982.8307383223,
+    "incremental_top1_relevance_events": 160360.37368156677,
+    "rounded_incremental_top1_relevance_events": 160360
   },
   "financial_claim": {
     "currency_value_per_incremental_top1": null,

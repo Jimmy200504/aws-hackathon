@@ -18,6 +18,9 @@ from app.ranker import SkillWeaveRanker
 ROOT = Path(__file__).resolve().parents[1]
 WEB_ROOT = ROOT / "web"
 DEFAULT_ARTIFACT = ROOT / "artifacts" / "demo-index.json"
+DEFAULT_LTR_MODEL = (
+    ROOT / "artifacts" / "models" / "ltr-quality-final.trees.json"
+)
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -171,12 +174,19 @@ def main() -> None:
     parser.add_argument(
         "--artifact", type=Path, default=Path(os.getenv("INDEX_PATH", DEFAULT_ARTIFACT))
     )
+    parser.add_argument(
+        "--ltr-model",
+        type=Path,
+        default=Path(os.getenv("LTR_MODEL_PATH", DEFAULT_LTR_MODEL)),
+    )
     args = parser.parse_args()
     if not args.artifact.is_file():
         raise SystemExit(
             f"Missing {args.artifact}. Run: python3 scripts/build_demo_index.py"
         )
-    Handler.ranker = SkillWeaveRanker(args.artifact)
+    Handler.ranker = SkillWeaveRanker(
+        args.artifact, ltr_model_path=args.ltr_model
+    )
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     print(f"SkillWeave listening on http://{args.host}:{args.port}")
     print(f"Loaded {len(Handler.ranker.jobs):,} jobs from {args.artifact}")

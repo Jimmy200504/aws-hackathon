@@ -92,8 +92,17 @@ class GraphIsolationTests(unittest.TestCase):
             "behavior_graph": {
                 "query_job": {"python": {"job-1": [2, 1, 2]}},
                 "query_skill": {"python": {"skill.python": [2, 1, 2]}},
+                "job_global": {"job-1": [4, 2, 3]},
+                "company_global": {"company-1": [8, 3, 5]},
+                "global_totals": [20, 4, 6],
                 "snapshots": {
-                    "2026-06-01": {"query_job": {}, "query_skill": {}}
+                    "2026-06-01": {
+                        "query_job": {},
+                        "query_skill": {},
+                        "job_global": {},
+                        "company_global": {},
+                        "global_totals": [0, 0, 0],
+                    }
                 },
             },
             "jobs": [
@@ -104,6 +113,7 @@ class GraphIsolationTests(unittest.TestCase):
                     "categories": [],
                     "city": "",
                     "industry": "",
+                    "company_id": "company-1",
                     "graph_eligible": True,
                     "skills": ["skill.python"],
                     "skill_confidence": {"skill.python": 0.9},
@@ -140,6 +150,10 @@ class GraphIsolationTests(unittest.TestCase):
         )
         self.assertEqual(full["behavior_query_job_seen"], 1.0)
         self.assertEqual(day_one["behavior_query_job_seen"], 0.0)
+        self.assertEqual(full["behavior_job_global_seen"], 1.0)
+        self.assertEqual(full["behavior_company_global_seen"], 1.0)
+        self.assertEqual(day_one["behavior_job_global_seen"], 0.0)
+        self.assertEqual(day_one["behavior_company_global_seen"], 0.0)
 
 
 if __name__ == "__main__":

@@ -20,6 +20,15 @@ OUTPUT = ROOT / "reports" / "sam-local-smoke.json"
 def run(command: list[str]) -> subprocess.CompletedProcess[str]:
     environment = os.environ.copy()
     environment["SAM_CLI_TELEMETRY"] = "0"
+    if command[:3] == ["sam", "local", "invoke"]:
+        # Local Lambda execution does not call AWS. Explicit inert credentials
+        # keep SAM from trying to refresh an expired AWS login before it starts
+        # the Docker runtime.
+        environment["AWS_ACCESS_KEY_ID"] = "local-test"
+        environment["AWS_SECRET_ACCESS_KEY"] = "local-test"
+        environment["AWS_DEFAULT_REGION"] = "us-east-1"
+        environment.pop("AWS_SESSION_TOKEN", None)
+        environment.pop("AWS_PROFILE", None)
     return subprocess.run(
         command,
         cwd=ROOT,

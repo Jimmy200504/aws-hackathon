@@ -1,15 +1,16 @@
 # Graph coverage 與必要性診斷
 
-Authoritative claim 仍是鎖定的 1,993-query confirmation：NDCG@10 相對
-`+1.34%`，paired 95% CI `[+0.00226, +0.00905]`，未通過整體 `≥5%`
-gate。完整診斷由 `scripts/report_graph_coverage.py` 產生到
-`reports/graph-coverage.json`。
+本頁是 **RC6 歷史模型** 的 post-hoc coverage 診斷，保留來說明模型如何從
+失敗實驗演進；它不是目前 release claim。目前 authoritative evidence 是
+`reports/ltr-quality-confirmation.json`（+5.72%）與互斥 replication
+（+5.07%）。本頁的 1,993-query 舊結果由
+`scripts/report_graph_coverage.py` 產生到 `reports/graph-coverage.json`。
 
 ## 為何整體 lift 被稀釋
 
 | 範圍 | Queries | 無圖譜 NDCG@10 | 有圖譜 NDCG@10 | 相對 lift |
 |---|---:|---:|---:|---:|
-| 全部 locked confirmation | 1,993 | 0.4168 | 0.4225 | +1.34% |
+| RC6 locked confirmation | 1,993 | 0.4168 | 0.4225 | +1.34% |
 | Confidence gate active | 285 | 0.3434 | 0.3826 | +11.41% |
 | Relevant row 有 graph feature | 1,115 | 0.3902 | 0.4042 | +3.60% |
 

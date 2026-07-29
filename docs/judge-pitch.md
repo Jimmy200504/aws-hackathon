@@ -32,17 +32,17 @@
 
 ## Slide 5 — 數字與誠實邊界（55 秒）
 
-- Locked 1,993 queries：NDCG@10 `+1.34%`、MRR `+1.72%`、Hit@1
-  `+2.70%`；paired CI 排除 0。
-- 285 個 confidence-active queries：post-hoc NDCG `+11.41%`；整體 5%
-  gate 仍是 false。
-- 第一個負向 holdout 保留在 repo。
+- Primary 1,991 queries：NDCG@10 `+5.72%`、MRR `+6.45%`、Hit@1
+  `+9.35%`；paired CI `[+0.01491, +0.03607]`。
+- 同一 frozen model 在第二個互斥 1,992-query bucket：NDCG `+5.07%`，
+  paired CI `[+0.01218, +0.03272]`。
+- 歷史負向 holdout與一個 +4.62% 的 rejected candidate 都保留在 repo。
 - 目前證明 graph feature family 有價值；尚未把 bootstrap fixture 冒充
   Bedrock 完整產物。
 
 ## Slide 6 — 商業價值（35 秒）
 
-Hit@1 的絕對改善換算到七日搜尋量約 40,050 次額外 Top-1 relevance proxy。
+Hit@1 的絕對改善換算到七日搜尋量約 160,360 次額外 Top-1 relevance proxy。
 這不是 conversion 或營收宣稱；正式 rollout 用 search-to-apply A/B 驗證。
 
 ## Slide 7 — AWS 落地與收尾（35 秒）
@@ -59,7 +59,8 @@ contract-safe Top-20。任一 managed service timeout 都能降級。
 
 - 為何不是 RAG 文案？核心輸出是 ranking features，移除後有量化退化。
 - 如何避免 leakage？JD cutoff、title escrow、rolling graph、disjoint buckets。
-- 為何只有 1.34%？嚴格 gate 僅覆蓋 14.30%；覆蓋 subgroup 是 +11.41%。
+- 如何證明不是挑 bucket？先凍結模型，再跑第二個互斥 bucket；兩次都超過 5%，
+  且 paired CI 都排除 0。
 - 何時可發布 Bedrock graph？完整 train-only batch 通過 evidence precision、
   coverage、ablation 與新預註冊 holdout 後。
 - 會傷害新職缺嗎？冷啟動走 lexical/semantic path，並監控

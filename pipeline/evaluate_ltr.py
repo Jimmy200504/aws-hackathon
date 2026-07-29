@@ -13,9 +13,10 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.train_ltr import load_groups
-from pipeline.train_ltr import BASE_FEATURES
+from pipeline.train_ltr import BASE_FEATURES, RETRIEVAL_FEATURES, load_groups
 from scripts.benchmark import aggregate, metrics
+
+ABLATION_BASE_FEATURES = set([*BASE_FEATURES, *RETRIEVAL_FEATURES])
 
 
 def load_model(path: Path):
@@ -61,11 +62,28 @@ def score_model(
             row["features"].get("behavior_query_job_seen", 0.0) > 0
             for row in group
         ):
-            group_allowed_features = set(BASE_FEATURES)
+            group_allowed_features = ABLATION_BASE_FEATURES
+        elif confidence_gate == "behavior_or_skill_edge" and not any(
+            row["features"].get("behavior_query_job_seen", 0.0) > 0
+            or row["features"].get("behavior_query_skill_seen_count", 0.0) > 0
+            for row in group
+        ):
+            group_allowed_features = ABLATION_BASE_FEATURES
+        elif confidence_gate == "behavior_or_direct" and not any(
+            row["features"].get("behavior_query_job_seen", 0.0) > 0
+            or row["features"].get("seed_direct_match_count", 0.0) > 0
+            for row in group
+        ):
+            group_allowed_features = ABLATION_BASE_FEATURES
+        elif confidence_gate == "direct" and not any(
+            row["features"].get("seed_direct_match_count", 0.0) > 0
+            for row in group
+        ):
+            group_allowed_features = ABLATION_BASE_FEATURES
         elif confidence_gate == "seed_active" and not any(
             row["features"].get("seed_graph_raw", 0.0) > 0 for row in group
         ):
-            group_allowed_features = set(BASE_FEATURES)
+            group_allowed_features = ABLATION_BASE_FEATURES
         x = np.asarray(
             [
                 [
@@ -120,11 +138,23 @@ def main() -> None:
     parser.add_argument("--baseline-model", type=Path)
     parser.add_argument("--graph-model", type=Path, required=True)
     parser.add_argument("--pairs", type=Path, required=True)
+    parser.add_argument(
+        "--qrels",
+        type=Path,
+        help="Optional temporal-eval JSON used to bind split provenance",
+    )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--split", choices=["validation", "test"], required=True)
     parser.add_argument(
         "--confidence-gate",
-        choices=["none", "behavior_job_edge", "seed_active"],
+        choices=[
+            "none",
+            "behavior_job_edge",
+            "behavior_or_skill_edge",
+            "behavior_or_direct",
+            "direct",
+            "seed_active",
+        ],
         default="none",
     )
     args = parser.parse_args()
@@ -143,7 +173,7 @@ def main() -> None:
             baseline_model,
             baseline_manifest,
             groups,
-            allowed_features=set(BASE_FEATURES),
+            allowed_features=ABLATION_BASE_FEATURES,
         )
     graph_rows = score_model(
         graph_model,
@@ -169,6 +199,11 @@ def main() -> None:
             "confidence_gate": args.confidence_gate,
             "baseline_model": baseline_manifest,
             "graph_model": graph_manifest,
+            "evaluation_fixture": (
+                json.loads(args.qrels.read_text(encoding="utf-8"))["metadata"]
+                if args.qrels is not None
+                else None
+            ),
         },
         "baseline_no_graph": baseline,
         "skill_graph": graph,

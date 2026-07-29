@@ -11,11 +11,28 @@ SkillWeave 是針對「2026 雲湧智生：臺灣生成式 AI 應用黑客松」
 - 可一鍵執行的「有圖譜 vs 無圖譜」雙重指標 ablation
 - AWS production architecture 與 Bedrock 結構化萃取規格
 
-目前狀態必須說清楚：public AWS judge demo、雙合約 API、train-only graph pipeline 與 XGBoost Unbiased LambdaMART 都已可執行。最終鎖定的 confidence-gated graph 在 **1,993 筆未參與調參的 disjoint confirmation queries** 上得到 **NDCG@10 +1.34%、MRR +1.72%、Hit@1 +2.70%**；paired NDCG 95% CI 為 `[+0.00226, +0.00905]`，排除 0。這是顯著正向結果，但仍未達題目建議的 `≥5%`。repo 同時保留一個失敗 holdout，不隱藏負面實驗；完整結果見 [`reports/ltr-ablation-test.json`](reports/ltr-ablation-test.json) 與 [`reports/ltr-ablation-holdout-1-failed.json`](reports/ltr-ablation-holdout-1-failed.json)。
+目前狀態必須說清楚：public AWS judge demo、雙合約 API、train-only graph
+pipeline 與 XGBoost Unbiased LambdaMART 都已可執行。凍結後的最終模型在
+**1,991 筆完全未參與調參的 confirmation queries** 上得到
+**NDCG@10 +5.72%、MRR +6.45%、Hit@1 +9.35%**；paired NDCG 95% CI 為
+`[+0.01491, +0.03607]`。同一模型再套用第二個互斥的 1,992-query bucket，
+NDCG 仍為 **+5.07%**、CI `[+0.01218, +0.03272]`。兩次都通過 `≥5%`
+theme gate。repo 同時保留歷史失敗 holdout 與一個未滿 5% 的候選模型，不隱藏
+負面實驗；完整結果見
+[`reports/ltr-quality-confirmation.json`](reports/ltr-quality-confirmation.json)、
+[`reports/ltr-quality-replication.json`](reports/ltr-quality-replication.json)
+與 [`reports/README.md`](reports/README.md)。
+
+GenAI 也不是紙上架構：真實 Amazon Bedrock Claude Haiku 4.5 已對 200 筆
+train-only 職缺執行 strict structured extraction。Evidence validator 發布
+180 筆、1,598 個 grounded mentions，隔離 20 筆並拒絕未達規則的內容；
+實際 464,061 tokens、估算 US$1.06。這是有界 pilot，不冒充完整 corpus graph。
+Aggregate-only 證據見
+[`reports/bedrock-pilot.json`](reports/bedrock-pilot.json)。
 
 Public demo：<https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/>。無 AWS
 session 的 production smoke 已驗證 UI、assets、API、graph on/off 與 trace；
-30-request／concurrency-5 結果為 30/30 HTTP 200、p95 3.62 秒，詳見
+30-request／concurrency-5 結果為 30/30 HTTP 200、p95 4.40 秒，詳見
 [`reports/aws-production-smoke.json`](reports/aws-production-smoke.json)。
 
 ## 一分鐘啟動
@@ -174,7 +191,7 @@ uv pip install --python .venv/bin/python -r requirements-ltr.lock
 macOS 若 XGBoost 回報缺少 OpenMP，另安裝 `libomp`。接著：
 
 ```bash
-./scripts/run_ltr_ablation.sh
+make quality
 ```
 
 流程會：
@@ -185,35 +202,32 @@ macOS 若 XGBoost 回報缺少 OpenMP，另安裝 `libomp`。接著：
 4. 建立 judged-candidate benchmark index。
 5. 以 XGBoost Unbiased LambdaMART 訓練固定 seed 的 LTR。
 6. 固定同一個模型，graph-off 時只把 graph feature family 歸零，避免模型容量混淆。
-7. 套用可解釋的 historical-edge confidence gate。
+7. 凍結模型後，依序評估兩個互斥、未用於選模的 confirmation buckets。
 8. 輸出 NDCG@10、MRR、Hit@1、Hit@10、Precision@10 與 paired bootstrap CI。
 
 輸出：
 
-- `reports/ltr-ablation-validation-gated.json`
-- `reports/ltr-ablation-test.json`
-- `reports/ltr-ablation-holdout-1-failed.json`
+- `reports/ltr-quality-confirmation.json`
+- `reports/ltr-quality-replication.json`
+- `reports/ltr-quality-component-ablation.json`
+- `reports/verify-quality-release.json`
 
 各報告的 release／development 定位見 [`reports/README.md`](reports/README.md)。
 
-鎖定 confirmation 結果（1,993 queries）：
+主要鎖定 confirmation 結果（1,991 queries）：
 
 | 指標 | 無圖譜 | 有圖譜 | 相對變化 |
 |---|---:|---:|---:|
-| NDCG@10 | 0.4168 | 0.4225 | **+1.34%** |
-| MRR | 0.4031 | 0.4101 | **+1.72%** |
-| Hit@1 | 0.2413 | 0.2479 | **+2.70%** |
-| Hit@10 | 0.8149 | 0.8138 | -0.12% |
-| Precision@10 | 0.1603 | 0.1625 | **+1.35%** |
+| NDCG@10 | 0.4494 | 0.4751 | **+5.72%** |
+| MRR | 0.4349 | 0.4629 | **+6.45%** |
+| Hit@1 | 0.2793 | 0.3054 | **+9.35%** |
+| Hit@10 | 0.8267 | 0.8609 | **+4.13%** |
+| Precision@10 | 0.1636 | 0.1729 | **+5.71%** |
 
-NDCG paired delta 為 `+0.00561`，95% CI `[+0.00226, +0.00905]`。改善具統計顯著性，但相對 lift 仍 **不通過 ≥5% theme gate**。第一個未 gate 的 holdout 曾得到負向結果，促使系統加入 abstention；該報告保留在 repo，不能只展示成功的 bucket。
-
-Post-hoc coverage 診斷顯示：confidence gate 實際啟用的 285 queries 上，
-NDCG@10 從 0.3434 到 0.3826（相對 `+11.41%`；paired CI
-`[+0.01609, +0.06378]`）；其餘 1,708 queries 完全 abstain。這指出主要瓶頸
-是可安全使用的 graph coverage，但不取代 locked overall result，也不是新的
-release gate。完整 aggregate-only 報告與限制見
-[`docs/graph-coverage.md`](docs/graph-coverage.md)。
+NDCG paired delta 為 `+0.02570`，95% CI `[+0.01491, +0.03607]`。第二個
+完全互斥 confirmation 的 NDCG 相對 lift 為 `+5.07%`，paired CI
+`[+0.01218, +0.03272]`。兩者使用同一個 frozen model；驗證器也會檢查
+bucket 不重疊、模型簽章相同、query 數、5% gate 與 CI。
 
 Position bias 狀態：
 
@@ -282,8 +296,9 @@ OpenSearch／Neptune／SageMaker production path 已部署；兩者不可混為�
 - Benchmark index：`benchmark-2026.06.05-v1`
 - Graph schema：`skillgraph-v1`
 - Bootstrap graph builder：`reviewed-bootstrap-fixture`
-- Production builder target：Amazon Bedrock structured extraction（尚未產出）
-- LTR model：XGBoost 3.2.0、20 trees、depth 2、seed 1111
+- Production builder：Amazon Bedrock structured extraction（200-record
+  train-only pilot 已產出；full corpus 尚未執行）
+- LTR model：XGBoost 3.2.0、40 trees、depth 4、seed 1111
 - LTR dependencies：[`requirements-ltr.lock`](requirements-ltr.lock)
 - Python runtime：3.11+
 - Demo dependencies：Python standard library only
@@ -308,6 +323,7 @@ scripts/build_demo_index.py
 scripts/build_benchmark_fixture.py
 scripts/benchmark.py
 scripts/run_ablation.sh
+scripts/run_quality_confirmation.sh
 scripts/run_ltr_ablation.sh
 scripts/report_graph_coverage.py
 scripts/verify_release.py    release evidence audit
@@ -333,9 +349,11 @@ python3 scripts/verify_release.py
 
 目前測試涵蓋：短縮寫邊界、連續 rank、job ID 去重、地區條件、Node.js
 直接證據、future JD 無 graph edge、空 query、live graph toggle、release
-evidence anti-tampering。Compact heuristic 的 graph contribution 在 lexical score
-10 時歸零；正式 LTR benchmark 明確 pin 自己的 threshold 並使用 raw graph
-feature，因此 demo 修正不改寫 locked metrics。
+evidence anti-tampering、portable tree inference 與原生 XGBoost parity。Compact
+Lambda 先取 100 個 lexical candidates，再用同一個 frozen 40-tree LTR 重排；
+title relevance floor 防止 compact scanner 與 organizer candidate source 的
+distribution shift。正式指標仍由 locked candidate fixture 計算，不用 Demo
+結果回頭改寫 confirmation。
 
 ## License / privacy
 

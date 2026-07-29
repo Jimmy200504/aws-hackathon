@@ -26,13 +26,20 @@ substring、temporal cutoff、type whitelist 與 confidence gate 的邊才能發
 線上以 Query → Skill → Job 的一跳路徑產生可解釋 ranking features；無信心或
 新職缺則回退 lexical cold-start，不用生成式 AI 自由撰寫結果文案。
 
-鎖定後的 1,993 個 confirmation queries 上，同一個
+真實 Amazon Bedrock Claude Haiku 4.5 pilot 已處理
+200 筆 train-only 職缺：
+180 筆通過、20
+筆隔離、1,598 個 grounded mentions、
+0 fatal；實際成本估算 US$1.06。這是 bounded
+pilot，不冒充完整 production corpus。
+
+鎖定後的 1,991 個 confirmation queries 上，同一個
 已訓練模型在關閉 graph feature family 後作為 baseline。Graph-on 的 NDCG@10
-由 0.41684 提升到 0.42245
-（相對 +1.34%），MRR +1.72%、Hit@1
-+2.70%；paired NDCG 差異的 95% CI 為
-[0.00226, 0.00905]。整體建議 5% gate **未通過**，
-第一個負向 holdout 也保留在 repo。
+由 0.44944 提升到 0.47514
+（相對 +5.72%），MRR +6.45%、Hit@1
++9.35%；paired NDCG 差異的 95% CI 為
+[0.01491, 0.03607]。整體 5% gate **已通過**。
+同一 frozen model 在第二個互斥的 1,992-query confirmation 仍得到 NDCG +5.07%，CI [0.01218, 0.03272]。歷史負向 holdout與 rejected candidate 也保留在 repo。
 
 ## 原創性與生成式 AI 必要性
 
@@ -60,16 +67,20 @@ substring、temporal cutoff、type whitelist 與 confidence gate 的邊才能發
 
 | 證據 | 結果 | 解讀限制 |
 |---|---:|---|
-| Locked NDCG@10 relative lift | +1.34% | 整體正式結果；5% gate 未過 |
-| Locked MRR relative lift | +1.72% | 同一模型 graph ablation |
-| Locked Hit@1 relative lift | +2.70% | 離線 relevance proxy |
-| Locked Hit@10 relative lift | -0.12% | 不隱藏小幅負值 |
-| Paired NDCG 95% CI | [0.00226, 0.00905] | 差異全為正 |
+| Primary NDCG@10 relative lift | +5.72% | 鎖定 confirmation；5% gate 通過 |
+| Replication NDCG@10 relative lift | +5.07% | 第二個互斥 1,992-query bucket |
+| Replication paired NDCG 95% CI | [0.01218, 0.03272] | 差異全為正 |
+| Locked MRR relative lift | +6.45% | 同一模型 graph ablation |
+| Locked Hit@1 relative lift | +9.35% | 離線 relevance proxy |
+| Locked Hit@10 relative lift | +4.13% | 不隱藏小幅負值 |
+| Paired NDCG 95% CI | [0.01491, 0.03607] | 差異全為正 |
+| Lambda/native model parity | 1.07e-07 max error | 40,218 rows；tolerance 1e-06 |
+| Real Bedrock structured extraction | 180/200 accepted；1,598 mentions | train-only bounded pilot；US$1.06 |
 | Relevant-row graph coverage | 40.53% | Coverage 是下一個瓶頸 |
 | Gate-active subgroup | 285 queries；NDCG +11.41% | Post-hoc，不能取代整體 |
-| 七日規模換算 | 約 40,050 次額外 Top-1 relevance events | 非 conversion、apply、hire 或營收 |
-| Release verifier | 67 PASS / 0 FAIL / 0 WARN | WARN 僅代表尚未登錄的外部 URL |
-| AWS production smoke | 30/30 HTTP 200；concurrency 5；p95 3.62s | Public HTTPS；低於 10s Lambda timeout |
+| 七日規模換算 | 約 160,360 次額外 Top-1 relevance events | 非 conversion、apply、hire 或營收 |
+| Release verifier | 88 PASS / 0 FAIL / 0 WARN | WARN 僅代表尚未登錄的外部 URL |
+| AWS production smoke | 30/30 HTTP 200；concurrency 5；p95 4.40s | Public HTTPS；低於 10s Lambda timeout |
 
 ## 商業應用
 
@@ -102,15 +113,15 @@ gap。目前沒有因果轉換或單次相關曝光的貨幣價值，因此**不
 3. 搜尋 `React 前端工程師`，展開 Query → Skill → Job evidence。
 4. 查看 cold-start 職缺，確認 cutoff 後 JD 沒有 graph edge。
 5. 開 `reports/aws-production-smoke.json`，核對 public UI/API、30/30 與 p95。
-6. 執行 `./scripts/release_gate.sh`，核對 tests、hash、ablation 與失敗實驗。
+6. 執行 `python3 scripts/verify_quality_release.py`，核對 frozen model、互斥
+   buckets、5% gate 與 CI。
 
 ## 不可誇大的限制
 
-- 不可宣稱整體 NDCG 提升 5%；正式 locked 值是
-  +1.34%。
-- 不可把 285-query post-hoc subgroup
-  +11.41% 偷換成整體結果。
+- 可宣稱內部時間切分 confirmation 的 NDCG 提升
+  +5.72%；必須說明它不是主辦方官方 holdout。
+- 不可只展示成功模型而隱藏歷史負向 holdout或 rejected candidate。
 - 不可把 bootstrap fixture 說成完整 Bedrock batch 產物。
 - 不可把 30 分鐘 attribution qrels 說成主辦方正式 relevance ground truth。
-- 不可把約 40,050 次 Top-1 relevance proxy 說成應徵、錄取或營收。
+- 不可把約 160,360 次 Top-1 relevance proxy 說成應徵、錄取或營收。
 - AWS production smoke 是 bounded judge-demo 證據，不等同大規模壓力測試。

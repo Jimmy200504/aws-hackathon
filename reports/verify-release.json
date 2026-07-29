@@ -1,11 +1,11 @@
 {
   "verifier_version": "1",
-  "verified_at_utc": "2026-07-28T16:29:47Z",
+  "verified_at_utc": "2026-07-29T13:32:13Z",
   "release": "skillweave-2026.07.28-rc6",
   "passed": true,
   "summary": {
-    "total": 67,
-    "passed": 67,
+    "total": 89,
+    "passed": 89,
     "failed": 0,
     "warnings": 0
   },
@@ -47,6 +47,11 @@
           "id": "G1.7",
           "status": "PASS",
           "message": "Live graph toggle changes ranking with non-zero graph contribution."
+        },
+        {
+          "id": "G1.8",
+          "status": "PASS",
+          "message": "Live API uses the frozen quality LTR model."
         }
       ]
     },
@@ -91,12 +96,17 @@
         {
           "id": "G3.4",
           "status": "PASS",
-          "message": "Registered 20-tree/depth-2 capacity is intact."
+          "message": "Frozen 40-tree/depth-4 quality model capacity is intact."
         },
         {
           "id": "G3.5",
           "status": "PASS",
           "message": "Model seed is 1111."
+        },
+        {
+          "id": "G3.6",
+          "status": "PASS",
+          "message": "Frozen release model and quality feature set are registered."
         }
       ]
     },
@@ -116,7 +126,7 @@
         {
           "id": "G4.3",
           "status": "PASS",
-          "message": "Registered confidence gate is active."
+          "message": "Final model does not depend on a post-hoc confidence gate."
         },
         {
           "id": "G4.4",
@@ -126,7 +136,7 @@
         {
           "id": "G4.5",
           "status": "PASS",
-          "message": "The unmet 5% gate remains honestly false."
+          "message": "The frozen confirmation clears the 5% NDCG gate."
         },
         {
           "id": "G4.6",
@@ -137,6 +147,121 @@
           "id": "G4.7",
           "status": "PASS",
           "message": "Graph-on NDCG lift is positive."
+        }
+      ]
+    },
+    "G14_quality_confirmations": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G14.1.1",
+          "status": "PASS",
+          "message": "Confirmation 1 contains at least 1,900 queries."
+        },
+        {
+          "id": "G14.1.2",
+          "status": "PASS",
+          "message": "Confirmation 1 clears the 5% NDCG gate."
+        },
+        {
+          "id": "G14.1.3",
+          "status": "PASS",
+          "message": "Confirmation 1 paired CI is entirely positive."
+        },
+        {
+          "id": "G14.1.4",
+          "status": "PASS",
+          "message": "Confirmation 1 uses its registered hash bucket."
+        },
+        {
+          "id": "G14.1.5",
+          "status": "PASS",
+          "message": "Confirmation 1 uses same-model ablation."
+        },
+        {
+          "id": "G14.2.1",
+          "status": "PASS",
+          "message": "Confirmation 2 contains at least 1,900 queries."
+        },
+        {
+          "id": "G14.2.2",
+          "status": "PASS",
+          "message": "Confirmation 2 clears the 5% NDCG gate."
+        },
+        {
+          "id": "G14.2.3",
+          "status": "PASS",
+          "message": "Confirmation 2 paired CI is entirely positive."
+        },
+        {
+          "id": "G14.2.4",
+          "status": "PASS",
+          "message": "Confirmation 2 uses its registered hash bucket."
+        },
+        {
+          "id": "G14.2.5",
+          "status": "PASS",
+          "message": "Confirmation 2 uses same-model ablation."
+        },
+        {
+          "id": "G14.3",
+          "status": "PASS",
+          "message": "Both confirmations use the exact same frozen model signature."
+        },
+        {
+          "id": "G14.4",
+          "status": "PASS",
+          "message": "Confirmation hash buckets are disjoint."
+        }
+      ]
+    },
+    "G15_portable_ltr": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G15.1",
+          "status": "PASS",
+          "message": "Portable LTR parity schema is registered."
+        },
+        {
+          "id": "G15.2",
+          "status": "PASS",
+          "message": "Portable inference was checked on at least 40,000 rows."
+        },
+        {
+          "id": "G15.3",
+          "status": "PASS",
+          "message": "Portable and native XGBoost scores agree within float32 tolerance."
+        }
+      ]
+    },
+    "G16_bedrock_pilot": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G16.1",
+          "status": "PASS",
+          "message": "Real Bedrock pilot schema and bounded status are registered."
+        },
+        {
+          "id": "G16.2",
+          "status": "PASS",
+          "message": "Bedrock pilot processed 200 records with no fatal output."
+        },
+        {
+          "id": "G16.3",
+          "status": "PASS",
+          "message": "Bedrock produced substantial validated mentions and quarantined relations."
+        },
+        {
+          "id": "G16.4",
+          "status": "PASS",
+          "message": "Bedrock pilot records bounded token usage and cost."
+        },
+        {
+          "id": "G16.5",
+          "status": "PASS",
+          "message": "Public Bedrock evidence is aggregate-only."
         }
       ]
     },
@@ -361,7 +486,7 @@
         {
           "id": "G11.4",
           "status": "PASS",
-          "message": "Recommended 5% gap remains honestly false."
+          "message": "Recommended 5% quality gate is backed by release evidence."
         }
       ]
     },
@@ -376,12 +501,12 @@
         {
           "id": "G7.2",
           "status": "PASS",
-          "message": "Manifest keeps the 5% gate false."
+          "message": "Manifest registers the verified 5% quality gate."
         },
         {
           "id": "G7.3",
           "status": "PASS",
-          "message": "Verified 15 artifact hashes."
+          "message": "Verified 25 artifact hashes."
         },
         {
           "id": "G7.4",

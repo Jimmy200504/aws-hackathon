@@ -230,6 +230,17 @@ class ReleaseVerifier:
             "Live graph toggle changes ranking with non-zero graph contribution.",
             "Live graph toggle does not affect the compact ranking.",
         )
+        self.add(
+            group,
+            "G1.8",
+            (
+                search_body.get("meta", {}).get("ranking_model")
+                == "ltr-quality-final.ubj"
+                and RANKER.ltr_model is not None
+            ),
+            "Live API uses the frozen quality LTR model.",
+            "Live API fell back to heuristic-only ranking.",
+        )
 
         graph_group = "G2_graph_cutoff"
         manifest = self.load_json("release-manifest.json")
@@ -264,7 +275,7 @@ class ReleaseVerifier:
     def check_model(self) -> None:
         group = "G3_model_manifest"
         try:
-            model = self.load_json("artifacts/models/ltr-graph-final.manifest.json")
+            model = self.load_json("artifacts/models/ltr-quality-final.manifest.json")
             loaded = True
         except (OSError, ValueError, json.JSONDecodeError):
             model = {}
@@ -281,10 +292,19 @@ class ReleaseVerifier:
             ("G3.3", model.get("objective") == "rank:ndcg", "Ranking objective is rank:ndcg."),
             (
                 "G3.4",
-                model.get("n_estimators") == 20 and model.get("max_depth") == 2,
-                "Registered 20-tree/depth-2 capacity is intact.",
+                model.get("n_estimators") == 40
+                and model.get("max_depth") == 4
+                and float(model.get("min_child_weight", 0.0)) == 12.0
+                and float(model.get("learning_rate", 0.0)) == 0.05,
+                "Frozen 40-tree/depth-4 quality model capacity is intact.",
             ),
             ("G3.5", model.get("random_seed") == 1111, "Model seed is 1111."),
+            (
+                "G3.6",
+                model.get("model") == "ltr-quality-final.ubj"
+                and model.get("feature_set") == "quality_minimal",
+                "Frozen release model and quality feature set are registered.",
+            ),
         ]
         for check_id, condition, message in expectations:
             self.add(
@@ -297,7 +317,9 @@ class ReleaseVerifier:
 
     def check_ablation(self, report: dict[str, Any] | None = None) -> None:
         group = "G4_ablation_report"
-        report = report or self.load_json("reports/ltr-ablation-test.json")
+        report = report or self.load_json(
+            "reports/ltr-quality-confirmation.json"
+        )
         metadata = report.get("metadata", {})
         gates = report.get("release_gates", {})
         bootstrap = report.get("paired_bootstrap_ndcg", {})
@@ -305,13 +327,198 @@ class ReleaseVerifier:
         conditions = [
             ("G4.1", metadata.get("schema") == "skillweave-ltr-ablation-v1", "Ablation schema is registered.", "Ablation schema is unexpected."),
             ("G4.2", int(metadata.get("queries", 0)) >= 1900, "Confirmation contains at least 1,900 queries.", "Confirmation query count is too small."),
-            ("G4.3", metadata.get("confidence_gate") == "behavior_job_edge", "Registered confidence gate is active.", "Confirmation confidence gate changed."),
+            ("G4.3", metadata.get("confidence_gate") == "none", "Final model does not depend on a post-hoc confidence gate.", "Final confirmation unexpectedly depends on a confidence gate."),
             ("G4.4", float(bootstrap.get("ci95_low", -1.0)) > 0.0, "Paired NDCG CI is entirely positive.", "Paired NDCG CI does not exclude zero."),
-            ("G4.5", gates.get("ndcg_relative_lift_at_least_5pct") is False, "The unmet 5% gate remains honestly false.", "The 5% gate was flipped to an unsupported success."),
+            ("G4.5", gates.get("ndcg_relative_lift_at_least_5pct") is True and float(lift.get("ndcg@10", 0.0)) >= 0.05, "The frozen confirmation clears the 5% NDCG gate.", "The 5% gate is absent or unsupported by the measured lift."),
             ("G4.6", gates.get("paired_ci_excludes_zero") is True, "Report records a positive paired CI.", "Report does not record a positive paired CI."),
             ("G4.7", float(lift.get("ndcg@10", -1.0)) > 0.0, "Graph-on NDCG lift is positive.", "Graph-on NDCG lift is not positive."),
         ]
         for check_id, condition, success, failure in conditions:
+            self.add(group, check_id, condition, success, failure)
+
+    def check_quality_confirmations(self) -> None:
+        group = "G14_quality_confirmations"
+        reports = [
+            self.load_json("reports/ltr-quality-confirmation.json"),
+            self.load_json("reports/ltr-quality-replication.json"),
+        ]
+        expected_buckets = [(2400, 3400), (3400, 4400)]
+        signatures = []
+        actual_buckets = []
+        for index, (report, expected) in enumerate(
+            zip(reports, expected_buckets), 1
+        ):
+            metadata = report.get("metadata", {})
+            fixture = metadata.get("evaluation_fixture", {})
+            model = metadata.get("graph_model", {})
+            gates = report.get("release_gates", {})
+            ci = report.get("paired_bootstrap_ndcg", {})
+            lift = report.get("relative_lift", {})
+            actual = (
+                int(fixture.get("test_sample_bucket_start", -1)),
+                int(
+                    fixture.get(
+                        "test_sample_bucket_end_exclusive", -1
+                    )
+                ),
+            )
+            actual_buckets.append(actual)
+            signatures.append(
+                (
+                    model.get("model"),
+                    model.get("feature_set"),
+                    tuple(model.get("features", [])),
+                    model.get("n_estimators"),
+                    model.get("max_depth"),
+                    model.get("min_child_weight"),
+                    model.get("learning_rate"),
+                )
+            )
+            conditions = [
+                (
+                    f"G14.{index}.1",
+                    int(metadata.get("queries", 0)) >= 1900,
+                    f"Confirmation {index} contains at least 1,900 queries.",
+                    f"Confirmation {index} query count is too small.",
+                ),
+                (
+                    f"G14.{index}.2",
+                    float(lift.get("ndcg@10", 0.0)) >= 0.05
+                    and gates.get(
+                        "ndcg_relative_lift_at_least_5pct"
+                    )
+                    is True,
+                    f"Confirmation {index} clears the 5% NDCG gate.",
+                    f"Confirmation {index} does not clear the 5% NDCG gate.",
+                ),
+                (
+                    f"G14.{index}.3",
+                    float(ci.get("ci95_low", -1.0)) > 0.0,
+                    f"Confirmation {index} paired CI is entirely positive.",
+                    f"Confirmation {index} paired CI includes zero.",
+                ),
+                (
+                    f"G14.{index}.4",
+                    actual == expected,
+                    f"Confirmation {index} uses its registered hash bucket.",
+                    f"Confirmation {index} hash bucket changed.",
+                ),
+                (
+                    f"G14.{index}.5",
+                    metadata.get("ablation_design")
+                    == (
+                        "same trained model; graph feature family "
+                        "zeroed at inference"
+                    ),
+                    f"Confirmation {index} uses same-model ablation.",
+                    f"Confirmation {index} changed its ablation design.",
+                ),
+            ]
+            for check_id, condition, success, failure in conditions:
+                self.add(group, check_id, condition, success, failure)
+        self.add(
+            group,
+            "G14.3",
+            len(set(signatures)) == 1,
+            "Both confirmations use the exact same frozen model signature.",
+            "Confirmation model signatures differ.",
+        )
+        self.add(
+            group,
+            "G14.4",
+            actual_buckets[0][1] <= actual_buckets[1][0],
+            "Confirmation hash buckets are disjoint.",
+            "Confirmation hash buckets overlap.",
+        )
+
+    def check_portable_ltr(self) -> None:
+        group = "G15_portable_ltr"
+        report = self.load_json("reports/portable-ltr-parity.json")
+        metadata = report.get("metadata", {})
+        checks = [
+            (
+                "G15.1",
+                metadata.get("schema")
+                == "skillweave-portable-ltr-parity-v1",
+                "Portable LTR parity schema is registered.",
+                "Portable LTR parity schema is unexpected.",
+            ),
+            (
+                "G15.2",
+                int(metadata.get("rows", 0)) >= 40_000,
+                "Portable inference was checked on at least 40,000 rows.",
+                "Portable inference parity sample is too small.",
+            ),
+            (
+                "G15.3",
+                report.get("passed") is True
+                and float(
+                    report.get("max_centered_absolute_error", 1.0)
+                )
+                <= float(report.get("tolerance", 0.0))
+                <= 1e-6,
+                "Portable and native XGBoost scores agree within float32 tolerance.",
+                "Portable inference differs from native XGBoost.",
+            ),
+        ]
+        for check_id, condition, success, failure in checks:
+            self.add(group, check_id, condition, success, failure)
+
+    def check_bedrock_pilot(self) -> None:
+        group = "G16_bedrock_pilot"
+        report = self.load_json("reports/bedrock-pilot.json")
+        metadata = report.get("metadata", {})
+        records = report.get("records", {})
+        usage = report.get("usage", {})
+        graph = report.get("validated_graph", {})
+        checks = [
+            (
+                "G16.1",
+                metadata.get("schema") == "skillweave-bedrock-pilot-v1"
+                and metadata.get("analysis_status")
+                == "bounded_real_bedrock_train_only_pilot",
+                "Real Bedrock pilot schema and bounded status are registered.",
+                "Bedrock pilot metadata is missing or overclaims production scale.",
+            ),
+            (
+                "G16.2",
+                int(records.get("input", 0)) == 200
+                and int(records.get("accepted", 0)) >= 170
+                and int(records.get("fatal", -1)) == 0,
+                "Bedrock pilot processed 200 records with no fatal output.",
+                "Bedrock pilot population or fatal count is invalid.",
+            ),
+            (
+                "G16.3",
+                int(graph.get("mentions", 0)) >= 1000
+                and int(
+                    graph.get(
+                        "relations_pending_corpus_corroboration", 0
+                    )
+                )
+                > 0,
+                "Bedrock produced substantial validated mentions and quarantined relations.",
+                "Bedrock graph evidence is too small.",
+            ),
+            (
+                "G16.4",
+                0.0 < float(usage.get("estimated_usd", 0.0)) < 5.0
+                and int(usage.get("total_tokens", 0)) > 0,
+                "Bedrock pilot records bounded token usage and cost.",
+                "Bedrock token/cost evidence is absent or outside the pilot bound.",
+            ),
+            (
+                "G16.5",
+                metadata.get("privacy")
+                == "aggregate-only report; no job or user identifiers"
+                and '"job_id"' not in json.dumps(
+                    report, ensure_ascii=False
+                ),
+                "Public Bedrock evidence is aggregate-only.",
+                "Public Bedrock evidence contains row identifiers.",
+            ),
+        ]
+        for check_id, condition, success, failure in checks:
             self.add(group, check_id, condition, success, failure)
 
     def check_failed_holdout(self, report: dict[str, Any] | None = None) -> None:
@@ -430,7 +637,7 @@ class ReleaseVerifier:
             (
                 "G9.2",
                 int(metadata.get("source_searches", 0)) == 6_139_952
-                and int(metadata.get("source_ablation_queries", 0)) == 1993,
+                and int(metadata.get("source_ablation_queries", 0)) == 1991,
                 "Business report uses the documented data and confirmation populations.",
                 "Business report populations differ from release evidence.",
             ),
@@ -531,13 +738,14 @@ class ReleaseVerifier:
         expected_blockers = {
             name for name in mandatory if requirements.get(name) is not True
         }
-        if (
-            requirements.get("R2a_full_train_only_bedrock_graph_executed")
-            is not True
-        ):
-            expected_blockers.add(
-                "R2a_full_train_only_bedrock_graph_executed"
-            )
+        bedrock_requirement = (
+            "R2b_real_train_only_bedrock_pilot_executed"
+            if "R2b_real_train_only_bedrock_pilot_executed"
+            in requirements
+            else "R2a_full_train_only_bedrock_graph_executed"
+        )
+        if requirements.get(bedrock_requirement) is not True:
+            expected_blockers.add(bedrock_requirement)
         local_required = {
             "R1_local_live_demo",
             "R1b_five_minute_video_artifact",
@@ -555,6 +763,10 @@ class ReleaseVerifier:
             "K1_kiro_activity_evidence",
             "S1_copy_ready_submission_packet",
         }
+        if "R2b_real_train_only_bedrock_pilot_executed" in requirements:
+            local_required.add(
+                "R2b_real_train_only_bedrock_pilot_executed"
+            )
         conditions = [
             (
                 "G11.1",
@@ -579,9 +791,9 @@ class ReleaseVerifier:
             ),
             (
                 "G11.4",
-                requirements.get("E2_recommended_five_percent_lift") is False,
-                "Recommended 5% gap remains honestly false.",
-                "Submission audit fabricates the recommended 5% result.",
+                requirements.get("E2_recommended_five_percent_lift") is True,
+                "Recommended 5% quality gate is backed by release evidence.",
+                "Submission audit does not register the verified 5% result.",
             ),
         ]
         for check_id, condition, success, failure in conditions:
@@ -731,9 +943,9 @@ class ReleaseVerifier:
         self.add(
             group,
             "G7.2",
-            confirmation.get("aspirational_five_percent_gate_passed") is False,
-            "Manifest keeps the 5% gate false.",
-            "Manifest makes an unsupported 5% claim.",
+            confirmation.get("aspirational_five_percent_gate_passed") is True,
+            "Manifest registers the verified 5% quality gate.",
+            "Manifest does not register the verified 5% quality gate.",
         )
 
         hashes = manifest.get("sha256", {})
@@ -828,6 +1040,9 @@ class ReleaseVerifier:
             self.check_api,
             self.check_model,
             self.check_ablation,
+            self.check_quality_confirmations,
+            self.check_portable_ltr,
+            self.check_bedrock_pilot,
             self.check_failed_holdout,
             self.check_load_smoke,
             self.check_graph_coverage,

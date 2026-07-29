@@ -117,6 +117,7 @@ def run_load_request(base_url: str, index: int) -> dict[str, Any]:
             "latency_ms": result["latency_ms"],
             "top_10": search_contract(body),
             "index_version": body.get("meta", {}).get("index_version"),
+            "ranking_model": body.get("meta", {}).get("ranking_model"),
             "error": None,
         }
     except Exception as exc:
@@ -125,6 +126,7 @@ def run_load_request(base_url: str, index: int) -> dict[str, Any]:
             "latency_ms": None,
             "top_10": False,
             "index_version": None,
+            "ranking_model": None,
             "error": f"{type(exc).__name__}: {exc}",
         }
 
@@ -194,6 +196,22 @@ def run_smoke(base_url: str, requests: int, concurrency: int) -> dict[str, Any]:
             and meta.get("metadata", {}).get("index_version") == INDEX_VERSION
             and meta.get("job_count") == 12_000
         ),
+        "quality_ltr_deployed": (
+            graph_on.get("meta", {}).get("ranking_model")
+            == "ltr-quality-final.ubj"
+            and graph_off.get("meta", {}).get("ranking_model")
+            == "ltr-quality-final.ubj"
+        ),
+        "real_bedrock_pilot_deployed": (
+            meta.get("metadata", {})
+            .get("bedrock_pilot", {})
+            .get("records_accepted")
+            == 180
+            and meta.get("metadata", {})
+            .get("bedrock_pilot", {})
+            .get("model_id")
+            == "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+        ),
         "graph_on_contract": (
             graph_on_result["status"] == 200 and search_contract(graph_on)
         ),
@@ -222,6 +240,12 @@ def run_smoke(base_url: str, requests: int, concurrency: int) -> dict[str, Any]:
                 for path in paths
             )
         ),
+        "bedrock_trace_provenance": any(
+            isinstance(path.get("provenance"), dict)
+            and path["provenance"].get("source")
+            == "amazon_bedrock_structured_extraction"
+            for path in paths
+        ),
     }
 
     started = time.perf_counter()
@@ -245,6 +269,10 @@ def run_smoke(base_url: str, requests: int, concurrency: int) -> dict[str, Any]:
     matching_index = sum(
         result["index_version"] == INDEX_VERSION for result in results
     )
+    matching_model = sum(
+        result["ranking_model"] == "ltr-quality-final.ubj"
+        for result in results
+    )
     errors = [result["error"] for result in results if result["error"]]
     load = {
         "requests": requests,
@@ -252,6 +280,7 @@ def run_smoke(base_url: str, requests: int, concurrency: int) -> dict[str, Any]:
         "http_200": http_200,
         "top_10_responses": top_10,
         "matching_index_version": matching_index,
+        "matching_ranking_model": matching_model,
         "elapsed_ms": elapsed_ms,
         "throughput_requests_per_second": round(
             requests / (elapsed_ms / 1000), 2
@@ -270,6 +299,7 @@ def run_smoke(base_url: str, requests: int, concurrency: int) -> dict[str, Any]:
             "load_all_http_200": http_200 == requests,
             "load_all_top_10": top_10 == requests,
             "load_index_version": matching_index == requests,
+            "load_quality_ltr_model": matching_model == requests,
             "load_p95_below_timeout": (
                 bool(latencies) and percentile(latencies, 0.95) < 10_000.0
             ),
@@ -298,6 +328,12 @@ def run_smoke(base_url: str, requests: int, concurrency: int) -> dict[str, Any]:
                 row.get("job_id") for row in graph_off_rows
             ],
             "graph_trace_path_count": len(paths),
+            "bedrock_trace_path_count": sum(
+                isinstance(path.get("provenance"), dict)
+                and path["provenance"].get("source")
+                == "amazon_bedrock_structured_extraction"
+                for path in paths
+            ),
         },
         "load": load,
     }

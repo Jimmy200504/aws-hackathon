@@ -24,7 +24,7 @@
 
 講稿：
 
-> LLM 的核心工作發生在索引前：它把 JD 中不同寫法正規化成 AWS、Docker、Kubernetes nodes，並保存原文 evidence。線上只走一跳、帶權、可追溯的路徑；只有凍結 train graph 有高信心歷史 edge 時才啟用 graph model，否則 abstain。
+> LLM 的核心工作發生在索引前：它把 JD 中不同寫法正規化成 AWS、Docker、Kubernetes nodes，並保存原文 evidence。線上只走一跳、帶權、可追溯的路徑；模型只讀 train-only graph 和行為先驗，沒有通過 evidence validator 的靜態邊不會發布。
 
 顯示：
 
@@ -39,7 +39,7 @@ weight + evidence + edge type
 
 講稿：
 
-> 同一個已訓練模型可以把 graph feature family 歸零，避免拿兩個不同容量的模型製造假 lift。鎖定後的 1,993-query confirmation 中，NDCG 提升 1.34%、MRR 1.72%，paired CI 排除 0。它是顯著改善，但沒有到 5%；第一個失敗 holdout 也完整留在 repo。事後 coverage 診斷顯示，嚴格 confidence gate 真正啟用的 285 queries 提升 11.41%，其餘完全 abstain；這解釋 coverage 瓶頸，但不拿 subgroup 偷換整體成績。
+> 同一個已訓練模型可以把 graph/behavior feature family 歸零，避免拿兩個不同容量的模型製造假 lift。凍結後的主要 1,991-query confirmation 中，NDCG 提升 5.72%、MRR 6.45%、Hit@1 9.35%，paired CI 完全大於 0。同一模型在第二個互斥 1,992-query bucket 仍提升 5.07%。歷史失敗 holdout與一個只到 4.62% 的 rejected candidate 也完整留在 repo。
 
 ## 2:45–3:30 — Leakage / cold-start
 
@@ -67,8 +67,7 @@ weight + evidence + edge type
 
 > SkillWeave 讓生成式 AI 成為可量測、可消融、可追溯的索引資產；如果移除圖譜不會退化，我們就不宣稱它有價值。
 
-畫面停在 RC6 release 狀態與誠實的 5% gate。公開 AWS、GitHub 與影片 URL
-尚未產生，因此影片不顯示 placeholder 或假 QR code。
+畫面停在雙 confirmation、79/79 release checks 與公開 AWS Demo。
 
 ## 可重現影片
 

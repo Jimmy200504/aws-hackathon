@@ -383,6 +383,9 @@ def build_train_behavior_graph(
     jobs_by_id = {job["id"]: job for job in jobs}
     query_job: dict[str, dict[str, list[int]]] = defaultdict(dict)
     query_skill: dict[str, dict[str, list[int]]] = defaultdict(dict)
+    job_global: dict[str, list[int]] = {}
+    company_global: dict[str, list[int]] = {}
+    global_totals = [0, 0, 0]
     snapshots: dict[str, dict] = {}
 
     def snapshot() -> dict:
@@ -395,6 +398,13 @@ def build_train_behavior_graph(
                 query: {edge: list(stats) for edge, stats in edges.items()}
                 for query, edges in query_skill.items()
             },
+            "job_global": {
+                edge: list(stats) for edge, stats in job_global.items()
+            },
+            "company_global": {
+                edge: list(stats) for edge, stats in company_global.items()
+            },
+            "global_totals": list(global_totals),
         }
 
     for day in sorted(train_days):
@@ -413,6 +423,21 @@ def build_train_behavior_graph(
                 job_stats[0] += 1
                 job_stats[1] += int(grade > 0)
                 job_stats[2] += grade
+                global_job_stats = job_global.setdefault(job_id, [0, 0, 0])
+                global_job_stats[0] += 1
+                global_job_stats[1] += int(grade > 0)
+                global_job_stats[2] += grade
+                global_totals[0] += 1
+                global_totals[1] += int(grade > 0)
+                global_totals[2] += grade
+                company_id = str(job.get("company_id", "")).strip()
+                if company_id:
+                    company_stats = company_global.setdefault(
+                        company_id, [0, 0, 0]
+                    )
+                    company_stats[0] += 1
+                    company_stats[1] += int(grade > 0)
+                    company_stats[2] += grade
                 for skill_id in job.get("skills", []):
                     skill_stats = query_skill[query].setdefault(
                         skill_id, [0, 0, 0]
@@ -423,12 +448,16 @@ def build_train_behavior_graph(
     return {
         "query_job": {query: edges for query, edges in query_job.items()},
         "query_skill": {query: edges for query, edges in query_skill.items()},
+        "job_global": job_global,
+        "company_global": company_global,
+        "global_totals": global_totals,
         "snapshots": snapshots,
         "provenance": {
             "source": "train_qrels_only",
             "train_days": sorted(train_days),
             "rolling_snapshot_policy": "strictly earlier train days",
             "edge_stats": "[exposures, positive_events, graded_relevance_sum]",
+            "global_prior_policy": "job/company aggregates use train qrels only",
         },
     }
 

@@ -1,0 +1,114 @@
+{
+  "metadata": {
+    "schema": "skillweave-bedrock-pilot-v1",
+    "analysis_status": "bounded_real_bedrock_train_only_pilot",
+    "graph_cutoff": "2026-06-05 23:59:59.999",
+    "prompt_version": "jd-skill-v3",
+    "model_ids": [
+      "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+    ],
+    "input_sha256": "42c5801e37266b4fff90537e0f44d06082e229ac4d5a99e22d8a91ed1f7cd7d6",
+    "accepted_sha256": "7b13d0627a87d4df3f1803b6652dcd8ad8881c46fd28d5df419e55abb67e3d71",
+    "quarantine_sha256": "ec47fd6377e4f3331cd8518dccfe7f017352b756e7f040308162b259e69163e3",
+    "privacy": "aggregate-only report; no job or user identifiers"
+  },
+  "records": {
+    "input": 200,
+    "accepted": 180,
+    "quarantined": 20,
+    "fatal": 0,
+    "record_acceptance_rate": 0.9
+  },
+  "usage": {
+    "input_tokens": 315298,
+    "output_tokens": 148763,
+    "total_tokens": 464061,
+    "estimated_usd": 1.059113,
+    "pricing_assumption": "Claude Haiku 4.5 standard: $1/M input, $5/M output; estimate excludes taxes and free credits"
+  },
+  "validated_graph": {
+    "mentions": 1598,
+    "relations_pending_corpus_corroboration": 296,
+    "validator_rejections": 413,
+    "mention_types": {
+      "tool": 382,
+      "domain": 362,
+      "method": 316,
+      "soft_skill": 204,
+      "certification": 103,
+      "language": 87,
+      "platform": 65,
+      "framework": 47,
+      "database": 26,
+      "library": 6
+    },
+    "requirement_levels": {
+      "required": 1294,
+      "preferred": 175,
+      "mentioned": 129
+    },
+    "top_canonical_skills": [
+      {
+        "skill": "Microsoft Word",
+        "count": 49
+      },
+      {
+        "skill": "Microsoft PowerPoint",
+        "count": 37
+      },
+      {
+        "skill": "Microsoft Excel",
+        "count": 37
+      },
+      {
+        "skill": "Excel",
+        "count": 34
+      },
+      {
+        "skill": "Word",
+        "count": 31
+      },
+      {
+        "skill": "PowerPoint",
+        "count": 27
+      },
+      {
+        "skill": "Microsoft Outlook",
+        "count": 15
+      },
+      {
+        "skill": "Python",
+        "count": 14
+      },
+      {
+        "skill": "Data Analysis",
+        "count": 13
+      },
+      {
+        "skill": "Linux",
+        "count": 11
+      },
+      {
+        "skill": "GitHub",
+        "count": 8
+      },
+      {
+        "skill": "Communication",
+        "count": 8
+      },
+      {
+        "skill": "Adobe Illustrator",
+        "count": 8
+      },
+      {
+        "skill": "Machine Learning",
+        "count": 8
+      },
+      {
+        "skill": "Java",
+        "count": 7
+      }
+    ]
+  },
+  "release_claim": "Real Amazon Bedrock structured extraction pilot; not a full production corpus graph and not used to tune locked confirmations."
+}

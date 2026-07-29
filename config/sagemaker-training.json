@@ -5,10 +5,10 @@
   "eval_metric": "ndcg@10",
   "random_seed": 1111,
   "selected_hyperparameters": {
-    "n_estimators": 20,
-    "max_depth": 2,
-    "learning_rate": 0.1,
-    "min_child_weight": 8,
+    "n_estimators": 40,
+    "max_depth": 4,
+    "learning_rate": 0.05,
+    "min_child_weight": 12,
     "subsample": 0.8,
     "colsample_bytree": 0.82
   },
@@ -19,12 +19,22 @@
     "pairs_per_sample": 12
   },
   "selection_split": "2026-06-06",
+  "feature_set": "quality_minimal",
+  "training_search_sample_basis_points": 1000,
   "confirmation_split": {
     "date": "2026-06-07",
-    "hash_bucket_start": 400,
-    "hash_bucket_end_exclusive": 1400,
-    "queries": 1993
+    "hash_bucket_start": 2400,
+    "hash_bucket_end_exclusive": 3400,
+    "queries": 1991
   },
-  "confidence_gate": "behavior_job_edge",
+  "replication_split": {
+    "date": "2026-06-07",
+    "hash_bucket_start": 3400,
+    "hash_bucket_end_exclusive": 4400,
+    "queries": 1992
+  },
+  "confidence_gate": "none",
+  "primary_ndcg_relative_lift": 0.05718023510343073,
+  "replication_ndcg_relative_lift": 0.05067678634656092,
   "selection_forbidden_on_confirmation": true
 }

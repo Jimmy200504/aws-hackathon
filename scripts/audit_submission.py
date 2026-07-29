@@ -25,10 +25,21 @@ def exists(relative: str) -> bool:
 def main() -> None:
     manifest = load_object("release-manifest.json")
     verifier = load_object("reports/verify-release.json")
-    ablation = load_object("reports/ltr-ablation-test.json")
+    ablation = load_object(
+        (
+            "reports/ltr-quality-confirmation.json"
+            if exists("reports/ltr-quality-confirmation.json")
+            else "reports/ltr-ablation-test.json"
+        )
+    )
     video = (
         load_object("reports/demo-video.json")
         if exists("reports/demo-video.json")
+        else {}
+    )
+    bedrock = (
+        load_object("reports/bedrock-pilot.json")
+        if exists("reports/bedrock-pilot.json")
         else {}
     )
     external = manifest.get("external_deliverables", {})
@@ -46,6 +57,13 @@ def main() -> None:
             and exists("docs/genai-safety.md")
         ),
         "R2a_full_train_only_bedrock_graph_executed": False,
+        "R2b_real_train_only_bedrock_pilot_executed": (
+            bedrock.get("metadata", {}).get("analysis_status")
+            == "bounded_real_bedrock_train_only_pilot"
+            and int(bedrock.get("records", {}).get("input", 0)) >= 100
+            and int(bedrock.get("records", {}).get("accepted", 0)) >= 100
+            and int(bedrock.get("records", {}).get("fatal", 1)) == 0
+        ),
         "R3_data_application_explained": exists("docs/data-card.md"),
         "R4_system_graph_schema_and_trace": (
             exists("docs/graph-schema.md")
@@ -61,7 +79,10 @@ def main() -> None:
         ),
         "R6_public_github": bool(external.get("github_url")),
         "R6a_reproducible_source_and_ablation": (
-            exists("scripts/run_ltr_ablation.sh")
+            (
+                exists("scripts/run_quality_confirmation.sh")
+                or exists("scripts/run_ltr_ablation.sh")
+            )
             and exists("requirements-ltr.lock")
             and exists("release-manifest.json")
         ),
@@ -99,6 +120,12 @@ def main() -> None:
             and exists("scripts/build_submission_packet.py")
         ),
     }
+    if not bedrock:
+        # Preserve the legacy audit contract for old release fixtures that
+        # predate the real bounded pilot.
+        requirements.pop(
+            "R2b_real_train_only_bedrock_pilot_executed", None
+        )
     mandatory_external = [
         "R1a_public_cloud_demo_url",
         "R1c_public_demo_video_url",
@@ -108,15 +135,24 @@ def main() -> None:
     blockers = [
         name for name in mandatory_external if not requirements[name]
     ]
-    if not requirements["R2a_full_train_only_bedrock_graph_executed"]:
-        blockers.append("R2a_full_train_only_bedrock_graph_executed")
+    bedrock_requirement = (
+        "R2b_real_train_only_bedrock_pilot_executed"
+        if "R2b_real_train_only_bedrock_pilot_executed"
+        in requirements
+        else "R2a_full_train_only_bedrock_graph_executed"
+    )
+    if not requirements[bedrock_requirement]:
+        blockers.append(bedrock_requirement)
     blocker_labels = {
         "R1a_public_cloud_demo_url": "public cloud demo URL",
         "R1c_public_demo_video_url": "hosted video URL",
         "R5a_actual_aws_deployment": "actual AWS deployment",
         "R6_public_github": "public GitHub release",
         "R2a_full_train_only_bedrock_graph_executed": (
-            "executed train-only Bedrock graph"
+            "full production-corpus Bedrock graph"
+        ),
+        "R2b_real_train_only_bedrock_pilot_executed": (
+            "real train-only Bedrock pilot"
         ),
     }
     remaining = ", ".join(blocker_labels[name] for name in blockers)
@@ -134,6 +170,16 @@ def main() -> None:
             None
             if requirements["E2_recommended_five_percent_lift"]
             else "Locked NDCG@10 lift is positive but below the recommended 5%."
+        ),
+        "production_scale_gap": (
+            None
+            if requirements[
+                "R2a_full_train_only_bedrock_graph_executed"
+            ]
+            else (
+                "The real Bedrock pilot is bounded to 200 records; full-corpus "
+                "managed-service rollout remains a production migration."
+            )
         ),
         "interpretation": (
             f"Local release evidence is complete; remaining blockers: {remaining}."

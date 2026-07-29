@@ -16,7 +16,13 @@ from app.ranker import SkillWeaveRanker
 ROOT = Path(__file__).resolve().parents[1]
 WEB_ROOT = ROOT / "web"
 INDEX_PATH = Path(os.getenv("INDEX_PATH", ROOT / "artifacts" / "demo-index.json"))
-RANKER = SkillWeaveRanker(INDEX_PATH)
+LTR_MODEL_PATH = Path(
+    os.getenv(
+        "LTR_MODEL_PATH",
+        ROOT / "artifacts" / "models" / "ltr-quality-final.trees.json",
+    )
+)
+RANKER = SkillWeaveRanker(INDEX_PATH, ltr_model_path=LTR_MODEL_PATH)
 
 
 def response(
@@ -95,6 +101,11 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
             "graph_enabled": include_graph,
             "resolved_skills": list(ranked["intent"].skills),
             "index_version": RANKER.metadata.get("index_version"),
+            "ranking_model": (
+                RANKER.ltr_model.metadata.get("source_model")
+                if RANKER.ltr_model is not None
+                else "heuristic_fallback"
+            ),
         },
     }
     if trace:

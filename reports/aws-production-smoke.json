@@ -1,7 +1,7 @@
 {
   "metadata": {
     "schema": "skillweave-aws-production-smoke-v1",
-    "verified_at_utc": "2026-07-28T16:28:23Z",
+    "verified_at_utc": "2026-07-29T13:30:26Z",
     "base_url": "https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/",
     "index_version": "demo-2026.06.05-v1",
     "client": "stdlib urllib; public HTTPS; no AWS session"
@@ -13,29 +13,33 @@
     "relative_javascript_asset": true,
     "health_contract": true,
     "metadata_contract": true,
+    "quality_ltr_deployed": true,
+    "real_bedrock_pilot_deployed": true,
     "graph_on_contract": true,
     "graph_off_contract": true,
     "graph_toggle_changes_ranking": true,
     "graph_trace_provenance": true,
+    "bedrock_trace_provenance": true,
     "load_all_http_200": true,
     "load_all_top_10": true,
     "load_index_version": true,
+    "load_quality_ltr_model": true,
     "load_p95_below_timeout": true
   },
   "observed": {
     "job_count": 12000,
-    "skill_count": 45,
+    "skill_count": 928,
     "graph_on_job_ids": [
       "132469993",
-      "132488749",
-      "130404234",
-      "130404249",
-      "98782183",
+      "132209785",
+      "103766259",
+      "132446961",
+      "130249640",
+      "131987268",
+      "132481149",
+      "132481157",
       "98836873",
-      "130196795",
-      "130270236",
-      "130280356",
-      "103895506"
+      "132746570"
     ],
     "graph_off_job_ids": [
       "132446961",
@@ -49,7 +53,8 @@
       "103766259",
       "130249640"
     ],
-    "graph_trace_path_count": 4
+    "graph_trace_path_count": 6,
+    "bedrock_trace_path_count": 1
   },
   "load": {
     "requests": 30,
@@ -57,14 +62,15 @@
     "http_200": 30,
     "top_10_responses": 30,
     "matching_index_version": 30,
-    "elapsed_ms": 10458.88,
-    "throughput_requests_per_second": 2.87,
+    "matching_ranking_model": 30,
+    "elapsed_ms": 13485.48,
+    "throughput_requests_per_second": 2.22,
     "latency_ms": {
-      "min": 1303.28,
-      "p50": 1402.99,
-      "p95": 3620.98,
-      "p99": 3663.83,
-      "max": 3663.83
+      "min": 1413.55,
+      "p50": 1583.66,
+      "p95": 4400.58,
+      "p99": 4494.89,
+      "max": 4494.89
     },
     "errors": []
   }

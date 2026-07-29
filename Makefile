@@ -1,4 +1,4 @@
-.PHONY: demo test verify release audit coverage business sam-smoke aws-smoke video submission external-preflight index benchmark package
+.PHONY: demo test verify release audit coverage business sam-smoke aws-smoke video submission external-preflight index benchmark quality package
 
 demo:
 	python3 -m app.server --port 8080
@@ -42,6 +42,9 @@ index:
 
 benchmark:
 	./scripts/run_ablation.sh
+
+quality:
+	./scripts/run_quality_confirmation.sh
 
 package:
 	python3 scripts/package_lambda.py

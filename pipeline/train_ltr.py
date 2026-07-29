@@ -59,6 +59,42 @@ BEHAVIOR_GRAPH_FEATURES = [
     "behavior_query_skill_positive_rate",
     "behavior_query_skill_grade_rate",
     "behavior_query_skill_max_positive_rate",
+    "behavior_job_global_seen",
+    "behavior_job_global_exposures_log",
+    "behavior_job_global_positive_rate",
+    "behavior_job_global_grade_rate",
+    "behavior_job_global_positive_rate_smoothed",
+    "behavior_job_global_grade_rate_smoothed",
+    "behavior_company_global_seen",
+    "behavior_company_global_exposures_log",
+    "behavior_company_global_positive_rate",
+    "behavior_company_global_grade_rate",
+    "behavior_company_global_positive_rate_smoothed",
+    "behavior_company_global_grade_rate_smoothed",
+]
+RETRIEVAL_FEATURES = [
+    "retrieval_rank",
+    "retrieval_reciprocal_rank",
+    "retrieval_log_rank",
+    "retrieval_top1",
+    "retrieval_top3",
+    "retrieval_top10",
+]
+QUALITY_FEATURES = [
+    *BEHAVIOR_GRAPH_FEATURES,
+    *RETRIEVAL_FEATURES,
+]
+QUALITY_MINIMAL_FEATURES = [
+    *BEHAVIOR_GRAPH_FEATURES,
+    "retrieval_reciprocal_rank",
+]
+QUALITY_COMPANY_FEATURES = [
+    *[
+        name
+        for name in BEHAVIOR_GRAPH_FEATURES
+        if not name.startswith("behavior_job_global")
+    ],
+    "retrieval_reciprocal_rank",
 ]
 
 
@@ -89,6 +125,13 @@ def load_groups(path: Path, features: list[str]):
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train unbiased LambdaMART ranker")
     parser.add_argument("--train", type=Path, required=True)
+    parser.add_argument(
+        "--train-extra",
+        type=Path,
+        action="append",
+        default=[],
+        help="Additional grouped JSONL used only after model selection",
+    )
     parser.add_argument("--validation", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument(
@@ -99,11 +142,15 @@ def main() -> None:
             "seed_graph_diagnostic",
             "graph",
             "behavior_graph",
+            "quality",
+            "quality_minimal",
+            "quality_company",
         ],
         required=True,
     )
     parser.add_argument("--n-estimators", type=int, default=700)
     parser.add_argument("--max-depth", type=int, default=7)
+    parser.add_argument("--min-child-weight", type=float, default=8)
     parser.add_argument("--learning-rate", type=float, default=0.045)
     parser.add_argument("--early-stopping-rounds", type=int, default=60)
     args = parser.parse_args()
@@ -119,8 +166,23 @@ def main() -> None:
         "seed_graph_diagnostic": SEED_GRAPH_DIAGNOSTIC_FEATURES,
         "graph": GRAPH_FEATURES,
         "behavior_graph": BEHAVIOR_GRAPH_FEATURES,
+        "quality": QUALITY_FEATURES,
+        "quality_minimal": QUALITY_MINIMAL_FEATURES,
+        "quality_company": QUALITY_COMPANY_FEATURES,
     }[args.feature_set]
-    x_train, y_train, group_train = load_groups(args.train, features)
+    train_parts = [
+        load_groups(path, features)
+        for path in [args.train, *args.train_extra]
+    ]
+    import numpy as np
+
+    x_train = np.concatenate([part[0] for part in train_parts])
+    y_train = np.concatenate([part[1] for part in train_parts])
+    group_train = [
+        group
+        for part in train_parts
+        for group in part[2]
+    ]
     x_valid, y_valid, group_valid = load_groups(args.validation, features)
     model = xgb.XGBRanker(
         objective="rank:ndcg",
@@ -129,7 +191,7 @@ def main() -> None:
         n_estimators=args.n_estimators,
         learning_rate=args.learning_rate,
         max_depth=args.max_depth,
-        min_child_weight=8,
+        min_child_weight=args.min_child_weight,
         subsample=0.8,
         colsample_bytree=0.82,
         reg_alpha=0.2,
@@ -163,7 +225,9 @@ def main() -> None:
         "random_seed": 1111,
         "n_estimators": args.n_estimators,
         "max_depth": args.max_depth,
+        "min_child_weight": args.min_child_weight,
         "learning_rate": args.learning_rate,
+        "train_sources": [str(args.train), *map(str, args.train_extra)],
         "best_iteration": getattr(model, "best_iteration", args.n_estimators - 1),
         "xgboost_version": xgb.__version__,
     }

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -61,6 +62,20 @@ def main() -> None:
                         behavior_snapshot_day=(
                             case.get("day") if split == "train" else None
                         ),
+                    )
+                    # Production OpenSearch contributes a retrieval score/rank
+                    # before LTR. The organizer fixture exposes only the
+                    # original candidate order, so preserve rank-derived priors
+                    # under an explicit retrieval feature family.
+                    features.update(
+                        {
+                            "retrieval_rank": float(exposure_rank),
+                            "retrieval_reciprocal_rank": 1.0 / exposure_rank,
+                            "retrieval_log_rank": math.log1p(exposure_rank),
+                            "retrieval_top1": float(exposure_rank == 1),
+                            "retrieval_top3": float(exposure_rank <= 3),
+                            "retrieval_top10": float(exposure_rank <= 10),
+                        }
                     )
                     group_rows.append(
                         {

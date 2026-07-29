@@ -18,14 +18,14 @@ class ReleaseVerifierIntegrityTests(unittest.TestCase):
             "metadata": {
                 "schema": "skillweave-ltr-ablation-v1",
                 "queries": 1993,
-                "confidence_gate": "behavior_job_edge",
+                "confidence_gate": "none",
             },
             "release_gates": {
-                "ndcg_relative_lift_at_least_5pct": False,
+                "ndcg_relative_lift_at_least_5pct": True,
                 "paired_ci_excludes_zero": True,
             },
             "paired_bootstrap_ndcg": {"ci95_low": 0.002},
-            "relative_lift": {"ndcg@10": 0.013},
+            "relative_lift": {"ndcg@10": 0.057},
         }
         verifier = ReleaseVerifier()
         verifier.check_ablation(report)
@@ -47,12 +47,12 @@ class ReleaseVerifierIntegrityTests(unittest.TestCase):
         )
         self.assertFalse(ReleaseVerifier.valid_graph_path({**valid, "evidence": "  "}))
 
-    def test_fabricated_five_percent_gate_fails(self) -> None:
+    def test_unsupported_five_percent_gate_fails(self) -> None:
         report = {
             "metadata": {
                 "schema": "skillweave-ltr-ablation-v1",
                 "queries": 1993,
-                "confidence_gate": "behavior_job_edge",
+                "confidence_gate": "none",
             },
             "release_gates": {
                 "ndcg_relative_lift_at_least_5pct": True,
@@ -323,7 +323,7 @@ class ReleaseVerifierIntegrityTests(unittest.TestCase):
         requirements.update(
             {
                 "R2a_full_train_only_bedrock_graph_executed": False,
-                "E2_recommended_five_percent_lift": False,
+                "E2_recommended_five_percent_lift": True,
             }
         )
         verifier = ReleaseVerifier()
@@ -355,7 +355,7 @@ class ReleaseVerifierIntegrityTests(unittest.TestCase):
             manifest = {
                 "confirmation": {
                     "queries": 1993,
-                    "aspirational_five_percent_gate_passed": False,
+                    "aspirational_five_percent_gate_passed": True,
                 },
                 "sha256": {
                     "artifact.bin": hashlib.sha256(b"different").hexdigest()

@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
+from app.tree_ranker import PortableTreeRanker
 
 _EN_TOKEN = re.compile(r"[a-z0-9][a-z0-9.+#/-]*")
 _SPACE = re.compile(r"\s+")
@@ -73,10 +74,18 @@ class SkillWeaveRanker:
     """
 
     def __init__(
-        self, artifact_path: str | Path, graph_novelty_threshold: float = 10.0
+        self,
+        artifact_path: str | Path,
+        graph_novelty_threshold: float = 10.0,
+        ltr_model_path: str | Path | None = None,
     ):
         self.artifact_path = Path(artifact_path)
         self.graph_novelty_threshold = max(0.1, float(graph_novelty_threshold))
+        self.ltr_model = (
+            PortableTreeRanker(ltr_model_path)
+            if ltr_model_path is not None and Path(ltr_model_path).is_file()
+            else None
+        )
         self._lock = threading.RLock()
         self._load()
 
@@ -89,6 +98,19 @@ class SkillWeaveRanker:
         self.duties: dict[str, list[str]] = artifact.get("duties", {})
         self.skills: dict[str, dict[str, Any]] = artifact["skills"]
         self.behavior_graph: dict[str, Any] = artifact.get("behavior_graph", {})
+        behavior_sources = [
+            self.behavior_graph,
+            *self.behavior_graph.get("snapshots", {}).values(),
+        ]
+        for source in behavior_sources:
+            totals = source.get("global_totals")
+            if isinstance(totals, list) and len(totals) >= 3:
+                continue
+            job_global = source.get("job_global", {})
+            source["global_totals"] = [
+                sum(int(stats[index]) for stats in job_global.values())
+                for index in range(3)
+            ]
         self.query_job_edges: dict[str, dict[str, list[int]]] = (
             self.behavior_graph.get("query_job", {})
         )
@@ -223,6 +245,14 @@ class SkillWeaveRanker:
                         "edges": ["RESOLVES_TO", "REQUIRES"],
                         "weight": round(confidence, 3),
                         "evidence": job.get("skill_evidence", {}).get(query_skill, "structured field"),
+                        "provenance": job.get(
+                            "skill_provenance", {}
+                        ).get(
+                            query_skill,
+                            self.skills.get(query_skill, {}).get(
+                                "provenance", "reviewed_graph"
+                            ),
+                        ),
                     }
                 )
                 continue
@@ -331,7 +361,16 @@ class SkillWeaveRanker:
             )
         query_job_edges = behavior_source.get("query_job", {})
         query_skill_edges = behavior_source.get("query_skill", {})
+        job_global_edges = behavior_source.get("job_global", {})
+        company_global_edges = behavior_source.get("company_global", {})
+        global_totals = behavior_source.get("global_totals")
+        if not isinstance(global_totals, list) or len(global_totals) < 3:
+            global_totals = [0, 0, 0]
         query_job_stats = query_job_edges.get(q, {}).get(job["id"], [0, 0, 0])
+        job_global_stats = job_global_edges.get(job["id"], [0, 0, 0])
+        company_global_stats = company_global_edges.get(
+            str(job.get("company_id", "")), [0, 0, 0]
+        )
         query_skill_map = query_skill_edges.get(q, {})
         skill_stats = [
             query_skill_map[skill_id]
@@ -341,6 +380,17 @@ class SkillWeaveRanker:
         query_job_exposures = int(query_job_stats[0])
         query_job_positives = int(query_job_stats[1])
         query_job_grade_sum = int(query_job_stats[2])
+        job_global_exposures = int(job_global_stats[0])
+        job_global_positives = int(job_global_stats[1])
+        job_global_grade_sum = int(job_global_stats[2])
+        company_global_exposures = int(company_global_stats[0])
+        company_global_positives = int(company_global_stats[1])
+        company_global_grade_sum = int(company_global_stats[2])
+        global_exposures = int(global_totals[0])
+        global_positives = int(global_totals[1])
+        global_grade_sum = int(global_totals[2])
+        global_positive_prior = global_positives / max(1, global_exposures)
+        global_grade_prior = global_grade_sum / max(1, 2 * global_exposures)
         query_skill_exposures = sum(int(stats[0]) for stats in skill_stats)
         query_skill_positives = sum(int(stats[1]) for stats in skill_stats)
         query_skill_grade_sum = sum(int(stats[2]) for stats in skill_stats)
@@ -460,6 +510,60 @@ class SkillWeaveRanker:
             "behavior_query_skill_max_positive_rate": round(
                 query_skill_max_positive_rate, 4
             ),
+            "behavior_job_global_seen": float(job_global_exposures > 0),
+            "behavior_job_global_exposures_log": round(
+                math.log1p(job_global_exposures), 4
+            ),
+            "behavior_job_global_positive_rate": round(
+                job_global_positives / max(1, job_global_exposures), 4
+            ),
+            "behavior_job_global_grade_rate": round(
+                job_global_grade_sum / max(1, 2 * job_global_exposures), 4
+            ),
+            "behavior_job_global_positive_rate_smoothed": round(
+                (
+                    job_global_positives
+                    + 5.0 * global_positive_prior
+                )
+                / (job_global_exposures + 5.0),
+                4,
+            ),
+            "behavior_job_global_grade_rate_smoothed": round(
+                (
+                    job_global_grade_sum / 2.0
+                    + 5.0 * global_grade_prior
+                )
+                / (job_global_exposures + 5.0),
+                4,
+            ),
+            "behavior_company_global_seen": float(company_global_exposures > 0),
+            "behavior_company_global_exposures_log": round(
+                math.log1p(company_global_exposures), 4
+            ),
+            "behavior_company_global_positive_rate": round(
+                company_global_positives / max(1, company_global_exposures), 4
+            ),
+            "behavior_company_global_grade_rate": round(
+                company_global_grade_sum
+                / max(1, 2 * company_global_exposures),
+                4,
+            ),
+            "behavior_company_global_positive_rate_smoothed": round(
+                (
+                    company_global_positives
+                    + 20.0 * global_positive_prior
+                )
+                / (company_global_exposures + 20.0),
+                4,
+            ),
+            "behavior_company_global_grade_rate_smoothed": round(
+                (
+                    company_global_grade_sum / 2.0
+                    + 20.0 * global_grade_prior
+                )
+                / (company_global_exposures + 20.0),
+                4,
+            ),
         }
         score = sum(
             features[name]
@@ -480,6 +584,7 @@ class SkillWeaveRanker:
         if not intent.normalized:
             return {"intent": intent, "results": []}
         limit = max(1, min(int(top_k), 100))
+        candidate_limit = max(limit, 100) if self.ltr_model is not None else limit
         heap: list[tuple[float, str, int, dict[str, float], list[dict[str, Any]], list[str]]] = []
         with self._lock:
             for index, job in enumerate(self.jobs):
@@ -493,11 +598,37 @@ class SkillWeaveRanker:
                 if score <= 0:
                     continue
                 item = (score, job["id"], index, features, traces, direct)
-                if len(heap) < limit:
+                if len(heap) < candidate_limit:
                     heapq.heappush(heap, item)
                 elif item[:2] > heap[0][:2]:
                     heapq.heapreplace(heap, item)
-        ranked = sorted(heap, key=lambda item: (-item[0], item[1]))
+        stage_one = sorted(heap, key=lambda item: (-item[0], item[1]))
+        if self.ltr_model is not None:
+            reranked = []
+            for retrieval_rank, item in enumerate(stage_one, 1):
+                item[3]["retrieval_reciprocal_rank"] = 1.0 / retrieval_rank
+                ltr_score = self.ltr_model.predict(
+                    item[3], include_graph=include_graph
+                )
+                # The offline fixture reranks an organizer-provided retrieval
+                # list. The compact demo uses a different lexical scanner, so
+                # retain a deterministic title-relevance floor while still
+                # letting the frozen LTR order otherwise comparable results.
+                online_score = (
+                    ltr_score
+                    + 0.30 * item[3]["title_unit_overlap"]
+                    + 0.05 * item[3]["exact_title"]
+                    + 0.01 * math.log1p(max(0.0, item[0]))
+                )
+                item[3]["stage_one_score"] = round(item[0], 4)
+                item[3]["ltr_score"] = round(ltr_score, 6)
+                item[3]["online_score"] = round(online_score, 6)
+                reranked.append((online_score, *item[1:]))
+            ranked = sorted(
+                reranked, key=lambda item: (-item[0], item[1])
+            )[:limit]
+        else:
+            ranked = stage_one[:limit]
         results: list[dict[str, Any]] = []
         for rank, (score, _, index, features, traces, direct) in enumerate(ranked, 1):
             job = self.jobs[index]

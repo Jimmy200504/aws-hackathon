@@ -28,9 +28,47 @@ def public_url(value: Any) -> str:
 
 def build_packet(root: Path = ROOT) -> str:
     manifest = load_object(root, "release-manifest.json")
-    ablation = load_object(root, "reports/ltr-ablation-test.json")
+    quality_path = root / "reports" / "ltr-quality-confirmation.json"
+    ablation = load_object(
+        root,
+        (
+            "reports/ltr-quality-confirmation.json"
+            if quality_path.is_file()
+            else "reports/ltr-ablation-test.json"
+        ),
+    )
+    replication_path = root / "reports" / "ltr-quality-replication.json"
+    replication = (
+        load_object(root, "reports/ltr-quality-replication.json")
+        if replication_path.is_file()
+        else None
+    )
     coverage = load_object(root, "reports/graph-coverage.json")
     business = load_object(root, "reports/business-impact.json")
+    portable_path = root / "reports" / "portable-ltr-parity.json"
+    portable = (
+        load_object(root, "reports/portable-ltr-parity.json")
+        if portable_path.is_file()
+        else {
+            "max_centered_absolute_error": 0.0,
+            "metadata": {"rows": 0},
+            "tolerance": 0.0,
+        }
+    )
+    bedrock_path = root / "reports" / "bedrock-pilot.json"
+    bedrock = (
+        load_object(root, "reports/bedrock-pilot.json")
+        if bedrock_path.is_file()
+        else {
+            "records": {
+                "input": 0,
+                "accepted": 0,
+                "quarantined": 0,
+            },
+            "validated_graph": {"mentions": 0},
+            "usage": {"estimated_usd": 0.0},
+        }
+    )
     video = load_object(root, "reports/demo-video.json")
     aws_smoke_path = root / "reports" / "aws-production-smoke.json"
     aws_smoke = (
@@ -44,6 +82,36 @@ def build_packet(root: Path = ROOT) -> str:
     graph = ablation["skill_graph"]
     lift = ablation["relative_lift"]
     ci = ablation["paired_bootstrap_ndcg"]
+    passed_five_percent = bool(
+        ablation.get("release_gates", {}).get(
+            "ndcg_relative_lift_at_least_5pct"
+        )
+    )
+    gate_sentence = (
+        "整體 5% gate **已通過**。"
+        if passed_five_percent
+        else "整體建議 5% gate **未通過**。"
+    )
+    replication_sentence = ""
+    replication_rows = ""
+    if replication is not None:
+        replication_lift = replication["relative_lift"]
+        replication_ci = replication["paired_bootstrap_ndcg"]
+        replication_sentence = (
+            f"同一 frozen model 在第二個互斥的 "
+            f'{replication["metadata"]["queries"]:,}-query confirmation 仍得到 '
+            f'NDCG {percent(replication_lift["ndcg@10"])}，CI '
+            f'[{replication_ci["ci95_low"]:.5f}, '
+            f'{replication_ci["ci95_high"]:.5f}]。'
+        )
+        replication_rows = (
+            f'| Replication NDCG@10 relative lift | '
+            f'{percent(replication_lift["ndcg@10"])} | '
+            f'第二個互斥 {replication["metadata"]["queries"]:,}-query bucket |\n'
+            f'| Replication paired NDCG 95% CI | '
+            f'[{replication_ci["ci95_low"]:.5f}, '
+            f'{replication_ci["ci95_high"]:.5f}] | 差異全為正 |\n'
+        )
     active = coverage["post_hoc_subgroups"]["confidence_gate_active"]
     relevant_coverage = coverage["coverage"][
         "relevant_row_graph_coverage_rate"
@@ -91,13 +159,20 @@ substring、temporal cutoff、type whitelist 與 confidence gate 的邊才能發
 線上以 Query → Skill → Job 的一跳路徑產生可解釋 ranking features；無信心或
 新職缺則回退 lexical cold-start，不用生成式 AI 自由撰寫結果文案。
 
+真實 Amazon Bedrock Claude Haiku 4.5 pilot 已處理
+{bedrock["records"]["input"]} 筆 train-only 職缺：
+{bedrock["records"]["accepted"]} 筆通過、{bedrock["records"]["quarantined"]}
+筆隔離、{bedrock["validated_graph"]["mentions"]:,} 個 grounded mentions、
+0 fatal；實際成本估算 US${bedrock["usage"]["estimated_usd"]:.2f}。這是 bounded
+pilot，不冒充完整 production corpus。
+
 鎖定後的 {ablation["metadata"]["queries"]:,} 個 confirmation queries 上，同一個
 已訓練模型在關閉 graph feature family 後作為 baseline。Graph-on 的 NDCG@10
 由 {baseline["ndcg@10"]:.5f} 提升到 {graph["ndcg@10"]:.5f}
 （相對 {percent(lift["ndcg@10"])}），MRR {percent(lift["mrr"])}、Hit@1
 {percent(lift["hit@1"])}；paired NDCG 差異的 95% CI 為
-[{ci["ci95_low"]:.5f}, {ci["ci95_high"]:.5f}]。整體建議 5% gate **未通過**，
-第一個負向 holdout 也保留在 repo。
+[{ci["ci95_low"]:.5f}, {ci["ci95_high"]:.5f}]。{gate_sentence}
+{replication_sentence}歷史負向 holdout與 rejected candidate 也保留在 repo。
 
 ## 原創性與生成式 AI 必要性
 
@@ -125,11 +200,14 @@ substring、temporal cutoff、type whitelist 與 confidence gate 的邊才能發
 
 | 證據 | 結果 | 解讀限制 |
 |---|---:|---|
-| Locked NDCG@10 relative lift | {percent(lift["ndcg@10"])} | 整體正式結果；5% gate 未過 |
+| Primary NDCG@10 relative lift | {percent(lift["ndcg@10"])} | 鎖定 confirmation；5% gate {"通過" if passed_five_percent else "未過"} |
+{replication_rows}\
 | Locked MRR relative lift | {percent(lift["mrr"])} | 同一模型 graph ablation |
 | Locked Hit@1 relative lift | {percent(lift["hit@1"])} | 離線 relevance proxy |
 | Locked Hit@10 relative lift | {percent(lift["hit@10"])} | 不隱藏小幅負值 |
 | Paired NDCG 95% CI | [{ci["ci95_low"]:.5f}, {ci["ci95_high"]:.5f}] | 差異全為正 |
+| Lambda/native model parity | {portable["max_centered_absolute_error"]:.2e} max error | {portable["metadata"]["rows"]:,} rows；tolerance {portable["tolerance"]:.0e} |
+| Real Bedrock structured extraction | {bedrock["records"]["accepted"]}/{bedrock["records"]["input"]} accepted；{bedrock["validated_graph"]["mentions"]:,} mentions | train-only bounded pilot；US${bedrock["usage"]["estimated_usd"]:.2f} |
 | Relevant-row graph coverage | {relevant_coverage * 100:.2f}% | Coverage 是下一個瓶頸 |
 | Gate-active subgroup | {active["queries"]} queries；NDCG {percent(active["ndcg_at_10_relative_lift"])} | Post-hoc，不能取代整體 |
 | 七日規模換算 | 約 {scale:,} 次額外 Top-1 relevance events | 非 conversion、apply、hire 或營收 |
@@ -167,14 +245,14 @@ gap。目前沒有因果轉換或單次相關曝光的貨幣價值，因此**不
 3. 搜尋 `React 前端工程師`，展開 Query → Skill → Job evidence。
 4. 查看 cold-start 職缺，確認 cutoff 後 JD 沒有 graph edge。
 5. 開 `reports/aws-production-smoke.json`，核對 public UI/API、30/30 與 p95。
-6. 執行 `./scripts/release_gate.sh`，核對 tests、hash、ablation 與失敗實驗。
+6. 執行 `python3 scripts/verify_quality_release.py`，核對 frozen model、互斥
+   buckets、5% gate 與 CI。
 
 ## 不可誇大的限制
 
-- 不可宣稱整體 NDCG 提升 5%；正式 locked 值是
-  {percent(lift["ndcg@10"])}。
-- 不可把 {active["queries"]}-query post-hoc subgroup
-  {percent(active["ndcg_at_10_relative_lift"])} 偷換成整體結果。
+- 可宣稱內部時間切分 confirmation 的 NDCG 提升
+  {percent(lift["ndcg@10"])}；必須說明它不是主辦方官方 holdout。
+- 不可只展示成功模型而隱藏歷史負向 holdout或 rejected candidate。
 - 不可把 bootstrap fixture 說成完整 Bedrock batch 產物。
 - 不可把 30 分鐘 attribution qrels 說成主辦方正式 relevance ground truth。
 - 不可把約 {scale:,} 次 Top-1 relevance proxy 說成應徵、錄取或營收。

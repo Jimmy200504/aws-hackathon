@@ -2,6 +2,15 @@
 
 Bedrock 模組只產生 graph proposal；validator 決定哪些邊能發布。
 
+## 已執行的真實 Bedrock pilot
+
+Claude Haiku 4.5 以 strict JSON Schema 對 200 筆 cutoff 前職缺執行。最終
+180 筆通過、20 筆因沒有足夠可發布 mention 而 quarantine、0 fatal；
+validator 發布 1,598 個 exact-substring-grounded mentions。296 條 relation
+proposal 全部維持 `requires_corpus_corroboration`，沒有直接發布。公開證據只含
+aggregate counts、token 與成本，不含 job/user identifiers，見
+`reports/bedrock-pilot.json`。
+
 | 失敗模式 | 例子 | 風險 | 防護 |
 |---|---|---|---|
 | 幻覺技能 | JD 沒寫 Kubernetes，模型因 DevOps 自行補上 | 假相關 | `REQUIRES` evidence 必須是 JD exact substring；否則 reject |

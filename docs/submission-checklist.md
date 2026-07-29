@@ -7,6 +7,8 @@
 - [x] 5 分鐘繁中錄影 artifact（1080p、語音、內嵌字幕、SHA-256）
 - [x] 公開可觀看的 Demo video URL
 - [x] 生成式 AI 方法與設計依據文件
+- [x] 真實 Amazon Bedrock train-only pilot（200 records、180 accepted、
+  1,598 validated mentions、0 fatal）
 - [x] 已知 LLM 失敗模式與防護
 - [x] 數據與資料應用說明
 - [x] 系統功能說明
@@ -32,16 +34,17 @@
 - [x] 商業 case、A/B 設計、規模換算與無營收宣稱 guardrail
 - [x] Live graph toggle 確實改變排序且 graph contribution 非零
 
-## 尚未通過的品質 gate
+## 品質 gate
 
 - [ ] Bedrock 完整 train-only graph 已產出
-- [ ] NDCG@10 相對 baseline ≥5%
-- [x] Paired CI 不支持明顯退化（confirmation CI 全為正）
+- [x] Bedrock bounded train-only pilot 已產出且 aggregate report 可驗證
+- [x] NDCG@10 相對 baseline ≥5%（primary +5.72%、replication +5.07%）
+- [x] Paired CI 不支持明顯退化（兩次 confirmation CI 全為正）
 - [x] Unbiased LambdaMART 已訓練並保存 model manifest
-- [x] Gate/model 鎖定後的 disjoint confirmation holdout 已跑
+- [x] 模型鎖定後的兩個互斥 confirmation holdouts 已跑
 - [ ] 主辦方統一 evaluation script 已跑
 - [x] Compact container：50 requests / concurrency 10，50/50 HTTP 200，p95 1.76 s
-- [x] AWS production p95 / timeout / concurrency 負載測試（30 requests、concurrency 5、30/30 HTTP 200、p95 3.62 s）
+- [x] AWS production p95 / timeout / concurrency 負載測試（30 requests、concurrency 5、30/30 HTTP 200、p95 4.40 s）
 - [x] OOV、新職缺、空結果、未知 code 測試
 - [x] AWS URL 從無 AWS session 的 public HTTPS client 可開
 - [x] Compact demo 無 WAF；bounded concurrency 5 未被擋，評審不需登入
@@ -74,7 +77,7 @@ curl -i -X POST "$DEMO_URL/api/v1/jobs/search" \
 
 ## 不可在簡報宣稱
 
-- 未經主辦 holdout 證實的「提升 ≥5%」
+- 把內部時間切分 qrels 說成主辦方官方 holdout
 - 只展示成功 confirmation、隱藏第一個失敗 holdout
 - bootstrap fixture 是 Bedrock 產物
 - 內部 30 分鐘 attribution 是正式 relevance ground truth
