@@ -6,6 +6,24 @@ STACK_NAME="${SKILLWEAVE_STACK_NAME:-skillweave-demo}"
 AWS_REGION_NAME="${AWS_REGION:-us-east-1}"
 STAGE_NAME="${SKILLWEAVE_STAGE_NAME:-prod}"
 RESERVED_CONCURRENCY="${SKILLWEAVE_RESERVED_CONCURRENCY:-0}"
+OPENSEARCH_ENDPOINT_VALUE="${OPENSEARCH_ENDPOINT:-}"
+OPENSEARCH_COLLECTION_ARN_VALUE="${OPENSEARCH_COLLECTION_ARN:-}"
+OPENSEARCH_INDEX_VALUE="${OPENSEARCH_INDEX:-skillweave-jobs-v1}"
+
+if [[ -n "$OPENSEARCH_ENDPOINT_VALUE" || -n "$OPENSEARCH_COLLECTION_ARN_VALUE" ]]; then
+  if [[ -z "$OPENSEARCH_ENDPOINT_VALUE" || -z "$OPENSEARCH_COLLECTION_ARN_VALUE" ]]; then
+    echo "OPENSEARCH_ENDPOINT and OPENSEARCH_COLLECTION_ARN must be supplied together" >&2
+    exit 1
+  fi
+fi
+
+PARAMETER_OVERRIDES=(
+  "StageName=$STAGE_NAME"
+  "ReservedConcurrency=$RESERVED_CONCURRENCY"
+  "OpenSearchEndpoint=$OPENSEARCH_ENDPOINT_VALUE"
+  "OpenSearchCollectionArn=$OPENSEARCH_COLLECTION_ARN_VALUE"
+  "OpenSearchIndex=$OPENSEARCH_INDEX_VALUE"
+)
 
 ./scripts/release_gate.sh
 sam validate --lint --template-file infra/template.yaml
@@ -17,9 +35,7 @@ sam deploy \
   --capabilities CAPABILITY_IAM \
   --no-confirm-changeset \
   --no-fail-on-empty-changeset \
-  --parameter-overrides \
-    "StageName=$STAGE_NAME" \
-    "ReservedConcurrency=$RESERVED_CONCURRENCY"
+  --parameter-overrides "${PARAMETER_OVERRIDES[@]}"
 
 DEMO_URL="$(
   aws cloudformation describe-stacks \

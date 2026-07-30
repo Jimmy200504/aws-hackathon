@@ -118,6 +118,10 @@ def run_load_request(base_url: str, index: int) -> dict[str, Any]:
             "top_10": search_contract(body),
             "index_version": body.get("meta", {}).get("index_version"),
             "ranking_model": body.get("meta", {}).get("ranking_model"),
+            "candidate_source": body.get("meta", {}).get("candidate_source"),
+            "degraded_components": body.get("meta", {}).get(
+                "degraded_components"
+            ),
             "error": None,
         }
     except Exception as exc:
@@ -127,11 +131,19 @@ def run_load_request(base_url: str, index: int) -> dict[str, Any]:
             "top_10": False,
             "index_version": None,
             "ranking_model": None,
+            "candidate_source": None,
+            "degraded_components": None,
             "error": f"{type(exc).__name__}: {exc}",
         }
 
 
-def run_smoke(base_url: str, requests: int, concurrency: int) -> dict[str, Any]:
+def run_smoke(
+    base_url: str,
+    requests: int,
+    concurrency: int,
+    *,
+    require_full_corpus: bool = False,
+) -> dict[str, Any]:
     root = request(base_url, "")
     css = request(base_url, "styles.css")
     javascript = request(base_url, "app.js")
@@ -195,6 +207,21 @@ def run_smoke(base_url: str, requests: int, concurrency: int) -> dict[str, Any]:
             meta_result["status"] == 200
             and meta.get("metadata", {}).get("index_version") == INDEX_VERSION
             and meta.get("job_count") == 12_000
+        ),
+        "full_corpus_scope_when_required": (
+            not require_full_corpus
+            or meta.get("search_scope") == "full_corpus_opensearch"
+        ),
+        "full_corpus_candidate_source_when_required": (
+            not require_full_corpus
+            or (
+                graph_on.get("meta", {}).get("candidate_source")
+                == "opensearch_full_corpus"
+                and graph_off.get("meta", {}).get("candidate_source")
+                == "opensearch_full_corpus"
+                and not graph_on.get("meta", {}).get("degraded_components")
+                and not graph_off.get("meta", {}).get("degraded_components")
+            )
         ),
         "quality_ltr_deployed": (
             graph_on.get("meta", {}).get("ranking_model")
@@ -273,6 +300,11 @@ def run_smoke(base_url: str, requests: int, concurrency: int) -> dict[str, Any]:
         result["ranking_model"] == "ltr-quality-final.ubj"
         for result in results
     )
+    full_corpus_responses = sum(
+        result["candidate_source"] == "opensearch_full_corpus"
+        and not result["degraded_components"]
+        for result in results
+    )
     errors = [result["error"] for result in results if result["error"]]
     load = {
         "requests": requests,
@@ -281,6 +313,7 @@ def run_smoke(base_url: str, requests: int, concurrency: int) -> dict[str, Any]:
         "top_10_responses": top_10,
         "matching_index_version": matching_index,
         "matching_ranking_model": matching_model,
+        "full_corpus_responses": full_corpus_responses,
         "elapsed_ms": elapsed_ms,
         "throughput_requests_per_second": round(
             requests / (elapsed_ms / 1000), 2
@@ -300,6 +333,9 @@ def run_smoke(base_url: str, requests: int, concurrency: int) -> dict[str, Any]:
             "load_all_top_10": top_10 == requests,
             "load_index_version": matching_index == requests,
             "load_quality_ltr_model": matching_model == requests,
+            "load_full_corpus_when_required": (
+                not require_full_corpus or full_corpus_responses == requests
+            ),
             "load_p95_below_timeout": (
                 bool(latencies) and percentile(latencies, 0.95) < 10_000.0
             ),
@@ -315,12 +351,20 @@ def run_smoke(base_url: str, requests: int, concurrency: int) -> dict[str, Any]:
             "base_url": base_url.rstrip("/") + "/",
             "index_version": INDEX_VERSION,
             "client": "stdlib urllib; public HTTPS; no AWS session",
+            "require_full_corpus": require_full_corpus,
         },
         "passed": all(checks.values()),
         "checks": checks,
         "observed": {
             "job_count": health.get("jobs"),
             "skill_count": meta.get("skill_count"),
+            "search_scope": meta.get("search_scope"),
+            "candidate_source": graph_on.get("meta", {}).get(
+                "candidate_source"
+            ),
+            "degraded_components": graph_on.get("meta", {}).get(
+                "degraded_components"
+            ),
             "graph_on_job_ids": [
                 row.get("job_id") for row in graph_on_rows
             ],
@@ -347,6 +391,11 @@ def main() -> int:
     parser.add_argument("--requests", type=int, default=30)
     parser.add_argument("--concurrency", type=int, default=5)
     parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument(
+        "--require-full-corpus",
+        action="store_true",
+        help="Fail if any request uses the embedded 12,000-job fallback",
+    )
     args = parser.parse_args()
     if args.requests < 1 or args.concurrency < 1:
         parser.error("--requests and --concurrency must be positive")
@@ -361,7 +410,12 @@ def main() -> int:
     if registered_url and base_url.rstrip("/") != str(registered_url).rstrip("/"):
         parser.error("--url must match the release manifest aws_url")
 
-    report = run_smoke(base_url, args.requests, args.concurrency)
+    report = run_smoke(
+        base_url,
+        args.requests,
+        args.concurrency,
+        require_full_corpus=args.require_full_corpus,
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n",

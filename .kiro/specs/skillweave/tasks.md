@@ -9,7 +9,9 @@
 - [x] Add real temporal graph/no-graph ablation.
 - [x] Add paired confidence interval and honest report.
 - [ ] Run Bedrock batch extraction on train-only JD corpus.
-- [ ] Build full OpenSearch and Neptune indexes.
+- [x] Implement full-corpus OpenSearch indexing, runtime retrieval, IAM wiring, and coverage verification.
+- [ ] Provision and ingest the full OpenSearch index in the judge AWS account.
+- [ ] Build the full Neptune index.
 - [ ] Train clipped-IPS LambdaMART on train split.
 - [ ] Select model only on validation split.
 - [x] Freeze and evaluate a disjoint confirmation holdout; retain the earlier failed holdout.

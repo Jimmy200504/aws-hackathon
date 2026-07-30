@@ -156,5 +156,60 @@ class GraphIsolationTests(unittest.TestCase):
         self.assertEqual(day_one["behavior_company_global_seen"], 0.0)
 
 
+class FakeFullCorpusRetriever:
+    def __init__(self, *, fail: bool = False) -> None:
+        self.fail = fail
+
+    def retrieve(self, query, *, limit, location_names, duty_names):
+        if self.fail:
+            raise RuntimeError("simulated OpenSearch outage")
+        return [
+            {
+                "id": "job-outside-embedded-demo",
+                "title": "Python 資料工程師",
+                "description": "使用 Python 建立資料處理服務",
+                "salary": "月薪 · 60000 · 90000",
+                "city": "台北市",
+                "categories": ["軟體工程", "資料工程師"],
+                "industry": "資訊軟體",
+                "company_id": "company-full",
+                "modified_at": "2026-06-01 12:00:00",
+                "graph_eligible": True,
+                "skills": ["skill.python"],
+                "skill_evidence": {"skill.python": "職稱：Python"},
+                "skill_confidence": {"skill.python": 0.96},
+                "freshness": 1.0,
+                "view_count": 0,
+                "apply_count": 0,
+                "_retrieval_score": 10.0,
+            }
+        ]
+
+
+@unittest.skipUnless((ROOT / "artifacts" / "demo-index.json").is_file(), "demo index missing")
+class FullCorpusRankerTests(unittest.TestCase):
+    def test_external_candidate_can_rank_when_absent_from_embedded_demo(self) -> None:
+        ranker = SkillWeaveRanker(
+            ROOT / "artifacts" / "demo-index.json",
+            candidate_retriever=FakeFullCorpusRetriever(),
+        )
+        result = ranker.search("Python 資料工程師", top_k=10)
+        self.assertEqual(result["candidate_source"], "opensearch_full_corpus")
+        self.assertEqual(result["degraded_components"], [])
+        self.assertEqual(
+            result["results"][0]["job_id"], "job-outside-embedded-demo"
+        )
+
+    def test_retrieval_failure_is_disclosed_when_using_embedded_fallback(self) -> None:
+        ranker = SkillWeaveRanker(
+            ROOT / "artifacts" / "demo-index.json",
+            candidate_retriever=FakeFullCorpusRetriever(fail=True),
+        )
+        result = ranker.search("行政助理", top_k=5)
+        self.assertEqual(result["candidate_source"], "embedded_12000_fallback")
+        self.assertEqual(result["degraded_components"], ["opensearch"])
+        self.assertEqual(len(result["results"]), 5)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import heapq
 import json
+import logging
 import math
 import re
 import threading
@@ -15,6 +16,7 @@ from app.tree_ranker import PortableTreeRanker
 _EN_TOKEN = re.compile(r"[a-z0-9][a-z0-9.+#/-]*")
 _SPACE = re.compile(r"\s+")
 _PUNCT = re.compile(r"[\s,，、/／|｜;；:：()（）\[\]【】{}「」『』·・_]+")
+LOGGER = logging.getLogger(__name__)
 
 
 def normalize(text: str | None) -> str:
@@ -78,9 +80,11 @@ class SkillWeaveRanker:
         artifact_path: str | Path,
         graph_novelty_threshold: float = 10.0,
         ltr_model_path: str | Path | None = None,
+        candidate_retriever: Any = None,
     ):
         self.artifact_path = Path(artifact_path)
         self.graph_novelty_threshold = max(0.1, float(graph_novelty_threshold))
+        self.candidate_retriever = candidate_retriever
         self.ltr_model = (
             PortableTreeRanker(ltr_model_path)
             if ltr_model_path is not None and Path(ltr_model_path).is_file()
@@ -319,6 +323,24 @@ class SkillWeaveRanker:
         job = self.jobs[index]
         fields = self._job_norm[index]
         job_units = self._job_units[index]
+        return self._score_job(
+            job,
+            fields,
+            job_units,
+            intent,
+            include_graph,
+            behavior_snapshot_day,
+        )
+
+    def _score_job(
+        self,
+        job: dict[str, Any],
+        fields: dict[str, str],
+        job_units: set[str],
+        intent: QueryIntent,
+        include_graph: bool,
+        behavior_snapshot_day: str | None = None,
+    ) -> tuple[float, dict[str, float], list[dict[str, Any]], list[str]]:
         q = intent.normalized
 
         exact_title = 1.0 if q and q == fields["title"] else 0.0
@@ -571,6 +593,72 @@ class SkillWeaveRanker:
         )
         return score, features, traces, direct_matches
 
+    @staticmethod
+    def _normalized_job_fields(
+        job: dict[str, Any],
+    ) -> tuple[dict[str, str], set[str]]:
+        fields = {
+            "title": normalize(job.get("title")),
+            "description": normalize(job.get("description")),
+            "category": normalize(" ".join(job.get("categories", []))),
+            "city": normalize(job.get("city")),
+            "industry": normalize(job.get("industry")),
+        }
+        units = lexical_units(
+            " ".join([fields["title"], fields["category"], fields["industry"]])
+        )
+        return fields, units
+
+    def _rerank(
+        self,
+        stage_one: list[
+            tuple[
+                float,
+                str,
+                dict[str, Any],
+                dict[str, float],
+                list[dict[str, Any]],
+                list[str],
+            ]
+        ],
+        *,
+        limit: int,
+        include_graph: bool,
+    ) -> list[
+        tuple[
+            float,
+            str,
+            dict[str, Any],
+            dict[str, float],
+            list[dict[str, Any]],
+            list[str],
+        ]
+    ]:
+        if self.ltr_model is None:
+            return stage_one[:limit]
+        reranked = []
+        for retrieval_rank, item in enumerate(stage_one, 1):
+            item[3].setdefault(
+                "retrieval_reciprocal_rank", 1.0 / retrieval_rank
+            )
+            ltr_score = self.ltr_model.predict(
+                item[3], include_graph=include_graph
+            )
+            # The offline fixture reranks an organizer-provided retrieval
+            # list. Keep a small deterministic title-relevance floor to limit
+            # candidate-source distribution shift.
+            online_score = (
+                ltr_score
+                + 0.30 * item[3]["title_unit_overlap"]
+                + 0.05 * item[3]["exact_title"]
+                + 0.01 * math.log1p(max(0.0, item[0]))
+            )
+            item[3]["stage_one_score"] = round(item[0], 4)
+            item[3]["ltr_score"] = round(ltr_score, 6)
+            item[3]["online_score"] = round(online_score, 6)
+            reranked.append((online_score, *item[1:]))
+        return sorted(reranked, key=lambda item: (-item[0], item[1]))[:limit]
+
     def search(
         self,
         query: str,
@@ -582,56 +670,106 @@ class SkillWeaveRanker:
     ) -> dict[str, Any]:
         intent = self.parse_intent(query, location_code, duty_code)
         if not intent.normalized:
-            return {"intent": intent, "results": []}
+            return {
+                "intent": intent,
+                "results": [],
+                "candidate_source": "none",
+                "degraded_components": [],
+            }
         limit = max(1, min(int(top_k), 100))
-        candidate_limit = max(limit, 100) if self.ltr_model is not None else limit
-        heap: list[tuple[float, str, int, dict[str, float], list[dict[str, Any]], list[str]]] = []
-        with self._lock:
-            for index, job in enumerate(self.jobs):
-                if candidate_ids is not None and job["id"] not in candidate_ids:
+        degraded_components: list[str] = []
+        external_candidates: list[dict[str, Any]] | None = None
+        if self.candidate_retriever is not None and candidate_ids is None:
+            try:
+                external_candidates = self.candidate_retriever.retrieve(
+                    intent.raw,
+                    limit=max(200, limit),
+                    location_names=self._filter_names(
+                        intent.location_codes, self.locations
+                    ),
+                    duty_names=self._filter_names(intent.duty_codes, self.duties),
+                )
+            except Exception as exc:
+                # Keep the API contract alive if full-corpus retrieval is
+                # temporarily unavailable. The response metadata makes the
+                # reduced fallback coverage explicit.
+                LOGGER.warning(
+                    "Full-corpus retrieval failed; using embedded fallback: %s",
+                    type(exc).__name__,
+                )
+                degraded_components.append("opensearch")
+
+        if external_candidates is not None:
+            stage_one = []
+            seen_ids: set[str] = set()
+            for retrieval_rank, job in enumerate(external_candidates, 1):
+                job_id = str(job.get("id", ""))
+                if not job_id or job_id in seen_ids:
                     continue
-                score, features, traces, direct = self._score(index, intent, include_graph)
-                # A graph neighbor is a feature, not sufficient candidate evidence.
-                # Require lexical overlap or an exact canonical skill match.
-                if features["lexical"] <= 0 and not direct:
+                seen_ids.add(job_id)
+                fields, job_units = self._normalized_job_fields(job)
+                score, features, traces, direct = self._score_job(
+                    job, fields, job_units, intent, include_graph
+                )
+                has_direct_candidate_evidence = bool(
+                    set(intent.skills) & set(job.get("skills", []))
+                )
+                if features["lexical"] <= 0 and not has_direct_candidate_evidence:
                     continue
                 if score <= 0:
                     continue
-                item = (score, job["id"], index, features, traces, direct)
-                if len(heap) < candidate_limit:
-                    heapq.heappush(heap, item)
-                elif item[:2] > heap[0][:2]:
-                    heapq.heapreplace(heap, item)
-        stage_one = sorted(heap, key=lambda item: (-item[0], item[1]))
-        if self.ltr_model is not None:
-            reranked = []
-            for retrieval_rank, item in enumerate(stage_one, 1):
-                item[3]["retrieval_reciprocal_rank"] = 1.0 / retrieval_rank
-                ltr_score = self.ltr_model.predict(
-                    item[3], include_graph=include_graph
+                features["retrieval_reciprocal_rank"] = 1.0 / retrieval_rank
+                features["opensearch_score"] = float(
+                    job.get("_retrieval_score", 0.0)
                 )
-                # The offline fixture reranks an organizer-provided retrieval
-                # list. The compact demo uses a different lexical scanner, so
-                # retain a deterministic title-relevance floor while still
-                # letting the frozen LTR order otherwise comparable results.
-                online_score = (
-                    ltr_score
-                    + 0.30 * item[3]["title_unit_overlap"]
-                    + 0.05 * item[3]["exact_title"]
-                    + 0.01 * math.log1p(max(0.0, item[0]))
+                stage_one.append(
+                    (score, job_id, job, features, traces, direct)
                 )
-                item[3]["stage_one_score"] = round(item[0], 4)
-                item[3]["ltr_score"] = round(ltr_score, 6)
-                item[3]["online_score"] = round(online_score, 6)
-                reranked.append((online_score, *item[1:]))
-            ranked = sorted(
-                reranked, key=lambda item: (-item[0], item[1])
-            )[:limit]
+            stage_one.sort(key=lambda item: (-item[0], item[1]))
+            candidate_source = "opensearch_full_corpus"
         else:
-            ranked = stage_one[:limit]
+            candidate_source = "embedded_12000_fallback"
+            candidate_limit = max(limit, 100) if self.ltr_model is not None else limit
+            heap: list[
+                tuple[
+                    float,
+                    str,
+                    dict[str, Any],
+                    dict[str, float],
+                    list[dict[str, Any]],
+                    list[str],
+                ]
+            ] = []
+            with self._lock:
+                for index, job in enumerate(self.jobs):
+                    if candidate_ids is not None and job["id"] not in candidate_ids:
+                        continue
+                    score, features, traces, direct = self._score(
+                        index, intent, include_graph
+                    )
+                    # A graph neighbor is a feature, not sufficient candidate evidence.
+                    # Require lexical overlap or an exact canonical skill match.
+                    has_direct_candidate_evidence = bool(
+                        set(intent.skills) & set(job.get("skills", []))
+                    )
+                    if (
+                        features["lexical"] <= 0
+                        and not has_direct_candidate_evidence
+                    ):
+                        continue
+                    if score <= 0:
+                        continue
+                    item = (score, job["id"], job, features, traces, direct)
+                    if len(heap) < candidate_limit:
+                        heapq.heappush(heap, item)
+                    elif item[:2] > heap[0][:2]:
+                        heapq.heapreplace(heap, item)
+            stage_one = sorted(heap, key=lambda item: (-item[0], item[1]))
+        ranked = self._rerank(
+            stage_one, limit=limit, include_graph=include_graph
+        )
         results: list[dict[str, Any]] = []
-        for rank, (score, _, index, features, traces, direct) in enumerate(ranked, 1):
-            job = self.jobs[index]
+        for rank, (score, _, job, features, traces, direct) in enumerate(ranked, 1):
             matched_labels = [
                 self.skills[skill_id].get("label", skill_id)
                 for skill_id in direct
@@ -654,7 +792,12 @@ class SkillWeaveRanker:
                     "graph_eligible": bool(job.get("graph_eligible", False)),
                 }
             )
-        return {"intent": intent, "results": results}
+        return {
+            "intent": intent,
+            "results": results,
+            "candidate_source": candidate_source,
+            "degraded_components": degraded_components,
+        }
 
     @staticmethod
     def _explanation(

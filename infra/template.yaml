@@ -11,10 +11,36 @@ Parameters:
     Default: 0
     MinValue: 0
     MaxValue: 100
+  OpenSearchEndpoint:
+    Type: String
+    Default: ""
+    Description: Optional full-corpus OpenSearch collection/domain HTTPS endpoint
+  OpenSearchCollectionArn:
+    Type: String
+    Default: ""
+    Description: Collection/domain ARN used by the Lambda IAM read policy
+  OpenSearchIndex:
+    Type: String
+    Default: skillweave-jobs-v1
+
+Rules:
+  OpenSearchParametersTogether:
+    Assertions:
+      - Assert: !Or
+          - !And
+            - !Equals [!Ref OpenSearchEndpoint, ""]
+            - !Equals [!Ref OpenSearchCollectionArn, ""]
+          - !And
+            - !Not [!Equals [!Ref OpenSearchEndpoint, ""]]
+            - !Not [!Equals [!Ref OpenSearchCollectionArn, ""]]
+        AssertDescription: OpenSearchEndpoint and OpenSearchCollectionArn must be supplied together
 
 Conditions:
   UseReservedConcurrency: !Not
     - !Equals [!Ref ReservedConcurrency, 0]
+  UseFullCorpusOpenSearch: !And
+    - !Not [!Equals [!Ref OpenSearchEndpoint, ""]]
+    - !Not [!Equals [!Ref OpenSearchCollectionArn, ""]]
 
 Globals:
   Function:
@@ -27,6 +53,9 @@ Globals:
       Variables:
         INDEX_PATH: /var/task/artifacts/demo-index.json
         LTR_MODEL_PATH: /var/task/artifacts/models/ltr-quality-final.trees.json
+        OPENSEARCH_ENDPOINT: !Ref OpenSearchEndpoint
+        OPENSEARCH_INDEX: !Ref OpenSearchIndex
+        OPENSEARCH_TIMEOUT_SECONDS: "2.0"
 
 Resources:
   HttpApi:
@@ -60,6 +89,14 @@ Resources:
         - !Ref AWS::NoValue
       Policies:
         - AWSLambdaBasicExecutionRole
+        - !If
+          - UseFullCorpusOpenSearch
+          - Statement:
+              - Effect: Allow
+                Action:
+                  - aoss:APIAccessAll
+                Resource: !Ref OpenSearchCollectionArn
+          - !Ref AWS::NoValue
       Events:
         Root:
           Type: HttpApi
@@ -103,3 +140,9 @@ Outputs:
   SearchEndpoint:
     Description: Judge endpoint
     Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${StageName}/api/v1/jobs/search
+  SearchScope:
+    Description: Candidate retrieval coverage configured for the judge endpoint
+    Value: !If
+      - UseFullCorpusOpenSearch
+      - full-corpus-opensearch
+      - embedded-12000-fallback

@@ -11,6 +11,7 @@ from typing import Any
 from urllib.parse import unquote
 
 from app.ranker import SkillWeaveRanker
+from app.retrieval import OpenSearchRetriever
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,7 +23,11 @@ LTR_MODEL_PATH = Path(
         ROOT / "artifacts" / "models" / "ltr-quality-final.trees.json",
     )
 )
-RANKER = SkillWeaveRanker(INDEX_PATH, ltr_model_path=LTR_MODEL_PATH)
+RANKER = SkillWeaveRanker(
+    INDEX_PATH,
+    ltr_model_path=LTR_MODEL_PATH,
+    candidate_retriever=OpenSearchRetriever.from_environment(),
+)
 
 
 def response(
@@ -106,6 +111,8 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
                 if RANKER.ltr_model is not None
                 else "heuristic_fallback"
             ),
+            "candidate_source": ranked["candidate_source"],
+            "degraded_components": ranked["degraded_components"],
         },
     }
     if trace:
@@ -157,6 +164,7 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
                     "service": "skillweave-search",
                     "index_version": RANKER.metadata.get("index_version"),
                     "jobs": len(RANKER.jobs),
+                    "full_corpus_retrieval": RANKER.candidate_retriever is not None,
                 },
             )
         if method == "GET" and path == "/api/v1/meta":
@@ -166,6 +174,11 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
                     "metadata": RANKER.metadata,
                     "job_count": len(RANKER.jobs),
                     "skill_count": len(RANKER.skills),
+                    "search_scope": (
+                        "full_corpus_opensearch"
+                        if RANKER.candidate_retriever is not None
+                        else "embedded_12000"
+                    ),
                 },
             )
         if method == "POST" and path == "/api/v1/jobs/search":

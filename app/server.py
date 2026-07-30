@@ -13,6 +13,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 from app.ranker import SkillWeaveRanker
+from app.retrieval import OpenSearchRetriever
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -55,6 +56,7 @@ class Handler(BaseHTTPRequestHandler):
                     "service": "skillweave-search",
                     "index_version": self.ranker.metadata.get("index_version"),
                     "jobs": len(self.ranker.jobs),
+                    "full_corpus_retrieval": self.ranker.candidate_retriever is not None,
                 }
             )
             return
@@ -64,6 +66,11 @@ class Handler(BaseHTTPRequestHandler):
                     "metadata": self.ranker.metadata,
                     "job_count": len(self.ranker.jobs),
                     "skill_count": len(self.ranker.skills),
+                    "search_scope": (
+                        "full_corpus_opensearch"
+                        if self.ranker.candidate_retriever is not None
+                        else "embedded_12000"
+                    ),
                 }
             )
             return
@@ -117,6 +124,8 @@ class Handler(BaseHTTPRequestHandler):
                     "graph_enabled": include_graph,
                     "resolved_skills": list(result["intent"].skills),
                     "index_version": self.ranker.metadata.get("index_version"),
+                    "candidate_source": result["candidate_source"],
+                    "degraded_components": result["degraded_components"],
                 },
             }
             if path == "/api/v1/graph/trace":
@@ -185,7 +194,9 @@ def main() -> None:
             f"Missing {args.artifact}. Run: python3 scripts/build_demo_index.py"
         )
     Handler.ranker = SkillWeaveRanker(
-        args.artifact, ltr_model_path=args.ltr_model
+        args.artifact,
+        ltr_model_path=args.ltr_model,
+        candidate_retriever=OpenSearchRetriever.from_environment(),
     )
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     print(f"SkillWeave listening on http://{args.host}:{args.port}")

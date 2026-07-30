@@ -1,4 +1,4 @@
-.PHONY: demo test verify release audit coverage business sam-smoke aws-smoke video submission external-preflight index benchmark quality package
+.PHONY: demo test verify release audit coverage business sam-smoke aws-smoke video submission external-preflight index benchmark quality package opensearch-local-up opensearch-local-down full-index-local full-demo-local
 
 demo:
 	python3 -m app.server --port 8080
@@ -48,3 +48,15 @@ quality:
 
 package:
 	python3 scripts/package_lambda.py
+
+opensearch-local-up:
+	docker compose -f infra/docker-compose.opensearch.yaml up -d
+
+opensearch-local-down:
+	docker compose -f infra/docker-compose.opensearch.yaml down
+
+full-index-local:
+	python3 scripts/index_full_opensearch.py --endpoint http://127.0.0.1:9200
+
+full-demo-local:
+	OPENSEARCH_ENDPOINT=http://127.0.0.1:9200 python3 -m app.server --port 8080

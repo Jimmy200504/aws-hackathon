@@ -1,0 +1,110 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: SkillWeave full-corpus OpenSearch Serverless search collection
+
+Parameters:
+  CollectionName:
+    Type: String
+    Default: skillweave-jobs
+    AllowedPattern: "[a-z][a-z0-9-]{2,31}"
+  CollectionGroupName:
+    Type: String
+    Default: skillweave-search
+    AllowedPattern: "[a-z][a-z0-9-]{2,31}"
+  MaxIndexingOcu:
+    Type: Number
+    Default: 4
+    AllowedValues: [1, 2, 4, 8]
+  MaxSearchOcu:
+    Type: Number
+    Default: 2
+    AllowedValues: [1, 2, 4, 8]
+  RuntimePrincipalArn:
+    Type: String
+    Description: ARN of the Lambda execution role that reads the full job index
+  IngestionPrincipalArn:
+    Type: String
+    Description: ARN of the IAM principal that runs index_full_opensearch.py
+
+Resources:
+  CollectionGroup:
+    Type: AWS::OpenSearchServerless::CollectionGroup
+    Properties:
+      Name: !Ref CollectionGroupName
+      Description: SkillWeave NextGen group with idle compute scale-to-zero
+      Generation: NEXTGEN
+      StandbyReplicas: ENABLED
+      CapacityLimits:
+        MinIndexingCapacityInOcu: 0
+        MaxIndexingCapacityInOcu: !Ref MaxIndexingOcu
+        MinSearchCapacityInOcu: 0
+        MaxSearchCapacityInOcu: !Ref MaxSearchOcu
+
+  EncryptionPolicy:
+    Type: AWS::OpenSearchServerless::SecurityPolicy
+    Properties:
+      Name: !Sub ${CollectionName}-encryption
+      Type: encryption
+      Policy: !Sub >-
+        {"Rules":[{"ResourceType":"collection","Resource":["collection/${CollectionName}"]}],"AWSOwnedKey":true}
+
+  NetworkPolicy:
+    Type: AWS::OpenSearchServerless::SecurityPolicy
+    Properties:
+      Name: !Sub ${CollectionName}-network
+      Type: network
+      Description: Public endpoint with IAM SigV4 and data-policy enforcement
+      Policy: !Sub >-
+        [{"Rules":[{"ResourceType":"collection","Resource":["collection/${CollectionName}"]}],"AllowFromPublic":true}]
+
+  DataAccessPolicy:
+    Type: AWS::OpenSearchServerless::AccessPolicy
+    Properties:
+      Name: !Sub ${CollectionName}-data
+      Type: data
+      Description: Separate read-only runtime and full-corpus ingestion permissions
+      Policy: !Sub >-
+        [
+          {
+            "Description":"Lambda runtime read access",
+            "Rules":[
+              {"ResourceType":"collection","Resource":["collection/${CollectionName}"],"Permission":["aoss:DescribeCollectionItems"]},
+              {"ResourceType":"index","Resource":["index/${CollectionName}/*"],"Permission":["aoss:ReadDocument","aoss:DescribeIndex"]}
+            ],
+            "Principal":["${RuntimePrincipalArn}"]
+          },
+          {
+            "Description":"Offline ingestion access",
+            "Rules":[
+              {"ResourceType":"collection","Resource":["collection/${CollectionName}"],"Permission":["aoss:DescribeCollectionItems"]},
+              {"ResourceType":"index","Resource":["index/${CollectionName}/*"],"Permission":["aoss:CreateIndex","aoss:DescribeIndex","aoss:WriteDocument","aoss:UpdateIndex","aoss:ReadDocument"]}
+            ],
+            "Principal":["${IngestionPrincipalArn}"]
+          }
+        ]
+
+  Collection:
+    Type: AWS::OpenSearchServerless::Collection
+    DependsOn:
+      - EncryptionPolicy
+      - NetworkPolicy
+      - DataAccessPolicy
+      - CollectionGroup
+    Properties:
+      Name: !Ref CollectionName
+      Type: SEARCH
+      CollectionGroupName: !Ref CollectionGroupName
+      StandbyReplicas: ENABLED
+      Description: Full 1111 job corpus for SkillWeave judge retrieval
+
+Outputs:
+  CollectionEndpoint:
+    Description: HTTPS endpoint passed to OPENSEARCH_ENDPOINT
+    Value: !GetAtt Collection.CollectionEndpoint
+  CollectionArn:
+    Description: ARN passed to the judge Lambda IAM policy
+    Value: !GetAtt Collection.Arn
+  CollectionId:
+    Value: !GetAtt Collection.Id
+  CollectionGroupId:
+    Description: NextGen collection group configured for scale-to-zero
+    Value: !Ref CollectionGroup

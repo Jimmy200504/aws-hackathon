@@ -30,8 +30,11 @@ train-only 職缺執行 strict structured extraction。Evidence validator 發布
 Aggregate-only 證據見
 [`reports/bedrock-pilot.json`](reports/bedrock-pilot.json)。
 
-Public demo：<https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/>。無 AWS
-session 的 production smoke 已驗證 UI、assets、API、graph on/off 與 trace；
+Public demo：<https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/>。目前這個
+既有 deployment 仍是 12,000-job embedded fallback；正式評測前必須依下方
+「全量職缺評測部署」建立並匯入 OpenSearch，且以 `/api/v1/meta` 的
+`search_scope=full_corpus_opensearch` 驗證，不能把 compact demo 當成全量搜尋。
+無 AWS session 的 production smoke 已驗證 UI、assets、API、graph on/off 與 trace；
 30-request／concurrency-5 結果為 30/30 HTTP 200、p95 4.46 秒，詳見
 [`reports/aws-production-smoke.json`](reports/aws-production-smoke.json)。
 
@@ -144,7 +147,10 @@ query + c0 + d0
                     Top 20
 ```
 
-本機 demo 以 12,000 筆真實職缺的精簡 artifact 模擬相同 feature contract；production 以 OpenSearch 取代逐筆掃描。
+本機 demo 以 12,000 筆真實職缺的精簡 artifact 模擬相同 feature contract。
+正式評測路徑由 OpenSearch 搜尋全部 1,218,635 筆職缺、取 Top 200，再沿用相同
+圖譜與 LTR feature contract；OpenSearch 無法使用時才降級到 embedded artifact，
+並在 `meta.candidate_source` 與 `meta.degraded_components` 揭露。
 
 主要特徵族：
 
@@ -287,6 +293,51 @@ arm64 + CloudWatch，公開 URL 與 production smoke 均已登錄。這不代表
 OpenSearch／Neptune／SageMaker production path 已部署；兩者不可混為一談。
 部署與驗證步驟見 [`docs/deployment.md`](docs/deployment.md)。
 
+### 全量職缺評測部署
+
+評審用 API 不可只搜尋 12,000-job demo artifact。repo 現在提供兩層候選來源：
+
+1. `OPENSEARCH_ENDPOINT` 已設定：搜尋全量 OpenSearch index，取 Top 200 後 LTR 重排。
+2. OpenSearch 未設定或暫時失敗：退回 12,000-job embedded demo，回應明確標示 degraded。
+
+先以不連 AWS 的 bounded dry run 驗證全量文件轉換：
+
+```bash
+python3 scripts/index_full_opensearch.py --dry-run --max-records 1000
+```
+
+實際建立 OpenSearch Serverless、匯入全部職缺並更新 judge Lambda 會產生 AWS
+費用，因此部署腳本要求顯式 opt-in：
+
+```bash
+export SKILLWEAVE_ENABLE_PAID_FULL_INDEX=yes
+export SKILLWEAVE_INGESTION_PRINCIPAL_ARN=arn:aws:iam::ACCOUNT:role/ROLE
+./scripts/deploy_full_search_aws.sh
+```
+
+匯入器最後會以 `_count` 驗證 OpenSearch 文件數等於 CSV 來源列數；只有
+`all_source_jobs_are_search_targets=true` 才算完成。部署後必須再檢查：
+
+```bash
+curl -sS "$DEMO_URL/api/v1/meta"
+```
+
+回應必須包含 `"search_scope":"full_corpus_opensearch"`。AWS collection/data
+policy 與 Lambda IAM 設定見
+[`infra/opensearch-serverless.yaml`](infra/opensearch-serverless.yaml) 和
+[`infra/template.yaml`](infra/template.yaml)。
+
+不產生 AWS 費用的本機全量驗證可使用 Docker：
+
+```bash
+make opensearch-local-up
+make full-index-local
+make full-demo-local
+```
+
+這是 self-managed 單節點 OpenSearch，不是 AWS Serverless；詳細差異與驗收方式見
+[`docs/deployment.md`](docs/deployment.md#local-full-corpus-opensearch)。
+
 ## 版本與重現資訊
 
 - Random seed：`1111`
@@ -320,6 +371,7 @@ app/                       API 與本機 ranker
 web/                       Live Demo
 config/                    reviewed bootstrap ontology
 scripts/build_demo_index.py
+scripts/index_full_opensearch.py full 1,218,635-job OpenSearch ingestion
 scripts/build_benchmark_fixture.py
 scripts/benchmark.py
 scripts/run_ablation.sh
@@ -330,6 +382,7 @@ scripts/verify_release.py    release evidence audit
 scripts/render_demo_video.py reproducible 5-minute judge video
 scripts/build_submission_packet.py evidence-derived form copy
 scripts/external_release_preflight.py credentials/tag/privacy preflight
+scripts/deploy_full_search_aws.sh billable full-corpus deployment
 tests/                     contract / leakage / ranking invariants
 docs/                      graph、GenAI、AWS、data card、提交稽核
 video/                     tracked deck、narration、captions

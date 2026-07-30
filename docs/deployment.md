@@ -1,6 +1,12 @@
 # AWS Demo Deployment Runbook
 
-這份 runbook 部署「可評審的 compact demo」：API Gateway HTTP API + Lambda + 12,000 筆真實職缺 artifact。完整 production OpenSearch/Neptune/SageMaker 架構另見 `aws-architecture.md`。
+這份 runbook 包含兩種模式：
+
+- Compact demo：API Gateway + Lambda + 12,000 筆 embedded artifact，適合 UI 與合約 smoke。
+- Full-corpus judge：OpenSearch 搜尋全部 1,218,635 筆職缺，再由同一 Lambda LTR 重排。
+
+若評分會以完整職缺集合檢驗，只有第二種模式符合搜尋範圍要求。完整
+Neptune/SageMaker production 架構另見 `aws-architecture.md`。
 
 ## 前置
 
@@ -106,6 +112,119 @@ python3 scripts/verify_release.py
 
 `update_release_urls.py` 會同步重建 submission audit 與它在 manifest 內的
 SHA-256，避免 URL 已完成但 audit 仍顯示舊 blocker。
+
+## Full-corpus judge deployment
+
+Compact Lambda 內仍保留 12,000 筆作服務降級，不再把它當成正式評測全集。
+完整流程為：
+
+```text
+1,218,635-row 職缺.csv
+  → index_full_opensearch.py
+  → OpenSearch Serverless skillweave-jobs-v1
+  → query Top 200
+  → Lambda graph/LTR rerank
+  → API Top 20
+```
+
+先確認既有 compact stack 存在，並準備具 OpenSearch Serverless 與
+CloudFormation 權限的 IAM role。部署會建立計費資源，必須顯式 opt-in：
+
+```bash
+uv pip install --python .venv/bin/python -r requirements-production.lock
+export AWS_REGION=us-east-1
+export SKILLWEAVE_ENABLE_PAID_FULL_INDEX=yes
+export SKILLWEAVE_INGESTION_PRINCIPAL_ARN=arn:aws:iam::ACCOUNT:role/ROLE
+./scripts/deploy_full_search_aws.sh
+```
+
+腳本依序：
+
+1. 解析現有 Lambda runtime role。
+2. 建立最低 OCU=0 的 NextGen collection group、security policies 與 SEARCH collection。
+3. 將 `職缺.csv` 每一列匯入 OpenSearch；有沒有技能命中都必須匯入。
+4. 等待 index refresh，使用 `_count` 驗證文件總數。
+5. 更新 Lambda 的 endpoint、index 與最小讀取 IAM 權限。
+6. 重跑 health/search smoke。
+
+OpenSearch Serverless endpoint 可從公網到達，但文件 API 仍要求 SigV4 與 data
+access policy。正式企業環境應改用 VPC endpoint；黑客松版本採這個設定是為了讓
+本機匯入器與 Lambda 共用同一 collection。
+
+NextGen group 在所有 collection 閒置 10 分鐘後可將 indexing/search workers
+降至 0 OCU；第一次喚醒可能增加 10～30 秒延遲。評審期間應使用有界 keep-warm，
+評審結束後停止，不能讓第一個 judge request 落入 12,000-job fallback。
+
+驗收：
+
+```bash
+curl -sS "$DEMO_URL/api/v1/meta"
+curl -sS -X POST "$DEMO_URL/api/v1/jobs/search" \
+  -H "content-type: application/json" \
+  -d '{"query":"行政助理","top_k":20}'
+```
+
+`/api/v1/meta` 必須回傳：
+
+```json
+{"search_scope":"full_corpus_opensearch"}
+```
+
+搜尋回應的 `meta.candidate_source` 必須是 `opensearch_full_corpus`，且
+`meta.degraded_components` 必須為空。若看到 `embedded_12000_fallback`，
+代表 API 合約仍可用，但不具全量評測資格。
+
+## Local full-corpus OpenSearch
+
+AWS OpenSearch Serverless 本身不能在本機執行；本機使用單節點 open-source
+OpenSearch，驗證相同的 mapping、bulk、CJK 搜尋與 rerank API。它不模擬 IAM、
+OCU、自動擴縮或 AWS data access policy。
+
+Docker Desktop 至少分配 4 GB 記憶體；對 121 萬筆完整 corpus，建議分配更多
+記憶體與足夠磁碟空間。啟動服務：
+
+```bash
+make opensearch-local-up
+curl http://127.0.0.1:9200
+```
+
+第一次建立全量索引：
+
+```bash
+make full-index-local
+```
+
+這會讀完 `data/dataset/職缺.csv`，可能需要一段時間。完成時報告必須顯示：
+
+```json
+{
+  "source_jobs_indexed": 1218635,
+  "verified_index_count": 1218635,
+  "all_source_jobs_are_search_targets": true
+}
+```
+
+啟動全量本機 API：
+
+```bash
+make full-demo-local
+```
+
+驗證：
+
+```bash
+curl -sS http://127.0.0.1:8080/api/v1/meta
+curl -sS -X POST http://127.0.0.1:8080/api/v1/jobs/search \
+  -H "content-type: application/json" \
+  -d '{"query":"行政助理","top_k":20}'
+```
+
+第一個回應應為 `search_scope=full_corpus_opensearch`；第二個回應應為
+`candidate_source=opensearch_full_corpus`。停止 container 但保留 index volume：
+
+```bash
+make opensearch-local-down
+```
 
 ## Public GitHub release + video
 
