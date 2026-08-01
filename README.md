@@ -23,14 +23,17 @@ flowchart TB
         EXACT --> VALIDATOR["Evidence / requirement / cutoff validator"]
         VALIDATOR --> STATS["全量共現統計 RELATED_TO"]
         STATS --> GRAPH["cutoff/latest immutable Skill Graph"]
+        GRAPH --> NEPTUNE[("Neptune Analytics<br/>evaluation-cutoff serving")]
     end
 
     subgraph Online["線上搜尋"]
         USER["使用者 / 評審"] --> API["Web UI / API Gateway / Lambda"]
         API --> NORMALIZE["Query 正規化<br/>Bedrock；失敗時安全降級"]
         NORMALIZE --> OS
+        NORMALIZE --> ALIAS["OpenSearch exact alias index"]
+        ALIAS --> NEPTUNE
         OS -->|"BM25 Top 200"| RANKER["特徵計算"]
-        GRAPH --> RANKER
+        NEPTUNE -->|"canonical skills + RELATED_TO"| RANKER
         FEATURES --> RANKER
         MODEL --> RANKER
         RANKER -->|"LambdaMART 重排"| TOP20["Top 20<br/>職缺、原因、Graph trace"]
@@ -44,18 +47,20 @@ flowchart TB
 
 ```text
 Query
-  → Bedrock Query 正規化（不可用時 deterministic fallback）
+  → 預先審閱 cache／Bedrock Query 正規化（逾時時 deterministic fallback）
+  → exact alias index 解析 canonical skill，並由 Neptune Analytics 擴展 RELATED_TO
   → OpenSearch 對 1,218,635 筆職缺做 CJK / BM25 搜尋
   → 取 Top 200
-  → 計算文字、條件、Skill Graph、行為與新鮮度特徵
+  → 計算文字、條件、Neptune Skill Graph、行為與新鮮度特徵
   → LambdaMART 重排
   → 回傳 Top 20 與 evidence trace
 ```
 
-本機與目前 judge AWS deployment 都由 OpenSearch 職缺文件與 Lambda 內的
-embedded artifact 提供圖譜特徵。Repository 另有 ECS Fargate pipeline 與 Neptune
-Analytics blue/green serving 模板，但未設定 `NEPTUNE_GRAPH_ID` 時不會建立或查詢
-Neptune；目前線上 `/health` 會明確回傳 `graph_backend=embedded_artifact`。
+本機開發預設由 Lambda／Python process 內的 embedded artifact 提供圖譜特徵；目前
+judge AWS deployment 則查詢 Neptune Analytics graph `g-tew85zms65`，並回傳
+`graph_backend=neptune_analytics` 與
+`graph_version=deterministic-v1-rules-v2-evaluation-cutoff`。未設定
+`NEPTUNE_GRAPH_ID` 或 managed graph 暫時不可用時，API 仍會安全降級而維持回應契約。
 
 ### 本機完整啟動（全量 OpenSearch + 線上 Query normalization + 前後端）
 
@@ -103,7 +108,7 @@ make full-index-local
 
 ```bash
 AWS_REGION=us-east-1 \
-BEDROCK_QUERY_MODEL_ID=us.anthropic.claude-sonnet-4-6 \
+BEDROCK_QUERY_MODEL_ID=global.anthropic.claude-haiku-4-5-20251001-v1:0 \
 OPENSEARCH_ENDPOINT=http://127.0.0.1:9200 \
 OPENSEARCH_INDEX=skillweave-jobs-v1 \
 .venv/bin/python -m app.server --port 8080
@@ -146,17 +151,22 @@ curl -sS http://127.0.0.1:8080/api/v1/meta
 }
 ```
 
-Bedrock 成功時，搜尋回應還應包含：
+預先審閱的常見查詢會直接使用 packaged cache；未快取查詢會嘗試 Bedrock，成功時
+`source=amazon_bedrock`，後續相同查詢則可能為 `amazon_bedrock_cached`：
 
 ```json
 {
   "query_normalization": {
-    "source": "amazon_bedrock",
-    "model_id": "us.anthropic.claude-sonnet-4-6"
+    "source": "amazon_bedrock_cached",
+    "model_id": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
   },
   "degraded_components": []
 }
 ```
+
+若 Bedrock 超過 request budget，該次請求會回傳
+`source=deterministic_fallback`，並在 `degraded_components` 揭露
+`bedrock_query_normalizer`；背景 batch 完成後會寫入目前 Lambda 容器的 cache。
 
 停止後端請在執行中的 terminal 按 `Ctrl-C`。停止 OpenSearch 但保留全量索引：
 
@@ -178,7 +188,9 @@ Public HTTPS
       → Amazon Bedrock query normalization
       → Provisioned Amazon OpenSearch Service domain
           → skillweave-jobs-v1，1,218,635 documents
-      → Embedded Skill Graph artifact + portable LambdaMART reranker
+      → OpenSearch exact skill alias index
+      → Neptune Analytics deterministic Skill Graph
+      → Frozen portable LambdaMART reranker
 
 Local OpenSearch index
   → FIXED-layout snapshot
@@ -186,9 +198,10 @@ Local OpenSearch index
   → provisioned OpenSearch restore
 ```
 
-目前 skill graph 功能已在 AWS Lambda 上運作，`/api/v1/graph/trace` 可回傳 evidence
-paths；它不是獨立 Neptune database。OpenSearch 文件本身包含每個職缺的 `skills`、
-`skill_evidence`、`skill_confidence` 與 `skill_provenance`。
+目前 skill graph 已匯入 Neptune Analytics，`/api/v1/graph/trace` 會回傳 grounded
+evidence paths。OpenSearch 職缺文件保留 `skills`、`skill_evidence`、
+`skill_confidence` 與 `skill_provenance`，供候選檢索、LTR 特徵與 managed graph
+故障時的 contract-safe fallback 使用。
 
 截至 2026-08-01 的公開 judge endpoints：
 
@@ -201,7 +214,8 @@ paths；它不是獨立 Neptune database。OpenSearch 文件本身包含每個�
 
 需要 AWS CLI v2、AWS SAM CLI、Docker Desktop、Python 3.11+、`curl` 與 `jq`。
 執行 deployment 的 IAM role 至少要能操作 CloudFormation、IAM、Lambda、API
-Gateway、CloudWatch、S3、Bedrock 與 OpenSearch Service，並具有 `iam:PassRole`。
+Gateway、CloudWatch、S3、Bedrock、OpenSearch Service 與 Neptune Analytics，並具有
+`iam:PassRole`。
 
 ```bash
 cd "/Users/jen/Desktop/Code/AWS Hackathon"
@@ -515,7 +529,11 @@ OPENSEARCH_COLLECTION_ARN="$OPENSEARCH_DOMAIN_ARN" \
 OPENSEARCH_INDEX="$INDEX_NAME" \
 OPENSEARCH_DOCUMENT_COUNT="$DOCUMENT_COUNT" \
 OPENSEARCH_SERVICE=es \
-BEDROCK_QUERY_MODEL_ID=us.anthropic.claude-sonnet-4-6 \
+BEDROCK_QUERY_MODEL_ID=global.anthropic.claude-haiku-4-5-20251001-v1:0 \
+NEPTUNE_GRAPH_ID=g-tew85zms65 \
+NEPTUNE_GRAPH_REGION="$AWS_REGION" \
+GRAPH_VERSION=deterministic-v1-rules-v2-evaluation-cutoff \
+SKILL_ALIAS_INDEX=skillweave-skill-alias-v2-94fe982a \
 ./scripts/deploy_compact_aws.sh
 ```
 
@@ -542,7 +560,11 @@ sam deploy \
     OpenSearchIndex="$INDEX_NAME" \
     OpenSearchDocumentCount="$DOCUMENT_COUNT" \
     OpenSearchService=es \
-    BedrockQueryModelId=us.anthropic.claude-sonnet-4-6
+    BedrockQueryModelId=global.anthropic.claude-haiku-4-5-20251001-v1:0 \
+    NeptuneGraphId=g-tew85zms65 \
+    NeptuneGraphRegion="$AWS_REGION" \
+    GraphVersion=deterministic-v1-rules-v2-evaluation-cutoff \
+    SkillAliasIndex=skillweave-skill-alias-v2-94fe982a
 ```
 
 取得 public URL 並更新 release evidence：
@@ -607,11 +629,19 @@ curl --fail-with-body -sS -X POST \
 ```json
 {
   "candidate_source": "opensearch_full_corpus",
+  "graph_backend": "neptune_analytics",
+  "graph_version": "deterministic-v1-rules-v2-evaluation-cutoff",
   "degraded_components": [],
   "ranking_model": "ltr-quality-final.ubj",
-  "query_normalization": {"source": "amazon_bedrock"}
+  "query_normalization": {
+    "source": "amazon_bedrock_cached",
+    "model_id": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+  }
 }
 ```
+
+`query_normalization.source` 也可能是即時完成的 `amazon_bedrock`；未快取查詢若超過
+request budget，則會明確標示 `deterministic_fallback` 與 degraded component。
 
 最後跑無 AWS authentication 的 public HTTPS bounded smoke：
 
@@ -620,7 +650,10 @@ python3 scripts/run_aws_production_smoke.py \
   --url "$DEMO_URL" \
   --requests 30 \
   --concurrency 5 \
-  --require-full-corpus
+  --require-full-corpus \
+  --require-neptune \
+  --expected-graph-version deterministic-v1-rules-v2-evaluation-cutoff \
+  --max-p95-ms 800
 
 python3 scripts/build_submission_packet.py
 python3 scripts/audit_submission.py
@@ -628,9 +661,10 @@ python3 scripts/verify_release.py
 ```
 
 正式驗收要求 30/30 HTTP 200、30/30 Top 10、30/30
-`opensearch_full_corpus`、p95 小於 10 秒、沒有 client errors 或 degraded
-components。結果保存在 `reports/aws-production-smoke.json` 與
-`reports/verify-release.json`。
+`opensearch_full_corpus`，所有 graph-on 請求都使用指定版本 Neptune Analytics，且
+response metadata 的服務端 p95 小於 800 ms、沒有 client errors 或 degraded
+components。2026-08-01 的最終 smoke 為 30/30、服務端 p95 `302.69 ms`；結果保存在
+`reports/aws-production-smoke.json` 與 `reports/verify-release.json`。
 
 ### 9. Rollback、停止計費與保留資料
 
@@ -708,6 +742,9 @@ Content-Type: application/json
   "empStr": "132144448,...",
   "meta": {
     "candidate_source": "opensearch_full_corpus",
+    "graph_backend": "neptune_analytics",
+    "graph_version": "deterministic-v1-rules-v2-evaluation-cutoff",
+    "ranking_model": "ltr-quality-final.ubj",
     "degraded_components": []
   }
 }
@@ -756,7 +793,7 @@ app/        API、OpenSearch retrieval、排序與 Lambda handler
 web/        Live Demo
 pipeline/   Deterministic graph build、LTR 特徵、訓練與評估
 scripts/    建索引、驗證、打包與部署
-infra/      SAM、provisioned OpenSearch 與選配 Serverless／Neptune templates
+infra/      SAM、provisioned OpenSearch、Serverless 與 Neptune Analytics templates
 artifacts/  Demo index 與 portable 模型
 reports/    品質、效能與部署證據
 docs/       架構、資料、安全與部署細節
