@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
-from app.job_fields import is_remote_job
+from app.job_fields import is_remote_job, parse_salary_intent
 from app.tree_ranker import PortableTreeRanker
 
 _EN_TOKEN = re.compile(r"[a-z0-9][a-z0-9.+#/-]*")
@@ -39,6 +39,14 @@ _REMOTE_QUERY_TERMS = (
 
 def wants_remote(normalized_query: str) -> bool:
     return any(term in normalized_query for term in _REMOTE_QUERY_TERMS)
+
+
+def wants_salary(normalized_query: str) -> dict[str, Any] | None:
+    """Parse an explicit salary condition (type + target number) from the
+    normalized query, e.g. 月薪4萬以上, 時薪200, 年薪百萬. Returns None when
+    the query does not state a salary type + number.
+    """
+    return parse_salary_intent(normalized_query)
 
 
 def normalize(text: str | None) -> str:
@@ -88,6 +96,7 @@ class QueryIntent:
     location_codes: tuple[str, ...]
     duty_codes: tuple[str, ...]
     wants_remote: bool = False
+    salary_intent: dict[str, Any] | None = None
 
 
 class SkillWeaveRanker:
@@ -227,6 +236,7 @@ class SkillWeaveRanker:
             location_codes=tuple(_as_codes(location_code)),
             duty_codes=tuple(_as_codes(duty_code)),
             wants_remote=wants_remote(normalized_value),
+            salary_intent=wants_salary(normalized_value),
         )
 
     def _filter_names(self, codes: Iterable[str], lookup: dict[str, list[str]]) -> set[str]:
@@ -409,6 +419,32 @@ class SkillWeaveRanker:
         if intent.wants_remote:
             remote_match = 1.0 if job.get("is_remote", False) else -1.0
 
+        # Salary conditions (時薪200, 月薪4萬以上, 年薪百萬, ...) must be
+        # compared against the job's structured salary_min/salary_max range,
+        # not against whether the exact number happens to appear in the
+        # title. A query target that falls anywhere in [salary_min,
+        # salary_max] (or at/above salary_min when salary_max is unset,
+        # e.g. "面議" floors) counts as a match; a job whose salary_type
+        # does not match the query's salary_type (e.g. hourly vs monthly)
+        # is not comparable and is neither rewarded nor penalized.
+        salary_match = 0.0
+        if intent.salary_intent is not None:
+            job_salary_type = job.get("salary_type", "unknown")
+            if job_salary_type == intent.salary_intent["salary_type"]:
+                job_min = float(job.get("salary_min", 0.0) or 0.0)
+                job_max = float(job.get("salary_max", 0.0) or 0.0)
+                target = intent.salary_intent["target"]
+                if job_min > 0 or job_max > 0:
+                    upper_bound = job_max if job_max > 0 else job_min
+                    if intent.salary_intent["comparator"] == "exact":
+                        covers = job_min <= target <= upper_bound
+                    else:
+                        # "at_least": job seekers want *this number or more*.
+                        # The job's own range must reach at or above the
+                        # target somewhere in [job_min, upper_bound].
+                        covers = upper_bound >= target
+                    salary_match = 1.0 if covers else -1.0
+
         graph_raw, traces, direct_matches, graph_components = self._graph_feature(
             intent, job, include_graph
         )
@@ -506,6 +542,7 @@ class SkillWeaveRanker:
             "location": round(2.8 if location_match > 0 else -16.0 if location_match < 0 else 0.0, 4),
             "duty": round(2.4 if duty_match > 0 else -10.0 if duty_match < 0 else 0.0, 4),
             "remote": round(2.4 if remote_match > 0 else -1.4 if remote_match < 0 else 0.0, 4),
+            "salary": round(2.4 if salary_match > 0 else -1.4 if salary_match < 0 else 0.0, 4),
             "is_remote": float(job.get("is_remote", False)),
             "salary_min": float(job.get("salary_min", 0.0) or 0.0),
             "salary_max": float(job.get("salary_max", 0.0) or 0.0),
@@ -629,7 +666,7 @@ class SkillWeaveRanker:
         }
         score = sum(
             features[name]
-            for name in ["lexical", "graph", "location", "duty", "remote", "behavior", "freshness"]
+            for name in ["lexical", "graph", "location", "duty", "remote", "salary", "behavior", "freshness"]
         )
         return score, features, traces, direct_matches
 
@@ -759,7 +796,7 @@ class SkillWeaveRanker:
                 )
                 has_direct_candidate_evidence = bool(
                     set(intent.skills) & set(job.get("skills", []))
-                )
+                ) or features["salary"] > 0
                 if features["lexical"] <= 0 and not has_direct_candidate_evidence:
                     continue
                 if score <= 0:
@@ -794,10 +831,13 @@ class SkillWeaveRanker:
                         index, intent, include_graph
                     )
                     # A graph neighbor is a feature, not sufficient candidate evidence.
-                    # Require lexical overlap or an exact canonical skill match.
+                    # Require lexical overlap, an exact canonical skill match, or a
+                    # structured salary-range match (e.g. 時薪210 covered by a job's
+                    # salary_min/salary_max even when the title never literally says
+                    # "210").
                     has_direct_candidate_evidence = bool(
                         set(intent.skills) & set(job.get("skills", []))
-                    )
+                    ) or features["salary"] > 0
                     if (
                         features["lexical"] <= 0
                         and not has_direct_candidate_evidence
@@ -868,6 +908,8 @@ class SkillWeaveRanker:
             evidence.append("職務分類吻合")
         if features["remote"] > 0:
             evidence.append("遠端／在家工作條件吻合")
+        if features["salary"] > 0:
+            evidence.append("薪資範圍符合查詢條件")
         if features["behavior"] > 1:
             evidence.append("訓練期正向互動訊號")
         if not job.get("graph_eligible", False):

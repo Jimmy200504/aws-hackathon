@@ -73,9 +73,96 @@ _SALARY_TYPE_MAP = {
     "面議": "negotiable",
 }
 
+# Salary-type keyword -> canonical type, used both for job posting text and
+# for parsing the user's query (e.g. "時薪200" -> hourly, target=200).
+_QUERY_SALARY_TYPE_KEYWORDS = (
+    ("時薪", "hourly"),
+    ("日薪", "daily"),
+    ("月薪", "monthly"),
+    ("年薪", "yearly"),
+)
+
+# userSearchLog shows queries like 月薪4萬以上, 時薪200以上, 月薪5萬, 時薪300,
+# 日薪2000, 年薪百萬. Chinese numerals combine a leading digit with 萬 (x10,000)
+# or 千 (x1,000); "百萬" alone means 1,000,000. Comparison direction is almost
+# always implicit "at least" (a bare number or explicit 以上/起); explicit
+# "剛好/恰好" (exactly) is rare in the data but supported for completeness.
+_SALARY_QUERY_PATTERN = re.compile(
+    r"(?P<type>時薪|日薪|月薪|年薪)"
+    r"\s*"
+    r"(?P<exact>剛好|恰好)?"
+    r"\s*"
+    r"(?P<number>[0-9]+(?:\.[0-9]+)?)"
+    r"(?P<wan>萬)?"
+    r"(?P<qian>千)?"
+    r"(?P<extra>[0-9]+)?"
+    r"\s*(?P<unit>元)?"
+    r"\s*(?P<at_least>以上|起)?"
+)
+# 百萬 without a leading digit (年薪百萬) means exactly 1,000,000.
+_BAI_WAN_PATTERN = re.compile(r"(?P<type>時薪|日薪|月薪|年薪)\s*(?P<at_least>以上)?\s*百萬")
+
 
 def _norm(value: str | None) -> str:
     return unicodedata.normalize("NFKC", value or "")
+
+
+def parse_salary_intent(query: str) -> dict[str, Any] | None:
+    """Parse an explicit salary condition out of a search query.
+
+    Mirrors real userSearchLog phrasing: 月薪4萬以上, 時薪200以上, 月薪5萬,
+    時薪300, 日薪2000, 年薪百萬. Returns None when the query does not state a
+    salary type + number (e.g. a bare "4萬以上" without 月薪/時薪/... is not
+    parsed, since the salary *type* to compare against is ambiguous).
+
+    Returns a dict with:
+    - salary_type: "monthly" | "hourly" | "daily" | "yearly"
+    - target: the parsed number (already scaled for 萬/千/百萬)
+    - comparator: "at_least" (剛好/恰好 explicit) or "at_least" (bare number
+      or 以上/起 -- job seekers overwhelmingly mean "at least" when typing a
+      bare salary number, per the observed query distribution) or "exact"
+    """
+    text = _norm(query)
+
+    bai_wan_match = _BAI_WAN_PATTERN.search(text)
+    if bai_wan_match:
+        salary_type = _SALARY_TYPE_MAP.get(bai_wan_match.group("type"))
+        if salary_type in ("monthly", "hourly", "daily", "yearly"):
+            return {
+                "salary_type": salary_type,
+                "target": 1_000_000.0,
+                "comparator": "at_least",
+            }
+
+    match = _SALARY_QUERY_PATTERN.search(text)
+    if not match:
+        return None
+    salary_type = _SALARY_TYPE_MAP.get(match.group("type"))
+    if salary_type not in ("monthly", "hourly", "daily", "yearly"):
+        return None
+
+    # "年薪14個月" means "14 months' pay per year" (a bonus-month count), not
+    # an absolute salary figure -- do not parse it as target=14.
+    tail = text[match.end():match.end() + 3]
+    if "個月" in tail:
+        return None
+
+    number = float(match.group("number"))
+    if match.group("wan"):
+        number *= 10_000
+        # 4萬5 (以上) means 45,000 -- the trailing digit is in units of 千.
+        extra = match.group("extra")
+        if extra:
+            number += float(extra) * 1_000
+    elif match.group("qian"):
+        number *= 1_000
+
+    comparator = "exact" if match.group("exact") else "at_least"
+    return {
+        "salary_type": salary_type,
+        "target": number,
+        "comparator": comparator,
+    }
 
 
 def is_remote_job(title: str | None, description: str | None) -> bool:

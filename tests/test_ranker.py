@@ -264,6 +264,126 @@ class RemoteWorkFeatureTests(unittest.TestCase):
         self.assertFalse(self.ranker.parse_intent("python 工程師").wants_remote)
 
 
+class SalaryRangeFeatureTests(unittest.TestCase):
+    def setUp(self) -> None:
+        artifact = {
+            "metadata": {"index_version": "test"},
+            "locations": {},
+            "duties": {},
+            "skills": {},
+            "behavior_graph": {},
+            "jobs": [
+                {
+                    # Range covers the query target (210) but the title
+                    # never literally says "210" -- this is exactly the
+                    # recall gap the salary feature must close.
+                    "id": "job-covers-no-literal-210",
+                    "title": "居家照顧服務員",
+                    "description": "時薪範圍依經驗調整",
+                    "categories": ["居家照顧"],
+                    "city": "",
+                    "industry": "",
+                    "company_id": "company-1",
+                    "graph_eligible": True,
+                    "skills": [],
+                    "view_count": 0,
+                    "apply_count": 0,
+                    "freshness": 0,
+                    "salary_min": 200.0,
+                    "salary_max": 300.0,
+                    "salary_type": "hourly",
+                    "is_remote": False,
+                },
+                {
+                    # Below the target: should not surface for 時薪210.
+                    "id": "job-below-target",
+                    "title": "洗碗人員",
+                    "description": "",
+                    "categories": [],
+                    "city": "",
+                    "industry": "",
+                    "company_id": "company-2",
+                    "graph_eligible": True,
+                    "skills": [],
+                    "view_count": 0,
+                    "apply_count": 0,
+                    "freshness": 0,
+                    "salary_min": 180.0,
+                    "salary_max": 190.0,
+                    "salary_type": "hourly",
+                    "is_remote": False,
+                },
+                {
+                    # Different salary_type (monthly): not comparable to an
+                    # hourly query, must be neither rewarded nor penalized.
+                    "id": "job-different-type",
+                    "title": "行政助理",
+                    "description": "",
+                    "categories": [],
+                    "city": "",
+                    "industry": "",
+                    "company_id": "company-3",
+                    "graph_eligible": True,
+                    "skills": [],
+                    "view_count": 0,
+                    "apply_count": 0,
+                    "freshness": 0,
+                    "salary_min": 30000.0,
+                    "salary_max": 35000.0,
+                    "salary_type": "monthly",
+                    "is_remote": False,
+                },
+            ],
+        }
+        self.tempdir = tempfile.TemporaryDirectory()
+        path = Path(self.tempdir.name) / "index.json"
+        path.write_text(json.dumps(artifact), encoding="utf-8")
+        self.ranker = SkillWeaveRanker(path)
+
+    def tearDown(self) -> None:
+        self.tempdir.cleanup()
+
+    def test_finds_job_whose_range_covers_target_without_literal_match(self) -> None:
+        rows = self.ranker.search("時薪210", top_k=10)["results"]
+        job_ids = [row["job_id"] for row in rows]
+        self.assertIn("job-covers-no-literal-210", job_ids)
+        covering_row = next(
+            row for row in rows if row["job_id"] == "job-covers-no-literal-210"
+        )
+        self.assertGreater(covering_row["features"]["salary"], 0)
+
+    def test_job_below_target_is_penalized_not_boosted(self) -> None:
+        rows = self.ranker.search(
+            "時薪210",
+            top_k=10,
+            candidate_ids={"job-covers-no-literal-210", "job-below-target"},
+        )["results"]
+        below_row = next(
+            (row for row in rows if row["job_id"] == "job-below-target"), None
+        )
+        if below_row is not None:
+            self.assertLess(below_row["features"]["salary"], 0)
+
+    def test_mismatched_salary_type_is_neutral(self) -> None:
+        intent = self.ranker.parse_intent("時薪210")
+        _, features, _, _ = self.ranker._score(
+            2, intent, include_graph=True
+        )  # job-different-type
+        self.assertEqual(features["salary"], 0.0)
+
+    def test_intent_parses_salary_condition(self) -> None:
+        intent = self.ranker.parse_intent("時薪210")
+        self.assertIsNotNone(intent.salary_intent)
+        self.assertEqual(intent.salary_intent["salary_type"], "hourly")
+        self.assertEqual(intent.salary_intent["target"], 210.0)
+
+    def test_query_without_salary_condition_has_neutral_feature(self) -> None:
+        intent = self.ranker.parse_intent("居家照顧服務員")
+        self.assertIsNone(intent.salary_intent)
+        _, features, _, _ = self.ranker._score(0, intent, include_graph=True)
+        self.assertEqual(features["salary"], 0.0)
+
+
 class FakeFullCorpusRetriever:
     def __init__(self, *, fail: bool = False) -> None:
         self.fail = fail

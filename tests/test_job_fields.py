@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from app.job_fields import derive_job_fields, is_remote_job, parse_salary
+from app.job_fields import derive_job_fields, is_remote_job, parse_salary, parse_salary_intent
 
 
 class RemoteDetectionTests(unittest.TestCase):
@@ -75,6 +75,46 @@ class DeriveJobFieldsTests(unittest.TestCase):
         self.assertEqual(fields["salary_max"], 60000.0)
         self.assertEqual(fields["salary_type"], "monthly")
         self.assertTrue(fields["is_remote"])
+
+
+class SalaryQueryIntentTests(unittest.TestCase):
+    def test_parses_hourly_bare_number_as_at_least(self) -> None:
+        result = parse_salary_intent("時薪200")
+        self.assertEqual(result["salary_type"], "hourly")
+        self.assertEqual(result["target"], 200.0)
+        self.assertEqual(result["comparator"], "at_least")
+
+    def test_parses_explicit_at_least_suffix(self) -> None:
+        result = parse_salary_intent("時薪200以上")
+        self.assertEqual(result["target"], 200.0)
+        self.assertEqual(result["comparator"], "at_least")
+
+    def test_parses_monthly_wan_unit(self) -> None:
+        result = parse_salary_intent("月薪4萬以上")
+        self.assertEqual(result["salary_type"], "monthly")
+        self.assertEqual(result["target"], 40000.0)
+
+    def test_parses_wan_with_qian_remainder(self) -> None:
+        result = parse_salary_intent("月薪4萬5以上")
+        self.assertEqual(result["target"], 45000.0)
+
+    def test_parses_yearly_bai_wan_as_one_million(self) -> None:
+        result = parse_salary_intent("年薪百萬")
+        self.assertEqual(result["salary_type"], "yearly")
+        self.assertEqual(result["target"], 1_000_000.0)
+
+    def test_bonus_month_count_is_not_a_salary_amount(self) -> None:
+        # "年薪14個月" means 14 months of pay per year (a bonus-month
+        # count), not an absolute target of NT$14.
+        self.assertIsNone(parse_salary_intent("年薪14個月"))
+
+    def test_query_without_salary_type_is_not_parsed(self) -> None:
+        self.assertIsNone(parse_salary_intent("4萬以上"))
+        self.assertIsNone(parse_salary_intent("後端工程師"))
+
+    def test_daily_and_yearly_types_parse(self) -> None:
+        self.assertEqual(parse_salary_intent("日薪2000")["salary_type"], "daily")
+        self.assertEqual(parse_salary_intent("日薪2000")["target"], 2000.0)
 
 
 if __name__ == "__main__":
