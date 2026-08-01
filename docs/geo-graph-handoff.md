@@ -3,18 +3,23 @@
 作者：timchen
 分支：`experiment/llm-graph-in-benchmark`（未推送）
 規劃書：[`docs/geo-graph.md`](geo-graph.md)
+Schema 與量測結果：[`docs/graph-schema.md`](graph-schema.md) 的「Geo graph（行政區層）」一節
 
-這份文件交接 geo graph 的前置量測階段。**尚未開始建圖**，做完的是「哪些層能有資料支撐、哪些不能」的量測，以及 L4 行政區的抽取器。
-
-先讀這一節與「資料層面的硬約束」，那裡有三件事會直接推翻規劃書裡的部分設計。
+**狀態：圖已建好並接上 API。** 本文件第 2～4 節是建圖前的量測，仍然有效，
+說明為什麼規劃書的部分設計做不到。第 5 節的四個步驟已完成三個，剩下 LLM collocation 判斷待跑
+（缺 AWS 憑證，程式已就緒）。
 
 ---
 
 ## 1. 現況
 
-### 已 commit（本分支領先 `origin/main` 五個 commit，全部未推送）
+### 已 commit（本分支領先 `origin/main` 九個 commit，全部未推送）
 
 ```
+e24e689  Prepare the occurrence-level district judgement for Bedrock
+bb4ba2a  Build the district geo graph from behaviour and audit its authored layers
+464337b  Pin the checkout to LF so the release audit passes on Windows
+f1525d7  Hand off the geo graph work with its measured constraints
 60fc880  Stop the district extractor from tagging the wrong district
 4422b75  Measure the geo graph's data support before building it
 ec25456  Surface region graph evidence in the search response and demo
@@ -27,11 +32,24 @@ ec25456  Surface region graph evidence in the search response and demo
 
 | 路徑 | 內容 | 追蹤 |
 |---|---|---|
-| `scripts/build_region_graph.py` | L2 縣市層行為圖（已完成） | 是 |
+| **L2 縣市層（先前完成）** | | |
+| `scripts/build_region_graph.py` | L2 縣市層行為圖 | 是 |
 | `artifacts/region-graph.json` | 22 縣市、201 條可替代邊、62 條通勤邊 | 是 |
 | `app/region_graph.py` | L2 圖的唯讀查詢與 `meta.region_trace` | 是 |
+| **L4 行政區層（本次完成）** | | |
+| `scripts/build_district_graph.py` | L4 區級行為圖 | 是 |
+| `artifacts/district-graph.json` | 368 節點、4,857 條邊（2,202 條跨縣市） | 是 |
+| `config/geo-authored.json` | L1/L3/L5 手填層 + `shortcut` 邊 | 是 |
+| `scripts/validate_geo_authored.py` | 手填層對行為圖的稽核 | 是 |
+| `reports/geo-authored-validation.json` | 28 個分組的逐條判定 | 是 |
+| `app/geo_graph.py` | 組裝、Dijkstra、`meta.geo_trace` | 是 |
+| `tests/test_geo_graph.py` | 39 個測試 | 是 |
+| **抽取器與待辦** | | |
 | `scripts/extract_job_districts.py` | L4 行政區抽取器 | 是 |
 | `reports/job-district-extraction.json` | 705 個 surface 的逐條判定 + 審查佇列 | 是 |
+| `artifacts/district-collocation-queue.json` | 完整 collocation 佇列（3,069 筆） | 是 |
+| `scripts/judge_district_collocations.py` | LLM occurrence 判斷（**未跑**） | 是 |
+| `tests/test_district_collocations.py` | 17 個測試 | 是 |
 | `artifacts/job-districts.json` | 255,119 筆職缺的行政區解析，43 MB | **否，gitignore** |
 | `scripts/measure_location_code_levels.py` | `c0` 層級分布 + 區級共同勾選 | 是 |
 | `reports/location-code-levels.json` | 含八里區的驗證結果 | 是 |
@@ -43,10 +61,19 @@ ec25456  Surface region graph evidence in the search response and demo
 全部用 `.\.venv\Scripts\python.exe`，**不要用 PATH 上的 `python`**（那是 Anaconda 3.8.8，缺 `str.removeprefix`，無法 import 本 repo）。
 
 ```powershell
+.\.venv\Scripts\python.exe scripts\build_district_graph.py             # ~46s
+.\.venv\Scripts\python.exe scripts\validate_geo_authored.py            # ~15s
 .\.venv\Scripts\python.exe scripts\extract_job_districts.py            # ~75s
 .\.venv\Scripts\python.exe scripts\measure_location_code_levels.py     # ~50s
 .\.venv\Scripts\python.exe scripts\mine_region_aliases.py              # ~70s
-.\.venv\Scripts\python.exe -m unittest discover -s tests               # 91 tests
+.\.venv\Scripts\python.exe -m unittest discover -s tests               # 147 tests
+```
+
+完整 collocation 佇列（LLM 步驟的輸入）要另外產，且**不要蓋掉** checked-in 報告：
+
+```powershell
+.\.venv\Scripts\python.exe scripts\extract_job_districts.py `
+    --review-collocations 100000 --report artifacts\district-collocation-queue.json
 ```
 
 ---
@@ -105,7 +132,7 @@ L2 只有 201 條邊，L4 有 2,723 條。**`is_adjacent_to = 20` 這種手填�
 
 ---
 
-## 3. 規劃書需要修正的四點
+## 3. 規劃書需要修正的四點（皆已實作，見 `docs/graph-schema.md`）
 
 ### 3.1 不要用 networkx
 
@@ -211,9 +238,18 @@ suffix_dropped  信義、板橋              167,758 筆命中
 
 ---
 
-## 5. 下一步（有序，前兩步互相依賴）
+## 5. 四個步驟（3 已完成，步驟 1 待跑）
 
-### 步驟 1：LLM collocation 判斷（本次交接的主要待辦）
+**原本這裡寫「前兩步互相依賴」，那是錯的，實作時發現了。**
+步驟 1 用的是**職缺文字**（職缺側），步驟 2 用的是**搜尋日誌的 `c0`**（查詢側），
+兩者資料來源不相交，抽取器準不準完全不影響共同勾選圖。真正交會的地方在步驟 4 之後，
+也就是要把職缺綁到區、算區級 `COMMUTES_TO` 的時候（見 §6 第 2 點）。
+
+實務上差很多：步驟 2 零依賴、零成本、不需要憑證，而且它就是圖本身；
+步驟 1 要花額度、受 1 RPS 限制、且可能量出「準確率不夠不能用」。
+先做 2 再做 1，最壞情況仍有一張完整的圖。本次即照此順序執行。
+
+### 步驟 1：LLM collocation 判斷（唯一待跑項）
 
 **問題。** surface 層級的通過/拒絕在數學上無法處理 occurrence 層級的錯誤。`北區` 是最清楚的例子：
 
@@ -226,7 +262,11 @@ suffix_dropped  信義、板橋              167,758 筆命中
 
 整體接受會留下 `北區業務`，整體拒絕會丟掉 `和緯`/`忠明`/`三民`。兩者都錯。
 
-**資料已備好。** `reports/job-district-extraction.json` 的 `occurrence_review_queue`：
+**資料已備好，但不在 checked-in 報告裡。** `reports/job-district-extraction.json` 的
+`occurrence_review_queue` 每個 surface 只留前 30 筆 collocation，所以它有**計數**、沒有**列**
+（實際只有 1,159 / 3,069 筆，需判斷的只有 740 / 2,558）。完整佇列要用
+`--review-collocations 100000` 另外產到 `artifacts/district-collocation-queue.json`，
+該檔已 commit，計數與下表完全相符。
 
 | 量測 | 值 |
 |---|---:|
@@ -241,31 +281,62 @@ collocation 的 key 是 surface 後面**一個**漢字，每筆附 `example` 片
 
 **標註帶是保守的，刻意留出中間帶。** `place` 需誤留率 ≤ 3%、`not_place` 需 ≥ 50%、且支撐 ≥ 30 筆。中間帶不標，因為 `北區和緯` 誤留率 12% 而它是真街道 —— 用單一 10% 門檻會把它標成負例，然後 LLM 答對反而被扣分。
 
-**做法。**
+**做法。程式已寫好在 `scripts/judge_district_collocations.py`，只差憑證。**
 
-1. 先在 511 筆已標註 collocation 上量 LLM 準確率（這是唯一有答案的部分，不能跳過）
-2. 準確率可接受再套用到 2,558 筆需判斷的
-3. 判斷結果寫回 artifact，帶 `extractor_model`、`prompt_version`
-4. 重跑抽取器，套用 occurrence 層級判定，看單一行政區佔比與覆蓋率怎麼變
+```powershell
+# 1. 先量準確率（21 次呼叫，約 30 秒）。低於 --min-accuracy 會 exit 非零，
+#    所以沒過關的模型不可能被拿去跑步驟 2。
+.\.venv\Scripts\python.exe scripts\judge_district_collocations.py `
+    --queue artifacts\district-collocation-queue.json --mode validate
 
-**成本。** 2,558 筆，每次批 25 個 → 約 103 次呼叫。**Bedrock 硬限 1 RPS，約 2 分鐘。** 加上標註集驗證約 21 次。
+# 2. 過關才跑（103 次呼叫，約 2 分鐘）
+.\.venv\Scripts\python.exe scripts\judge_district_collocations.py `
+    --queue artifacts\district-collocation-queue.json --mode apply
+```
+
+`--dry-run` 會印出 system prompt 與第一批的實際內容，不呼叫 Bedrock。
+
+已內建的守則：
+- prompt 只給 `surface` / `following` / `example`，**不給** `label` 與 `precision`（那是答案），有測試把關
+- cache 是 append-only JSONL，帶 `mode` 欄位，validate 的列永遠不會被當成 apply 的產出
+- 憑證過期可換一組接著跑，已成功的不會重複計費
+- 1.05 秒間隔（沿用 `scripts/normalize_eval_queries.py` 實測 0.7604 RPS 的限流器）
+- `--region` 不是 us-east-1 / us-west-2 直接拒絕，不會跑到一半才炸
+
+**尚未執行的第 4 步：** 判斷結果回寫抽取器、套用 occurrence 層級判定，看單一行政區佔比與覆蓋率怎麼變。
 
 **一個好的測試題。** `林口長庚 n=927 p=18.66%` —— 林口長庚醫院行政上屬**桃園市龜山區**，不是新北市林口區。資料抓到了這件事，而一般模型很可能答錯。
+它會出現在 validate 的第一批裡。**行為圖獨立地證實了同一件事**：`林口區 ↔ 龜山區` 的 Jaccard 是 0.1978、
+共同勾選 10,723 次，是全部跨縣市邊的第三強。
 
-### 步驟 2：L4 區級共同勾選圖
+### 步驟 2：L4 區級共同勾選圖 —— **已完成**
 
-`scripts/measure_location_code_levels.py` 已經算出 2,723 條邊，但目前只寫在報告裡。需要一支 `scripts/build_district_graph.py` 產出與 `region-graph.json` 同構的 artifact：
+`scripts/build_district_graph.py` → `artifacts/district-graph.json`。
+與原本規劃的差別：**跨縣市區對也算了**，這是原本列在 §6 的未解問題。
 
-- `SUBSTITUTABLE_WITH`（無向，Jaccard + 兩向條件機率）
-- 節點 key 用 `縣市/行政區`，不要裸區名（`北區` 在台中、台南、新竹都有；`東區` 有四個）
-- metadata 記 `dataset_version` / `graph_cutoff` / `schema` / `seed`
-- train-only（06-01~06-05），排除匿名 `talentNo = 0`
+| 量測 | 值 |
+|---|---:|
+| 節點 | 368 |
+| 邊（`min_co_selected = 30`） | 4,857 |
+| 　同縣市 | 2,655 |
+| 　跨縣市 | 2,202 |
 
-跨縣市的區對目前沒算（只算同縣市），若要做通勤走廊需要補。
+先前報告的 2,723 條同縣市邊與現在的 2,655 差在新增的 `--max-districts-per-search 10`：
+49 筆一次勾選十個以上行政區的搜尋被排除，它們表達的是「哪裡都行」而非可替代性，
+卻會貢獻 30,668 個配對。排除比例 0.005% 的搜尋，影響 0.33% 的配對證據。
 
-### 步驟 3：L5 表 + 集中度驗證
+schema 與八里例子的完整結果見 [`docs/graph-schema.md`](graph-schema.md)。
 
-L5 表還沒給。驗證機制已經驗證過可用：`scripts/mine_region_aliases.py` 的負控制組（`經驗`、`團隊`、`加班` 等十個非地名詞）落在 17.6~26.7%，基準率 17.5%；真實地名 `大墩 97.9%`、`文心 91.8%`、`北車 86.4%`、`南科 81.1%`、`中科 74.0%`、`竹科 60.9%`。
+### 步驟 3：L5 表 + 集中度驗證 —— **已完成**
+
+L5 表在 `config/geo-authored.json`，連同 L1 大區與 L3 生活圈。
+**而且手填層現在被行為圖稽核**（`scripts/validate_geo_authored.py`）：組內平均 Jaccard 對上
+「同縣市同樣大小的隨機分組」的虛無分布，可窮舉時窮舉。28 個分組裡 13 個通過、8 個沒通過、7 個單一行政區無法測。
+
+沒通過的留著不刪 —— 那是最有資訊量的部分。`L5/中科` 落在第 61 百分位，因為后里園區與西屯園區的
+Jaccard 只有 0.0097；`L1/宜花東` 第 81 百分位，宜蘭花蓮台東不是一個勞動市場。
+
+驗證機制原本就驗證過可用：`scripts/mine_region_aliases.py` 的負控制組（`經驗`、`團隊`、`加班` 等十個非地名詞）落在 17.6~26.7%，基準率 17.5%；真實地名 `大墩 97.9%`、`文心 91.8%`、`北車 86.4%`、`南科 81.1%`、`中科 74.0%`、`竹科 60.9%`。
 
 閘門也擋掉三個 LLM 會答錯的：
 
@@ -291,20 +362,37 @@ L5 表還沒給。驗證機制已經驗證過可用：`scripts/mine_region_alias
 
 但 `reports/region-alias-candidates.json` 的 2,695 個候選裡**約兩成是正則邊界碎片**（`區西盛`、`往後`、`過這一`），另有相當比例是路名層級（`內環北`、`五工三`）。真正可用的約一成。挖掘來源是職缺文字，那告訴你職缺在哪，不告訴你求職者會打什麼 —— 打字搜尋含地標名的只有 0.198%。
 
-### 步驟 4：組裝 geo graph
+### 步驟 4：組裝 geo graph —— **已完成**
 
-前三步完成後才有足夠的節點與邊。`docs/geo-graph.md` 的 `build_geo_graph` / `get_expanded_locations` 介面可以照用，但依 §3 修正實作。
+`app/geo_graph.py`。規劃書的 `build_geo_graph(base, special, cutoff_date)` 與
+`get_expanded_locations(G, source, max_distance)` 兩個介面都照用了，實作依 §3 修正：
+無 networkx、成本是 `-log(可替代度)`、層級是集合查詢。
+
+`meta.geo_trace` 與 `meta.region_trace` 並存，`applied_to_ranking: false`，
+搜尋代碼是縣市級時整個鍵省略。`/health` 有 `geo_graph` 欄位。
+
+**尚未做，且刻意不做：** 沒有接進排序路徑，也沒有做成 LTR 特徵。理由見
+[`docs/graph-schema.md`](graph-schema.md) 的「已知限制」——
+候選集 84.3% 只落在 ≤1 個縣市，區級特徵在候選組內變異數為零；
+加上職缺側只有 26.53% 有行政區，缺值語意無法在這個 benchmark 上驗證。
 
 ---
 
 ## 6. 已知未解問題
 
 1. **`桃園_`（後面非漢字）n=8,235、p=78.35% 仍在需判斷帶。** 這是 `桃園)`、`桃園|` 這類，量很大且未解。
-2. **L4 跨縣市區對沒算。** 通勤走廊（如新竹市→新北市在 L2 有 163 vs 6）在 L4 沒有對應資料。
-3. **`shortcut` 邊無法用這份資料驗證。** 搜尋日誌是 2026-06-01~06-07，規劃書標的淡江大橋通車日是 2026-05-12，**整個資料窗都在通車後**，沒有 before/after 可比。淡水是八里第一名鄰居這件事與大橋已通車一致，但不構成證明。
-4. **本分支的 commit 都未推送。**
+2. **L4 區級 `COMMUTES_TO` 沒做。** 應徵流向需要知道職缺在哪一區，而職缺只有 26.53% 解析得到，
+   且缺值非隨機。這條要等步驟 1 的 LLM 判斷提高抽取品質之後才有意義 —— 那是這兩步唯一真正的依賴關係。
+3. **`shortcut` 邊無法用這份資料驗證。** 搜尋日誌是 2026-06-01~06-07，規劃書標的淡江大橋通車日是 2026-05-12，**整個資料窗都在通車後**，沒有 before/after 可比。
+   實作上已處理：手填邊是備援不是覆寫，兩條 `shortcut` 都落在行為已涵蓋的區對上，
+   所以時序過濾器可證明會動（三鶯線在 06-01 被排除、07-01 被接受），但不改變任何一條邊的權重。
+4. **LLM collocation 判斷未跑，本 workspace 的 Workshop Studio 憑證已過期。**
+   程式與測試就緒，換一組憑證即可執行。
+5. **本分支的 commit 都未推送。**
 
-已解決：`.gitattributes` 缺失導致 `scripts/verify_release.py` 在 Windows 上 19/25 個 hash mismatch。已加入 `* text=auto eol=lf`，驗證器現在 89/89 全過。
+已解決：
+- `.gitattributes` 缺失導致 `scripts/verify_release.py` 在 Windows 上 19/25 個 hash mismatch。已加入 `* text=auto eol=lf`，驗證器現在 89/89 全過。
+- **L4 跨縣市區對**（原第 2 點）已在 `build_district_graph.py` 補上，2,202 條。
 
 ---
 
@@ -315,5 +403,10 @@ L5 表還沒給。驗證機制已經驗證過可用：`scripts/mine_region_alias
 - `.ps1` 檔勿含中文（PS 5.1 以 ANSI 讀取會壞）
 - Bedrock：**限 us-east-1 / us-west-2**，1 RPS。`pipeline/bedrock_extract.py` 預設 `--region ap-northeast-1` 與 `--max-workers 4` 兩者都違規，尚未修
 - `bedrock:CreateModelInvocationJob` 不在允許清單，batch inference 不可用
-- 探索性報告不要登入 `release-manifest.json`，那會變成發布宣稱
+- 探索性報告不要登入 `release-manifest.json`，那會變成發布宣稱。`district-graph.json` 與
+  `geo-authored-validation.json` 都**沒有**登入，`app/geo_graph.py` 也不進 release gate
 - 不要改 `app/ranker.py` 的 `LLM_SKILL_PREFIX = "bedrock."`，否則 `llm_*` 特徵族會靜默歸零
+- `scripts/package_lambda.py` 不打包 `region-graph.json`，也不打包 `district-graph.json`。
+  兩個模組缺檔時都自動停用、搜尋照常回應，這是既有設計，改動會動到已通過驗證的部署 hash
+- bash 工具下 Python 的 stdout 是 cp950，中文會變亂碼。要看中文輸出就設 `PYTHONIOENCODING=utf-8`，
+  或寫進檔案再讀
