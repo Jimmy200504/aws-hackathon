@@ -11,12 +11,34 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
+from app.job_fields import is_remote_job
 from app.tree_ranker import PortableTreeRanker
 
 _EN_TOKEN = re.compile(r"[a-z0-9][a-z0-9.+#/-]*")
 _SPACE = re.compile(r"\s+")
 _PUNCT = re.compile(r"[\s,，、/／|｜;；:：()（）\[\]【】{}「」『』·・_]+")
 LOGGER = logging.getLogger(__name__)
+
+# Same remote-work vocabulary used to derive `is_remote` at index time. A
+# query containing one of these terms expresses remote-work intent, mirrored
+# against userSearchLog_20260601_20260607.csv's most frequent `ks` values
+# (遠端, 在家工作, 居家辦公, WFH, ...).
+_REMOTE_QUERY_TERMS = (
+    "遠端",
+    "在家工作",
+    "在家上班",
+    "在家兼職",
+    "居家辦公",
+    "居家工作",
+    "wfh",
+    "work from home",
+    "remote work",
+    "remote job",
+)
+
+
+def wants_remote(normalized_query: str) -> bool:
+    return any(term in normalized_query for term in _REMOTE_QUERY_TERMS)
 
 
 def normalize(text: str | None) -> str:
@@ -65,6 +87,7 @@ class QueryIntent:
     skills: tuple[str, ...]
     location_codes: tuple[str, ...]
     duty_codes: tuple[str, ...]
+    wants_remote: bool = False
 
 
 class SkillWeaveRanker:
@@ -203,6 +226,7 @@ class SkillWeaveRanker:
             skills=tuple(seed_skills + duty_skills),
             location_codes=tuple(_as_codes(location_code)),
             duty_codes=tuple(_as_codes(duty_code)),
+            wants_remote=wants_remote(normalized_value),
         )
 
     def _filter_names(self, codes: Iterable[str], lookup: dict[str, list[str]]) -> set[str]:
@@ -376,6 +400,15 @@ class SkillWeaveRanker:
                 else -0.7
             )
 
+        # Remote-work is one of the most frequent explicit conditions in
+        # search logs (遠端/在家工作/WFH) but is never present as a
+        # structured field on the job posting itself, so it has to be
+        # matched as an explicit query condition rather than folded into
+        # generic lexical overlap.
+        remote_match = 0.0
+        if intent.wants_remote:
+            remote_match = 1.0 if job.get("is_remote", False) else -1.0
+
         graph_raw, traces, direct_matches, graph_components = self._graph_feature(
             intent, job, include_graph
         )
@@ -472,6 +505,10 @@ class SkillWeaveRanker:
             "title_unit_overlap": round(title_overlap, 4),
             "location": round(2.8 if location_match > 0 else -16.0 if location_match < 0 else 0.0, 4),
             "duty": round(2.4 if duty_match > 0 else -10.0 if duty_match < 0 else 0.0, 4),
+            "remote": round(2.4 if remote_match > 0 else -1.4 if remote_match < 0 else 0.0, 4),
+            "is_remote": float(job.get("is_remote", False)),
+            "salary_min": float(job.get("salary_min", 0.0) or 0.0),
+            "salary_max": float(job.get("salary_max", 0.0) or 0.0),
             "behavior": round(behavior, 4),
             "freshness": round(0.7 * freshness, 4),
             "post_cutoff_jd": float(
@@ -592,7 +629,7 @@ class SkillWeaveRanker:
         }
         score = sum(
             features[name]
-            for name in ["lexical", "graph", "location", "duty", "behavior", "freshness"]
+            for name in ["lexical", "graph", "location", "duty", "remote", "behavior", "freshness"]
         )
         return score, features, traces, direct_matches
 
@@ -792,6 +829,10 @@ class SkillWeaveRanker:
                     "title": job.get("title", ""),
                     "city": job.get("city", ""),
                     "salary": job.get("salary", ""),
+                    "salary_min": job.get("salary_min", 0.0),
+                    "salary_max": job.get("salary_max", 0.0),
+                    "salary_type": job.get("salary_type", "unknown"),
+                    "is_remote": bool(job.get("is_remote", False)),
                     "category": (job.get("categories") or [""])[-1],
                     "industry": job.get("industry", ""),
                     "matched_skills": matched_labels,
@@ -825,6 +866,8 @@ class SkillWeaveRanker:
             evidence.append("地區條件吻合")
         if features["duty"] > 0:
             evidence.append("職務分類吻合")
+        if features["remote"] > 0:
+            evidence.append("遠端／在家工作條件吻合")
         if features["behavior"] > 1:
             evidence.append("訓練期正向互動訊號")
         if not job.get("graph_eligible", False):

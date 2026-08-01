@@ -15,6 +15,13 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+import sys
+
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from app.job_fields import derive_job_fields
+
 DEFAULT_DATA = ROOT / "data" / "dataset"
 DEFAULT_OUTPUT = ROOT / "artifacts" / "demo-index.json"
 DEFAULT_ONTOLOGY = ROOT / "config" / "skill_ontology.seed.json"
@@ -135,6 +142,7 @@ def select_jobs(
                 "title": title,
                 "description": description[:420],
                 "salary": row["薪資"].replace("‧", " · "),
+                **derive_job_fields(row),
                 "city": row["工作城市"],
                 "categories": categories,
                 "industry": row["產業中類"] or row["產業大類"],
