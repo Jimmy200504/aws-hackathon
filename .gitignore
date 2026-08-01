@@ -39,3 +39,6 @@ cdk.out/
 dist/
 snapshots/
 *.log
+
+# Throwaway resume helper generated during an interrupted index run.
+RESUME-INDEX.sh
