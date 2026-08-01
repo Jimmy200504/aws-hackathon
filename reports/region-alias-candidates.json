@@ -1,0 +1,1112 @@
+{
+  "metadata": {
+    "schema": "skillweave-region-alias-candidates-v1",
+    "dataset_version": "1111-2026-06-01_2026-06-07",
+    "graph_cutoff": "2026-06-05 23:59:59.999000",
+    "leakage_policy": "only postings last modified on or before the graph cutoff",
+    "candidate_rule": "2-3 Han characters anchored on a location cue word, excluding official place names",
+    "suffix_cues": [
+      "科學園區",
+      "工業區",
+      "交流道",
+      "捷運站",
+      "火車站",
+      "園區",
+      "商圈",
+      "夜市",
+      "分店",
+      "門市",
+      "一帶",
+      "附近",
+      "廠區",
+      "站",
+      "廠",
+      "路",
+      "街"
+    ],
+    "prefix_cues": [
+      "位於",
+      "鄰近",
+      "靠近",
+      "座落於",
+      "坐落於"
+    ],
+    "min_jobs": 30,
+    "random_seed": 1111,
+    "elapsed_seconds": 68.5
+  },
+  "corpus": {
+    "pass1": {
+      "rows": 1218635,
+      "post_cutoff": 251258,
+      "eligible": 961780,
+      "no_county": 5597
+    },
+    "pass2": {
+      "rows": 1218635,
+      "post_cutoff": 251258,
+      "eligible": 961780,
+      "no_county": 5597
+    },
+    "eligible_postings": 961780,
+    "base_rate_top_county": "台北市",
+    "base_rate_top_share": 0.1752,
+    "county_base_rate": {
+      "台北市": 0.1752,
+      "新北市": 0.1635,
+      "台中市": 0.1478,
+      "桃園市": 0.1279,
+      "高雄市": 0.1254,
+      "台南市": 0.0825,
+      "彰化縣": 0.0312,
+      "新竹縣": 0.0275,
+      "新竹市": 0.0214,
+      "屏東縣": 0.017,
+      "雲林縣": 0.013,
+      "宜蘭縣": 0.0118,
+      "苗栗縣": 0.0117,
+      "南投縣": 0.0102,
+      "嘉義縣": 0.0093,
+      "嘉義市": 0.0074,
+      "基隆市": 0.0063,
+      "花蓮縣": 0.0056,
+      "台東縣": 0.0036,
+      "澎湖縣": 0.0008,
+      "金門縣": 0.0007,
+      "連江縣": 0.0001
+    }
+  },
+  "candidates": {
+    "distinct_total": 52941,
+    "surviving_min_jobs": 2695,
+    "concentration_buckets": {
+      "0%": 2,
+      "10%": 154,
+      "100%": 239,
+      "20%": 524,
+      "30%": 370,
+      "40%": 220,
+      "50%": 190,
+      "60%": 159,
+      "70%": 152,
+      "80%": 207,
+      "90%": 478
+    },
+    "top": [
+      {
+        "surface": "區西盛",
+        "postings": 386,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "工作地點：新北市新莊區西盛街131號2樓 （附近有公車站"
+      },
+      {
+        "surface": "南雅東",
+        "postings": 365,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "板橋區南雅東路社區清潔員 我們的這項職務，"
+      },
+      {
+        "surface": "高雄車",
+        "postings": 318,
+        "top_county": "高雄市",
+        "concentration": 1.0,
+        "evidence": "電機人員-高雄車廠 1.車輛報修 2.車輛設備"
+      },
+      {
+        "surface": "區文自",
+        "postings": 316,
+        "top_county": "高雄市",
+        "concentration": 1.0,
+        "evidence": "地 點 : 高雄市左營區文自路505巷57號(近曾子路)-"
+      },
+      {
+        "surface": "股新五",
+        "postings": 280,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "現185~220/H-五股新五路-大小夜網購理貨員 🔥天天報"
+      },
+      {
+        "surface": "往後",
+        "postings": 248,
+        "top_county": "高雄市",
+        "concentration": 1.0,
+        "evidence": "可坐捷運到〝高雄車站〝，往後火車站方向走，走路10分鐘能到達"
+      },
+      {
+        "surface": "區萬安",
+        "postings": 222,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "新莊萬安店\t新北市新莊區萬安街24號1樓 新莊榮華店\t新北"
+      },
+      {
+        "surface": "大墩",
+        "postings": 202,
+        "top_county": "台中市",
+        "concentration": 1.0,
+        "evidence": "🎯南屯區：    * 大墩店：大墩路177號    * 8"
+      },
+      {
+        "surface": "工業十",
+        "postings": 187,
+        "top_county": "桃園市",
+        "concentration": 1.0,
+        "evidence": "📌 工作地點：平鎮區 工業十路 📌 工作內容：   1."
+      },
+      {
+        "surface": "頂崁",
+        "postings": 176,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "北街✔️免費機車停車位 頂崁工業區►近捷運站＜新北產業園區站"
+      },
+      {
+        "surface": "區鳳頂",
+        "postings": 165,
+        "top_county": "高雄市",
+        "concentration": 1.0,
+        "evidence": "竹貨運鳳山所 高雄市鳳山區鳳頂路610號 中班裝卸人員 15"
+      },
+      {
+        "surface": "大發",
+        "postings": 164,
+        "top_county": "高雄市",
+        "concentration": 1.0,
+        "evidence": "倉管理貨人員-大發廠 1.進貨 出貨 理貨及庫存盤"
+      },
+      {
+        "surface": "蘭轉運",
+        "postings": 158,
+        "top_county": "宜蘭縣",
+        "concentration": 1.0,
+        "evidence": "時一班)，免費搭乘 ●宜蘭轉運站(蘭陽院區正門對面步行2分鍾"
+      },
+      {
+        "surface": "側門出",
+        "postings": 154,
+        "top_county": "宜蘭縣",
+        "concentration": 1.0,
+        "evidence": "鄰近宜蘭市立圖書館(位於側門出口) ●本院全新托嬰中心，另鄰"
+      },
+      {
+        "surface": "區橋安",
+        "postings": 153,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "道的 【工作地點】：中和區橋安街（近好市多） 【上班時間】："
+      },
+      {
+        "surface": "利澤",
+        "postings": 121,
+        "top_county": "宜蘭縣",
+        "concentration": 1.0,
+        "evidence": "蘭鎮蘇澳鎮頂強路23號(利澤工業區) https://www"
+      },
+      {
+        "surface": "過這一",
+        "postings": 121,
+        "top_county": "台中市",
+        "concentration": 1.0,
+        "evidence": "的好環境。  ⭐️不要錯過這一站⭐️ 房仲業所有品牌的門店，"
+      },
+      {
+        "surface": "鎮新城",
+        "postings": 118,
+        "top_county": "宜蘭縣",
+        "concentration": 1.0,
+        "evidence": "廠區可自選 ❶宜蘭縣蘇澳鎮新城路 ❷宜蘭縣冬山鄉廣興路 【工"
+      },
+      {
+        "surface": "內環北",
+        "postings": 112,
+        "top_county": "高雄市",
+        "concentration": 1.0,
+        "evidence": "❤️工作地點：楠梓區內環北路 –––––––––––––"
+      },
+      {
+        "surface": "湖瑞光",
+        "postings": 106,
+        "top_county": "台北市",
+        "concentration": 1.0,
+        "evidence": "6958分機10 欲在內湖瑞光路大樓上班 找 呂幹事0953"
+      },
+      {
+        "surface": "黎明國",
+        "postings": 103,
+        "top_county": "宜蘭縣",
+        "concentration": 1.0,
+        "evidence": "本院全新托嬰中心，另鄰近黎明國小、宜蘭國小、中山國小、中華國"
+      },
+      {
+        "surface": "內環東",
+        "postings": 101,
+        "top_county": "高雄市",
+        "concentration": 1.0,
+        "evidence": "【工作地點】高雄市楠梓區內環東路(楠梓加工區) ▂▂▂▂▂▂"
+      },
+      {
+        "surface": "樹谷",
+        "postings": 99,
+        "top_county": "台南市",
+        "concentration": 1.0,
+        "evidence": "地點：新市區堤塘港路 (樹谷園區) ––––––––––––"
+      },
+      {
+        "surface": "三吉二",
+        "postings": 96,
+        "top_county": "宜蘭縣",
+        "concentration": 1.0,
+        "evidence": "-工作地點：宜蘭縣五結鄉三吉二路25號 。  福利: 1.享"
+      },
+      {
+        "surface": "近橋和",
+        "postings": 96,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "到光寶電子走路2分鐘 ➜近橋和捷運站走路11分鐘 【工作內容"
+      },
+      {
+        "surface": "區六福",
+        "postings": 95,
+        "top_county": "桃園市",
+        "concentration": 1.0,
+        "evidence": "六福廠 : 桃園市蘆竹區六福路 (近 台茂購物中心 騎車３"
+      },
+      {
+        "surface": "市五權",
+        "postings": 95,
+        "top_county": "台東縣",
+        "concentration": 1.0,
+        "evidence": "寄達)至【95043臺東市五權街一號衛生福利部臺東醫院人事室"
+      },
+      {
+        "surface": "區定安",
+        "postings": 94,
+        "top_county": "桃園市",
+        "concentration": 1.0,
+        "evidence": "驗) 工作地點:桃園中壢區定安路 工作時間: 08:30-1"
+      },
+      {
+        "surface": "埔心車",
+        "postings": 92,
+        "top_county": "桃園市",
+        "concentration": 1.0,
+        "evidence": "6.楊梅(DC11)☞近埔心車站5分鐘 7.平鎮(TS7)☞"
+      },
+      {
+        "surface": "中鋼駐",
+        "postings": 90,
+        "top_county": "高雄市",
+        "concentration": 1.0,
+        "evidence": "電氣維護技術員 中鋼駐廠人員 天車保養維修人員 電氣"
+      },
+      {
+        "surface": "點選",
+        "postings": 90,
+        "top_county": "台東縣",
+        "concentration": 1.0,
+        "evidence": "w.gov.tw (2)點選路徑：關於本院→各科介紹→人事室"
+      },
+      {
+        "surface": "精科南",
+        "postings": 89,
+        "top_county": "台中市",
+        "concentration": 1.0,
+        "evidence": "中市南屯區工業區二十路/精科南路 ⚡內容: 組裝組立 測試"
+      },
+      {
+        "surface": "新馬車",
+        "postings": 87,
+        "top_county": "宜蘭縣",
+        "concentration": 1.0,
+        "evidence": "15-20分鐘 近 #新馬車站 7-10分鐘  【工作時間"
+      },
+      {
+        "surface": "近永寧",
+        "postings": 85,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "土城區自強街2之1號 (近永寧捷運站) 💰月薪：36,000"
+      },
+      {
+        "surface": "區大直",
+        "postings": 84,
+        "top_county": "台北市",
+        "concentration": 1.0,
+        "evidence": "B實踐大學  台北市中山區大直街70號 C台北商業科技大學"
+      },
+      {
+        "surface": "動性久",
+        "postings": 79,
+        "top_county": "桃園市",
+        "concentration": 1.0,
+        "evidence": "填、滅菌 *工作條件：走動性久站、無塵服、搬重物、須配合加班"
+      },
+      {
+        "surface": "新北園",
+        "postings": 79,
+        "top_county": "桃園市",
+        "concentration": 1.0,
+        "evidence": "工作地點】：桃園市中壢區新北園路(中壢工業區)  ╚════"
+      },
+      {
+        "surface": "區三多",
+        "postings": 78,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "【工作地點】新北市樹林區三多路 【交通方式】公車701、7"
+      },
+      {
+        "surface": "竹南青",
+        "postings": 77,
+        "top_county": "桃園市",
+        "concentration": 1.0,
+        "evidence": "✔️上班底地點:桃園蘆竹南青路 ✔️休假制度:周休二日(六"
+      },
+      {
+        "surface": "山鳳頂",
+        "postings": 76,
+        "top_county": "高雄市",
+        "concentration": 1.0,
+        "evidence": "⌛(中班15-23點)鳳山鳳頂路-網購理貨員-享久任獎金12"
+      },
+      {
+        "surface": "五工三",
+        "postings": 75,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "：520或橘17搭到五權五工三路口站，藍色大樓，一樓是7-1"
+      },
+      {
+        "surface": "區縣府",
+        "postings": 75,
+        "top_county": "桃園市",
+        "concentration": 1.0,
+        "evidence": "園縣府門市 (桃園市桃園區縣府路116號) 2. 面試日期："
+      },
+      {
+        "surface": "區大工",
+        "postings": 74,
+        "top_county": "桃園市",
+        "concentration": 1.0,
+        "evidence": "【工作地點】 : 大園區大工路 【職缺名稱】 : 現場作業"
+      },
+      {
+        "surface": "定二十",
+        "postings": 73,
+        "top_county": "桃園市",
+        "concentration": 1.0,
+        "evidence": ") 地址：桃園市中壢區內定二十街76巷35號"
+      },
+      {
+        "surface": "區萬興",
+        "postings": 72,
+        "top_county": "台中市",
+        "concentration": 1.0,
+        "evidence": "上班&面試地點：大肚區萬興路58號  全家日翊物流"
+      },
+      {
+        "surface": "和環中",
+        "postings": 71,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "現200/H自由排班)中和環中路-大夜網購理貨員 D1 #可"
+      },
+      {
+        "surface": "艾訊一",
+        "postings": 71,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "【艾訊一廠】【板卡製造部】維修助理工程"
+      },
+      {
+        "surface": "區洲子",
+        "postings": 69,
+        "top_county": "台北市",
+        "concentration": 1.0,
+        "evidence": "0 上班地點:台北市內湖區洲子街  想了解更多歡迎主動聯繫"
+      },
+      {
+        "surface": "利工一",
+        "postings": 68,
+        "top_county": "宜蘭縣",
+        "concentration": 1.0,
+        "evidence": "════╗ 宜蘭縣五結鄉利工一路二段 ➜利澤工業區►近育英國"
+      },
+      {
+        "surface": "區二十",
+        "postings": 68,
+        "top_county": "台中市",
+        "concentration": 1.0,
+        "evidence": "地點: 台中市南屯區工業區二十路/精科南路 ⚡內容: 組裝組"
+      },
+      {
+        "surface": "近內壢",
+        "postings": 68,
+        "top_county": "桃園市",
+        "concentration": 1.0,
+        "evidence": ". 工程內業相關工作  近內壢火車站、中壢工業區 歡迎態度積"
+      },
+      {
+        "surface": "區展業",
+        "postings": 67,
+        "top_county": "新竹市",
+        "concentration": 1.0,
+        "evidence": "ES系統開發工程師-新竹區展業廠 【維護及開發MES相關系統"
+      },
+      {
+        "surface": "南勢角",
+        "postings": 67,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "人員-新北市中和區-捷運南勢角站 身為引領時尚潮流的藥妝產業"
+      },
+      {
+        "surface": "區埔工",
+        "postings": 66,
+        "top_county": "桃園市",
+        "concentration": 1.0,
+        "evidence": "🚩工作地點：桃園市新屋區埔工路XXX號  ⏰工作時間： 0"
+      },
+      {
+        "surface": "區楊新",
+        "postings": 66,
+        "top_county": "桃園市",
+        "concentration": 1.0,
+        "evidence": "終❗ ⭕【工作地點】楊梅區楊新路三段  ➖➖職缺重點➖➖ ✔"
+      },
+      {
+        "surface": "新樹",
+        "postings": 66,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "新樹廠計時作業員有勞保全勤週休二日"
+      },
+      {
+        "surface": "區鄭州",
+        "postings": 65,
+        "top_county": "台北市",
+        "concentration": 1.0,
+        "evidence": "興院區護理科（臺北市大同區鄭州路145號），連絡電話:02-"
+      },
+      {
+        "surface": "科園一",
+        "postings": 65,
+        "top_county": "台中市",
+        "concentration": 1.0,
+        "evidence": "科雅東路 ❷台中市西屯區科園一路 【工作內容】樣品加工、產品"
+      },
+      {
+        "surface": "區重化",
+        "postings": 64,
+        "top_county": "新北市",
+        "concentration": 1.0,
+        "evidence": "【工作地點】新北市三重區重化街 【薪資結構】$200 可周"
+      },
+      {
+        "surface": "畫機場",
+        "postings": 64,
+        "top_county": "桃園市",
+        "concentration": 1.0,
+        "evidence": "局委託辦理「桃園航空城計畫機場園區特定區區段徵收工程」經費，"
+      }
+    ],
+    "bottom": [
+      {
+        "surface": "安排",
+        "postings": 110,
+        "top_county": "台北市",
+        "concentration": 0.1727,
+        "evidence": "掌控加工廠交期。 2. 安排廠內加工物料。 3. 送貨及跑加"
+      },
+      {
+        "surface": "各分包",
+        "postings": 209,
+        "top_county": "台中市",
+        "concentration": 0.1722,
+        "evidence": "與調整。 ※協助主管進行各分包廠商完成工程之驗收與結算。 ※"
+      },
+      {
+        "surface": "定期線",
+        "postings": 93,
+        "top_county": "台中市",
+        "concentration": 0.172,
+        "evidence": "配置及設備安裝測試 2.定期線路及設備檢查、測試及維護 3."
+      },
+      {
+        "surface": "招募",
+        "postings": 35,
+        "top_county": "台中市",
+        "concentration": 0.1714,
+        "evidence": "春芳號『台中城中店總店』招募門市正職人員儲備幹部 #手搖花杯"
+      },
+      {
+        "surface": "捷安特",
+        "postings": 35,
+        "top_county": "高雄市",
+        "concentration": 0.1714,
+        "evidence": "挑戰性的零售服務工作者，捷安特門市絕對是您最棒的選擇!"
+      },
+      {
+        "surface": "除單",
+        "postings": 35,
+        "top_county": "台北市",
+        "concentration": 0.1714,
+        "evidence": "キ 屋莎洋食鬆餅屋) ※除單站考核調薪外，全區站考核完成調整"
+      },
+      {
+        "surface": "核對",
+        "postings": 479,
+        "top_county": "新北市",
+        "concentration": 0.1712,
+        "evidence": "及查核。 7.數量計算，核對廠商的合約數量及單價。 8.負責"
+      },
+      {
+        "surface": "探索大",
+        "postings": 450,
+        "top_county": "台北市",
+        "concentration": 0.1711,
+        "evidence": "協助餐廳夥伴 轉動油門探索大街小巷 將美食送到顧客手中〝"
+      },
+      {
+        "surface": "執行工",
+        "postings": 117,
+        "top_county": "桃園市",
+        "concentration": 0.1709,
+        "evidence": "維修,織紡.圓編織 3.執行工廠品管作業 4.排除生產線異常"
+      },
+      {
+        "surface": "確保工",
+        "postings": 123,
+        "top_county": "高雄市",
+        "concentration": 0.1707,
+        "evidence": "，確保安全運行。 5. 確保工廠環境的整理與清潔，遵守工業安"
+      },
+      {
+        "surface": "其他",
+        "postings": 564,
+        "top_county": "高雄市",
+        "concentration": 0.1702,
+        "evidence": "5.主管交辦事項。 6.其他廠務機動性交辦工作。  1.需具"
+      },
+      {
+        "surface": "早班",
+        "postings": 1320,
+        "top_county": "新北市",
+        "concentration": 0.1689,
+        "evidence": "181-早班門市兼職人員-台北市信義區 身為"
+      },
+      {
+        "surface": "聯繫",
+        "postings": 626,
+        "top_county": "新北市",
+        "concentration": 0.1677,
+        "evidence": "雜項事物及文書作業 4.聯繫廠商"
+      },
+      {
+        "surface": "進行",
+        "postings": 204,
+        "top_county": "新北市",
+        "concentration": 0.1667,
+        "evidence": "作飲料製作器具和設備，並進行日常檢查、基礎保養及清潔工作。"
+      },
+      {
+        "surface": "劃配送",
+        "postings": 120,
+        "top_county": "新北市",
+        "concentration": 0.1667,
+        "evidence": "司機工作內容   a.規劃配送路線，客戶訂單配送並確實對點。"
+      },
+      {
+        "surface": "車輛進",
+        "postings": 72,
+        "top_county": "桃園市",
+        "concentration": 0.1667,
+        "evidence": "專員(新莊廠) 1.接待車輛進廠維修到交車作業流程 2.細部"
+      },
+      {
+        "surface": "康是美",
+        "postings": 322,
+        "top_county": "台中市",
+        "concentration": 0.1646,
+        "evidence": "【康是美藥局】-新北市-林口區藥局-招"
+      },
+      {
+        "surface": "數以各",
+        "postings": 55,
+        "top_county": "桃園市",
+        "concentration": 0.1636,
+        "evidence": "維護。  ✦排班時段及時數以各分店實際排定為主，若有特殊需求"
+      },
+      {
+        "surface": "維持",
+        "postings": 7242,
+        "top_county": "新北市",
+        "concentration": 0.1631,
+        "evidence": "品包裝、陳列工作。 5.維持門市整潔。"
+      },
+      {
+        "surface": "處理",
+        "postings": 3177,
+        "top_county": "台中市",
+        "concentration": 0.1624,
+        "evidence": "用支付之發票、單據及帳務處理。 3.處理廠商貨款或費用等應付"
+      },
+      {
+        "surface": "信特約",
+        "postings": 185,
+        "top_county": "台北市",
+        "concentration": 0.1622,
+        "evidence": "中華電信特約門市銷售員/儲備幹部(新北市_"
+      },
+      {
+        "surface": "系統管",
+        "postings": 74,
+        "top_county": "新竹縣",
+        "concentration": 0.1622,
+        "evidence": "消防配管技工 1.消防水系統管路配管(車牙及焊接) 2.對於"
+      },
+      {
+        "surface": "追蹤工",
+        "postings": 31,
+        "top_county": "雲林縣",
+        "concentration": 0.1613,
+        "evidence": "廠端。 3.依據確認交期追蹤工廠準時完貨及追蹤出口單位提前並"
+      },
+      {
+        "surface": "維護",
+        "postings": 1282,
+        "top_county": "新北市",
+        "concentration": 0.1599,
+        "evidence": "設計、外盒設計等) 3.維護門市形象 (活動佈置、產品陳列等"
+      },
+      {
+        "surface": "依各",
+        "postings": 1396,
+        "top_county": "台中市",
+        "concentration": 0.159,
+        "evidence": "週最少配合排班20小時，依各門市營業需求進行排班工時規劃。"
+      },
+      {
+        "surface": "管執行",
+        "postings": 547,
+        "top_county": "台中市",
+        "concentration": 0.159,
+        "evidence": "工作內容： 1.協助店主管執行門市營運維護 2.提供顧客收銀"
+      },
+      {
+        "surface": "配合",
+        "postings": 1157,
+        "top_county": "台北市",
+        "concentration": 0.1582,
+        "evidence": "越南語翻譯員 配合廠商現場翻譯及文書翻譯"
+      },
+      {
+        "surface": "直營門",
+        "postings": 1095,
+        "top_county": "新北市",
+        "concentration": 0.158,
+        "evidence": "(南投市)My Fone直營門市/大集團福利佳 錄取高！請馬"
+      },
+      {
+        "surface": "台皆有",
+        "postings": 114,
+        "top_county": "台南市",
+        "concentration": 0.1579,
+        "evidence": "住地分配至各直營門市/全台皆有門市據點  ⦿條件需求 　➜無"
+      },
+      {
+        "surface": "近直營",
+        "postings": 1096,
+        "top_county": "新北市",
+        "concentration": 0.1578,
+        "evidence": "離家近➟依居住地點，鄰近直營門市分配，不用擔心長距離通勤"
+      },
+      {
+        "surface": "生產工",
+        "postings": 102,
+        "top_county": "桃園市",
+        "concentration": 0.1569,
+        "evidence": "務人員 發展出口業務、洽生產工廠、訂單追蹤及主管交辦事項"
+      },
+      {
+        "surface": "晚班",
+        "postings": 1452,
+        "top_county": "台北市",
+        "concentration": 0.1563,
+        "evidence": "晚班門市人員(全職) 門市服務、管理"
+      },
+      {
+        "surface": "間鄰近",
+        "postings": 32,
+        "top_county": "台北市",
+        "concentration": 0.1562,
+        "evidence": "每日工作門店會分在3-5間鄰近門市上班 (請在電洽)  【提"
+      },
+      {
+        "surface": "寵物",
+        "postings": 154,
+        "top_county": "台北市",
+        "concentration": 0.1558,
+        "evidence": "寵物門市外務人員(木柵店) 1.負責"
+      },
+      {
+        "surface": "可愛的",
+        "postings": 167,
+        "top_county": "台北市",
+        "concentration": 0.1557,
+        "evidence": "8. 工作氣氛好，跟可愛的門市夥伴一起打拚。 **偶爾需"
+      },
+      {
+        "surface": "更了解",
+        "postings": 167,
+        "top_county": "台北市",
+        "concentration": 0.1557,
+        "evidence": "存盤點、門市清潔，讓 你更了解門市運營模式。 5. 月休8-"
+      },
+      {
+        "surface": "旅遊逛",
+        "postings": 45,
+        "top_county": "台中市",
+        "concentration": 0.1556,
+        "evidence": "你選】年特休假自由安排，旅遊逛街無人擠 10.【生活健康好平"
+      },
+      {
+        "surface": "無需與",
+        "postings": 45,
+        "top_county": "台中市",
+        "concentration": 0.1556,
+        "evidence": "運作，培養未來的管理者；無需與門市輪班。  《升遷管道》 〉"
+      },
+      {
+        "surface": "選擇線",
+        "postings": 97,
+        "top_county": "台南市",
+        "concentration": 0.1546,
+        "evidence": "管 1. 依據工程要求，選擇線路種類與材質，規劃最佳化布線方"
+      },
+      {
+        "surface": "負責",
+        "postings": 3707,
+        "top_county": "台北市",
+        "concentration": 0.1543,
+        "evidence": "之連絡維繫、報價、接單、負責廠內協調之工作、出貨、與國內外客"
+      },
+      {
+        "surface": "向分包",
+        "postings": 143,
+        "top_county": "高雄市",
+        "concentration": 0.1538,
+        "evidence": "。  13.依據施工狀況向分包廠商協商提出各項建議等。 14"
+      },
+      {
+        "surface": "完成",
+        "postings": 124,
+        "top_county": "台中市",
+        "concentration": 0.1532,
+        "evidence": "確保產品品質。 4.偕同完成每日生產量。 5.偕同完成廠區清"
+      },
+      {
+        "surface": "大直營",
+        "postings": 1518,
+        "top_county": "台中市",
+        "concentration": 0.1528,
+        "evidence": "松山區～派駐台哥大直營門市人員 1. 協助進店客戶相"
+      },
+      {
+        "surface": "若具",
+        "postings": 112,
+        "top_county": "桃園市",
+        "concentration": 0.1518,
+        "evidence": "，上班也能進修自我 💡 若具門市經驗者優先考量，快速進入角色"
+      },
+      {
+        "surface": "運進行",
+        "postings": 66,
+        "top_county": "新北市",
+        "concentration": 0.1515,
+        "evidence": "驗可)。 －須配合企業營運進行門市輪調管理訓練。   ※ 工"
+      },
+      {
+        "surface": "活動與",
+        "postings": 318,
+        "top_county": "台中市",
+        "concentration": 0.1509,
+        "evidence": "動展開。 (4) 區域內活動與門市內同仁支援。"
+      },
+      {
+        "surface": "執行",
+        "postings": 719,
+        "top_county": "高雄市",
+        "concentration": 0.1502,
+        "evidence": "業務(北區) 1.執行街訪調查專案。 2.管控問卷資料"
+      },
+      {
+        "surface": "性支援",
+        "postings": 100,
+        "top_county": "高雄市",
+        "concentration": 0.15,
+        "evidence": "等事宜。   6.機動性支援門市的交機、調貨... 等事宜"
+      },
+      {
+        "surface": "的連鎖",
+        "postings": 68,
+        "top_county": "新北市",
+        "concentration": 0.1471,
+        "evidence": "理念。 4.學習成為優秀的連鎖門市經營者，並培養自我成為卓越"
+      },
+      {
+        "surface": "手機網",
+        "postings": 83,
+        "top_county": "新北市",
+        "concentration": 0.1446,
+        "evidence": "後會接觸的有web網站／手機網站／手機APP／WIN8 AP"
+      },
+      {
+        "surface": "污水",
+        "postings": 78,
+        "top_county": "台中市",
+        "concentration": 0.141,
+        "evidence": "放流水質採樣監測 4. 污水廠設備預防性保養工作"
+      },
+      {
+        "surface": "大夜",
+        "postings": 64,
+        "top_county": "桃園市",
+        "concentration": 0.1406,
+        "evidence": "正職大夜班人員 大夜門市收銀/上架工作"
+      },
+      {
+        "surface": "供其他",
+        "postings": 280,
+        "top_county": "高雄市",
+        "concentration": 0.1393,
+        "evidence": "候選人專長與發展潛力，提供其他門市相關職缺之媒合說明。  其"
+      },
+      {
+        "surface": "徵直營",
+        "postings": 62,
+        "top_county": "台北市",
+        "concentration": 0.129,
+        "evidence": "☎️(台中)知名電信業者徵直營門市服務人員◆依同仁居住地分發"
+      },
+      {
+        "surface": "專業化",
+        "postings": 148,
+        "top_county": "高雄市",
+        "concentration": 0.1284,
+        "evidence": "報、諮詢等專業技能 2.專業化門市客服教學及銷售訓練，簡易學"
+      },
+      {
+        "surface": "電路管",
+        "postings": 39,
+        "top_county": "台中市",
+        "concentration": 0.1282,
+        "evidence": "工，支架鎖固、模組鋪設、電路管路配置 2.主管交辦事項  （"
+      },
+      {
+        "surface": "材料與",
+        "postings": 47,
+        "top_county": "台北市",
+        "concentration": 0.1277,
+        "evidence": "系尤佳 ✔協助搬運商品 材料與站內小家電維修 ✔文書輸入基礎"
+      },
+      {
+        "surface": "地分發",
+        "postings": 48,
+        "top_county": "桃園市",
+        "concentration": 0.125,
+        "evidence": "門市服務人員◆依同仁居住地分發門市 ☎️知名電信業者徵直營門"
+      },
+      {
+        "surface": "有晉升",
+        "postings": 51,
+        "top_county": "新竹市",
+        "concentration": 0.0588,
+        "evidence": "區 對於營養師職涯發展沒有晉升的空間嗎？ 對於工作成就總感到"
+      },
+      {
+        "surface": "在地道",
+        "postings": 41,
+        "top_county": "台北市",
+        "concentration": 0.0488,
+        "evidence": "，能禮貌應對乘客  熟悉在地道路或願意配合導航  *加分條件"
+      }
+    ]
+  },
+  "named_checklist": [
+    {
+      "surface": "南科",
+      "postings": 2457,
+      "top_county": "台南市",
+      "concentration": 0.8112,
+      "is_official_name": false
+    },
+    {
+      "surface": "竹科",
+      "postings": 2257,
+      "top_county": "新竹市",
+      "concentration": 0.6092,
+      "is_official_name": false
+    },
+    {
+      "surface": "中科",
+      "postings": 1555,
+      "top_county": "台中市",
+      "concentration": 0.7395,
+      "is_official_name": false
+    },
+    {
+      "surface": "內科",
+      "postings": 1436,
+      "top_county": "台北市",
+      "concentration": 0.2584,
+      "is_official_name": false
+    },
+    {
+      "surface": "北車",
+      "postings": 1230,
+      "top_county": "台北市",
+      "concentration": 0.8642,
+      "is_official_name": false
+    },
+    {
+      "surface": "嘉南",
+      "postings": 624,
+      "top_county": "台南市",
+      "concentration": 0.4647,
+      "is_official_name": false
+    },
+    {
+      "surface": "板後",
+      "postings": 7,
+      "top_county": "台中市",
+      "concentration": 0.2857,
+      "is_official_name": false
+    },
+    {
+      "surface": "公益",
+      "postings": 1751,
+      "top_county": "台中市",
+      "concentration": 0.442,
+      "is_official_name": false
+    },
+    {
+      "surface": "文心",
+      "postings": 1583,
+      "top_county": "台中市",
+      "concentration": 0.9179,
+      "is_official_name": false
+    },
+    {
+      "surface": "大墩",
+      "postings": 564,
+      "top_county": "台中市",
+      "concentration": 0.9787,
+      "is_official_name": false
+    },
+    {
+      "surface": "北北基",
+      "postings": 362,
+      "top_county": "台北市",
+      "concentration": 0.4116,
+      "is_official_name": false
+    },
+    {
+      "surface": "桃竹苗",
+      "postings": 464,
+      "top_county": "桃園市",
+      "concentration": 0.3599,
+      "is_official_name": false
+    },
+    {
+      "surface": "中彰投",
+      "postings": 372,
+      "top_county": "台中市",
+      "concentration": 0.7742,
+      "is_official_name": false
+    },
+    {
+      "surface": "雲嘉南",
+      "postings": 258,
+      "top_county": "台南市",
+      "concentration": 0.438,
+      "is_official_name": false
+    }
+  ],
+  "negative_controls": [
+    {
+      "surface": "經驗",
+      "postings": 257553,
+      "top_county": "台北市",
+      "concentration": 0.1862,
+      "is_official_name": false
+    },
+    {
+      "surface": "團隊",
+      "postings": 96793,
+      "top_county": "台北市",
+      "concentration": 0.2549,
+      "is_official_name": false
+    },
+    {
+      "surface": "客戶",
+      "postings": 144333,
+      "top_county": "台北市",
+      "concentration": 0.1951,
+      "is_official_name": false
+    },
+    {
+      "surface": "加班",
+      "postings": 79582,
+      "top_county": "桃園市",
+      "concentration": 0.2666,
+      "is_official_name": false
+    },
+    {
+      "surface": "輪班",
+      "postings": 38301,
+      "top_county": "桃園市",
+      "concentration": 0.1903,
+      "is_official_name": false
+    },
+    {
+      "surface": "勞保",
+      "postings": 36433,
+      "top_county": "桃園市",
+      "concentration": 0.2244,
+      "is_official_name": false
+    },
+    {
+      "surface": "獎金",
+      "postings": 144215,
+      "top_county": "台北市",
+      "concentration": 0.1869,
+      "is_official_name": false
+    },
+    {
+      "surface": "教育訓練",
+      "postings": 65728,
+      "top_county": "台北市",
+      "concentration": 0.2135,
+      "is_official_name": false
+    },
+    {
+      "surface": "責任",
+      "postings": 37700,
+      "top_county": "台北市",
+      "concentration": 0.2055,
+      "is_official_name": false
+    },
+    {
+      "surface": "配合",
+      "postings": 153038,
+      "top_county": "新北市",
+      "concentration": 0.1758,
+      "is_official_name": false
+    }
+  ]
+}

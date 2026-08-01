@@ -16,6 +16,11 @@ hackathon_docs/
 # Rebuildable / potentially sensitive evaluation material.
 artifacts/benchmark-index.json
 artifacts/temporal-eval.json
+# 43 MB of per-posting district resolutions, rebuilt in ~75s by
+# scripts/extract_job_districts.py. The aggregate evidence and every surface
+# verdict live in reports/job-district-extraction.json, which is tracked.
+artifacts/job-districts.json
+artifacts/job-districts.jsonl
 artifacts/skill_ontology.seed_plus_llm.json
 artifacts/llm-exp-smoke/
 artifacts/llm-exp/

@@ -1,0 +1,601 @@
+{
+  "metadata": {
+    "schema": "skillweave-location-code-levels-v1",
+    "dataset_version": "1111-2026-06-01_2026-06-07",
+    "train_days": [
+      "2026-06-01",
+      "2026-06-02",
+      "2026-06-03",
+      "2026-06-04",
+      "2026-06-05"
+    ],
+    "leakage_policy": "train days only; anonymous talentNo dropped",
+    "min_co_selected": 30,
+    "random_seed": 1111,
+    "elapsed_seconds": 51.6
+  },
+  "code_inventory": {
+    "overseas_type3": 631,
+    "domestic_other_type1": 1,
+    "domestic_county": 22,
+    "domestic_district": 368,
+    "overseas_type1": 6,
+    "overseas_type2": 49
+  },
+  "corpus": {
+    "rows": 6139952,
+    "anonymous_or_no_exposure": 2112914,
+    "with_location_filter": 2251763,
+    "no_location_filter": 955864,
+    "searches_with_any_district_code": 1341666,
+    "outside_train_days": 819411
+  },
+  "code_selections": {
+    "total": 6221362,
+    "by_level": {
+      "county": 1651491,
+      "district": 4544538,
+      "unknown_or_overseas": 25333
+    },
+    "district_share_of_selections": 0.7305
+  },
+  "search_shape": {
+    "county_only": 899408,
+    "district_only": 1245654,
+    "mixed_county_and_district": 94688,
+    "other_only": 12013,
+    "district_only_share": 0.5532,
+    "any_district_share": 0.5958
+  },
+  "district_selection": {
+    "distinct_districts_selected": 366,
+    "districts_per_search": {
+      "1": 374551,
+      "2": 231394,
+      "3": 207784,
+      "4": 161803,
+      "5": 127704,
+      "6": 238430
+    },
+    "top_districts": [
+      {
+        "district": "新北市/板橋區",
+        "searches": 97439
+      },
+      {
+        "district": "新北市/新莊區",
+        "searches": 87269
+      },
+      {
+        "district": "台中市/北屯區",
+        "searches": 84329
+      },
+      {
+        "district": "台中市/西屯區",
+        "searches": 82450
+      },
+      {
+        "district": "台中市/北區",
+        "searches": 79931
+      },
+      {
+        "district": "桃園市/中壢區",
+        "searches": 77125
+      },
+      {
+        "district": "新北市/三重區",
+        "searches": 77104
+      },
+      {
+        "district": "高雄市/三民區",
+        "searches": 69787
+      },
+      {
+        "district": "新北市/中和區",
+        "searches": 69410
+      },
+      {
+        "district": "台中市/西區",
+        "searches": 66515
+      },
+      {
+        "district": "高雄市/鳳山區",
+        "searches": 65630
+      },
+      {
+        "district": "桃園市/桃園區",
+        "searches": 65215
+      },
+      {
+        "district": "台中市/南屯區",
+        "searches": 64084
+      },
+      {
+        "district": "台中市/東區",
+        "searches": 59922
+      },
+      {
+        "district": "高雄市/苓雅區",
+        "searches": 58383
+      },
+      {
+        "district": "高雄市/左營區",
+        "searches": 57828
+      },
+      {
+        "district": "台中市/南區",
+        "searches": 55785
+      },
+      {
+        "district": "台中市/中區",
+        "searches": 54048
+      },
+      {
+        "district": "台中市/大里區",
+        "searches": 53653
+      },
+      {
+        "district": "高雄市/前鎮區",
+        "searches": 53165
+      }
+    ]
+  },
+  "district_co_selection": {
+    "pairs_total": 3827,
+    "pairs_at_min_support": 2723,
+    "top": [
+      {
+        "a": "台東縣/大武鄉",
+        "b": "台東縣/達仁鄉",
+        "co_selected": 43,
+        "jaccard": 0.93478,
+        "p_b_given_a": 0.97727,
+        "p_a_given_b": 0.95556
+      },
+      {
+        "a": "金門縣/金城鎮",
+        "b": "金門縣/金寧鄉",
+        "co_selected": 188,
+        "jaccard": 0.90385,
+        "p_b_given_a": 0.92611,
+        "p_a_given_b": 0.97409
+      },
+      {
+        "a": "苗栗縣/竹南鎮",
+        "b": "苗栗縣/頭份市",
+        "co_selected": 9936,
+        "jaccard": 0.76667,
+        "p_b_given_a": 0.83876,
+        "p_a_given_b": 0.89919
+      },
+      {
+        "a": "台東縣/海端鄉",
+        "b": "台東縣/鹿野鄉",
+        "co_selected": 161,
+        "jaccard": 0.72523,
+        "p_b_given_a": 0.98171,
+        "p_a_given_b": 0.73516
+      },
+      {
+        "a": "基隆市/中正區",
+        "b": "基隆市/信義區",
+        "co_selected": 2325,
+        "jaccard": 0.71826,
+        "p_b_given_a": 0.84484,
+        "p_a_given_b": 0.8274
+      },
+      {
+        "a": "彰化縣/伸港鄉",
+        "b": "彰化縣/線西鄉",
+        "co_selected": 6598,
+        "jaccard": 0.69887,
+        "p_b_given_a": 0.823,
+        "p_a_given_b": 0.82249
+      },
+      {
+        "a": "台南市/中西區",
+        "b": "台南市/北區",
+        "co_selected": 38658,
+        "jaccard": 0.68337,
+        "p_b_given_a": 0.78834,
+        "p_a_given_b": 0.83692
+      },
+      {
+        "a": "台東縣/大武鄉",
+        "b": "台東縣/金峰鄉",
+        "co_selected": 43,
+        "jaccard": 0.68254,
+        "p_b_given_a": 0.97727,
+        "p_a_given_b": 0.69355
+      },
+      {
+        "a": "高雄市/新興區",
+        "b": "高雄市/苓雅區",
+        "co_selected": 43272,
+        "jaccard": 0.67991,
+        "p_b_given_a": 0.8916,
+        "p_a_given_b": 0.74117
+      },
+      {
+        "a": "基隆市/仁愛區",
+        "b": "基隆市/信義區",
+        "co_selected": 2631,
+        "jaccard": 0.66255,
+        "p_b_given_a": 0.69383,
+        "p_a_given_b": 0.9363
+      },
+      {
+        "a": "高雄市/前金區",
+        "b": "高雄市/新興區",
+        "co_selected": 35161,
+        "jaccard": 0.66244,
+        "p_b_given_a": 0.88553,
+        "p_a_given_b": 0.72448
+      },
+      {
+        "a": "台東縣/池上鄉",
+        "b": "台東縣/關山鎮",
+        "co_selected": 230,
+        "jaccard": 0.65341,
+        "p_b_given_a": 0.87121,
+        "p_a_given_b": 0.72327
+      },
+      {
+        "a": "台東縣/達仁鄉",
+        "b": "台東縣/金峰鄉",
+        "co_selected": 42,
+        "jaccard": 0.64615,
+        "p_b_given_a": 0.93333,
+        "p_a_given_b": 0.67742
+      },
+      {
+        "a": "花蓮縣/吉安鄉",
+        "b": "花蓮縣/花蓮市",
+        "co_selected": 5986,
+        "jaccard": 0.63708,
+        "p_b_given_a": 0.98147,
+        "p_a_given_b": 0.64483
+      },
+      {
+        "a": "台中市/東勢區",
+        "b": "台中市/石岡區",
+        "co_selected": 3245,
+        "jaccard": 0.63157,
+        "p_b_given_a": 0.80501,
+        "p_a_given_b": 0.74563
+      },
+      {
+        "a": "台東縣/池上鄉",
+        "b": "台東縣/海端鄉",
+        "co_selected": 164,
+        "jaccard": 0.62121,
+        "p_b_given_a": 0.62121,
+        "p_a_given_b": 1.0
+      },
+      {
+        "a": "台中市/中區",
+        "b": "台中市/東區",
+        "co_selected": 43519,
+        "jaccard": 0.61772,
+        "p_b_given_a": 0.80519,
+        "p_a_given_b": 0.72626
+      },
+      {
+        "a": "金門縣/金寧鄉",
+        "b": "金門縣/金湖鎮",
+        "co_selected": 130,
+        "jaccard": 0.61321,
+        "p_b_given_a": 0.67358,
+        "p_a_given_b": 0.87248
+      },
+      {
+        "a": "台南市/中西區",
+        "b": "台南市/東區",
+        "co_selected": 37385,
+        "jaccard": 0.60691,
+        "p_b_given_a": 0.76238,
+        "p_a_given_b": 0.74849
+      },
+      {
+        "a": "台中市/梧棲區",
+        "b": "台中市/清水區",
+        "co_selected": 19448,
+        "jaccard": 0.60339,
+        "p_b_given_a": 0.72489,
+        "p_a_given_b": 0.78262
+      },
+      {
+        "a": "新竹縣/新豐鄉",
+        "b": "新竹縣/湖口鄉",
+        "co_selected": 8726,
+        "jaccard": 0.60283,
+        "p_b_given_a": 0.8149,
+        "p_a_given_b": 0.69847
+      },
+      {
+        "a": "雲林縣/台西鄉",
+        "b": "雲林縣/東勢鄉",
+        "co_selected": 619,
+        "jaccard": 0.60273,
+        "p_b_given_a": 0.79974,
+        "p_a_given_b": 0.70986
+      },
+      {
+        "a": "高雄市/杉林區",
+        "b": "高雄市/甲仙區",
+        "co_selected": 144,
+        "jaccard": 0.59751,
+        "p_b_given_a": 0.61538,
+        "p_a_given_b": 0.95364
+      },
+      {
+        "a": "屏東縣/九如鄉",
+        "b": "屏東縣/里港鄉",
+        "co_selected": 2982,
+        "jaccard": 0.59736,
+        "p_b_given_a": 0.7325,
+        "p_a_given_b": 0.76403
+      },
+      {
+        "a": "高雄市/桃源區",
+        "b": "高雄市/那瑪夏區",
+        "co_selected": 43,
+        "jaccard": 0.59722,
+        "p_b_given_a": 0.7963,
+        "p_a_given_b": 0.70492
+      },
+      {
+        "a": "台中市/梧棲區",
+        "b": "台中市/沙鹿區",
+        "co_selected": 22872,
+        "jaccard": 0.5899,
+        "p_b_given_a": 0.85251,
+        "p_a_given_b": 0.65694
+      },
+      {
+        "a": "金門縣/金城鎮",
+        "b": "金門縣/金湖鎮",
+        "co_selected": 130,
+        "jaccard": 0.58559,
+        "p_b_given_a": 0.64039,
+        "p_a_given_b": 0.87248
+      },
+      {
+        "a": "高雄市/前金區",
+        "b": "高雄市/苓雅區",
+        "co_selected": 35844,
+        "jaccard": 0.57585,
+        "p_b_given_a": 0.90274,
+        "p_a_given_b": 0.61395
+      },
+      {
+        "a": "宜蘭縣/五結鄉",
+        "b": "宜蘭縣/冬山鄉",
+        "co_selected": 3825,
+        "jaccard": 0.57235,
+        "p_b_given_a": 0.66591,
+        "p_a_given_b": 0.8029
+      },
+      {
+        "a": "基隆市/中正區",
+        "b": "基隆市/仁愛區",
+        "co_selected": 2378,
+        "jaccard": 0.57081,
+        "p_b_given_a": 0.8641,
+        "p_a_given_b": 0.62711
+      },
+      {
+        "a": "台南市/南化區",
+        "b": "台南市/楠西區",
+        "co_selected": 42,
+        "jaccard": 0.56757,
+        "p_b_given_a": 0.66667,
+        "p_a_given_b": 0.79245
+      },
+      {
+        "a": "台南市/楠西區",
+        "b": "台南市/玉井區",
+        "co_selected": 47,
+        "jaccard": 0.56627,
+        "p_b_given_a": 0.88679,
+        "p_a_given_b": 0.61039
+      },
+      {
+        "a": "屏東縣/長治鄉",
+        "b": "屏東縣/麟洛鄉",
+        "co_selected": 5330,
+        "jaccard": 0.56552,
+        "p_b_given_a": 0.67179,
+        "p_a_given_b": 0.78141
+      },
+      {
+        "a": "新竹縣/北埔鄉",
+        "b": "新竹縣/峨眉鄉",
+        "co_selected": 157,
+        "jaccard": 0.56071,
+        "p_b_given_a": 0.61569,
+        "p_a_given_b": 0.86264
+      },
+      {
+        "a": "台南市/中西區",
+        "b": "台南市/南區",
+        "co_selected": 30459,
+        "jaccard": 0.55839,
+        "p_b_given_a": 0.62114,
+        "p_a_given_b": 0.84679
+      },
+      {
+        "a": "台東縣/池上鄉",
+        "b": "台東縣/鹿野鄉",
+        "co_selected": 172,
+        "jaccard": 0.55305,
+        "p_b_given_a": 0.65152,
+        "p_a_given_b": 0.78539
+      },
+      {
+        "a": "苗栗縣/公館鄉",
+        "b": "苗栗縣/銅鑼鄉",
+        "co_selected": 1306,
+        "jaccard": 0.54989,
+        "p_b_given_a": 0.79976,
+        "p_a_given_b": 0.6377
+      },
+      {
+        "a": "台南市/佳里區",
+        "b": "台南市/西港區",
+        "co_selected": 5168,
+        "jaccard": 0.5459,
+        "p_b_given_a": 0.62385,
+        "p_a_given_b": 0.81373
+      },
+      {
+        "a": "屏東縣/南州鄉",
+        "b": "屏東縣/崁頂鄉",
+        "co_selected": 1739,
+        "jaccard": 0.54497,
+        "p_b_given_a": 0.62576,
+        "p_a_given_b": 0.80846
+      },
+      {
+        "a": "新北市/中和區",
+        "b": "新北市/永和區",
+        "co_selected": 39961,
+        "jaccard": 0.544,
+        "p_b_given_a": 0.57572,
+        "p_a_given_b": 0.90802
+      }
+    ]
+  },
+  "spec_example_八里區": {
+    "focus": "新北市/八里區",
+    "focus_searches": 10702,
+    "neighbours_at_min_support": [
+      {
+        "other": "新北市/淡水區",
+        "co_selected": 6228,
+        "jaccard": 0.23691,
+        "p_other_given_focus": 0.58195
+      },
+      {
+        "other": "新北市/五股區",
+        "co_selected": 6347,
+        "jaccard": 0.13047,
+        "p_other_given_focus": 0.59307
+      },
+      {
+        "other": "新北市/三芝區",
+        "co_selected": 1353,
+        "jaccard": 0.11004,
+        "p_other_given_focus": 0.12642
+      },
+      {
+        "other": "新北市/蘆洲區",
+        "co_selected": 6131,
+        "jaccard": 0.11,
+        "p_other_given_focus": 0.57288
+      },
+      {
+        "other": "新北市/泰山區",
+        "co_selected": 3051,
+        "jaccard": 0.07652,
+        "p_other_given_focus": 0.28509
+      },
+      {
+        "other": "新北市/林口區",
+        "co_selected": 2366,
+        "jaccard": 0.06986,
+        "p_other_given_focus": 0.22108
+      },
+      {
+        "other": "新北市/三重區",
+        "co_selected": 5022,
+        "jaccard": 0.06066,
+        "p_other_given_focus": 0.46926
+      },
+      {
+        "other": "新北市/新莊區",
+        "co_selected": 3527,
+        "jaccard": 0.03734,
+        "p_other_given_focus": 0.32956
+      },
+      {
+        "other": "新北市/石門區",
+        "co_selected": 251,
+        "jaccard": 0.02194,
+        "p_other_given_focus": 0.02345
+      },
+      {
+        "other": "新北市/樹林區",
+        "co_selected": 612,
+        "jaccard": 0.00995,
+        "p_other_given_focus": 0.05719
+      },
+      {
+        "other": "新北市/永和區",
+        "co_selected": 539,
+        "jaccard": 0.00995,
+        "p_other_given_focus": 0.05036
+      },
+      {
+        "other": "新北市/板橋區",
+        "co_selected": 1058,
+        "jaccard": 0.00988,
+        "p_other_given_focus": 0.09886
+      },
+      {
+        "other": "新北市/中和區",
+        "co_selected": 621,
+        "jaccard": 0.00781,
+        "p_other_given_focus": 0.05803
+      },
+      {
+        "other": "新北市/汐止區",
+        "co_selected": 159,
+        "jaccard": 0.00477,
+        "p_other_given_focus": 0.01486
+      },
+      {
+        "other": "新北市/萬里區",
+        "co_selected": 47,
+        "jaccard": 0.00385,
+        "p_other_given_focus": 0.00439
+      },
+      {
+        "other": "新北市/鶯歌區",
+        "co_selected": 114,
+        "jaccard": 0.00374,
+        "p_other_given_focus": 0.01065
+      },
+      {
+        "other": "新北市/坪林區",
+        "co_selected": 34,
+        "jaccard": 0.00296,
+        "p_other_given_focus": 0.00318
+      },
+      {
+        "other": "新北市/金山區",
+        "co_selected": 33,
+        "jaccard": 0.0028,
+        "p_other_given_focus": 0.00308
+      },
+      {
+        "other": "新北市/三峽區",
+        "co_selected": 79,
+        "jaccard": 0.00251,
+        "p_other_given_focus": 0.00738
+      },
+      {
+        "other": "新北市/新店區",
+        "co_selected": 84,
+        "jaccard": 0.00203,
+        "p_other_given_focus": 0.00785
+      },
+      {
+        "other": "新北市/土城區",
+        "co_selected": 103,
+        "jaccard": 0.00163,
+        "p_other_given_focus": 0.00962
+      }
+    ]
+  }
+}
