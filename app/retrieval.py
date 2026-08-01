@@ -50,6 +50,7 @@ class OpenSearchRetriever:
         *,
         region: str | None = None,
         timeout_seconds: float = 2.0,
+        service: str | None = None,
     ) -> None:
         endpoint = endpoint.strip().rstrip("/")
         if not endpoint:
@@ -64,7 +65,13 @@ class OpenSearchRetriever:
         self.index = index
         self.region = region or os.getenv("AWS_REGION", "us-east-1")
         self.timeout_seconds = max(0.1, float(timeout_seconds))
-        self.service = "aoss" if ".aoss." in endpoint else "es"
+        # Signing with the wrong SigV4 service name yields a 403 that looks
+        # exactly like a policy problem, so let the deployment state it
+        # explicitly instead of inferring it from the endpoint hostname.
+        if service in {"aoss", "es"}:
+            self.service = service
+        else:
+            self.service = "aoss" if ".aoss." in endpoint else "es"
         self.sign_requests = not endpoint.startswith(
             ("http://127.0.0.1", "http://localhost")
         )
@@ -78,6 +85,7 @@ class OpenSearchRetriever:
             endpoint,
             os.getenv("OPENSEARCH_INDEX", "skillweave-jobs-v1"),
             timeout_seconds=float(os.getenv("OPENSEARCH_TIMEOUT_SECONDS", "2.0")),
+            service=os.getenv("OPENSEARCH_SERVICE"),
         )
 
     @staticmethod

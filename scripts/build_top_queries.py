@@ -45,7 +45,11 @@ def main() -> None:
 
     counts: Counter[str] = Counter()
     rows = 0
-    source = args.data_dir / "userSearchLog_20260601_20260607.csv"
+    # Prefer the spam/URL-filtered log the pipeline scripts already read, so
+    # pre-warming never spends Bedrock requests on SEO spam.
+    source = args.data_dir / "userSearchLog_cleaned.csv"
+    if not source.is_file():
+        source = args.data_dir / "userSearchLog_20260601_20260607.csv"
     with source.open(encoding="utf-8-sig", newline="") as handle:
         for row in csv.DictReader(handle):
             rows += 1
