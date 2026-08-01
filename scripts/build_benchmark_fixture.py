@@ -97,7 +97,7 @@ def read_sampled_searches(
     users: set[str] = set()
     exposed_jobs: set[str] = set()
     print("Pass 1/4 · deterministic search-session sample…", flush=True)
-    with (data_dir / "userSearchLog_20260601_20260607.csv").open(
+    with (data_dir / "userSearchLog_cleaned.csv").open(
         encoding="utf-8-sig", newline=""
     ) as handle:
         for row in csv.DictReader(handle):
@@ -481,8 +481,22 @@ def write_fixture(
     test_day: str,
     test_sample_bucket_start: int,
     test_sample_basis_points: int,
+    ontology_extra: list[Path] | None = None,
 ) -> None:
     ontology = json.loads(ontology_path.read_text(encoding="utf-8"))
+    seed_node_count = len(ontology["skills"])
+    # Validated extraction output is merged as additional canonical nodes. Node
+    # IDs keep the skill./occupation. prefixes so the existing seed_* feature
+    # family sees them without changing feature semantics.
+    extra_nodes: dict[str, dict] = {}
+    extra_provenance: list[dict] = []
+    for path in ontology_extra or []:
+        extension = json.loads(path.read_text(encoding="utf-8"))
+        extra_nodes.update(extension["skills"])
+        extra_provenance.append(
+            {"source": str(path), **extension.get("provenance", {})}
+        )
+    ontology["skills"].update(extra_nodes)
     duty_ontology = load_duty_ontology(data_dir)
     ontology["skills"].update(duty_ontology)
     aliases = {
@@ -551,7 +565,12 @@ def write_fixture(
             "dataset_version": "1111-2026-06-01_2026-06-07",
             "schema_fingerprint": schema_fingerprint(data_dir),
             "graph_train_cutoff": TRAIN_CUTOFF.isoformat(sep=" "),
-            "graph_builder": "reviewed-bootstrap-fixture",
+            "graph_builder": (
+                "reviewed-bootstrap-fixture+validated-extraction"
+                if extra_nodes
+                else "reviewed-bootstrap-fixture"
+            ),
+            "graph_extensions": extra_provenance,
             "random_seed": 1111,
             "purpose": "Temporal graph/no-graph reranking ablation only",
             "stats": {
@@ -559,6 +578,8 @@ def write_fixture(
                 "materialized_candidates": len(jobs),
                 "train_apply_title_snapshots": len(title_snapshots),
                 "seed_skill_nodes": len(ontology["skills"]) - len(duty_ontology),
+                "reviewed_bootstrap_nodes": seed_node_count,
+                "extraction_nodes": len(extra_nodes),
                 "duty_occupation_nodes": len(duty_ontology),
                 "behavior_query_nodes": len(behavior_graph["query_job"]),
                 "behavior_query_job_edges": sum(
@@ -595,6 +616,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Build sampled temporal qrels + judged index")
     parser.add_argument("--data-dir", type=Path, default=DATA)
     parser.add_argument("--ontology", type=Path, default=ONTOLOGY)
+    parser.add_argument(
+        "--ontology-extra",
+        type=Path,
+        action="append",
+        default=[],
+        help="Additional validated ontology file merged as canonical nodes; repeatable",
+    )
     parser.add_argument("--qrels-output", type=Path, default=QRELS_OUTPUT)
     parser.add_argument("--index-output", type=Path, default=INDEX_OUTPUT)
     parser.add_argument(
@@ -655,6 +683,7 @@ def main() -> None:
         args.test_day,
         args.test_sample_bucket_start,
         args.test_sample_basis_points,
+        ontology_extra=args.ontology_extra,
     )
 
 

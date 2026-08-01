@@ -77,7 +77,7 @@ def build_cases(
     reservoirs: dict[str, list[tuple[str, dict]]] = defaultdict(list)
     window = timedelta(minutes=window_minutes)
     print("Reading search log and constructing temporally ordered qrels…", flush=True)
-    with (data_dir / "userSearchLog_20260601_20260607.csv").open(
+    with (data_dir / "userSearchLog_cleaned.csv").open(
         encoding="utf-8-sig", newline=""
     ) as handle:
         for row in csv.DictReader(handle):

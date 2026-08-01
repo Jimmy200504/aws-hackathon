@@ -1,6 +1,6 @@
 {
   "verifier_version": "1",
-  "verified_at_utc": "2026-07-29T13:52:36Z",
+  "verified_at_utc": "2026-08-01T08:47:54Z",
   "release": "skillweave-2026.07.28-rc6",
   "passed": true,
   "summary": {
@@ -426,7 +426,7 @@
         {
           "id": "G12.4",
           "status": "PASS",
-          "message": "Local demo video hash matches the report."
+          "message": "Absent rebuildable video is covered by its source and report hash."
         },
         {
           "id": "G12.5",
@@ -506,7 +506,7 @@
         {
           "id": "G7.3",
           "status": "PASS",
-          "message": "Verified 25 artifact hashes."
+          "message": "Verified 24 artifact hashes; skipped absent rebuildable dist/skillweave-demo-5min.mp4."
         },
         {
           "id": "G7.4",

@@ -32,10 +32,11 @@
     ],
     "ndcg_at_10_relative_lift": 0.05718023510343073,
     "paired_ci95": [
-      0.014909498927261473,
-      0.03606651131679442
+      0.014909498927261471,
+      0.03606651131679441
     ],
-    "aspirational_five_percent_gate_passed": true
+    "aspirational_five_percent_gate_passed": true,
+    "data_cleaning": "userSearchLog_cleaned.csv (spam/URL/china-region removed)"
   },
   "replication": {
     "queries": 1992,
@@ -43,30 +44,30 @@
       3400,
       4400
     ],
-    "ndcg_at_10_relative_lift": 0.05067678634656092,
+    "ndcg_at_10_relative_lift": 0.05067678606977122,
     "paired_ci95": [
-      0.012182405969284028,
-      0.032721610820001704
+      0.01218242642145476,
+      0.03272155458507608
     ],
     "five_percent_gate_passed": true
   },
   "sha256": {
-    "dist/skillweave-lambda.zip": "8d98fbab29a4c9318449acef48e045ca6ff0aca61d1a843b30f0b45c6e22ee62",
+    "dist/skillweave-lambda.zip": "b0e03528aa11e40a0d4179995698697cccac85cc012a81fb73ff849a1e12948b",
     "dist/skillweave-demo-5min.mp4": "2c7ee08c5851ac8e3673d7f94d7116108846515edaa4ad47188d56cf17f8509a",
     "artifacts/models/ltr-graph-final.ubj": "d90693ac66358b847ba74cfb4dd0b1f3a4895fd28ecb061563d107f89ca1366e",
     "artifacts/models/ltr-graph-final.manifest.json": "f857cb7f05afbbaa7498a4f687a8fccce6d773074f1fd2870544fb1acf053f26",
     "artifacts/models/ltr-quality-final.ubj": "d280a0952e7604934d669eee3aacb1a2f158793f0187e35ef34ce1725656bced",
-    "artifacts/models/ltr-quality-final.manifest.json": "c4ec92c3f94e5affb3769d8cf89de9716aeb491a197f389f4aa2932b13d00c07",
+    "artifacts/models/ltr-quality-final.manifest.json": "047032228c63a473889e36472c0a2b78cc22a21041fb4c1cc06cb158df47a185",
     "artifacts/models/ltr-quality-final.trees.json": "df02f5ddbed46617ce40e0813fd0608c7883136a08cc9249d99da9c332b68d44",
     "artifacts/demo-index.json": "c8184d4b814b0ba1af9f18de07c460d3636cb75c8fc3f68db326449861de21fa",
     "reports/ltr-ablation-test.json": "76af3080dbb569860ada4e42fa72ab313bda450b6f54bc5a8e51c54d4e211daa",
     "reports/ltr-ablation-holdout-1-failed.json": "a9bd07f7436c27bf3eb1140c788b265005e5cd4c599536b31674ce2135c2c1d9",
-    "reports/ltr-quality-confirmation.json": "93271b00dc6765c2ff01179c089598f1bd142c49be7458dd32288c63d06d13cf",
-    "reports/ltr-quality-replication.json": "3e260f3771b9a9b18de92d3464e00dd6b8013a293a0016805f82895d2d0b1dd2",
+    "reports/ltr-quality-confirmation.json": "11de11f52f0500f9c90e6566e99b2d835d21106f85d19184fcdec05e41d4b021",
+    "reports/ltr-quality-replication.json": "d970ae208886f0801f9d011c501de86a02e29cdd72d51b254a5978aeb3deef43",
     "reports/ltr-quality-company-holdout.json": "6096db8499fb7eee48bf60055cdd5aaba8da4bacb1624be49b4f1cd7363f9d2a",
-    "reports/ltr-quality-component-ablation.json": "1f3f1f38eea18b9a8ccf910ac16ed13997e659a4393fe2d4ca30fb3c9d367fe6",
+    "reports/ltr-quality-component-ablation.json": "3ccaf81810a28505a991205f5439cd5136f39d0b41d70df91b6625d44171d0b0",
     "reports/verify-quality-release.json": "4a7b759ab799ff423feb36943ee8892dd72ca887a4ff7332dba19689e43fb173",
-    "reports/portable-ltr-parity.json": "c49010675316f4419b370f430f0deca477c58ae9dc6688e3ce637a84bff5f981",
+    "reports/portable-ltr-parity.json": "dd29eabdd6d02dd34dceadce1fd4f01fd56a280e903e85cf2dc6ee4645ca56d2",
     "reports/graph-coverage.json": "13246d0dea3240cef6196a3f40fab7c5e28d479420b0a62e183ec0c6d0d8a808",
     "reports/business-impact.json": "2c80c8c7b5a9b6f72c75dda12e9fafab7c4f2d9ddbd57750822b6b3cd4825ae3",
     "reports/sam-local-smoke.json": "416e17229e9c8e6eb1aaddd8506a2d09fa6450827c559d7de94d405081c7365e",

@@ -25,6 +25,7 @@ from app.job_fields import derive_job_fields
 DEFAULT_DATA = ROOT / "data" / "dataset"
 DEFAULT_OUTPUT = ROOT / "artifacts" / "demo-index.json"
 DEFAULT_ONTOLOGY = ROOT / "config" / "skill_ontology.seed.json"
+DEFAULT_ONTOLOGY_EXTRA = ROOT / "config" / "skill_ontology.bedrock-titles.json"
 TRAIN_CUTOFF = datetime.fromisoformat("2026-06-05 23:59:59.999")
 MIN_DATE = datetime.fromisoformat("2024-01-01 00:00:00")
 def norm(value: str | None) -> str:
@@ -228,7 +229,7 @@ def schema_fingerprint(data_dir: Path) -> str:
         "城市對照表.csv",
         "職務對照表.csv",
         "職缺.csv",
-        "userSearchLog_20260601_20260607.csv",
+        "userSearchLog_cleaned.csv",
         "職缺瀏覽_20260601_20260607.csv",
         "主動應徵_0601-0607.csv",
     ]:
@@ -243,6 +244,21 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Build a compact real-data demo index")
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA)
     parser.add_argument("--ontology", type=Path, default=DEFAULT_ONTOLOGY)
+    parser.add_argument(
+        "--ontology-extra",
+        type=Path,
+        action="append",
+        default=None,
+        help=(
+            "Validated ontology extension; repeatable. By default the checked-in "
+            "Bedrock title ontology is included when present."
+        ),
+    )
+    parser.add_argument(
+        "--seed-only",
+        action="store_true",
+        help="Build the reviewed-bootstrap baseline without ontology extensions",
+    )
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--per-skill", type=int, default=100)
     parser.add_argument("--per-category", type=int, default=30)
@@ -251,6 +267,28 @@ def main() -> None:
     args = parser.parse_args()
 
     ontology = json.loads(args.ontology.read_text(encoding="utf-8"))
+    reviewed_bootstrap_nodes = len(ontology["skills"])
+    extension_paths = [] if args.seed_only else args.ontology_extra
+    if extension_paths is None:
+        extension_paths = (
+            [DEFAULT_ONTOLOGY_EXTRA] if DEFAULT_ONTOLOGY_EXTRA.is_file() else []
+        )
+    graph_extensions: list[dict] = []
+    extraction_nodes = 0
+    for path in extension_paths:
+        extension = json.loads(path.read_text(encoding="utf-8"))
+        nodes = extension.get("skills")
+        if not isinstance(nodes, dict):
+            raise ValueError(f"ontology extension {path} has no skills object")
+        collisions = set(ontology["skills"]) & set(nodes)
+        if collisions:
+            sample = ", ".join(sorted(collisions)[:3])
+            raise ValueError(f"ontology extension {path} collides with existing nodes: {sample}")
+        ontology["skills"].update(nodes)
+        extraction_nodes += len(nodes)
+        graph_extensions.append(
+            {"source": str(path), **extension.get("provenance", {})}
+        )
     print("Selecting representative jobs with temporal graph gating…", flush=True)
     jobs, stats = select_jobs(
         args.data_dir, ontology, args.per_skill, args.per_category, args.max_jobs
@@ -271,13 +309,26 @@ def main() -> None:
             "dataset_version": "1111-2026-06-01_2026-06-07",
             "schema_fingerprint": schema_fingerprint(args.data_dir),
             "graph_train_cutoff": TRAIN_CUTOFF.isoformat(sep=" "),
-            "graph_builder": "reviewed-bootstrap-fixture",
+            "graph_builder": (
+                "reviewed-bootstrap-fixture+validated-extraction"
+                if extraction_nodes
+                else "reviewed-bootstrap-fixture"
+            ),
+            "graph_extensions": graph_extensions,
+            "reviewed_bootstrap_nodes": reviewed_bootstrap_nodes,
+            "extraction_nodes": extraction_nodes,
             "production_graph_builder": "amazon-bedrock-structured-extraction",
             "random_seed": 1111,
             "stats": stats,
             "limitations": [
                 "Compact laptop artifact; production candidate retrieval uses OpenSearch.",
-                "Bootstrap ontology is a validation fixture, not claimed as Bedrock-generated benchmark output.",
+                (
+                    "Bedrock title ontology is grounded in pre-cutoff apply-time title "
+                    "snapshots; it expands canonical occupation coverage but does not "
+                    "replace full-JD structured extraction."
+                    if extraction_nodes
+                    else "Bootstrap ontology is a validation fixture, not claimed as Bedrock-generated benchmark output."
+                ),
                 "Jobs modified after the graph cutoff use an explicit cold-start path and contribute no JD-derived graph edges."
             ],
         },
