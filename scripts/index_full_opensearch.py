@@ -2,17 +2,19 @@
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import csv
 import json
 import os
 import re
 import sys
+import threading
 import time
 import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
@@ -156,6 +158,42 @@ class SignedOpenSearchClient:
         *,
         content_type: str = "application/json",
         acceptable: tuple[int, ...] = (200, 201),
+        attempts: int = 5,
+    ) -> dict[str, Any]:
+        """Send one signed request, retrying transient transport failures.
+
+        A full-corpus pass is thousands of sequential bulk requests over tens of
+        minutes; a single dropped connection would otherwise discard the whole
+        run. Each attempt is re-signed because SigV4 covers the timestamp.
+        """
+        last_error: Exception | None = None
+        for attempt in range(1, max(1, attempts) + 1):
+            try:
+                return self._request_once(
+                    method, path, payload, content_type, acceptable
+                )
+            except (URLError, ConnectionError, TimeoutError, OSError) as exc:
+                last_error = exc
+                if attempt == attempts:
+                    break
+                delay = min(30.0, 2.0**attempt)
+                print(
+                    f"  transient {type(exc).__name__} on {method} {path}; "
+                    f"retry {attempt}/{attempts - 1} in {delay:.0f}s",
+                    flush=True,
+                )
+                time.sleep(delay)
+        raise RuntimeError(
+            f"OpenSearch {method} {path} failed after {attempts} attempts: {last_error}"
+        ) from last_error
+
+    def _request_once(
+        self,
+        method: str,
+        path: str,
+        payload: bytes,
+        content_type: str,
+        acceptable: tuple[int, ...],
     ) -> dict[str, Any]:
         url = self.endpoint + path
         headers = {"content-type": content_type}
@@ -352,8 +390,24 @@ def main() -> None:
     parser.add_argument(
         "--region", default=os.getenv("AWS_REGION", "us-east-1")
     )
-    parser.add_argument("--batch-size", type=int, default=400)
+    parser.add_argument("--batch-size", type=int, default=250)
+    parser.add_argument(
+        "--max-workers",
+        type=int,
+        default=8,
+        help="Bulk requests kept in flight; overlaps parsing with network round trips",
+    )
     parser.add_argument("--max-records", type=int, default=0)
+    parser.add_argument(
+        "--skip-records",
+        type=int,
+        default=0,
+        help=(
+            "Resume a full-corpus pass by skipping this many leading CSV rows. "
+            "Writes are keyed by _id, so re-covering rows is harmless; this only "
+            "avoids repeating work after a dropped connection."
+        ),
+    )
     parser.add_argument("--timeout-seconds", type=float, default=60.0)
     parser.add_argument(
         "--skip-create",
@@ -436,59 +490,93 @@ def main() -> None:
         )
         print(f"Updated mapping on {args.index} with {len(properties)} properties")
 
+    def send(payload: bytes) -> None:
+        response = client.request(
+            "POST",
+            "/_bulk",
+            payload,
+            content_type="application/x-ndjson",
+        )
+        if response.get("errors"):
+            failures = [
+                item
+                for item in response.get("items", [])
+                if int(next(iter(item.values())).get("status", 500)) >= 300
+            ]
+            raise RuntimeError(
+                "OpenSearch bulk indexing failed: "
+                + json.dumps(failures[:3], ensure_ascii=False)
+            )
+
     indexed = graph_jobs = batches = 0
     started = time.monotonic()
     pending: list[dict[str, Any]] = []
     source_path = args.data_dir / "職缺.csv"
-    with source_path.open(encoding="utf-8-sig", newline="") as handle:
-        for row in csv.DictReader(handle):
-            if args.max_records > 0 and indexed >= args.max_records:
-                break
-            document = job_document(
-                row, skills, pattern, alias_to_skills, behavior
-            )
-            pending.append(document)
-            graph_jobs += int(document["graph_eligible"])
-            indexed += 1
-            if len(pending) < args.batch_size:
-                continue
-            if client is not None:
-                response = client.request(
-                    "POST",
-                    "/_bulk",
-                    bulk_payload(args.index, pending),
-                    content_type="application/x-ndjson",
-                )
-                if response.get("errors"):
-                    failures = [
-                        item
-                        for item in response.get("items", [])
-                        if int(next(iter(item.values())).get("status", 500)) >= 300
-                    ]
-                    raise RuntimeError(
-                        "OpenSearch bulk indexing failed: "
-                        + json.dumps(failures[:3], ensure_ascii=False)
-                    )
-            pending.clear()
-            batches += 1
-            if batches % 25 == 0:
-                elapsed = max(0.001, time.monotonic() - started)
-                print(
-                    f"Indexed {indexed:,} jobs · {indexed / elapsed:,.0f} jobs/s",
-                    flush=True,
-                )
+    # Sending one bulk request at a time leaves the whole round trip idle while
+    # the next batch is parsed. Overlapping a bounded number of in-flight
+    # requests is what turns a multi-hour full-corpus pass into minutes; the
+    # semaphore keeps queued payloads from growing without limit.
+    in_flight = threading.Semaphore(max(1, args.max_workers))
+    failures: list[BaseException] = []
+    failure_lock = threading.Lock()
 
-    if pending and client is not None:
-        response = client.request(
-            "POST",
-            "/_bulk",
-            bulk_payload(args.index, pending),
-            content_type="application/x-ndjson",
-        )
-        if response.get("errors"):
-            raise RuntimeError("final OpenSearch bulk request contained errors")
+    def dispatch(payload: bytes) -> None:
+        try:
+            send(payload)
+        except BaseException as exc:  # surfaced on the main thread below
+            with failure_lock:
+                failures.append(exc)
+        finally:
+            in_flight.release()
+
+    def submit(pool: Any, payload: bytes) -> None:
+        with failure_lock:
+            if failures:
+                raise failures[0]
+        in_flight.acquire()
+        pool.submit(dispatch, payload)
+
+    with concurrent.futures.ThreadPoolExecutor(
+        max_workers=max(1, args.max_workers)
+    ) as pool:
+        with source_path.open(encoding="utf-8-sig", newline="") as handle:
+            reader = csv.DictReader(handle)
+            for skipped, _ in enumerate(reader, 1):
+                if skipped >= args.skip_records:
+                    break
+            if args.skip_records:
+                print(f"Resuming after {args.skip_records:,} rows", flush=True)
+            for row in reader:
+                if args.max_records > 0 and indexed >= args.max_records:
+                    break
+                document = job_document(
+                    row, skills, pattern, alias_to_skills, behavior
+                )
+                pending.append(document)
+                graph_jobs += int(document["graph_eligible"])
+                indexed += 1
+                if len(pending) < args.batch_size:
+                    continue
+                if client is not None:
+                    submit(pool, bulk_payload(args.index, pending))
+                pending.clear()
+                batches += 1
+                if batches % 25 == 0:
+                    elapsed = max(0.001, time.monotonic() - started)
+                    print(
+                        f"Indexed {indexed:,} jobs · {indexed / elapsed:,.0f} jobs/s",
+                        flush=True,
+                    )
+        if pending and client is not None:
+            submit(pool, bulk_payload(args.index, pending))
+    if failures:
+        raise failures[0]
 
     verified_count = None
+    # A partial run (--max-records) or an in-place field upgrade (--skip-create)
+    # overwrites documents by _id inside an index that already holds the whole
+    # corpus, so the document count is expected not to equal this run's total.
+    partial_update = args.max_records > 0 or args.skip_create
     if client is not None:
         if client.service != "aoss":
             client.request("POST", f"{index_path}/_refresh", b"{}")
@@ -498,12 +586,16 @@ def main() -> None:
         while True:
             count = client.request("POST", f"{index_path}/_count", b"{}")
             verified_count = int(count.get("count", -1))
-            if verified_count == indexed or time.monotonic() >= deadline:
+            if verified_count >= indexed or time.monotonic() >= deadline:
                 break
             time.sleep(5)
-        if verified_count != indexed:
+        if not partial_update and verified_count != indexed:
             raise RuntimeError(
                 f"index count mismatch: expected {indexed:,}, got {verified_count:,}"
+            )
+        if partial_update and verified_count < indexed:
+            raise RuntimeError(
+                f"index holds {verified_count:,} documents after writing {indexed:,}"
             )
 
     report = {
@@ -514,8 +606,9 @@ def main() -> None:
         "verified_index_count": verified_count,
         "graph_eligible_jobs": graph_jobs,
         "cold_start_jobs": indexed - graph_jobs,
+        "partial_update": partial_update,
         "all_source_jobs_are_search_targets": (
-            verified_count == indexed if verified_count is not None else None
+            verified_count >= indexed if verified_count is not None else None
         ),
         "dry_run": args.dry_run,
         "elapsed_seconds": round(time.monotonic() - started, 2),
