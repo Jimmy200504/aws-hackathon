@@ -229,12 +229,63 @@ Query:"作業員"  c0=[100600]
 且不因此讓新北市搜尋反向獲得新竹市職缺。
 ```
 
-對照的可解釋輸出（一行，面向求職者）：
+### API surface
+
+`POST /api/v1/jobs/search` 在 `meta.region_trace` 回傳這個遍歷結果。官方契約欄位（`request_id`、`result`、`empStr`）完全未動；無任何搜尋代碼可解析成國內縣市時（未帶地區、海外代碼、無效代碼）整個鍵省略。契約定義見 `docs/openapi.yaml` 的 `RegionTrace`。
+
+```json
+{
+  "meta": {
+    "region_trace": {
+      "schema": "skillweave-region-graph-v1",
+      "searched_counties": ["新竹市"],
+      "min_conditional": 0.05,
+      "expansions": [
+        {
+          "county": "新竹縣",
+          "from": "新竹市",
+          "evidence": ["co_selection", "commute_flow"],
+          "explanation": "56.5% 搜尋新竹市的求職者同時勾選新竹縣（35,360 次共同勾選）",
+          "co_selection": {
+            "co_selected": 35360, "jaccard": 0.39407,
+            "p_target_given_source": 0.56534, "p_source_given_target": 0.56535
+          },
+          "commute_flow": {
+            "applications": 59, "reverse_applications": 22, "asymmetry": 0.4568
+          }
+        }
+      ],
+      "applied_to_ranking": false
+    }
+  }
+}
+```
+
+`applied_to_ranking` 恆為 `false`。這個子圖不參與評分，回傳的是行為資料支持什麼，不是排序被改成什麼。
+
+發布閘門（兩者取聯集，任一通過即納入，並記錄在 `evidence` 欄位）：
+
+| Gate | 條件 | 理由 |
+|---|---|---|
+| `co_selection` | P(target \| source) ≥ 0.05 | 低於此值代表不到二十分之一的來源縣市搜尋者會勾選目標縣市，不足以當作替代地點呈現 |
+| `commute_flow` | 存在 `COMMUTES_TO` 邊且 `asymmetry > 0` | 淨流向目標縣市；`min_flow = 30` 已在建圖時把低支撐組合擋掉 |
+
+排序為 `(−P(target|source), −applications, county)` 的全序，最後以縣市名稱決勝，因此同一請求永遠得到同一份輸出。預設回傳前 3 筆（`REGION_GRAPH_LIMIT`）。
+
+`REGION_GRAPH_PATH` 缺檔時模組自動停用、`meta.region_trace` 省略、搜尋照常回應，`/health` 的 `region_graph` 欄位回報可用性。
+
+面向求職者的一行說明直接取自 `explanation`：
 
 ```text
 你搜尋 新竹市 —— 也納入 新北市
 依據：163 位新竹市求職者應徵了新北市職缺，反向僅 6 位
 ```
+
+### `COMMUTES_TO` 的語意邊界
+
+這條邊量的是**淨應徵流向**，不是通勤本身。資料無法區分「每日通勤」與「搬遷就業」，所以像 `台北市 → 高雄市`（140 vs 32）這種長距離流動也會成為邊。實測 `meta.region_trace` 在搜尋台北市時會據此提出台中市與高雄市，那是真實的流向，但不是通勤。
+
+因此 `explanation` 一律陳述可稽核的原始事實（「140 筆台北市求職者應徵高雄市職缺，反向僅 32 筆」），不宣稱「附近」或「可通勤」。邊名保留 `COMMUTES_TO` 以對應主要語意，語意邊界以本節為準。
 
 ### 已知限制
 

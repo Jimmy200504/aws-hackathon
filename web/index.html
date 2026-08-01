@@ -63,7 +63,10 @@
                 <option value="100100">台北市</option>
                 <option value="100200">新北市</option>
                 <option value="100500">桃園市</option>
-                <option value="100600">新竹地區</option>
+                <option value="100600">新竹市</option>
+                <option value="100700">新竹縣</option>
+                <option value="100300">基隆市</option>
+                <option value="102000">屏東縣</option>
                 <option value="100900">台中市</option>
                 <option value="101800">高雄市</option>
               </select>
@@ -132,6 +135,29 @@
             </div>
             <div id="intent-graph" class="intent-graph">
               <p class="panel-empty">搜尋後顯示 Query → Skill → Job 的實際遍歷證據。</p>
+            </div>
+          </div>
+
+          <div class="panel region-panel">
+            <div class="panel-head">
+              <div>
+                <span class="kicker">REGION GRAPH</span>
+                <h3>行為推導的地區替代</h3>
+              </div>
+              <span id="region-badge" class="mini-badge">等待查詢</span>
+            </div>
+            <div id="region-trace" aria-live="polite">
+              <p class="panel-empty">
+                選擇地區後，顯示求職者實際視為可替代的縣市，以及支持它的共同勾選與應徵流向數據。
+              </p>
+            </div>
+            <div class="provenance">
+              <i></i>
+              <p>
+                <strong>此面板不改動排序</strong>
+                地區圖的作用位置在檢索擴充階段；本次結果的排序未使用它。權重全部來自
+                2026-06-05 cutoff 前的搜尋與應徵行為，無人工填值。
+              </p>
             </div>
           </div>
 

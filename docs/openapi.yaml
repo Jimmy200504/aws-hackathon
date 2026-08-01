@@ -77,6 +77,67 @@ components:
         graph_trace:
           type: array
           items: { type: object }
+    RegionExpansion:
+      type: object
+      required: [county, from, evidence, explanation]
+      properties:
+        county:
+          type: string
+          description: County the behaviour graph supports adding
+        from:
+          type: string
+          description: Searched county the evidence was measured from
+        evidence:
+          type: array
+          description: Deterministic gates this expansion passed
+          items:
+            type: string
+            enum: [co_selection, commute_flow]
+        explanation:
+          type: string
+          description: One-line human-readable evidence sentence
+        co_selection:
+          type: object
+          properties:
+            co_selected: { type: integer }
+            jaccard: { type: number }
+            p_target_given_source: { type: number }
+            p_source_given_target: { type: number }
+        commute_flow:
+          type: object
+          properties:
+            applications: { type: integer }
+            reverse_applications: { type: integer }
+            asymmetry: { type: number }
+    RegionTrace:
+      type: object
+      description: >-
+        Read-only region expansion evidence from the behaviour-derived region
+        graph. Omitted when no searched code resolves to a domestic county.
+        applied_to_ranking is always false: the subgraph acts at retrieval
+        expansion and does not reorder results.
+      required: [searched_counties, expansions, applied_to_ranking]
+      properties:
+        schema: { type: string }
+        dataset_version: { type: string }
+        graph_cutoff: { type: string }
+        searched_counties:
+          type: array
+          items: { type: string }
+        min_conditional: { type: number }
+        expansions:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegionExpansion"
+        applied_to_ranking:
+          type: boolean
+          enum: [false]
+    SearchMeta:
+      type: object
+      additionalProperties: true
+      properties:
+        region_trace:
+          $ref: "#/components/schemas/RegionTrace"
     SearchResponse:
       type: object
       required: [request_id, result]
@@ -87,3 +148,5 @@ components:
           items:
             $ref: "#/components/schemas/RankedJob"
         empStr: { type: string }
+        meta:
+          $ref: "#/components/schemas/SearchMeta"

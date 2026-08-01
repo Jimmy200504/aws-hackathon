@@ -12,6 +12,7 @@ from urllib.parse import unquote
 
 from app.query_normalizer import BedrockQueryNormalizer
 from app.ranker import SkillWeaveRanker
+from app.region_graph import RegionGraph
 from app.retrieval import OpenSearchRetriever
 
 
@@ -30,6 +31,7 @@ RANKER = SkillWeaveRanker(
     candidate_retriever=OpenSearchRetriever.from_environment(),
 )
 QUERY_NORMALIZER = BedrockQueryNormalizer.from_environment()
+REGION_GRAPH = RegionGraph.from_environment()
 
 
 def response(
@@ -122,6 +124,11 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
             "query_normalization": normalization.metadata(),
         },
     }
+    # Additive and optional: the official contract fields (request_id, result,
+    # empStr) are untouched, and the key is omitted when no county resolves.
+    region_trace = REGION_GRAPH.trace(location, RANKER.locations)
+    if region_trace is not None:
+        payload["meta"]["region_trace"] = region_trace
     if trace:
         payload["trace"] = [
             {"job_id": row["job_id"], "rank": row["rank"], "paths": row["graph_trace"]}
@@ -173,6 +180,7 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
                     "jobs": len(RANKER.jobs),
                     "full_corpus_retrieval": RANKER.candidate_retriever is not None,
                     "bedrock_query_normalization": QUERY_NORMALIZER.enabled,
+                    "region_graph": REGION_GRAPH.enabled,
                 },
             )
         if method == "GET" and path == "/api/v1/meta":

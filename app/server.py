@@ -14,6 +14,7 @@ from urllib.parse import unquote, urlparse
 
 from app.query_normalizer import BedrockQueryNormalizer
 from app.ranker import SkillWeaveRanker
+from app.region_graph import RegionGraph
 from app.retrieval import OpenSearchRetriever
 
 
@@ -28,6 +29,7 @@ DEFAULT_LTR_MODEL = (
 class Handler(BaseHTTPRequestHandler):
     ranker: SkillWeaveRanker
     query_normalizer: BedrockQueryNormalizer
+    region_graph: RegionGraph
     server_version = "SkillWeave/0.1"
 
     def _json(self, body: dict, status: int = HTTPStatus.OK) -> None:
@@ -60,6 +62,7 @@ class Handler(BaseHTTPRequestHandler):
                     "jobs": len(self.ranker.jobs),
                     "full_corpus_retrieval": self.ranker.candidate_retriever is not None,
                     "bedrock_query_normalization": self.query_normalizer.enabled,
+                    "region_graph": self.region_graph.enabled,
                 }
             )
             return
@@ -136,6 +139,12 @@ class Handler(BaseHTTPRequestHandler):
                     "query_normalization": normalization.metadata(),
                 },
             }
+            # Additive and optional, exactly as in the Lambda path: the official
+            # contract fields stay untouched and the key is omitted when no
+            # searched code resolves to a domestic county.
+            region_trace = self.region_graph.trace(location, self.ranker.locations)
+            if region_trace is not None:
+                response["meta"]["region_trace"] = region_trace
             if path == "/api/v1/graph/trace":
                 response["trace"] = [
                     {"job_id": row["job_id"], "rank": row["rank"], "paths": row["graph_trace"]}
@@ -207,6 +216,7 @@ def main() -> None:
         candidate_retriever=OpenSearchRetriever.from_environment(),
     )
     Handler.query_normalizer = BedrockQueryNormalizer.from_environment()
+    Handler.region_graph = RegionGraph.from_environment()
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     print(f"SkillWeave listening on http://{args.host}:{args.port}")
     print(f"Loaded {len(Handler.ranker.jobs):,} jobs from {args.artifact}")

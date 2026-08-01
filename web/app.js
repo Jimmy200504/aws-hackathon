@@ -8,9 +8,16 @@ const errorBox = document.querySelector("#error");
 const resultMeta = document.querySelector("#result-meta");
 const graphPanel = document.querySelector("#intent-graph");
 const graphBadge = document.querySelector("#graph-badge");
+const regionPanel = document.querySelector("#region-trace");
+const regionBadge = document.querySelector("#region-badge");
 const template = document.querySelector("#result-template");
 
 const escapeText = (value) => String(value ?? "");
+
+const REGION_GATE_LABELS = {
+  co_selection: "共同勾選",
+  commute_flow: "應徵流向",
+};
 
 async function loadMeta() {
   try {
@@ -55,6 +62,58 @@ function showTrace(row, query, graphEnabled) {
     copy.append(title, detail);
     item.append(rail, copy);
     graphPanel.append(item);
+  });
+}
+
+function regionEmpty(message) {
+  const empty = document.createElement("p");
+  empty.className = "panel-empty";
+  empty.textContent = message;
+  regionPanel.append(empty);
+}
+
+// Renders meta.region_trace. This is evidence only: the region subgraph acts at
+// retrieval expansion, so it never reorders the results shown alongside it.
+function showRegionTrace(trace) {
+  regionPanel.replaceChildren();
+  if (!trace) {
+    regionBadge.textContent = "未指定地區";
+    regionBadge.classList.remove("active");
+    regionEmpty("未指定地區，或代碼不對應國內縣市，本次不進行地區擴充。");
+    return;
+  }
+  regionBadge.textContent = trace.searched_counties.join("、");
+  regionBadge.classList.add("active");
+  const expansions = trace.expansions || [];
+  if (!expansions.length) {
+    regionEmpty(
+      `${trace.searched_counties.join("、")} 沒有通過發布門檻的可替代縣市（` +
+        `共同勾選需 ≥ ${(trace.min_conditional * 100).toFixed(0)}%，或存在淨應徵流向）。`
+    );
+    return;
+  }
+  expansions.forEach((expansion) => {
+    const item = document.createElement("div");
+    item.className = "trace-path";
+    const rail = document.createElement("div");
+    rail.className = "trace-rail";
+    const dot = document.createElement("span");
+    dot.className = "trace-dot";
+    rail.append(dot);
+    const copy = document.createElement("div");
+    copy.className = "trace-copy";
+    const title = document.createElement("strong");
+    title.textContent = `${expansion.from} → ${expansion.county}`;
+    const detail = document.createElement("small");
+    const gates = (expansion.evidence || [])
+      .map((gate) => REGION_GATE_LABELS[gate] || gate)
+      .join(" / ");
+    detail.textContent = gates
+      ? `${gates} · ${expansion.explanation}`
+      : expansion.explanation;
+    copy.append(title, detail);
+    item.append(rail, copy);
+    regionPanel.append(item);
   });
 }
 
@@ -116,6 +175,7 @@ async function search(event) {
     const body = await response.json();
     if (!response.ok) throw new Error(body.error?.message || "搜尋失敗");
     renderRows(body.result, query, graphEnabled);
+    showRegionTrace(body.meta?.region_trace);
     resultMeta.textContent =
       `${body.result.length} RESULTS · ${body.meta.latency_ms} MS · ${graphEnabled ? "GRAPH" : "BASELINE"}`;
   } catch (error) {
