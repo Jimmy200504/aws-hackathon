@@ -19,6 +19,10 @@ class OpenSearchRetriever:
         "title",
         "description",
         "salary",
+        "salary_min",
+        "salary_max",
+        "salary_type",
+        "is_remote",
         "city",
         "categories",
         "industry",
@@ -130,6 +134,8 @@ class OpenSearchRetriever:
         limit: int,
         location_names: Iterable[str] = (),
         duty_names: Iterable[str] = (),
+        wants_remote: bool = False,
+        salary_intent: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         locations = self._clean_names(location_names)
         duties = self._clean_names(duty_names)
@@ -167,6 +173,57 @@ class OpenSearchRetriever:
             }
             for name in duties
         )
+        if wants_remote:
+            # A remote-intent query (遠端/在家工作/WFH) must be able to pull
+            # in an is_remote job even when the query text has no lexical
+            # overlap with the title/description (e.g. 遠端客服 vs a job
+            # titled "夜間客服人員" that only mentions "可遠端" in the body).
+            # This is a `should` clause, not a `must` filter: it widens
+            # recall without excluding otherwise-relevant lexical matches.
+            should.append({"term": {"is_remote": {"value": True, "boost": 6.0}}})
+        if salary_intent is not None:
+            # Mirror the local ranker's salary-range match: a job whose
+            # salary_min/salary_max range covers the requested figure is
+            # relevant even if its title never prints that exact number
+            # (e.g. 168+ jobs with a covering range but no literal "210" in
+            # the title -- the recall gap fixed in app/ranker.py). Gate on
+            # salary_type so an hourly query does not match a monthly job.
+            target = float(salary_intent.get("target", 0.0))
+            salary_type = salary_intent.get("salary_type")
+            if salary_type and target > 0:
+                should.append(
+                    {
+                        "bool": {
+                            "filter": [{"term": {"salary_type": salary_type}}],
+                            "should": [
+                                # salary_max > 0 means an explicit upper bound
+                                # is set; the job's range covers the target
+                                # when that ceiling reaches at least target.
+                                {
+                                    "bool": {
+                                        "filter": [
+                                            {"range": {"salary_max": {"gt": 0}}},
+                                            {"range": {"salary_max": {"gte": target}}},
+                                        ]
+                                    }
+                                },
+                                # salary_max == 0 means no upper bound was
+                                # parsed (e.g. "面議40000‧" or open-ended pay);
+                                # fall back to comparing salary_min alone.
+                                {
+                                    "bool": {
+                                        "filter": [
+                                            {"term": {"salary_max": 0}},
+                                            {"range": {"salary_min": {"gte": target}}},
+                                        ]
+                                    }
+                                },
+                            ],
+                            "minimum_should_match": 1,
+                            "boost": 6.0,
+                        }
+                    }
+                )
         body = {
             "size": max(1, min(int(limit), 500)),
             "track_total_hits": False,

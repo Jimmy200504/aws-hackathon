@@ -388,7 +388,16 @@ class FakeFullCorpusRetriever:
     def __init__(self, *, fail: bool = False) -> None:
         self.fail = fail
 
-    def retrieve(self, query, *, limit, location_names, duty_names):
+    def retrieve(
+        self,
+        query,
+        *,
+        limit,
+        location_names,
+        duty_names,
+        wants_remote=False,
+        salary_intent=None,
+    ):
         if self.fail:
             raise RuntimeError("simulated OpenSearch outage")
         return [

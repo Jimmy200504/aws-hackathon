@@ -771,6 +771,8 @@ class SkillWeaveRanker:
                         intent.location_codes, self.locations
                     ),
                     duty_names=self._filter_names(intent.duty_codes, self.duties),
+                    wants_remote=intent.wants_remote,
+                    salary_intent=intent.salary_intent,
                 )
             except Exception as exc:
                 # Keep the API contract alive if full-corpus retrieval is
