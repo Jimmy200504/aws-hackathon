@@ -77,6 +77,17 @@ class RankerTests(unittest.TestCase):
         )
         self.assertTrue(any(row["features"]["graph"] > 0 for row in graph))
 
+    def test_results_expose_salary_and_remote_fields(self) -> None:
+        rows = self.ranker.search("行政助理", top_k=5)["results"]
+        self.assertTrue(rows)
+        for row in rows:
+            self.assertIn("salary_min", row)
+            self.assertIn("salary_max", row)
+            self.assertIn("salary_type", row)
+            self.assertIn("is_remote", row)
+            self.assertIsInstance(row["is_remote"], bool)
+
+
 
 class GraphIsolationTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -163,6 +174,214 @@ class GraphIsolationTests(unittest.TestCase):
         self.assertEqual(full["behavior_company_global_seen"], 1.0)
         self.assertEqual(day_one["behavior_job_global_seen"], 0.0)
         self.assertEqual(day_one["behavior_company_global_seen"], 0.0)
+
+
+class RemoteWorkFeatureTests(unittest.TestCase):
+    def setUp(self) -> None:
+        artifact = {
+            "metadata": {"index_version": "test"},
+            "locations": {},
+            "duties": {},
+            "skills": {
+                "skill.python": {
+                    "label": "Python",
+                    "aliases": ["python"],
+                    "related": {},
+                }
+            },
+            "behavior_graph": {},
+            "jobs": [
+                {
+                    "id": "job-remote",
+                    "title": "Python 後端工程師",
+                    "description": "全遠端工作，需自備電腦",
+                    "categories": ["軟體工程"],
+                    "city": "台北市",
+                    "industry": "資訊軟體",
+                    "company_id": "company-1",
+                    "graph_eligible": True,
+                    "skills": ["skill.python"],
+                    "skill_confidence": {"skill.python": 0.9},
+                    "skill_evidence": {"skill.python": "Python 後端工程師"},
+                    "view_count": 0,
+                    "apply_count": 0,
+                    "freshness": 0,
+                    "salary_min": 50000.0,
+                    "salary_max": 70000.0,
+                    "salary_type": "monthly",
+                    "is_remote": True,
+                },
+                {
+                    "id": "job-onsite",
+                    "title": "Python 後端工程師",
+                    "description": "需至台北市辦公室上班",
+                    "categories": ["軟體工程"],
+                    "city": "台北市",
+                    "industry": "資訊軟體",
+                    "company_id": "company-2",
+                    "graph_eligible": True,
+                    "skills": ["skill.python"],
+                    "skill_confidence": {"skill.python": 0.9},
+                    "skill_evidence": {"skill.python": "Python 後端工程師"},
+                    "view_count": 0,
+                    "apply_count": 0,
+                    "freshness": 0,
+                    "salary_min": 50000.0,
+                    "salary_max": 70000.0,
+                    "salary_type": "monthly",
+                    "is_remote": False,
+                },
+            ],
+        }
+        self.tempdir = tempfile.TemporaryDirectory()
+        path = Path(self.tempdir.name) / "index.json"
+        path.write_text(json.dumps(artifact), encoding="utf-8")
+        self.ranker = SkillWeaveRanker(path)
+
+    def tearDown(self) -> None:
+        self.tempdir.cleanup()
+
+    def test_remote_query_ranks_remote_job_first(self) -> None:
+        rows = self.ranker.search("Python 後端工程師 遠端", top_k=10)["results"]
+        self.assertTrue(rows)
+        self.assertEqual(rows[0]["job_id"], "job-remote")
+        self.assertTrue(rows[0]["is_remote"])
+        remote_row = next(row for row in rows if row["job_id"] == "job-remote")
+        onsite_row = next(row for row in rows if row["job_id"] == "job-onsite")
+        self.assertGreater(
+            remote_row["features"]["remote"], onsite_row["features"]["remote"]
+        )
+
+    def test_non_remote_query_does_not_penalize_onsite_job(self) -> None:
+        rows = self.ranker.search("Python 後端工程師", top_k=10)["results"]
+        self.assertTrue(rows)
+        for row in rows:
+            self.assertEqual(row["features"]["remote"], 0.0)
+
+    def test_intent_detects_remote_terms(self) -> None:
+        self.assertTrue(self.ranker.parse_intent("遠端 python 工程師").wants_remote)
+        self.assertTrue(self.ranker.parse_intent("在家工作 客服").wants_remote)
+        self.assertFalse(self.ranker.parse_intent("python 工程師").wants_remote)
+
+
+class SalaryRangeFeatureTests(unittest.TestCase):
+    def setUp(self) -> None:
+        artifact = {
+            "metadata": {"index_version": "test"},
+            "locations": {},
+            "duties": {},
+            "skills": {},
+            "behavior_graph": {},
+            "jobs": [
+                {
+                    # Range covers the query target (210) but the title
+                    # never literally says "210" -- this is exactly the
+                    # recall gap the salary feature must close.
+                    "id": "job-covers-no-literal-210",
+                    "title": "居家照顧服務員",
+                    "description": "時薪範圍依經驗調整",
+                    "categories": ["居家照顧"],
+                    "city": "",
+                    "industry": "",
+                    "company_id": "company-1",
+                    "graph_eligible": True,
+                    "skills": [],
+                    "view_count": 0,
+                    "apply_count": 0,
+                    "freshness": 0,
+                    "salary_min": 200.0,
+                    "salary_max": 300.0,
+                    "salary_type": "hourly",
+                    "is_remote": False,
+                },
+                {
+                    # Below the target: should not surface for 時薪210.
+                    "id": "job-below-target",
+                    "title": "洗碗人員",
+                    "description": "",
+                    "categories": [],
+                    "city": "",
+                    "industry": "",
+                    "company_id": "company-2",
+                    "graph_eligible": True,
+                    "skills": [],
+                    "view_count": 0,
+                    "apply_count": 0,
+                    "freshness": 0,
+                    "salary_min": 180.0,
+                    "salary_max": 190.0,
+                    "salary_type": "hourly",
+                    "is_remote": False,
+                },
+                {
+                    # Different salary_type (monthly): not comparable to an
+                    # hourly query, must be neither rewarded nor penalized.
+                    "id": "job-different-type",
+                    "title": "行政助理",
+                    "description": "",
+                    "categories": [],
+                    "city": "",
+                    "industry": "",
+                    "company_id": "company-3",
+                    "graph_eligible": True,
+                    "skills": [],
+                    "view_count": 0,
+                    "apply_count": 0,
+                    "freshness": 0,
+                    "salary_min": 30000.0,
+                    "salary_max": 35000.0,
+                    "salary_type": "monthly",
+                    "is_remote": False,
+                },
+            ],
+        }
+        self.tempdir = tempfile.TemporaryDirectory()
+        path = Path(self.tempdir.name) / "index.json"
+        path.write_text(json.dumps(artifact), encoding="utf-8")
+        self.ranker = SkillWeaveRanker(path)
+
+    def tearDown(self) -> None:
+        self.tempdir.cleanup()
+
+    def test_finds_job_whose_range_covers_target_without_literal_match(self) -> None:
+        rows = self.ranker.search("時薪210", top_k=10)["results"]
+        job_ids = [row["job_id"] for row in rows]
+        self.assertIn("job-covers-no-literal-210", job_ids)
+        covering_row = next(
+            row for row in rows if row["job_id"] == "job-covers-no-literal-210"
+        )
+        self.assertGreater(covering_row["features"]["salary"], 0)
+
+    def test_job_below_target_is_penalized_not_boosted(self) -> None:
+        rows = self.ranker.search(
+            "時薪210",
+            top_k=10,
+            candidate_ids={"job-covers-no-literal-210", "job-below-target"},
+        )["results"]
+        below_row = next(
+            (row for row in rows if row["job_id"] == "job-below-target"), None
+        )
+        if below_row is not None:
+            self.assertLess(below_row["features"]["salary"], 0)
+
+    def test_mismatched_salary_type_is_neutral(self) -> None:
+        intent = self.ranker.parse_intent("時薪210")
+        _, features, _, _ = self.ranker._score(
+            2, intent, include_graph=True
+        )  # job-different-type
+        self.assertEqual(features["salary"], 0.0)
+
+    def test_intent_parses_salary_condition(self) -> None:
+        intent = self.ranker.parse_intent("時薪210")
+        self.assertIsNotNone(intent.salary_intent)
+        self.assertEqual(intent.salary_intent["salary_type"], "hourly")
+        self.assertEqual(intent.salary_intent["target"], 210.0)
+
+    def test_query_without_salary_condition_has_neutral_feature(self) -> None:
+        intent = self.ranker.parse_intent("居家照顧服務員")
+        self.assertIsNone(intent.salary_intent)
+        _, features, _, _ = self.ranker._score(0, intent, include_graph=True)
+        self.assertEqual(features["salary"], 0.0)
 
 
 class FakeFullCorpusRetriever:

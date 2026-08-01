@@ -21,6 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from app.job_fields import derive_job_fields
+
 DATA = ROOT / "data" / "dataset"
 DEMO_INDEX = ROOT / "artifacts" / "demo-index.json"
 TRAIN_CUTOFF = datetime.fromisoformat("2026-06-05 23:59:59.999")
@@ -78,6 +80,10 @@ def mapping(
                 "description": {"type": "text", "analyzer": "cjk"},
                 "description_search": {"type": "text", "analyzer": "cjk"},
                 "salary": {"type": "keyword", "index": False},
+                "salary_min": {"type": "float"},
+                "salary_max": {"type": "float"},
+                "salary_type": {"type": "keyword"},
+                "is_remote": {"type": "boolean"},
                 "city": {
                     "type": "text",
                     "analyzer": "cjk",
@@ -266,6 +272,7 @@ def job_document(
         "description": row["職務內容"].strip()[:420],
         "description_search": row["職務內容"].strip(),
         "salary": row["薪資"].replace("‧", " · "),
+        **derive_job_fields(row),
         "city": row["工作城市"],
         "categories": categories,
         "industry": row["產業中類"] or row["產業大類"],

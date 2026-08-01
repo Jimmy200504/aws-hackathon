@@ -7,9 +7,14 @@ import csv
 import hashlib
 import json
 import re
+import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from build_demo_index import (
     MIN_DATE,
@@ -20,9 +25,9 @@ from build_demo_index import (
     parse_time,
     schema_fingerprint,
 )
+from app.job_fields import derive_job_fields
 
 
-ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "dataset"
 ONTOLOGY = ROOT / "config" / "skill_ontology.seed.json"
 QRELS_OUTPUT = ROOT / "artifacts" / "temporal-eval.json"
@@ -331,6 +336,7 @@ def build_job(
         "title": title,
         "description": description[:420],
         "salary": row["薪資"].replace("‧", " · "),
+        **derive_job_fields(row),
         "city": row["工作城市"],
         "categories": categories,
         "industry": row["產業中類"] or row["產業大類"],

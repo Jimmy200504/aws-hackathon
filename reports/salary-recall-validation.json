@@ -1,0 +1,86 @@
+{
+  "query": "時薪210",
+  "salary_intent": {
+    "salary_type": "hourly",
+    "target": 210.0,
+    "comparator": "at_least"
+  },
+  "jobs_covering_range_without_literal_number": 545,
+  "found_before_fix": 147,
+  "found_after_fix": 545,
+  "recall_gain_jobs": 398,
+  "recall_before_fix_pct": 26.97,
+  "recall_after_fix_pct": 100.0,
+  "sample_recovered_jobs": [
+    {
+      "id": "91272678",
+      "title": "#️⃣周休二日開缺！近長庚機捷A8站#️⃣ 物流理貨員 無經驗可 快速上班",
+      "salary": "時薪 · 216 · 234",
+      "salary_min": 216.0,
+      "salary_max": 234.0
+    },
+    {
+      "id": "98782990",
+      "title": "(Home-based) Part-time English Teacher for Kids needed",
+      "salary": "時薪 · 300 · 450",
+      "salary_min": 300.0,
+      "salary_max": 450.0
+    },
+    {
+      "id": "98713305",
+      "title": "(儲備)特約臨場服務護理師(雲嘉南地區)",
+      "salary": "時薪 · 700 · 1000",
+      "salary_min": 700.0,
+      "salary_max": 1000.0
+    },
+    {
+      "id": "99092693",
+      "title": "(全職)居家照顧服務員-桃園區",
+      "salary": "時薪 · 200 · 300",
+      "salary_min": 200.0,
+      "salary_max": 300.0
+    },
+    {
+      "id": "132133254",
+      "title": "(六福村)鐵工",
+      "salary": "時薪 · 250 · 300",
+      "salary_min": 250.0,
+      "salary_max": 300.0
+    },
+    {
+      "id": "112950581",
+      "title": "(兼職)現場燈控人員-台中頂級夜店ALTA(上班時間:09:30PM-05:00AM)",
+      "salary": "時薪 · 196 · 300",
+      "salary_min": 196.0,
+      "salary_max": 300.0
+    },
+    {
+      "id": "92190982",
+      "title": "(兼職)現場燈控人員-台北市東區頂級夜店OMNI(09:30PM-05:00AM)",
+      "salary": "時薪 · 190 · 300",
+      "salary_min": 190.0,
+      "salary_max": 300.0
+    },
+    {
+      "id": "132524112",
+      "title": "(兼職工讀) APCS課程講師",
+      "salary": "時薪 · 650 · ",
+      "salary_min": 650.0,
+      "salary_max": 0.0
+    },
+    {
+      "id": "132516922",
+      "title": "(兼職工讀) C/C++課程講師",
+      "salary": "時薪 · 650 · ",
+      "salary_min": 650.0,
+      "salary_max": 0.0
+    },
+    {
+      "id": "85203063",
+      "title": "(兼職工讀) Java 課程講師",
+      "salary": "時薪 · 700 · ",
+      "salary_min": 700.0,
+      "salary_max": 0.0
+    }
+  ]
+}
