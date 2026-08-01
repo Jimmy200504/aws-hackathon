@@ -302,8 +302,9 @@ L5 表還沒給。驗證機制已經驗證過可用：`scripts/mine_region_alias
 1. **`桃園_`（後面非漢字）n=8,235、p=78.35% 仍在需判斷帶。** 這是 `桃園)`、`桃園|` 這類，量很大且未解。
 2. **L4 跨縣市區對沒算。** 通勤走廊（如新竹市→新北市在 L2 有 163 vs 6）在 L4 沒有對應資料。
 3. **`shortcut` 邊無法用這份資料驗證。** 搜尋日誌是 2026-06-01~06-07，規劃書標的淡江大橋通車日是 2026-05-12，**整個資料窗都在通車後**，沒有 before/after 可比。淡水是八里第一名鄰居這件事與大橋已通車一致，但不構成證明。
-4. **`.gitattributes` 缺失。** `scripts/verify_release.py` 在 Windows 上 25 個 manifest hash 有 19 個 mismatch，因為 `core.autocrlf=true`。CRLF→LF 正規化後 hash 精確重現。不影響 geo graph，但發布前要修。
-5. **本分支五個 commit 都未推送。**
+4. **本分支的 commit 都未推送。**
+
+已解決：`.gitattributes` 缺失導致 `scripts/verify_release.py` 在 Windows 上 19/25 個 hash mismatch。已加入 `* text=auto eol=lf`，驗證器現在 89/89 全過。
 
 ---
 

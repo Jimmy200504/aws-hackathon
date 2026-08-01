@@ -1,0 +1,19 @@
+# scripts/verify_release.py hashes the exact bytes of every released artifact,
+# and release-manifest.json records the LF bytes that are committed. With
+# core.autocrlf=true and no attributes file, a Windows checkout inflates those
+# files to CRLF, so the audit reported 19 of its 25 hashes as mismatched while
+# the repository itself was intact: the blob in HEAD already matched. Pinning
+# the checkout to LF makes the working tree byte-identical to the committed
+# blob on every platform, which is what the manifest is asserting.
+#
+# Every tracked blob is LF-only today, so this changes no content. It also
+# protects the six .sh files, which break outright when checked out with CRLF.
+* text=auto eol=lf
+
+# Byte-audited models and other binaries must never reach the text filter.
+# demo-screenshot.png happens to contain CR LF byte pairs inside its image
+# data, which is exactly the case content detection should not have to guess.
+*.ubj binary
+*.png binary
+*.mp4 binary
+*.zip binary
