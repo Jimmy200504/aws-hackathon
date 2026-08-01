@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import heapq
+import inspect
 import json
 import logging
 import math
@@ -72,6 +73,14 @@ def lexical_units(text: str | None) -> set[str]:
         if len(run) > 2:
             parts.update(run[i : i + 3] for i in range(len(run) - 2))
     return parts
+
+
+def signed_match_score(value: float, reward: float, penalty: float) -> float:
+    if value > 0:
+        return reward
+    if value < 0:
+        return penalty
+    return 0.0
 
 
 def _as_codes(value: Any) -> list[str]:
@@ -155,6 +164,7 @@ class SkillWeaveRanker:
         )
         self.alias_to_skill: dict[str, str] = {}
         self.alias_to_skills: dict[str, list[str]] = {}
+        self.skill_blocked_phrases: dict[str, tuple[str, ...]] = {}
         for skill_id, skill in self.skills.items():
             aliases = set(skill.get("aliases", []))
             aliases.add(skill.get("label", skill_id))
@@ -164,6 +174,13 @@ class SkillWeaveRanker:
                 if key:
                     self.alias_to_skill[key] = skill_id
                     self.alias_to_skills.setdefault(key, []).append(skill_id)
+            blocked_phrases = tuple(
+                normalized
+                for phrase in skill.get("blocked_phrases", [])
+                if (normalized := normalize(phrase))
+            )
+            if blocked_phrases:
+                self.skill_blocked_phrases[skill_id] = blocked_phrases
         alias_alternatives = "|".join(
             (
                 rf"(?<![a-z0-9.+#]){re.escape(alias)}(?![a-z0-9.+#])"
@@ -211,6 +228,11 @@ class SkillWeaveRanker:
         for match in self._alias_pattern.finditer(normalized_value):
             alias = normalize(match.group(0))
             for skill_id in self.alias_to_skills.get(alias, []):
+                if any(
+                    phrase in normalized_value
+                    for phrase in self.skill_blocked_phrases.get(skill_id, ())
+                ):
+                    continue
                 resolved.append((len(alias), skill_id))
         # Longest aliases win and canonical nodes are unique.
         seen: set[str] = set()
@@ -247,7 +269,11 @@ class SkillWeaveRanker:
         return names
 
     def _graph_feature(
-        self, intent: QueryIntent, job: dict[str, Any], include_graph: bool
+        self,
+        intent: QueryIntent,
+        job: dict[str, Any],
+        include_graph: bool,
+        external_relations: dict[str, dict[str, dict[str, Any]]] | None = None,
     ) -> tuple[float, list[dict[str, Any]], list[str], dict[str, float]]:
         component_names = ("technical", "seed_occupation", "duty_occupation")
         empty_components = {
@@ -282,10 +308,16 @@ class SkillWeaveRanker:
                 direct_matches.append(query_skill)
                 traces.append(
                     {
-                        "path": [f"Query:{intent.raw}", f"Skill:{query_skill}", f"Job:{job['id']}"],
+                        "path": [
+                            f"Query:{intent.raw}",
+                            f"Skill:{query_skill}",
+                            f"Job:{job['id']}",
+                        ],
                         "edges": ["RESOLVES_TO", "REQUIRES"],
                         "weight": round(confidence, 3),
-                        "evidence": job.get("skill_evidence", {}).get(query_skill, "structured field"),
+                        "evidence": job.get("skill_evidence", {}).get(
+                            query_skill, "structured field"
+                        ),
                         "provenance": job.get(
                             "skill_provenance", {}
                         ).get(
@@ -297,9 +329,15 @@ class SkillWeaveRanker:
                     }
                 )
                 continue
-            related = self.skills.get(query_skill, {}).get("related", {})
+            related: dict[str, Any] = (
+                external_relations.get(query_skill, {})
+                if external_relations is not None
+                else self.skills.get(query_skill, {}).get("related", {})
+            )
             for candidate_skill in job_skills:
-                weight = float(related.get(candidate_skill, 0.0))
+                relation = related.get(candidate_skill, 0.0)
+                relation_meta = relation if isinstance(relation, dict) else {}
+                weight = float(relation_meta.get("weight", 0.0) if relation_meta else relation)
                 if weight <= 0:
                     continue
                 contribution = 2.6 * weight
@@ -308,6 +346,11 @@ class SkillWeaveRanker:
                 )
                 if contribution > best_related:
                     best_related = contribution
+                    relation_evidence = relation_meta.get("evidence")
+                    if not relation_evidence:
+                        relation_evidence = self.skills.get(query_skill, {}).get(
+                            "relation_evidence", {}
+                        ).get(candidate_skill, "validated ontology relation")
                     best_related_trace = {
                         "path": [
                             f"Query:{intent.raw}",
@@ -315,11 +358,22 @@ class SkillWeaveRanker:
                             f"Skill:{candidate_skill}",
                             f"Job:{job['id']}",
                         ],
-                        "edges": ["RESOLVES_TO", "RELATED_TO", "REQUIRES"],
+                        "edges": [
+                            "RESOLVES_TO",
+                            relation_meta.get("relation_type", "RELATED_TO"),
+                            "REQUIRES",
+                        ],
                         "weight": round(weight, 3),
-                        "evidence": self.skills.get(query_skill, {}).get("relation_evidence", {}).get(
-                            candidate_skill, "validated ontology relation"
+                        "edge_id": relation_meta.get("edge_id"),
+                        "relation_confidence": relation_meta.get("confidence"),
+                        "support_jobs": relation_meta.get("support_jobs"),
+                        "support_companies": relation_meta.get("support_companies"),
+                        "rules_version": relation_meta.get("rules_version"),
+                        "corpus_hash": relation_meta.get("corpus_hash"),
+                        "provenance": relation_meta.get(
+                            "provenance", "reviewed_statistical_relation"
                         ),
+                        "evidence": relation_evidence,
                     }
         if best_related_trace is not None:
             traces.append(best_related_trace)
@@ -356,6 +410,7 @@ class SkillWeaveRanker:
         intent: QueryIntent,
         include_graph: bool,
         behavior_snapshot_day: str | None = None,
+        external_relations: dict[str, dict[str, dict[str, Any]]] | None = None,
     ) -> tuple[float, dict[str, float], list[dict[str, Any]], list[str]]:
         job = self.jobs[index]
         fields = self._job_norm[index]
@@ -367,6 +422,7 @@ class SkillWeaveRanker:
             intent,
             include_graph,
             behavior_snapshot_day,
+            external_relations,
         )
 
     def _score_job(
@@ -377,6 +433,7 @@ class SkillWeaveRanker:
         intent: QueryIntent,
         include_graph: bool,
         behavior_snapshot_day: str | None = None,
+        external_relations: dict[str, dict[str, dict[str, Any]]] | None = None,
     ) -> tuple[float, dict[str, float], list[dict[str, Any]], list[str]]:
         q = intent.normalized
 
@@ -385,7 +442,9 @@ class SkillWeaveRanker:
         category_phrase = 1.0 if q and q in fields["category"] else 0.0
         description_phrase = 1.0 if q and q in fields["description"] else 0.0
         overlap = len(intent.units & job_units) / max(1, len(intent.units))
-        title_overlap = len(intent.units & lexical_units(fields["title"])) / max(1, len(intent.units))
+        title_overlap = len(
+            intent.units & lexical_units(fields["title"])
+        ) / max(1, len(intent.units))
 
         lexical = (
             18.0 * exact_title
@@ -399,14 +458,25 @@ class SkillWeaveRanker:
         wanted_locations = self._filter_names(intent.location_codes, self.locations)
         location_match = 0.0
         if wanted_locations:
-            location_match = 1.0 if any(name in fields["city"] for name in wanted_locations) else -1.0
+            location_match = (
+                1.0
+                if any(name in fields["city"] for name in wanted_locations)
+                else -1.0
+            )
 
         wanted_duties = self._filter_names(intent.duty_codes, self.duties)
         duty_match = 0.0
         if wanted_duties:
             duty_match = (
                 1.0
-                if any(name and (name in fields["category"] or name in fields["title"]) for name in wanted_duties)
+                if any(
+                    name
+                    and (
+                        name in fields["category"]
+                        or name in fields["title"]
+                    )
+                    for name in wanted_duties
+                )
                 else -0.7
             )
 
@@ -446,7 +516,7 @@ class SkillWeaveRanker:
                     salary_match = 1.0 if covers else -1.0
 
         graph_raw, traces, direct_matches, graph_components = self._graph_feature(
-            intent, job, include_graph
+            intent, job, include_graph, external_relations
         )
         behavior_source = self.behavior_graph
         if behavior_snapshot_day:
@@ -539,10 +609,10 @@ class SkillWeaveRanker:
             "description_phrase": description_phrase,
             "query_unit_overlap": round(overlap, 4),
             "title_unit_overlap": round(title_overlap, 4),
-            "location": round(2.8 if location_match > 0 else -16.0 if location_match < 0 else 0.0, 4),
-            "duty": round(2.4 if duty_match > 0 else -10.0 if duty_match < 0 else 0.0, 4),
-            "remote": round(2.4 if remote_match > 0 else -1.4 if remote_match < 0 else 0.0, 4),
-            "salary": round(2.4 if salary_match > 0 else -1.4 if salary_match < 0 else 0.0, 4),
+            "location": signed_match_score(location_match, 2.8, -16.0),
+            "duty": signed_match_score(duty_match, 2.4, -10.0),
+            "remote": signed_match_score(remote_match, 2.4, -1.4),
+            "salary": signed_match_score(salary_match, 2.4, -1.4),
             "is_remote": float(job.get("is_remote", False)),
             "salary_min": float(job.get("salary_min", 0.0) or 0.0),
             "salary_max": float(job.get("salary_max", 0.0) or 0.0),
@@ -745,6 +815,9 @@ class SkillWeaveRanker:
         include_graph: bool = True,
         candidate_ids: set[str] | None = None,
         normalized_query: str | None = None,
+        resolved_skill_ids: Iterable[str] | None = None,
+        external_relations: dict[str, dict[str, dict[str, Any]]] | None = None,
+        structured_intent: Any = None,
     ) -> dict[str, Any]:
         intent = self.parse_intent(
             query,
@@ -752,6 +825,13 @@ class SkillWeaveRanker:
             duty_code,
             normalized_query=normalized_query,
         )
+        if resolved_skill_ids is not None:
+            combined = tuple(dict.fromkeys((*resolved_skill_ids, *intent.skills)))[:16]
+            intent = QueryIntent(
+                intent.raw, intent.normalized, intent.units, combined,
+                intent.location_codes, intent.duty_codes,
+                intent.wants_remote, intent.salary_intent,
+            )
         if not intent.normalized:
             return {
                 "intent": intent,
@@ -760,19 +840,81 @@ class SkillWeaveRanker:
                 "degraded_components": [],
             }
         limit = max(1, min(int(top_k), 100))
+        stage_one, candidate_source, degraded_components = self._collect_stage_one(
+            intent,
+            structured_intent=structured_intent,
+            limit=limit,
+            include_graph=include_graph,
+            candidate_ids=candidate_ids,
+            external_relations=external_relations,
+        )
+        # Attribute and brand queries (現領, 萊爾富) name nothing that occurs in
+        # job text, so the first pass comes back thin. Retry with the taxonomy
+        # expansion only in that case: a query that already retrieves well must
+        # not have five duty labels diluting its title-phrase evidence.
+        expansion = getattr(structured_intent, "recall_expansion", "") or ""
+        if expansion and len(stage_one) < limit:
+            rescue_intent = self.parse_intent(
+                query, location_code, duty_code, normalized_query=expansion
+            )
+            rescue, rescue_source, rescue_degraded = self._collect_stage_one(
+                rescue_intent,
+                structured_intent=structured_intent,
+                limit=limit,
+                include_graph=include_graph,
+                candidate_ids=candidate_ids,
+                external_relations=external_relations,
+            )
+            seen = {item[1] for item in stage_one}
+            stage_one = stage_one + [item for item in rescue if item[1] not in seen]
+            candidate_source = f"{rescue_source}+taxonomy_expansion"
+            degraded_components = list(
+                dict.fromkeys(degraded_components + rescue_degraded)
+            )
+        ranked = self._rerank(stage_one, limit=limit, include_graph=include_graph)
+        return self._assemble(
+            intent, ranked, candidate_source, degraded_components
+        )
+
+    def _collect_stage_one(
+        self,
+        intent: QueryIntent,
+        *,
+        structured_intent: Any,
+        limit: int,
+        include_graph: bool,
+        candidate_ids: set[str] | None,
+        external_relations: dict[str, dict[str, dict[str, Any]]] | None,
+    ) -> tuple[list[Any], str, list[str]]:
         degraded_components: list[str] = []
         external_candidates: list[dict[str, Any]] | None = None
         if self.candidate_retriever is not None and candidate_ids is None:
             try:
-                external_candidates = self.candidate_retriever.retrieve(
+                retrieve = self.candidate_retriever.retrieve
+                parameters = inspect.signature(retrieve).parameters
+                supports_kwargs = any(
+                    parameter.kind is inspect.Parameter.VAR_KEYWORD
+                    for parameter in parameters.values()
+                )
+                optional_retrieval_kwargs = {
+                    "wants_remote": intent.wants_remote,
+                    "salary_intent": intent.salary_intent,
+                    "intent": structured_intent,
+                }
+                if not supports_kwargs:
+                    optional_retrieval_kwargs = {
+                        name: value
+                        for name, value in optional_retrieval_kwargs.items()
+                        if name in parameters
+                    }
+                external_candidates = retrieve(
                     intent.normalized,
                     limit=max(200, limit),
                     location_names=self._filter_names(
                         intent.location_codes, self.locations
                     ),
                     duty_names=self._filter_names(intent.duty_codes, self.duties),
-                    wants_remote=intent.wants_remote,
-                    salary_intent=intent.salary_intent,
+                    **optional_retrieval_kwargs,
                 )
             except Exception as exc:
                 # Keep the API contract alive if full-corpus retrieval is
@@ -794,7 +936,8 @@ class SkillWeaveRanker:
                 seen_ids.add(job_id)
                 fields, job_units = self._normalized_job_fields(job)
                 score, features, traces, direct = self._score_job(
-                    job, fields, job_units, intent, include_graph
+                    job, fields, job_units, intent, include_graph,
+                    external_relations=external_relations,
                 )
                 has_direct_candidate_evidence = bool(
                     set(intent.skills) & set(job.get("skills", []))
@@ -830,7 +973,8 @@ class SkillWeaveRanker:
                     if candidate_ids is not None and job["id"] not in candidate_ids:
                         continue
                     score, features, traces, direct = self._score(
-                        index, intent, include_graph
+                        index, intent, include_graph,
+                        external_relations=external_relations,
                     )
                     # A graph neighbor is a feature, not sufficient candidate evidence.
                     # Require lexical overlap, an exact canonical skill match, or a
@@ -853,9 +997,15 @@ class SkillWeaveRanker:
                     elif item[:2] > heap[0][:2]:
                         heapq.heapreplace(heap, item)
             stage_one = sorted(heap, key=lambda item: (-item[0], item[1]))
-        ranked = self._rerank(
-            stage_one, limit=limit, include_graph=include_graph
-        )
+        return stage_one, candidate_source, degraded_components
+
+    def _assemble(
+        self,
+        intent: QueryIntent,
+        ranked: list[Any],
+        candidate_source: str,
+        degraded_components: list[str],
+    ) -> dict[str, Any]:
         results: list[dict[str, Any]] = []
         for rank, (score, _, job, features, traces, direct) in enumerate(ranked, 1):
             matched_labels = [

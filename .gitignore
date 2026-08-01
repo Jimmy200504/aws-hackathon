@@ -8,6 +8,7 @@ __pycache__/
 # Organizer-provided data must not be published.
 data/dataset/*.csv
 docs/*.pdf
+docs/Supported AWS Services List*.csv
 
 # Rebuildable / potentially sensitive evaluation material.
 artifacts/benchmark-index.json
@@ -15,6 +16,19 @@ artifacts/temporal-eval.json
 artifacts/ltr/
 artifacts/quality/
 artifacts/bedrock-pilot/
+artifacts/quality-v2/
+artifacts/skill-graph-canary/
+artifacts/skill-graph-full/
+artifacts/skill-graph-review/
+artifacts/skill-graph-full-v2/extraction/
+artifacts/skill-graph-full-v2/relations/
+artifacts/skill-graph-full-v2/resolved/
+artifacts/skill-graph-full-v2/pipeline-state.json
+artifacts/skill-graph-full-v2/release/runs/*/*/edges/
+artifacts/skill-graph-full-v2/release/runs/*/*/extraction/
+artifacts/skill-graph-full-v2/release/runs/*/*/neptune/
+artifacts/skill-graph-full-v2/release/runs/*/*/nodes/
+artifacts/skill-graph-full-v2/release/runs/*/*/review/
 artifacts/models/*
 !artifacts/models/ltr-graph-final.ubj
 !artifacts/models/ltr-graph-final.manifest.json
@@ -33,3 +47,7 @@ cdk.out/
 dist/
 snapshots/
 *.log
+.agents/
+
+# Derived from organizer search logs; deployed separately as an online cache.
+config/query-intents.json

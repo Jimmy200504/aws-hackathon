@@ -26,16 +26,27 @@ Parameters:
     Type: Number
     Default: 0
     MinValue: 0
-    Description: Full-corpus document count disclosed by health and metadata APIs
   OpenSearchService:
     Type: String
     Default: none
     AllowedValues: [none, aoss, es]
-    Description: SigV4 service for the configured OpenSearch endpoint
   BedrockQueryModelId:
     Type: String
-    Default: us.anthropic.claude-sonnet-4-6
+    Default: global.anthropic.claude-haiku-4-5-20251001-v1:0
     Description: Bedrock model or inference profile used for online query normalization
+  NeptuneGraphId:
+    Type: String
+    Default: ""
+    Description: Optional blue/green Neptune Analytics graph identifier
+  NeptuneGraphRegion:
+    Type: String
+    Default: us-east-1
+  GraphVersion:
+    Type: String
+    Default: evaluation-cutoff-embedded
+  SkillAliasIndex:
+    Type: String
+    Default: skillweave-skill-alias-v1
 
 Rules:
   OpenSearchParametersTogether:
@@ -56,12 +67,14 @@ Conditions:
     - !Not [!Equals [!Ref OpenSearchEndpoint, ""]]
     - !Not [!Equals [!Ref OpenSearchCollectionArn, ""]]
   UseProvisionedOpenSearch: !Equals [!Ref OpenSearchService, es]
+  UseNeptuneGraph: !Not
+    - !Equals [!Ref NeptuneGraphId, ""]
 
 Globals:
   Function:
     Runtime: python3.13
     Architectures: [arm64]
-    MemorySize: 2048
+    MemorySize: 4096
     Timeout: 10
     Tracing: Active
     Environment:
@@ -69,12 +82,20 @@ Globals:
         INDEX_PATH: /var/task/artifacts/demo-index.json
         LTR_MODEL_PATH: /var/task/artifacts/models/ltr-quality-final.trees.json
         OPENSEARCH_ENDPOINT: !Ref OpenSearchEndpoint
+        OPENSEARCH_SERVICE: !Ref OpenSearchService
         OPENSEARCH_INDEX: !Ref OpenSearchIndex
         OPENSEARCH_DOCUMENT_COUNT: !Ref OpenSearchDocumentCount
-        OPENSEARCH_SERVICE: !Ref OpenSearchService
         OPENSEARCH_TIMEOUT_SECONDS: "4.0"
         BEDROCK_QUERY_MODEL_ID: !Ref BedrockQueryModelId
-        BEDROCK_QUERY_MAX_TOKENS: "128"
+        BEDROCK_QUERY_MAX_TOKENS: "4000"
+        BEDROCK_QUERY_MAX_BATCH: "10"
+        BEDROCK_QUERY_MAX_WAIT_SECONDS: "1.0"
+        BEDROCK_QUERY_DEADLINE_SECONDS: "2.5"
+        NEPTUNE_GRAPH_ID: !Ref NeptuneGraphId
+        NEPTUNE_GRAPH_REGION: !Ref NeptuneGraphRegion
+        GRAPH_VERSION: !Ref GraphVersion
+        SKILL_ALIAS_INDEX: !Ref SkillAliasIndex
+        GRAPH_QUERY_TIMEOUT_MS: "500"
 
 Resources:
   HttpApi:
@@ -129,6 +150,14 @@ Resources:
                   Action:
                     - aoss:APIAccessAll
                   Resource: !Ref OpenSearchCollectionArn
+          - !Ref AWS::NoValue
+        - !If
+          - UseNeptuneGraph
+          - Statement:
+              - Effect: Allow
+                Action:
+                  - neptune-graph:ReadDataViaQuery
+                Resource: !Sub arn:${AWS::Partition}:neptune-graph:${NeptuneGraphRegion}:${AWS::AccountId}:graph/${NeptuneGraphId}
           - !Ref AWS::NoValue
       Events:
         Root:

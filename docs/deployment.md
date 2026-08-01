@@ -286,7 +286,7 @@ metadata、graph on/off、trace provenance，以及 30 個 concurrency-5 搜尋�
 Compact Lambda 是交付安全網，不冒充完整 production architecture。升級順序：
 
 1. S3 + Glue + Step Functions temporal manifest。
-2. Bedrock batch structured extraction + evidence validator。
+2. Deterministic exact extraction + evidence/negation validator（零 LLM/embedding request）。
 3. OpenSearch hybrid index。
 4. Neptune graph import/traversal。
 5. SageMaker Unbiased LambdaMART endpoint。

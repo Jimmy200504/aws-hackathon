@@ -465,7 +465,7 @@ class ReleaseVerifier:
             self.add(group, check_id, condition, success, failure)
 
     def check_bedrock_pilot(self) -> None:
-        group = "G16_bedrock_pilot"
+        group = "G16_historical_bedrock_pilot"
         report = self.load_json("reports/bedrock-pilot.json")
         metadata = report.get("metadata", {})
         records = report.get("records", {})
@@ -476,8 +476,10 @@ class ReleaseVerifier:
                 "G16.1",
                 metadata.get("schema") == "skillweave-bedrock-pilot-v1"
                 and metadata.get("analysis_status")
-                == "bounded_real_bedrock_train_only_pilot",
-                "Real Bedrock pilot schema and bounded status are registered.",
+                == "bounded_real_bedrock_train_only_pilot"
+                and metadata.get("historical_experiment") is True
+                and metadata.get("production_graph_input") is False,
+                "Historical Bedrock pilot schema and bounded status are registered.",
                 "Bedrock pilot metadata is missing or overclaims production scale.",
             ),
             (
@@ -497,7 +499,7 @@ class ReleaseVerifier:
                     )
                 )
                 > 0,
-                "Bedrock produced substantial validated mentions and quarantined relations.",
+                "Historical pilot records substantial validated mentions and quarantined relations.",
                 "Bedrock graph evidence is too small.",
             ),
             (
@@ -519,6 +521,70 @@ class ReleaseVerifier:
             ),
         ]
         for check_id, condition, success, failure in checks:
+            self.add(group, check_id, condition, success, failure)
+
+    def check_deterministic_graph_build(self) -> None:
+        group = "G17_deterministic_graph_build"
+        inventory = self.load_json("reports/deterministic-corpus-inventory.json")
+        canary = self.load_json("reports/deterministic-graph-canary.json")
+        config = self.load_json("config/skill_graph.pipeline.json")
+        manifest = self.load_json("release-manifest.json")
+        graph_build = manifest.get("graph_build", {})
+        extraction = config.get("extraction", {})
+        workflow = (self.root / "infra/graph-pipeline.yaml").read_text(encoding="utf-8")
+        conditions = [
+            (
+                "G17.1",
+                inventory.get("processed") == 1_218_635
+                and inventory.get("cutoff_eligible") == 967_377
+                and inventory.get("invalid_timestamps") == 0,
+                "Full-corpus and cutoff inventory counts match the release baseline.",
+                "Deterministic corpus inventory counts are incomplete or changed.",
+            ),
+            (
+                "G17.2",
+                extraction.get("extractor") == "deterministic-v1"
+                and extraction.get("model_id") is None
+                and extraction.get("llm_requests") == 0
+                and extraction.get("embedding_requests") == 0,
+                "Offline graph extraction declares zero model and embedding requests.",
+                "Offline graph extraction still declares a model request path.",
+            ),
+            (
+                "G17.3",
+                all(stage in workflow for stage in (
+                    "DeterministicExtract", "ResolveExactAliases",
+                    "BuildStatisticalRelations", "ExportAndValidate",
+                ))
+                and "bedrock:InvokeModel" not in workflow
+                and "ClassifyRelations" not in workflow,
+                "Graph workflow has four deterministic stages and no Bedrock worker permission.",
+                "Graph workflow still contains a model stage or permission.",
+            ),
+            (
+                "G17.4",
+                graph_build.get("default_scope") == "evaluation-cutoff"
+                and graph_build.get("neptune_release_status")
+                in {"pending_full_release_gates", "release_gates_passed", "serving"},
+                "Release manifest defaults to cutoff and records a gated graph rollout state.",
+                "Graph release scope/status is missing or unsafe.",
+            ),
+            (
+                "G17.5",
+                canary.get("llm_requests") == 0
+                and canary.get("embedding_requests") == 0
+                and all(
+                    scope.get("candidate_nodes_in_neptune") == 0
+                    and scope.get("all_edges_have_provenance") is True
+                    and scope.get("referential_integrity") is True
+                    for scope in canary.get("scopes", {}).values()
+                )
+                and set(canary.get("scopes", {})) == {"evaluation-cutoff", "latest"},
+                "Real-data dual-scope canary has provenance, integrity, and candidate isolation.",
+                "Deterministic graph canary is missing a publication invariant.",
+            ),
+        ]
+        for check_id, condition, success, failure in conditions:
             self.add(group, check_id, condition, success, failure)
 
     def check_failed_holdout(self, report: dict[str, Any] | None = None) -> None:
@@ -738,18 +804,20 @@ class ReleaseVerifier:
         expected_blockers = {
             name for name in mandatory if requirements.get(name) is not True
         }
-        bedrock_requirement = (
-            "R2b_real_train_only_bedrock_pilot_executed"
-            if "R2b_real_train_only_bedrock_pilot_executed"
-            in requirements
-            else "R2a_full_train_only_bedrock_graph_executed"
+        graph_requirement = (
+            "R2a_full_deterministic_graph_release_gates_passed"
+            if "R2a_full_deterministic_graph_release_gates_passed" in requirements
+            else (
+                "R2b_real_train_only_bedrock_pilot_executed"
+                if "R2b_real_train_only_bedrock_pilot_executed" in requirements
+                else "R2a_full_train_only_bedrock_graph_executed"
+            )
         )
-        if requirements.get(bedrock_requirement) is not True:
-            expected_blockers.add(bedrock_requirement)
+        if requirements.get(graph_requirement) is not True:
+            expected_blockers.add(graph_requirement)
         local_required = {
             "R1_local_live_demo",
             "R1b_five_minute_video_artifact",
-            "R2_genai_method_and_failure_modes",
             "R3_data_application_explained",
             "R4_system_graph_schema_and_trace",
             "R5_aws_architecture",
@@ -763,10 +831,17 @@ class ReleaseVerifier:
             "K1_kiro_activity_evidence",
             "S1_copy_ready_submission_packet",
         }
+        local_required.add(
+            "R2_deterministic_graph_method_and_failure_modes"
+            if "R2_deterministic_graph_method_and_failure_modes" in requirements
+            else "R2_genai_method_and_failure_modes"
+        )
         if "R2b_real_train_only_bedrock_pilot_executed" in requirements:
             local_required.add(
                 "R2b_real_train_only_bedrock_pilot_executed"
             )
+        if "R2b_historical_bedrock_pilot_archived" in requirements:
+            local_required.add("R2b_historical_bedrock_pilot_archived")
         conditions = [
             (
                 "G11.1",
@@ -1043,6 +1118,7 @@ class ReleaseVerifier:
             self.check_quality_confirmations,
             self.check_portable_ltr,
             self.check_bedrock_pilot,
+            self.check_deterministic_graph_build,
             self.check_failed_holdout,
             self.check_load_smoke,
             self.check_graph_coverage,

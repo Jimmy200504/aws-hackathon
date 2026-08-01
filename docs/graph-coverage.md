@@ -36,6 +36,6 @@ false`，release verifier 會在有人改寫該欄位時失敗。
 
 目前本機 benchmark 的 graph builder 是 `reviewed-bootstrap-fixture`。上述結果
 證明已實作的 graph feature family 在有信心覆蓋時有價值，但尚不能單獨證明
-Amazon Bedrock extraction 的增量。下一個合法改善方向是只在 train-only JD
-跑 Bedrock batch、通過 evidence validator 後擴大 relevant-row coverage，再用
+reviewed deterministic vocabulary 的增量。下一個合法改善方向是人工審閱
+structured surface candidates、通過 collision/evidence validator 後擴大 coverage，再用
 新的預註冊 holdout 驗證；不可在目前 confirmation 上繼續調 gate。

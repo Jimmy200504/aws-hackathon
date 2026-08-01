@@ -24,7 +24,7 @@
 
 講稿：
 
-> LLM 的核心工作發生在索引前：它把 JD 中不同寫法正規化成 AWS、Docker、Kubernetes nodes，並保存原文 evidence。線上只走一跳、帶權、可追溯的路徑；模型只讀 train-only graph 和行為先驗，沒有通過 evidence validator 的靜態邊不會發布。
+> 離線 extractor 不使用 LLM：它只把 JD 中 reviewed exact aliases 對應成 canonical nodes，並保存原文 evidence。未知詞先進人工審閱佇列。線上只走一跳、帶權、可追溯的路徑；沒有通過 evidence validator 的靜態邊不會發布。
 
 顯示：
 
@@ -55,7 +55,7 @@ weight + evidence + edge type
 
 講稿：
 
-> Offline 由 Step Functions 執行 temporal gate、Bedrock batch structured extraction 與 evidence validation；OpenSearch 做 hybrid candidates，Neptune 聚合一跳 graph feature，SageMaker Unbiased LambdaMART 重排。任一服務超時仍回合法 fallback ranking。
+> Offline 由 Step Functions 執行 DeterministicExtract、ResolveExactAliases、BuildStatisticalRelations 與 ExportAndValidate；OpenSearch 做全量 candidates，Neptune 聚合一跳 graph feature，LambdaMART 重排。線上 Bedrock 只正規化 Query，任一服務超時仍回合法 fallback ranking。
 
 ## 4:15–4:45 — 商業價值
 

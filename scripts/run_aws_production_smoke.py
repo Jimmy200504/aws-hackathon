@@ -110,7 +110,20 @@ def percentile(values: list[float], quantile: float) -> float:
     return round(ordered[index], 2)
 
 
+def summarize_latencies(values: list[float]) -> dict[str, float | None]:
+    if not values:
+        return {name: None for name in ("min", "p50", "p95", "p99", "max")}
+    return {
+        "min": round(min(values), 2),
+        "p50": round(statistics.median(values), 2),
+        "p95": percentile(values, 0.95),
+        "p99": percentile(values, 0.99),
+        "max": round(max(values), 2),
+    }
+
+
 def run_load_request(base_url: str, index: int) -> dict[str, Any]:
+    graph_requested = index % 2 == 0
     try:
         result = request(
             base_url,
@@ -118,16 +131,20 @@ def run_load_request(base_url: str, index: int) -> dict[str, Any]:
             {
                 "query": QUERIES[index % len(QUERIES)],
                 "top_k": 10,
-                "use_graph": index % 2 == 0,
+                "use_graph": graph_requested,
             },
         )
         body = json_body(result)
         return {
             "status": result["status"],
+            "graph_requested": graph_requested,
             "latency_ms": result["latency_ms"],
+            "service_latency_ms": body.get("meta", {}).get("latency_ms"),
             "top_10": search_contract(body),
             "index_version": body.get("meta", {}).get("index_version"),
             "ranking_model": body.get("meta", {}).get("ranking_model"),
+            "graph_backend": body.get("meta", {}).get("graph_backend"),
+            "graph_version": body.get("meta", {}).get("graph_version"),
             "candidate_source": body.get("meta", {}).get("candidate_source"),
             "degraded_components": body.get("meta", {}).get(
                 "degraded_components"
@@ -137,10 +154,14 @@ def run_load_request(base_url: str, index: int) -> dict[str, Any]:
     except Exception as exc:
         return {
             "status": None,
+            "graph_requested": graph_requested,
             "latency_ms": None,
+            "service_latency_ms": None,
             "top_10": False,
             "index_version": None,
             "ranking_model": None,
+            "graph_backend": None,
+            "graph_version": None,
             "candidate_source": None,
             "degraded_components": None,
             "error": f"{type(exc).__name__}: {exc}",
@@ -153,6 +174,9 @@ def run_smoke(
     concurrency: int,
     *,
     require_full_corpus: bool = False,
+    require_neptune: bool = False,
+    expected_graph_version: str | None = None,
+    max_p95_ms: float = 10_000.0,
 ) -> dict[str, Any]:
     root = request(base_url, "")
     css = request(base_url, "styles.css")
@@ -297,6 +321,19 @@ def run_smoke(
                 )
             )
         ),
+        "neptune_backend_when_required": (
+            not require_neptune
+            or (
+                health.get("graph_backend") == "neptune_analytics"
+                and graph_on.get("meta", {}).get("graph_backend")
+                == "neptune_analytics"
+            )
+        ),
+        "graph_version_when_required": (
+            expected_graph_version is None
+            or graph_on.get("meta", {}).get("graph_version")
+            == expected_graph_version
+        ),
     }
 
     started = time.perf_counter()
@@ -315,6 +352,11 @@ def run_smoke(
         for result in results
         if result["latency_ms"] is not None
     ]
+    service_latencies = [
+        float(result["service_latency_ms"])
+        for result in results
+        if result["service_latency_ms"] is not None
+    ]
     http_200 = sum(result["status"] == 200 for result in results)
     top_10 = sum(result["top_10"] is True for result in results)
     matching_index = sum(
@@ -324,6 +366,15 @@ def run_smoke(
         result["ranking_model"] == "ltr-quality-final.ubj"
         for result in results
     )
+    graph_on_results = [result for result in results if result["graph_requested"]]
+    matching_graph_backend = sum(
+        result["graph_backend"] == "neptune_analytics"
+        for result in graph_on_results
+    )
+    matching_graph_version = sum(
+        result["graph_version"] == expected_graph_version
+        for result in graph_on_results
+    )
     full_corpus_responses = sum(
         result["candidate_source"] == "opensearch_full_corpus"
         and not result["degraded_components"]
@@ -332,23 +383,21 @@ def run_smoke(
     errors = [result["error"] for result in results if result["error"]]
     load = {
         "requests": requests,
+        "graph_on_requests": len(graph_on_results),
         "concurrency": concurrency,
         "http_200": http_200,
         "top_10_responses": top_10,
         "matching_index_version": matching_index,
         "matching_ranking_model": matching_model,
+        "matching_graph_backend": matching_graph_backend,
+        "matching_graph_version": matching_graph_version,
         "full_corpus_responses": full_corpus_responses,
         "elapsed_ms": elapsed_ms,
         "throughput_requests_per_second": round(
             requests / (elapsed_ms / 1000), 2
         ),
-        "latency_ms": {
-            "min": round(min(latencies), 2) if latencies else None,
-            "p50": round(statistics.median(latencies), 2) if latencies else None,
-            "p95": percentile(latencies, 0.95) if latencies else None,
-            "p99": percentile(latencies, 0.99) if latencies else None,
-            "max": round(max(latencies), 2) if latencies else None,
-        },
+        "latency_ms": summarize_latencies(latencies),
+        "service_latency_ms": summarize_latencies(service_latencies),
         "errors": errors,
     }
     checks.update(
@@ -360,8 +409,17 @@ def run_smoke(
             "load_full_corpus_when_required": (
                 not require_full_corpus or full_corpus_responses == requests
             ),
-            "load_p95_below_timeout": (
-                bool(latencies) and percentile(latencies, 0.95) < 10_000.0
+            "load_neptune_when_required": (
+                not require_neptune
+                or matching_graph_backend == len(graph_on_results)
+            ),
+            "load_graph_version_when_required": (
+                expected_graph_version is None
+                or matching_graph_version == len(graph_on_results)
+            ),
+            "load_p95_below_threshold": (
+                bool(service_latencies)
+                and percentile(service_latencies, 0.95) < max_p95_ms
             ),
         }
     )
@@ -376,6 +434,10 @@ def run_smoke(
             "index_version": INDEX_VERSION,
             "client": "stdlib urllib; public HTTPS; no AWS session",
             "require_full_corpus": require_full_corpus,
+            "require_neptune": require_neptune,
+            "expected_graph_version": expected_graph_version,
+            "max_p95_ms": max_p95_ms,
+            "p95_gate_basis": "response.meta.latency_ms (service-side)",
         },
         "passed": all(checks.values()),
         "checks": checks,
@@ -387,6 +449,8 @@ def run_smoke(
             "candidate_source": graph_on.get("meta", {}).get(
                 "candidate_source"
             ),
+            "graph_backend": graph_on.get("meta", {}).get("graph_backend"),
+            "graph_version": graph_on.get("meta", {}).get("graph_version"),
             "degraded_components": graph_on.get("meta", {}).get(
                 "degraded_components"
             ),
@@ -426,6 +490,18 @@ def main() -> int:
         action="store_true",
         help="Fail if any request uses the embedded 12,000-job fallback",
     )
+    parser.add_argument(
+        "--require-neptune",
+        action="store_true",
+        help="Fail unless health and every graph-on request use Neptune Analytics",
+    )
+    parser.add_argument("--expected-graph-version")
+    parser.add_argument("--max-p95-ms", type=float, default=10_000.0)
+    parser.add_argument(
+        "--no-register-release-artifact",
+        action="store_true",
+        help="Do not update release-manifest.json with this smoke artifact",
+    )
     args = parser.parse_args()
     if args.requests < 1 or args.concurrency < 1:
         parser.error("--requests and --concurrency must be positive")
@@ -445,6 +521,9 @@ def main() -> int:
         args.requests,
         args.concurrency,
         require_full_corpus=args.require_full_corpus,
+        require_neptune=args.require_neptune,
+        expected_graph_version=args.expected_graph_version,
+        max_p95_ms=args.max_p95_ms,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
@@ -455,7 +534,7 @@ def main() -> int:
         relative = args.output.resolve().relative_to(ROOT).as_posix()
     except ValueError:
         relative = None
-    if relative:
+    if relative and not args.no_register_release_artifact:
         manifest.setdefault("sha256", {})[relative] = hashlib.sha256(
             args.output.read_bytes()
         ).hexdigest()

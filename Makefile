@@ -1,10 +1,10 @@
-.PHONY: demo test verify release audit coverage business sam-smoke aws-smoke video submission external-preflight index benchmark quality package opensearch-local-up opensearch-local-down full-index-local full-demo-local
+.PHONY: demo test verify release audit coverage business sam-smoke aws-smoke video submission external-preflight index benchmark quality package opensearch-local-up opensearch-local-down full-index-local full-demo-local graph-full-plan graph-full-build graph-review graph-review-score
 
 demo:
 	python3 -m app.server --port 8080
 
 test:
-	python3 -m py_compile app/*.py scripts/*.py tests/*.py
+	python3 -m py_compile app/*.py pipeline/*.py scripts/*.py tests/*.py
 	python3 -m unittest discover -s tests -v
 
 verify:
@@ -60,3 +60,15 @@ full-index-local:
 
 full-demo-local:
 	OPENSEARCH_ENDPOINT=http://127.0.0.1:9200 python3 -m app.server --port 8080
+
+graph-full-plan:
+	python3 scripts/run_full_graph_build.py --dry-run
+
+graph-full-build:
+	python3 scripts/run_full_graph_build.py
+
+graph-review:
+	python3 scripts/build_graph_review_packet.py
+
+graph-review-score:
+	python3 scripts/score_graph_review.py

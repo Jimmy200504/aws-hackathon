@@ -36,8 +36,8 @@
 
 ## 品質 gate
 
-- [ ] Bedrock 完整 train-only graph 已產出
-- [x] Bedrock bounded train-only pilot 已產出且 aggregate report 可驗證
+- [ ] Deterministic 完整 train-only graph 已產出並通過所有 release gates
+- [x] Bedrock bounded pilot 已封存且明確標記為歷史實驗
 - [x] NDCG@10 相對 baseline ≥5%（primary +5.72%、replication +5.07%）
 - [x] Paired CI 不支持明顯退化（兩次 confirmation CI 全為正）
 - [x] Unbiased LambdaMART 已訓練並保存 model manifest

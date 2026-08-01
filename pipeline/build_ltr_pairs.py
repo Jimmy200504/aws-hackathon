@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import sys
@@ -20,6 +21,14 @@ QRELS = ROOT / "artifacts" / "temporal-eval.json"
 OUTPUT = ROOT / "artifacts" / "ltr"
 
 
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Materialize grouped LTR feature rows")
     parser.add_argument("--index", type=Path, default=INDEX)
@@ -33,7 +42,11 @@ def main() -> None:
     manifest = {
         "schema": "skillweave-ltr-pairs-v1",
         "index_version": ranker.metadata["index_version"],
+        "index_sha256": sha256_file(args.index),
         "qrels_schema": evaluation["metadata"]["schema"],
+        "qrels_sha256": sha256_file(args.qrels),
+        "graph_version": ranker.metadata.get("graph_version"),
+        "graph_manifest_hash": ranker.metadata.get("graph_manifest_hash"),
         "random_seed": 1111,
         "splits": {},
     }
@@ -94,6 +107,7 @@ def main() -> None:
             "groups": groups_written,
             "rows": rows_written,
             "path": str(output_path),
+            "sha256": sha256_file(output_path),
         }
     (args.output_dir / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"

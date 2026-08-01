@@ -1,0 +1,77 @@
+{
+  "schema_version": "icap-reviewed-v1",
+  "policy": {
+    "allowed_kinds": ["K", "S"],
+    "attitudes_imported": false,
+    "automatic_suffix_aliases": false,
+    "serving_requires_reuse_review": true,
+    "source_catalog": "https://icap.wda.gov.tw/ap/resources_datum_list.php"
+  },
+  "standards": [
+    {
+      "standard_code": "BGM5220-002v3",
+      "version": "v3",
+      "name": "連鎖門市服務人員",
+      "source_url": "https://icap.wda.gov.tw/File/datum/108044001v3.pdf",
+      "content_review": {"status": "manually_reviewed", "scope": "selected K/S labels only"},
+      "reuse_review": {"status": "pending_publication_review", "serving_approved": false},
+      "vocabulary": [
+        {"kind": "K", "label": "門市品保與鮮度知識", "aliases": []},
+        {"kind": "S", "label": "商品目檢能力", "aliases": []},
+        {"kind": "S", "label": "商品盤點能力", "aliases": []}
+      ]
+    },
+    {
+      "standard_code": "TFB5139-001v1",
+      "version": "v1",
+      "name": "餐飲服務人員",
+      "source_url": "https://icap.wda.gov.tw/File/datum/107042001v1.pdf",
+      "content_review": {"status": "manually_reviewed", "scope": "selected K/S labels only"},
+      "reuse_review": {"status": "pending_publication_review", "serving_approved": false},
+      "vocabulary": [
+        {"kind": "K", "label": "餐飲服務概論", "aliases": []},
+        {"kind": "S", "label": "餐具、杯皿清潔與保養能力", "aliases": []},
+        {"kind": "S", "label": "點菜能力", "aliases": []}
+      ]
+    },
+    {
+      "standard_code": "TFB9901-001v1",
+      "version": "v1",
+      "name": "廚房助手",
+      "source_url": "https://icap.wda.gov.tw/File/datum/110070001v1.pdf",
+      "content_review": {"status": "manually_reviewed", "scope": "selected K/S labels only"},
+      "reuse_review": {"status": "pending_publication_review", "serving_approved": false},
+      "vocabulary": [
+        {"kind": "K", "label": "職業安全衛生相關規範", "aliases": []},
+        {"kind": "K", "label": "食品安全衛生相關法規", "aliases": []},
+        {"kind": "S", "label": "食材基本處理技巧", "aliases": []}
+      ]
+    },
+    {
+      "standard_code": "FAC3313-001v2",
+      "version": "v2",
+      "name": "會計助理",
+      "source_url": "https://icap.wda.gov.tw/File/datum/110064001v2.pdf",
+      "content_review": {"status": "manually_reviewed", "scope": "selected K/S labels only"},
+      "reuse_review": {"status": "pending_publication_review", "serving_approved": false},
+      "vocabulary": [
+        {"kind": "K", "label": "財務報表相關知識", "aliases": []},
+        {"kind": "S", "label": "計算能力", "aliases": []},
+        {"kind": "S", "label": "文書處理能力", "aliases": []}
+      ]
+    },
+    {
+      "standard_code": "ISD2152-001v2",
+      "version": "v2",
+      "name": "半導體產業軟體設計工程師",
+      "source_url": "https://icap.wda.gov.tw/File/datum/103054001v2.pdf",
+      "content_review": {"status": "manually_reviewed", "scope": "selected K/S labels only"},
+      "reuse_review": {"status": "pending_publication_review", "serving_approved": false},
+      "vocabulary": [
+        {"kind": "K", "label": "C/C++程式設計", "aliases": []},
+        {"kind": "K", "label": "物件導向程式設計", "aliases": []},
+        {"kind": "S", "label": "軟體工程技術", "aliases": []}
+      ]
+    }
+  ]
+}

@@ -26,7 +26,7 @@ substring、temporal cutoff、type whitelist 與 confidence gate 的邊才能發
 線上以 Query → Skill → Job 的一跳路徑產生可解釋 ranking features；無信心或
 新職缺則回退 lexical cold-start，不用生成式 AI 自由撰寫結果文案。
 
-真實 Amazon Bedrock Claude Haiku 4.5 pilot 已處理
+歷史 Amazon Bedrock Claude Haiku 4.5 pilot 曾處理
 200 筆 train-only 職缺：
 180 筆通過、20
 筆隔離、1,598 個 grounded mentions、
@@ -43,7 +43,7 @@ pilot，不冒充完整 production corpus。
 
 ## 原創性與生成式 AI 必要性
 
-- LLM 的核心輸出是可驗證的 ranking asset，不是結果後方的裝飾性摘要。
+- Production graph 的核心輸出是可驗證的 deterministic ranking asset，不是結果後方的裝飾性摘要；LLM 只做線上 Query normalization。
 - 每條 edge 保存 evidence、source timestamp、model/prompt version。
 - JD cutoff、title escrow、strictly-earlier-day rolling graph 與 disjoint
   buckets 防止 future leakage。
@@ -56,7 +56,7 @@ pilot，不冒充完整 production corpus。
 
 - Compact judge demo：API Gateway HTTP API + Lambda Python 3.13 arm64 +
   CloudWatch；exact bundle 已通過 SAM validate/build/local invoke。
-- Production design：S3/Glue → Step Functions → Bedrock structured batch →
+- Production design：S3/Glue → Step Functions → deterministic exact extraction →
   evidence validator → OpenSearch + Neptune → SageMaker Unbiased LambdaMART →
   API Gateway/WAF。
 - 任一 managed service timeout 都回傳 contract-safe fallback ranking。
@@ -75,12 +75,12 @@ pilot，不冒充完整 production corpus。
 | Locked Hit@10 relative lift | +4.13% | 不隱藏小幅負值 |
 | Paired NDCG 95% CI | [0.01491, 0.03607] | 差異全為正 |
 | Lambda/native model parity | 1.07e-07 max error | 40,218 rows；tolerance 1e-06 |
-| Real Bedrock structured extraction | 180/200 accepted；1,598 mentions | train-only bounded pilot；US$1.06 |
+| Historical Bedrock structured extraction | 180/200 accepted；1,598 mentions | 舊 bounded pilot；US$1.06；非 production graph |
 | Relevant-row graph coverage | 40.53% | Coverage 是下一個瓶頸 |
 | Gate-active subgroup | 285 queries；NDCG +11.41% | Post-hoc，不能取代整體 |
 | 七日規模換算 | 約 160,360 次額外 Top-1 relevance events | 非 conversion、apply、hire 或營收 |
 | Release verifier | 89 PASS / 0 FAIL / 0 WARN | WARN 僅代表尚未登錄的外部 URL |
-| AWS production smoke | 30/30 HTTP 200；concurrency 5；p95 4.46s | Public HTTPS；低於 10s Lambda timeout |
+| AWS production smoke | 30/30 HTTP 200；concurrency 5；p95 4.91s | Public HTTPS；低於 10s Lambda timeout |
 
 ## 商業應用
 
@@ -99,7 +99,7 @@ gap。目前沒有因果轉換或單次相關曝光的貨幣價值，因此**不
 
 ## 公開交付 URL
 
-- AWS Demo：https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/
+- AWS Demo：https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/
 - GitHub Release：https://github.com/Jimmy200504/aws-hackathon/releases/tag/skillweave-2026.07.28-rc6
 - 5 分鐘影片：https://github.com/Jimmy200504/aws-hackathon/releases/download/skillweave-2026.07.28-rc6/skillweave-demo-5min.mp4
 
@@ -121,7 +121,7 @@ gap。目前沒有因果轉換或單次相關曝光的貨幣價值，因此**不
 - 可宣稱內部時間切分 confirmation 的 NDCG 提升
   +5.72%；必須說明它不是主辦方官方 holdout。
 - 不可只展示成功模型而隱藏歷史負向 holdout或 rejected candidate。
-- 不可把 bootstrap fixture 說成完整 Bedrock batch 產物。
+- 不可把歷史 Bedrock pilot 或 bootstrap fixture 說成新的 deterministic production graph 產物。
 - 不可把 30 分鐘 attribution qrels 說成主辦方正式 relevance ground truth。
 - 不可把約 160,360 次 Top-1 relevance proxy 說成應徵、錄取或營收。
 - AWS production smoke 是 bounded judge-demo 證據，不等同大規模壓力測試。

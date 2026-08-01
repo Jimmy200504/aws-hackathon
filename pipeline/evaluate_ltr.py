@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import random
 import sys
@@ -19,12 +20,21 @@ from scripts.benchmark import aggregate, metrics
 ABLATION_BASE_FEATURES = set([*BASE_FEATURES, *RETRIEVAL_FEATURES])
 
 
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def load_model(path: Path):
     import xgboost as xgb
 
     model = xgb.XGBRanker()
     model.load_model(path)
     manifest = json.loads(path.with_suffix(".manifest.json").read_text(encoding="utf-8"))
+    manifest["model_sha256"] = sha256_file(path)
     return model, manifest
 
 
@@ -144,6 +154,11 @@ def main() -> None:
         help="Optional temporal-eval JSON used to bind split provenance",
     )
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--graph-binding-manifest",
+        type=Path,
+        help="Optional deterministic graph overlay sidecar used to bind provenance",
+    )
     parser.add_argument("--split", choices=["validation", "test"], required=True)
     parser.add_argument(
         "--confidence-gate",
@@ -160,6 +175,34 @@ def main() -> None:
     args = parser.parse_args()
     graph_model, graph_manifest = load_model(args.graph_model)
     groups = read_grouped_rows(args.pairs)
+    pairs_manifest_path = args.pairs.parent / "manifest.json"
+    pairs_manifest = (
+        json.loads(pairs_manifest_path.read_text(encoding="utf-8"))
+        if pairs_manifest_path.is_file()
+        else None
+    )
+    if pairs_manifest is not None:
+        split_metadata = pairs_manifest.get("splits", {}).get(args.split, {})
+        if split_metadata.get("sha256") and split_metadata["sha256"] != sha256_file(args.pairs):
+            raise SystemExit("pairs hash does not match pairs manifest")
+    graph_binding = None
+    if args.graph_binding_manifest is not None:
+        graph_binding = json.loads(
+            args.graph_binding_manifest.read_text(encoding="utf-8")
+        )
+        if graph_binding.get("schema") != "skillweave-ranking-graph-overlay-v1":
+            raise SystemExit("unsupported graph binding manifest")
+        overlay = graph_binding.get("metadata", {}).get("graph_overlay", {})
+        if args.qrels is not None and overlay.get("qrels_sha256") != sha256_file(args.qrels):
+            raise SystemExit("graph binding qrels hash does not match evaluation qrels")
+        if overlay.get("scope") != "evaluation-cutoff":
+            raise SystemExit("graph binding is not evaluation-cutoff scoped")
+        if pairs_manifest is None:
+            raise SystemExit("graph-bound evaluation requires a pairs manifest")
+        if pairs_manifest.get("index_sha256") != graph_binding.get("index_sha256"):
+            raise SystemExit("pairs index hash does not match graph binding index")
+        if pairs_manifest.get("qrels_sha256") != overlay.get("qrels_sha256"):
+            raise SystemExit("pairs qrels hash does not match graph binding qrels")
     if args.baseline_model:
         baseline_model, baseline_manifest = load_model(args.baseline_model)
         ablation_design = "independently trained no-graph and graph models"
@@ -190,7 +233,7 @@ def main() -> None:
     bootstrap = paired_bootstrap(baseline_rows, graph_rows)
     report = {
         "metadata": {
-            "schema": "skillweave-ltr-ablation-v1",
+            "schema": "skillweave-ltr-ablation-v2",
             "split": args.split,
             "queries": len(groups),
             "random_seed": 1111,
@@ -199,6 +242,9 @@ def main() -> None:
             "confidence_gate": args.confidence_gate,
             "baseline_model": baseline_manifest,
             "graph_model": graph_manifest,
+            "pairs_sha256": sha256_file(args.pairs),
+            "pairs_manifest": pairs_manifest,
+            "graph_binding": graph_binding,
             "evaluation_fixture": (
                 json.loads(args.qrels.read_text(encoding="utf-8"))["metadata"]
                 if args.qrels is not None
@@ -220,6 +266,17 @@ def main() -> None:
     report["release_gates"]["theme_gate_passed"] = (
         report["release_gates"]["minimum_queries_100"]
         and report["release_gates"]["ndcg_relative_lift_at_least_5pct"]
+    )
+    report["release_gates"]["all_reported_metrics_non_decreasing"] = all(
+        graph[name] >= baseline[name] for name in baseline
+    )
+    report["release_gates"]["ndcg_positive_lift"] = bool(
+        lift["ndcg@10"] is not None and lift["ndcg@10"] > 0
+    )
+    report["release_gates"]["locked_graph_gate_passed"] = bool(
+        graph_binding is not None
+        and report["release_gates"]["all_reported_metrics_non_decreasing"]
+        and report["release_gates"]["ndcg_positive_lift"]
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")

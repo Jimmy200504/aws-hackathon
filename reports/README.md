@@ -21,12 +21,16 @@ Authoritative release evidence:
 - `sam-local-smoke.json` — exact Lambda ZIP invoked through SAM's Python 3.13 arm64 runtime image.
 - `portable-ltr-parity.json` — 40,218-row native XGBoost versus dependency-free
   Lambda tree-inference parity check.
-- `bedrock-pilot.json` — aggregate-only real Bedrock structured-extraction
-  evidence: 200 train-only records, validated publication/quarantine, tokens,
-  and bounded cost.
+- `bedrock-pilot.json` — aggregate-only historical Bedrock experiment: 200
+  train-only records, tokens and bounded cost. It is not an input to the
+  deterministic production graph.
+- `deterministic-corpus-inventory.json` — input/cutoff count and timestamp
+  inventory for the zero-LLM graph migration; not a completed Neptune release.
+- `deterministic-graph-canary.json` — real first-1,000-job end-to-end run through
+  both scopes, statistical relations and Neptune CSV validation.
 - `aws-production-smoke.json` — public HTTPS UI/API/trace checks plus bounded AWS concurrency and latency evidence.
 - `demo-video.json` — five-minute Full HD MP4, audio/subtitle streams, scene count, size, and immutable hash verification.
-- `submission-audit.json` — binding-deliverable completion audit; intentionally false until external and Bedrock execution blockers are resolved.
+- `submission-audit.json` — binding-deliverable completion audit; full deterministic Neptune release remains separately gated.
 
 Development evidence, not release claims:
 

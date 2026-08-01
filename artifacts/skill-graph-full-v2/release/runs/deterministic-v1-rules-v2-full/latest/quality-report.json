@@ -1,0 +1,1 @@
+{"accepted":1218635,"cutoff":"2026-06-05 23:59:59.999","edges":5249573,"edges_by_type":{"INSTANCE_OF":3632678,"RELATED_TO":225,"REQUIRES":1616670},"inputs":1218635,"nodes":1219372,"nodes_by_type":{"Job":1218635,"Occupation":688,"Skill":49},"quarantine":0,"referential_integrity":true,"silent_loss":0}

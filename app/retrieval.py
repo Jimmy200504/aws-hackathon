@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
@@ -34,6 +35,10 @@ class OpenSearchRetriever:
         "categories",
         "industry",
         "company_id",
+        "employment_type",
+        "shifts",
+        "education",
+        "experience",
         "modified_at",
         "post_cutoff_jd",
         "graph_eligible",
@@ -54,6 +59,7 @@ class OpenSearchRetriever:
         region: str | None = None,
         timeout_seconds: float = 2.0,
         embedding_client: Any = None,
+        service: str | None = None,
     ) -> None:
         endpoint = endpoint.strip().rstrip("/")
         if not endpoint:
@@ -68,7 +74,13 @@ class OpenSearchRetriever:
         self.index = index
         self.region = region or os.getenv("AWS_REGION", "us-east-1")
         self.timeout_seconds = max(0.1, float(timeout_seconds))
-        self.service = "aoss" if ".aoss." in endpoint else "es"
+        # Signing with the wrong SigV4 service name yields a 403 that looks
+        # exactly like a policy problem, so let the deployment state it
+        # explicitly instead of inferring it from the endpoint hostname.
+        if service in {"aoss", "es"}:
+            self.service = service
+        else:
+            self.service = "aoss" if ".aoss." in endpoint else "es"
         self.sign_requests = not endpoint.startswith(
             ("http://127.0.0.1", "http://localhost")
         )
@@ -89,6 +101,7 @@ class OpenSearchRetriever:
             os.getenv("OPENSEARCH_INDEX", "skillweave-jobs-v1"),
             timeout_seconds=float(os.getenv("OPENSEARCH_TIMEOUT_SECONDS", "2.0")),
             embedding_client=embedding_client,
+            service=os.getenv("OPENSEARCH_SERVICE"),
         )
 
     @staticmethod
@@ -106,6 +119,8 @@ class OpenSearchRetriever:
         )
         url = self.endpoint + path
         headers = {"content-type": "application/json"}
+        if self.service == "aoss":
+            headers["x-amz-content-sha256"] = hashlib.sha256(payload).hexdigest()
         if self.sign_requests:
             try:
                 from botocore.auth import SigV4Auth
@@ -142,6 +157,38 @@ class OpenSearchRetriever:
             raise RuntimeError("OpenSearch returned a non-object response")
         return decoded
 
+    @staticmethod
+    def _intent_boosts(intent: Any) -> list[dict[str, Any]]:
+        """Turn a normalizer-inferred intent into recall-safe scoring clauses.
+
+        Attribute queries (現領/兼職/晚班) dominate the head of the search log but
+        barely occur in job free text; their answer lives in the structured
+        `employment_type` / `shifts` fields instead.
+        """
+        if intent is None:
+            return []
+        clauses: list[dict[str, Any]] = []
+        for name in getattr(intent, "duty_categories", ()) or ():
+            clauses.append(
+                {"match_phrase": {"categories": {"query": name, "boost": 6.0}}}
+            )
+        for name in getattr(intent, "employment_types", ()) or ():
+            clauses.append({"term": {"employment_type": {"value": name, "boost": 2.5}}})
+        for name in getattr(intent, "shifts", ()) or ():
+            clauses.append({"term": {"shifts": {"value": name, "boost": 2.0}}})
+        for name in getattr(intent, "locations", ()) or ():
+            clauses.append({"term": {"city.keyword": {"value": name, "boost": 3.0}}})
+        salary_type = getattr(intent, "salary_type", None)
+        if salary_type:
+            clauses.append({"term": {"salary_type": {"value": salary_type, "boost": 1.5}}})
+        company = getattr(intent, "company", None)
+        if company:
+            clauses.append(
+                {"match_phrase": {"description": {"query": company, "boost": 3.0}}}
+            )
+            clauses.append({"match_phrase": {"title": {"query": company, "boost": 4.0}}})
+        return clauses
+
     def _build_bm25_query(
         self,
         query: str,
@@ -149,9 +196,10 @@ class OpenSearchRetriever:
         locations: list[str],
         duties: list[str],
         wants_remote: bool,
-        salary_intent: dict[str, Any] | None,
+        salary_intent: dict[str, Any] | None = None,
+        intent: Any = None,
     ) -> dict[str, Any]:
-        """Build the BM25 keyword query (same as original logic)."""
+        """Build a BM25 query with explicit filters and inferred-intent boosts."""
         should: list[dict[str, Any]] = [
             {
                 "match_phrase": {
@@ -187,8 +235,20 @@ class OpenSearchRetriever:
             for name in duties
         )
         if wants_remote:
+            # A remote-intent query (遠端/在家工作/WFH) must be able to pull
+            # in an is_remote job even when the query text has no lexical
+            # overlap with the title/description (e.g. 遠端客服 vs a job
+            # titled "夜間客服人員" that only mentions "可遠端" in the body).
+            # This is a `should` clause, not a `must` filter: it widens
+            # recall without excluding otherwise-relevant lexical matches.
             should.append({"term": {"is_remote": {"value": True, "boost": 6.0}}})
         if salary_intent is not None:
+            # Mirror the local ranker's salary-range match: a job whose
+            # salary_min/salary_max range covers the requested figure is
+            # relevant even if its title never prints that exact number
+            # (e.g. 168+ jobs with a covering range but no literal "210" in
+            # the title -- the recall gap fixed in app/ranker.py). Gate on
+            # salary_type so an hourly query does not match a monthly job.
             target = float(salary_intent.get("target", 0.0))
             salary_type = salary_intent.get("salary_type")
             if salary_type and target > 0:
@@ -197,6 +257,9 @@ class OpenSearchRetriever:
                         "bool": {
                             "filter": [{"term": {"salary_type": salary_type}}],
                             "should": [
+                                # salary_max > 0 means an explicit upper bound
+                                # is set; the job's range covers the target
+                                # when that ceiling reaches at least target.
                                 {
                                     "bool": {
                                         "filter": [
@@ -205,6 +268,9 @@ class OpenSearchRetriever:
                                         ]
                                     }
                                 },
+                                # salary_max == 0 means no upper bound was
+                                # parsed (e.g. "面議40000‧" or open-ended pay);
+                                # fall back to comparing salary_min alone.
                                 {
                                     "bool": {
                                         "filter": [
@@ -219,7 +285,15 @@ class OpenSearchRetriever:
                         }
                     }
                 )
-        return {"bool": {"should": should, "minimum_should_match": 1}}
+        should.extend(self._intent_boosts(intent))
+        filters = [{"terms": {"city.keyword": locations}}] if locations else []
+        return {
+            "bool": {
+                "should": should,
+                "minimum_should_match": 1,
+                **({"filter": filters} if filters else {}),
+            }
+        }
 
     def _search_bm25(
         self,
@@ -230,8 +304,9 @@ class OpenSearchRetriever:
         duties: list[str],
         wants_remote: bool,
         salary_intent: dict[str, Any] | None,
+        intent: Any = None,
     ) -> list[dict[str, Any]]:
-        """Execute BM25 keyword search."""
+        """Execute BM25 keyword search with a recall-safe filter fallback."""
         body = {
             "size": limit,
             "track_total_hits": False,
@@ -242,6 +317,7 @@ class OpenSearchRetriever:
                 duties=duties,
                 wants_remote=wants_remote,
                 salary_intent=salary_intent,
+                intent=intent,
             ),
             "sort": [{"_score": "desc"}, {"_id": "asc"}],
         }
@@ -250,7 +326,26 @@ class OpenSearchRetriever:
             f"/{quote(self.index, safe='-_.')}/_search",
             body,
         )
-        return result.get("hits", {}).get("hits", [])
+        hits = result.get("hits", {}).get("hits", [])
+        query_body = body["query"]
+        if (
+            locations
+            and isinstance(hits, list)
+            and not hits
+            and isinstance(query_body, dict)
+        ):
+            bool_query = query_body.get("bool", {})
+            if isinstance(bool_query, dict):
+                bool_query.pop("filter", None)
+            result = self._signed_request(
+                "POST",
+                f"/{quote(self.index, safe='-_.')}/_search",
+                body,
+            )
+            hits = result.get("hits", {}).get("hits", [])
+        if not isinstance(hits, list):
+            raise RuntimeError("OpenSearch hits are malformed")
+        return hits
 
     def _search_knn(
         self,
@@ -360,6 +455,7 @@ class OpenSearchRetriever:
         duty_names: Iterable[str] = (),
         wants_remote: bool = False,
         salary_intent: dict[str, Any] | None = None,
+        intent: Any = None,
     ) -> list[dict[str, Any]]:
         locations = self._clean_names(location_names)
         duties = self._clean_names(duty_names)
@@ -373,6 +469,7 @@ class OpenSearchRetriever:
             duties=duties,
             wants_remote=wants_remote,
             salary_intent=salary_intent,
+            intent=intent,
         )
 
         # Attempt kNN vector search if embedding client is available

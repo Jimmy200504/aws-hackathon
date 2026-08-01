@@ -2,6 +2,9 @@
   "metadata": {
     "schema": "skillweave-bedrock-pilot-v1",
     "analysis_status": "bounded_real_bedrock_train_only_pilot",
+    "historical_experiment": true,
+    "production_graph_input": false,
+    "superseded_by": "deterministic-v1 offline graph build",
     "graph_cutoff": "2026-06-05 23:59:59.999",
     "prompt_version": "jd-skill-v3",
     "model_ids": [

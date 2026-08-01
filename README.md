@@ -19,9 +19,10 @@ flowchart TB
         FEATURES --> TRAIN["XGBoost Unbiased LambdaMART"]
         TRAIN --> MODEL["Portable 40-tree 模型"]
 
-        JD["Train-only JD"] --> BEDROCK["Amazon Bedrock<br/>技能結構化萃取"]
-        BEDROCK --> VALIDATOR["Evidence / cutoff validator"]
-        VALIDATOR --> GRAPH["已驗證 Skill Graph"]
+        JD["1111 職缺與 duty taxonomy"] --> EXACT["Deterministic extractor<br/>reviewed exact aliases"]
+        EXACT --> VALIDATOR["Evidence / requirement / cutoff validator"]
+        VALIDATOR --> STATS["全量共現統計 RELATED_TO"]
+        STATS --> GRAPH["cutoff/latest immutable Skill Graph"]
     end
 
     subgraph Online["線上搜尋"]
@@ -51,9 +52,12 @@ Query
   → 回傳 Top 20 與 evidence trace
 ```
 
-目前全量版本的 Skill Graph 特徵主要存在 OpenSearch 職缺文件與本機 artifact；Neptune、SageMaker 與 ECS 是完整 production 藍圖，不是本機全量搜尋的必要元件。
+本機與目前 judge AWS deployment 都由 OpenSearch 職缺文件與 Lambda 內的
+embedded artifact 提供圖譜特徵。Repository 另有 ECS Fargate pipeline 與 Neptune
+Analytics blue/green serving 模板，但未設定 `NEPTUNE_GRAPH_ID` 時不會建立或查詢
+Neptune；目前線上 `/health` 會明確回傳 `graph_backend=embedded_artifact`。
 
-### 本機完整啟動（全量 OpenSearch + Bedrock + 前後端）
+### 本機完整啟動（全量 OpenSearch + 線上 Query normalization + 前後端）
 
 前端是 `web/` 內的靜態檔案，由 Python API 一起提供，因此不需要另外執行
 `npm install`、`npm build` 或啟動第二個 frontend process。Docker Desktop 建議配置
@@ -750,7 +754,7 @@ API 同時相容原命題欄位 `ks`、`c0`、`d0`。完整契約見 [docs/opena
 ```text
 app/        API、OpenSearch retrieval、排序與 Lambda handler
 web/        Live Demo
-pipeline/   Bedrock 萃取、LTR 特徵、訓練與評估
+pipeline/   Deterministic graph build、LTR 特徵、訓練與評估
 scripts/    建索引、驗證、打包與部署
 infra/      SAM、provisioned OpenSearch 與選配 Serverless／Neptune templates
 artifacts/  Demo index 與 portable 模型
@@ -765,5 +769,16 @@ tests/      API、排序、防洩漏與 release 測試
 - [全量／compact 部署步驟](docs/deployment.md)
 - [Skill Graph schema](docs/graph-schema.md)
 - [資料卡與時間切分](docs/data-card.md)
-- [Bedrock 安全與 evidence gate](docs/genai-safety.md)
+- [Deterministic graph 安全、evidence gate 與歷史 Bedrock pilot](docs/genai-safety.md)
+
+## 零 LLM graph build 邊界
+
+正式離線 Skill Graph build 不呼叫任何 LLM 或 embedding API。Occupation 只由
+1111 duty code taxonomy 建立；Skill 只接受 reviewed ontology 的 unique exact
+alias，並保留 JD 原始 substring。未知 structured surface 會聚合到人工審閱佇列，
+不會進 Neptune。技能關係只發布有門檻、無方向的 `RELATED_TO` 共現邊。
+
+Amazon Bedrock 仍只用於線上 Query normalization，失敗時走既有 deterministic
+fallback。`reports/bedrock-pilot.json` 是 200 筆舊實驗證據，不是 production graph
+build，也不應與新的 cutoff/latest manifests 混用。
 - [評估報告索引](reports/README.md)

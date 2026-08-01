@@ -1,15 +1,18 @@
 # 生成式 AI 萃取：已知失敗模式與防護
 
-Bedrock 模組只產生 graph proposal；validator 決定哪些邊能發布。
+正式離線 Skill Graph build 是零 LLM deterministic pipeline：reviewed exact alias、
+原文 evidence、duty taxonomy 與 corpus statistics 決定所有發布內容。Bedrock 只保留
+在線上 Query normalization；失敗時使用 deterministic fallback。
 
-## 已執行的真實 Bedrock pilot
+## 已封存的歷史 Bedrock pilot（非 production graph build）
 
 Claude Haiku 4.5 以 strict JSON Schema 對 200 筆 cutoff 前職缺執行。最終
 180 筆通過、20 筆因沒有足夠可發布 mention 而 quarantine、0 fatal；
 validator 發布 1,598 個 exact-substring-grounded mentions。296 條 relation
 proposal 全部維持 `requires_corpus_corroboration`，沒有直接發布。公開證據只含
 aggregate counts、token 與成本，不含 job/user identifiers，見
-`reports/bedrock-pilot.json`。
+`reports/bedrock-pilot.json`。這份 200 筆報告保留作為舊實驗與失敗模式證據，
+不屬於新的 cutoff/latest graph manifests，graph worker 也沒有 Bedrock IAM 權限。
 
 | 失敗模式 | 例子 | 風險 | 防護 |
 |---|---|---|---|
@@ -22,7 +25,7 @@ aggregate counts、token 與成本，不含 job/user identifiers，見
 | Negation | 「不需具備經驗」 | 反向解讀 | evidence window 包含否定詞；negation validator |
 | 薪資／品牌誤認技能 | Excel 公司名或產品名語境 | 噪音 | field-aware prompt、entity type classifier、corpus frequency review |
 | 過度關聯 | React → 任意 frontend tool | graph flooding | related edge degree cap、max-one-hop、max aggregation、offline lift gate |
-| OOV 新技能 | train 未見新框架 | 零召回 | query-time Bedrock fallback 只建立 ephemeral nodes；不寫入 production graph，待 batch review |
+| OOV 新技能 | reviewed ontology 未收錄 | 零召回 | 只從 structured fields 聚合 candidate；至少 3 jobs、2 companies 才進人工審閱，永不直接寫 production graph |
 | Prompt/model drift | 同一 JD 新版模型輸出改變 | 不可重現 | 保存 model ID、prompt hash、schema、seed/settings；canary corpus diff |
 | Prompt injection in JD | JD 文字要求模型忽略 schema | 越權輸出 | JD 放在 data field、工具不可用、strict JSON schema、allowlisted nodes/edges |
 

@@ -17,7 +17,7 @@
 
 ## Slide 3 — 原創核心（50 秒）
 
-- LLM 在索引前提出 edge，不在結果後自由寫文案。
+- Production graph 在索引前以 deterministic exact evidence 與共現統計建 edge，不在結果後自由寫文案。
 - Evidence substring、temporal cutoff、confidence、degree cap 決定是否發布。
 - Rolling Query→Skill/Job graph 僅讀 strictly-earlier-day snapshot。
 - 無信心就 abstain；新職缺仍可由 lexical cold-start 搜尋。
@@ -38,7 +38,7 @@
   paired CI `[+0.01218, +0.03272]`。
 - 歷史負向 holdout與一個 +4.62% 的 rejected candidate 都保留在 repo。
 - 目前證明 graph feature family 有價值；尚未把 bootstrap fixture 冒充
-  Bedrock 完整產物。
+  deterministic cutoff/latest 完整產物。
 
 ## Slide 6 — 商業價值（35 秒）
 
@@ -47,12 +47,12 @@ Hit@1 的絕對改善換算到七日搜尋量約 160,360 次額外 Top-1 relevan
 
 ## Slide 7 — AWS 落地與收尾（35 秒）
 
-Offline：S3/Glue → Step Functions → Bedrock → validator → Neptune/OpenSearch。
+Offline：S3/Glue → Step Functions → deterministic exact validator → statistical relations → Neptune/OpenSearch。
 
 Online：API Gateway/WAF → Fargate → OpenSearch + Neptune → SageMaker →
 contract-safe Top-20。任一 managed service timeout 都能降級。
 
-收尾：多數系統讓 LLM 解釋結果；SkillWeave 讓 LLM 產生可消融、可追溯、可
+收尾：多數系統讓 LLM 解釋結果；SkillWeave 讓 deterministic graph 產生可消融、可追溯、可
 拒絕的排名資產。
 
 ## 評審追問速答
@@ -61,7 +61,7 @@ contract-safe Top-20。任一 managed service timeout 都能降級。
 - 如何避免 leakage？JD cutoff、title escrow、rolling graph、disjoint buckets。
 - 如何證明不是挑 bucket？先凍結模型，再跑第二個互斥 bucket；兩次都超過 5%，
   且 paired CI 都排除 0。
-- 何時可發布 Bedrock graph？完整 train-only batch 通過 evidence precision、
+- 何時可發布 deterministic graph？完整 train-only build 通過 evidence precision、
   coverage、ablation 與新預註冊 holdout 後。
 - 會傷害新職缺嗎？冷啟動走 lexical/semantic path，並監控
   time-to-first-qualified-view。

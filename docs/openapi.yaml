@@ -76,10 +76,28 @@ components:
           items: { type: string }
         graph_trace:
           type: array
-          items: { type: object }
+          items:
+            type: object
+            properties:
+              edge_id: { type: [string, "null"] }
+              relation_confidence: { type: [number, "null"] }
+              support_jobs: { type: [integer, "null"] }
+              support_companies: { type: [integer, "null"] }
+              evidence: {}
+    SearchMeta:
+      type: object
+      required: [graph_backend, graph_version, degraded_components]
+      properties:
+        graph_backend:
+          type: string
+          enum: [neptune_analytics, embedded_artifact, disabled]
+        graph_version: { type: string }
+        degraded_components:
+          type: array
+          items: { type: string }
     SearchResponse:
       type: object
-      required: [request_id, result]
+      required: [request_id, result, meta]
       properties:
         request_id: { type: string }
         result:
@@ -87,3 +105,5 @@ components:
           items:
             $ref: "#/components/schemas/RankedJob"
         empStr: { type: string }
+        meta:
+          $ref: "#/components/schemas/SearchMeta"
