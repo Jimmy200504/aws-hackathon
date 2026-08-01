@@ -20,12 +20,47 @@ QRELS = ROOT / "artifacts" / "temporal-eval.json"
 OUTPUT = ROOT / "artifacts" / "ltr"
 
 
+def load_query_normalization(path: Path | None) -> dict[str, str]:
+    """Map raw query -> Bedrock-normalized query for offline replay.
+
+    Degraded rows are skipped: replaying a deterministic fallback as if it were
+    a Bedrock rewrite would attribute a null result to the LLM.
+    """
+    if path is None:
+        return {}
+    mapping: dict[str, str] = {}
+    skipped = 0
+    with path.open(encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if not line:
+                continue
+            row = json.loads(line)
+            if row.get("degraded") or row.get("source") != "amazon_bedrock":
+                skipped += 1
+                continue
+            mapping[row["query"]] = row["normalized"]
+    print(
+        f"Loaded {len(mapping):,} Bedrock query rewrites "
+        f"({skipped:,} degraded rows skipped)",
+        flush=True,
+    )
+    return mapping
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Materialize grouped LTR feature rows")
     parser.add_argument("--index", type=Path, default=INDEX)
     parser.add_argument("--qrels", type=Path, default=QRELS)
     parser.add_argument("--output-dir", type=Path, default=OUTPUT)
+    parser.add_argument(
+        "--query-normalization",
+        type=Path,
+        default=None,
+        help="JSONL cache from scripts/normalize_eval_queries.py",
+    )
     args = parser.parse_args()
+    normalization = load_query_normalization(args.query_normalization)
     ranker = SkillWeaveRanker(args.index, graph_novelty_threshold=1.0)
     evaluation = json.loads(args.qrels.read_text(encoding="utf-8"))
     job_to_index = {job["id"]: index for index, job in enumerate(ranker.jobs)}
@@ -35,12 +70,16 @@ def main() -> None:
         "index_version": ranker.metadata["index_version"],
         "qrels_schema": evaluation["metadata"]["schema"],
         "random_seed": 1111,
+        "query_normalization": {
+            "source": str(args.query_normalization) if args.query_normalization else None,
+            "rewrites_available": len(normalization),
+        },
         "splits": {},
     }
     for split in ["train", "validation", "test"]:
         cases = evaluation["splits"].get(split, [])
         output_path = args.output_dir / f"{split}.jsonl"
-        rows_written = groups_written = 0
+        rows_written = groups_written = llm_widened_groups = 0
         with output_path.open("w", encoding="utf-8") as output:
             for case in cases:
                 available = [
@@ -51,8 +90,13 @@ def main() -> None:
                 if max((case["qrels"].get(job_id, 0) for job_id in available), default=0) <= 0:
                     continue
                 intent = ranker.parse_intent(
-                    case["query"], case["location_code"], case["duty_code"]
+                    case["query"],
+                    case["location_code"],
+                    case["duty_code"],
+                    normalized_query=normalization.get(case["query"]),
                 )
+                if intent.llm_only_skills:
+                    llm_widened_groups += 1
                 group_rows = []
                 for exposure_rank, job_id in enumerate(available, 1):
                     _, features, _, _ = ranker._score(
@@ -93,6 +137,10 @@ def main() -> None:
         manifest["splits"][split] = {
             "groups": groups_written,
             "rows": rows_written,
+            # How many groups gained at least one canonical node that the raw
+            # query alone could not resolve. This is the only channel through
+            # which query normalization can move a metric.
+            "groups_widened_by_llm": llm_widened_groups,
             "path": str(output_path),
         }
     (args.output_dir / "manifest.json").write_text(

@@ -30,6 +30,12 @@ Authoritative release evidence:
 
 Development evidence, not release claims:
 
+- `llm-contribution-exploration.json` — timchen's exploratory attribution of the
+  generative-AI contribution: Bedrock node family +1.00% and Bedrock query
+  normalization -0.06%, both with paired intervals crossing zero. 499 queries on
+  a window already consumed by the locked confirmation, trained on 4.3% of the
+  release training data, so it supports no claim. Read together with
+  [`docs/evaluation-limits.md`](../docs/evaluation-limits.md).
 - `ltr-tuning-*.json` — local validation-only model-selection traces; ignored
   from release commits.
 - `ltr-ablation-validation.json` — earlier ungated validation experiment.

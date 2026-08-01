@@ -13,6 +13,11 @@ from typing import Any, Iterable
 
 from app.tree_ranker import PortableTreeRanker
 
+# Canonical node-ID prefix for Amazon Bedrock structured extraction output.
+# Keeping it a named constant means the ablation boundary between reviewed and
+# generated graph nodes is defined in exactly one place.
+LLM_SKILL_PREFIX = "bedrock."
+
 _EN_TOKEN = re.compile(r"[a-z0-9][a-z0-9.+#/-]*")
 _SPACE = re.compile(r"\s+")
 _PUNCT = re.compile(r"[\s,，、/／|｜;；:：()（）\[\]【】{}「」『』·・_]+")
@@ -60,11 +65,16 @@ def _as_codes(value: Any) -> list[str]:
 @dataclass(frozen=True)
 class QueryIntent:
     raw: str
+    # Raw-query surface. Drives literal phrase features and behavior-edge keys.
     normalized: str
     units: frozenset[str]
     skills: tuple[str, ...]
     location_codes: tuple[str, ...]
     duty_codes: tuple[str, ...]
+    # LLM rewrite surface, kept for provenance. It only widens alias resolution.
+    llm_surface: str | None = None
+    # Nodes that only the LLM surface could resolve, for attribution reporting.
+    llm_only_skills: tuple[str, ...] = ()
 
 
 class SkillWeaveRanker:
@@ -171,15 +181,30 @@ class SkillWeaveRanker:
         duty_code: Any = None,
         normalized_query: str | None = None,
     ) -> QueryIntent:
-        normalized_value = normalize(
-            query if normalized_query is None else normalized_query
-        )
+        # The raw query is the only surface allowed to drive literal phrase
+        # features and behavior-edge lookups. Those were learned from raw search
+        # strings and the train-only behavior graph is keyed by them, so an LLM
+        # rewrite that adds a translation or swaps punctuation would silently
+        # zero the phrase family and every Query->Job/Skill behavior feature.
+        normalized_value = normalize(query)
         units = lexical_units(normalized_value)
+        # An LLM rewrite contributes exactly one thing: extra alias surface for
+        # skill resolution. Both surfaces are scanned so a rewrite can only add
+        # canonical nodes, never drop one the raw query would have matched.
+        resolution_surfaces = dict.fromkeys(
+            surface
+            for surface in (normalized_value, normalize(normalized_query or ""))
+            if surface
+        )
         resolved: list[tuple[int, str]] = []
-        for match in self._alias_pattern.finditer(normalized_value):
-            alias = normalize(match.group(0))
-            for skill_id in self.alias_to_skills.get(alias, []):
-                resolved.append((len(alias), skill_id))
+        raw_resolvable: set[str] = set()
+        for surface in resolution_surfaces:
+            for match in self._alias_pattern.finditer(surface):
+                alias = normalize(match.group(0))
+                for skill_id in self.alias_to_skills.get(alias, []):
+                    resolved.append((len(alias), skill_id))
+                    if surface == normalized_value:
+                        raw_resolvable.add(skill_id)
         # Longest aliases win and canonical nodes are unique.
         seen: set[str] = set()
         skills: list[str] = []
@@ -193,6 +218,10 @@ class SkillWeaveRanker:
         duty_skills = [
             skill_id for skill_id in skills if skill_id.startswith("duty.")
         ][:8]
+        selected = tuple(seed_skills + duty_skills)
+        llm_surface = normalize(normalized_query or "") or None
+        if llm_surface == normalized_value:
+            llm_surface = None
         return QueryIntent(
             raw=query,
             normalized=normalized_value,
@@ -200,9 +229,13 @@ class SkillWeaveRanker:
             # Keep independently capped feature families. A large deterministic
             # duty taxonomy must never evict reviewed skill nodes and silently
             # contaminate a seed-only ablation.
-            skills=tuple(seed_skills + duty_skills),
+            skills=selected,
             location_codes=tuple(_as_codes(location_code)),
             duty_codes=tuple(_as_codes(duty_code)),
+            llm_surface=llm_surface,
+            llm_only_skills=tuple(
+                skill_id for skill_id in selected if skill_id not in raw_resolvable
+            ),
         )
 
     def _filter_names(self, codes: Iterable[str], lookup: dict[str, list[str]]) -> set[str]:
@@ -215,11 +248,17 @@ class SkillWeaveRanker:
     def _graph_feature(
         self, intent: QueryIntent, job: dict[str, Any], include_graph: bool
     ) -> tuple[float, list[dict[str, Any]], list[str], dict[str, float]]:
-        component_names = ("technical", "seed_occupation", "duty_occupation")
+        component_names = (
+            "technical",
+            "seed_occupation",
+            "duty_occupation",
+            "llm_extracted",
+        )
         empty_components = {
             **{name: 0.0 for name in component_names},
             "seed": 0.0,
             "seed_related": 0.0,
+            "llm_related": 0.0,
         }
         if not include_graph or not intent.skills or not job.get("graph_eligible", False):
             return 0.0, [], [], empty_components
@@ -228,6 +267,12 @@ class SkillWeaveRanker:
                 return "duty_occupation"
             if skill_id.startswith("occupation."):
                 return "seed_occupation"
+            # LLM-extracted nodes stay in their own family so the generative-AI
+            # contribution can be ablated independently of the reviewed seed
+            # ontology. Mixing them into "technical" would make the two
+            # provenances inseparable in every downstream report.
+            if skill_id.startswith(LLM_SKILL_PREFIX):
+                return "llm_extracted"
             return "technical"
 
         job_skills = set(job.get("skills", []))
@@ -308,6 +353,9 @@ class SkillWeaveRanker:
                 related_by_component["seed_occupation"],
             )
             > 0
+        )
+        components["llm_related"] = float(
+            related_by_component["llm_extracted"] > 0
         )
         return (
             min(direct_score, 8.5) + best_related,
@@ -451,6 +499,7 @@ class SkillWeaveRanker:
             "duty_occupation_graph_raw": round(
                 graph_components["duty_occupation"], 4
             ),
+            "llm_graph_raw": round(graph_components["llm_extracted"], 4),
             "graph_novelty": round(graph_novelty, 4),
             "direct_skill_count": float(len(direct_matches)),
             "llm_skill_match_count": float(
@@ -462,8 +511,15 @@ class SkillWeaveRanker:
             "duty_occupation_match_count": float(
                 sum(skill_id.startswith("duty.") for skill_id in direct_matches)
             ),
+            "llm_direct_match_count": float(
+                sum(
+                    skill_id.startswith(LLM_SKILL_PREFIX)
+                    for skill_id in direct_matches
+                )
+            ),
             "related_path_count": float(related_path_count),
             "seed_related_path_count": graph_components["seed_related"],
+            "llm_related_path_count": graph_components["llm_related"],
             "exact_title": exact_title,
             "title_phrase": title_phrase,
             "category_phrase": category_phrase,
@@ -507,6 +563,18 @@ class SkillWeaveRanker:
             "seed_job_skill_count": float(
                 sum(
                     skill_id.startswith(("skill.", "occupation."))
+                    for skill_id in job.get("skills", [])
+                )
+            ),
+            "llm_job_skill_count": float(
+                sum(
+                    skill_id.startswith(LLM_SKILL_PREFIX)
+                    for skill_id in job.get("skills", [])
+                )
+            ),
+            "llm_graph_cold_start": float(
+                not any(
+                    skill_id.startswith(LLM_SKILL_PREFIX)
                     for skill_id in job.get("skills", [])
                 )
             ),

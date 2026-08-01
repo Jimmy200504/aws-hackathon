@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 .venv/
+.venv-ltr/
 .pytest_cache/
 .coverage
 
@@ -9,9 +10,15 @@ __pycache__/
 data/dataset/*.csv
 docs/*.pdf
 
+# Organizer-provided competition briefs, rules, and service allowlists.
+hackathon_docs/
+
 # Rebuildable / potentially sensitive evaluation material.
 artifacts/benchmark-index.json
 artifacts/temporal-eval.json
+artifacts/skill_ontology.seed_plus_llm.json
+artifacts/llm-exp-smoke/
+artifacts/llm-exp/
 artifacts/ltr/
 artifacts/quality/
 artifacts/bedrock-pilot/

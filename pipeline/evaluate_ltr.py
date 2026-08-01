@@ -13,10 +13,28 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.train_ltr import BASE_FEATURES, RETRIEVAL_FEATURES, load_groups
+from pipeline.train_ltr import (
+    BASE_FEATURES,
+    LLM_GRAPH_FEATURES,
+    RETRIEVAL_FEATURES,
+    load_groups,
+)
 from scripts.benchmark import aggregate, metrics
 
 ABLATION_BASE_FEATURES = set([*BASE_FEATURES, *RETRIEVAL_FEATURES])
+LLM_ABLATION_FEATURES = set(LLM_GRAPH_FEATURES)
+
+
+def baseline_allowed_features(scope: str, manifest: dict) -> set[str]:
+    """Features the control arm may read.
+
+    graph_off keeps only text/condition/retrieval evidence. llm_off keeps every
+    reviewed-graph and behavior feature and removes just the Bedrock-derived
+    family, which isolates the generative-AI contribution.
+    """
+    if scope == "graph_off":
+        return set(ABLATION_BASE_FEATURES)
+    return set(manifest["features"]) - LLM_ABLATION_FEATURES
 
 
 def load_model(path: Path):
@@ -157,6 +175,12 @@ def main() -> None:
         ],
         default="none",
     )
+    parser.add_argument(
+        "--baseline-scope",
+        choices=["graph_off", "llm_off"],
+        default="graph_off",
+        help="Which feature families the control arm loses",
+    )
     args = parser.parse_args()
     graph_model, graph_manifest = load_model(args.graph_model)
     groups = read_grouped_rows(args.pairs)
@@ -168,12 +192,17 @@ def main() -> None:
         baseline_model, baseline_manifest = graph_model, graph_manifest
         ablation_design = (
             "same trained model; graph feature family zeroed at inference"
+            if args.baseline_scope == "graph_off"
+            else "same trained model; only Bedrock-derived LLM graph family "
+            "zeroed at inference"
         )
         baseline_rows = score_model(
             baseline_model,
             baseline_manifest,
             groups,
-            allowed_features=ABLATION_BASE_FEATURES,
+            allowed_features=baseline_allowed_features(
+                args.baseline_scope, baseline_manifest
+            ),
         )
     graph_rows = score_model(
         graph_model,
@@ -196,6 +225,7 @@ def main() -> None:
             "random_seed": 1111,
             "position_bias_correction": "XGBoost Unbiased LambdaMART",
             "ablation_design": ablation_design,
+            "baseline_scope": args.baseline_scope,
             "confidence_gate": args.confidence_gate,
             "baseline_model": baseline_manifest,
             "graph_model": graph_manifest,

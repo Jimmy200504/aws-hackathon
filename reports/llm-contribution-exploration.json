@@ -1,0 +1,197 @@
+{
+  "metadata": {
+    "schema": "skillweave-llm-contribution-exploration-v1",
+    "author": "timchen",
+    "status": "exploratory_only_not_release_evidence",
+    "release_claim": null,
+    "question": "How much of the measured ranking quality is attributable to generative AI, as opposed to the reviewed seed ontology and behavior aggregates?",
+    "why_this_is_not_release_evidence": [
+      "499 evaluation queries; both locked confirmations use 1,991 and 1,992.",
+      "The ranking model was trained on 1,673 groups; the locked run used 39,335 (4.3%).",
+      "The test window [2400,2600) is a subset of the already-consumed confirmation window [2400,3400), so it cannot support a fresh claim.",
+      "Every paired bootstrap confidence interval crosses zero.",
+      "Bedrock node coverage comes from a bounded 200-record pilot, not the full train-only corpus."
+    ],
+    "fresh_window_required_before_any_claim": "[4400,5400)",
+    "graph_cutoff": "2026-06-05 23:59:59.999",
+    "dataset_version": "1111-2026-06-01_2026-06-07",
+    "index_version": "benchmark-2026.06.05-v1",
+    "random_seed": 1111,
+    "model": {
+      "feature_set": "quality_llm",
+      "objective": "rank:ndcg",
+      "lambdarank_unbiased": true,
+      "n_estimators": 40,
+      "max_depth": 4,
+      "min_child_weight": 12.0,
+      "learning_rate": 0.05,
+      "xgboost_version": "3.2.0"
+    },
+    "fixture": {
+      "test_sample_bucket_start": 2400,
+      "test_sample_bucket_end_exclusive": 2600,
+      "train_groups": 1673,
+      "validation_groups": 497,
+      "test_groups": 499,
+      "judged_candidate_jobs": 38703
+    }
+  },
+  "generative_ai_inputs": {
+    "jd_skill_extraction": {
+      "model_id": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+      "prompt_version": "jd-skill-v3",
+      "records_extracted": 200,
+      "records_accepted": 180,
+      "nodes_published": 883,
+      "nodes_merged_into_evaluation_ontology": 882,
+      "relations_published": 0,
+      "relation_policy": "requires separate corpus corroboration",
+      "new_bedrock_calls_for_this_experiment": 0,
+      "note": "Reused the frozen pilot output already committed in artifacts/demo-index.json."
+    },
+    "query_normalization": {
+      "model_id": "us.anthropic.claude-sonnet-4-6",
+      "prompt_sha256_prefix": "b701c1571ec34be3",
+      "calls": 1507,
+      "distinct_queries_covered": 1512,
+      "degraded": 0,
+      "rewritten_vs_deterministic": 503,
+      "rewritten_rate": 0.3338,
+      "latency_ms_p50": 1163.1,
+      "latency_ms_p95": 2094.6,
+      "observed_rps": 0.7604,
+      "rate_ceiling_rps": 1.0,
+      "region": "us-east-1"
+    }
+  },
+  "arms": {
+    "bedrock_node_family": {
+      "design": "same trained model; only the Bedrock-derived llm_* feature family zeroed at inference",
+      "source_report": "artifacts/llm-exp-smoke/reports/C-llm-only-off.json",
+      "queries": 499,
+      "off": {
+        "ndcg@10": 0.44273984238701497,
+        "mrr": 0.4116630085567961,
+        "hit@1": 0.24448897795591182,
+        "hit@10": 0.8136272545090181,
+        "precision@10": 0.1587174348697395
+      },
+      "on": {
+        "ndcg@10": 0.44718221438340955,
+        "mrr": 0.41518751789292874,
+        "hit@1": 0.250501002004008,
+        "hit@10": 0.8216432865731463,
+        "precision@10": 0.16012024048096193
+      },
+      "relative_lift": {
+        "ndcg@10": 0.010033820250835657,
+        "mrr": 0.008561637219940632,
+        "hit@1": 0.024590163934426146,
+        "hit@10": 0.009852216748768461,
+        "precision@10": 0.008838383838383868
+      },
+      "paired_bootstrap_ndcg": {
+        "mean": 0.004442371996394561,
+        "ci95_low": -0.0002145264893747195,
+        "ci95_high": 0.009271088976406255
+      },
+      "verdict": "positive point estimate, confidence interval crosses zero by 0.0002; not significant at this sample size"
+    },
+    "query_normalization": {
+      "design": "one fixed model scoring two feature sets; only the resolved-skill surface differs",
+      "queries": 499,
+      "off": {
+        "ndcg@10": 0.4472,
+        "mrr": 0.4152,
+        "hit@1": 0.2505,
+        "hit@10": 0.8216,
+        "precision@10": 0.1601
+      },
+      "on": {
+        "ndcg@10": 0.4469,
+        "mrr": 0.415,
+        "hit@1": 0.2505,
+        "hit@10": 0.8216,
+        "precision@10": 0.1599
+      },
+      "relative_lift": {
+        "ndcg@10": -0.0006,
+        "mrr": -0.0006,
+        "hit@1": 0.0,
+        "hit@10": 0.0,
+        "precision@10": -0.0013
+      },
+      "paired_bootstrap_ndcg": {
+        "mean": -0.00027,
+        "ci95_low": -0.00083,
+        "ci95_high": 5e-05
+      },
+      "sanity_check": {
+        "unchanged_queries": 356,
+        "unchanged_queries_with_nonzero_delta": 0,
+        "note": "A query the LLM did not rewrite must score identically. This gate confirms the comparison is not contaminated by model retraining."
+      },
+      "verdict": "no measurable effect"
+    }
+  },
+  "coverage": {
+    "judged_candidate_jobs": 38703,
+    "reachable_by_bedrock_nodes": 2527,
+    "reachable_by_bedrock_nodes_rate": 0.0653,
+    "reachable_only_by_bedrock_nodes": 1091,
+    "reachable_only_by_bedrock_nodes_rate": 0.0282,
+    "no_graph_edge_at_all": 26865,
+    "queries_resolving_a_seed_node": 128,
+    "queries_resolving_a_bedrock_node": 14,
+    "queries_where_a_bedrock_node_matches_a_candidate": 8,
+    "note": "45 hand-written nodes reach 9x more queries than 882 Bedrock nodes, because the seed ontology was authored around search vocabulary while extraction produces job-description vocabulary."
+  },
+  "findings": {
+    "reranking_ceiling": {
+      "statement": "The offline benchmark reranks the original exposure list, so any improvement that would surface a job the previous system never showed is unmeasurable by construction.",
+      "queries_whose_graph_features_the_rewrite_moved": 12,
+      "share_of_all_queries": 0.024,
+      "predicted_order_changed": 9,
+      "ndcg_improved": 1,
+      "ndcg_worsened": 3,
+      "ndcg_unchanged": 8,
+      "relevant_candidates_that_received_the_new_signal": 12,
+      "relevant_candidates_total_in_those_groups": 32,
+      "relevant_signal_hit_rate": 0.375,
+      "reasons_ndcg_did_not_improve": [
+        "already saturated: the single relevant job was ranked first before the change",
+        "signal landed only on non-relevant candidates, reordering them without moving a relevant job",
+        "relevant job moved but stayed inside the same effective rank band",
+        "signal was uniform across all candidates, so relative order could not change"
+      ]
+    },
+    "downstream_dependency": {
+      "statement": "Query-side normalization is capped by job-side edge coverage. Rewrites resolved the correct occupation node in every inspected case, but only 37.5% of relevant candidates carried a matching edge, so the signal became noise as often as evidence.",
+      "implication": "Scaling train-only JD extraction is a prerequisite for measuring query normalization, not an independent alternative."
+    },
+    "methodological_correction": {
+      "statement": "An earlier version of this comparison trained a second model on the rewritten pairs and reported -0.98% for query normalization. That number was model-retraining variance, not rewrite effect: 356 unrewritten queries also moved, 106 worse and 112 better. Holding the model fixed reduced the effect to -0.06%.",
+      "retained_because": "the failure mode is easy to repeat and the discarded number should not resurface as evidence"
+    },
+    "online_configuration_risk": {
+      "statement": "Query normalization runs synchronously on every search request with a 2.0 second read timeout. Measured p95 was 2094.6 ms, so more than 5% of live requests would fall back to deterministic normalization and report a degraded component.",
+      "second_risk": "One Bedrock call per request exceeds the event's 1 request-per-second ceiling under any sustained judge traffic."
+    }
+  },
+  "reproduce": [
+    "python scripts/build_llm_ontology.py",
+    "python scripts/build_benchmark_fixture.py --ontology artifacts/skill_ontology.seed_plus_llm.json --qrels-output artifacts/llm-exp-smoke/temporal-eval.json --index-output artifacts/llm-exp-smoke/benchmark-index.json --train-sample-basis-points 30 --eval-sample-basis-points 200 --test-sample-bucket-start 2400 --test-sample-basis-points 200 --max-train-per-day 400 --max-eval-per-day 500 --max-test-per-day 500",
+    "python scripts/normalize_eval_queries.py --qrels artifacts/llm-exp-smoke/temporal-eval.json --cache artifacts/llm-exp-smoke/query-normalization.jsonl --splits test,validation,train",
+    "python pipeline/build_ltr_pairs.py --index artifacts/llm-exp-smoke/benchmark-index.json --qrels artifacts/llm-exp-smoke/temporal-eval.json --output-dir artifacts/llm-exp-smoke/ltr-rawq",
+    "python pipeline/build_ltr_pairs.py --index artifacts/llm-exp-smoke/benchmark-index.json --qrels artifacts/llm-exp-smoke/temporal-eval.json --output-dir artifacts/llm-exp-smoke/ltr-llmq --query-normalization artifacts/llm-exp-smoke/query-normalization.jsonl",
+    "python pipeline/train_ltr.py --train artifacts/llm-exp-smoke/ltr-rawq/train.jsonl --train-extra artifacts/llm-exp-smoke/ltr-rawq/validation.jsonl --validation artifacts/llm-exp-smoke/ltr-rawq/validation.jsonl --output artifacts/llm-exp-smoke/models/q-rawq.ubj --feature-set quality_llm --n-estimators 40 --max-depth 4 --min-child-weight 12 --learning-rate 0.05 --early-stopping-rounds 0",
+    "python pipeline/evaluate_ltr.py --graph-model artifacts/llm-exp-smoke/models/q-rawq.ubj --pairs artifacts/llm-exp-smoke/ltr-rawq/test.jsonl --qrels artifacts/llm-exp-smoke/temporal-eval.json --output artifacts/llm-exp-smoke/reports/C-llm-only-off.json --split test --baseline-scope llm_off"
+  ],
+  "next_steps": [
+    "Run train-only JD extraction across the 22,674 graph-eligible judged candidates to lift job-side edge coverage above 6.5%.",
+    "Resolve duplicate canonical nodes before scaling: the pilot emitted Microsoft Excel (37) and Excel (34) as separate nodes.",
+    "Serialize pipeline/bedrock_extract.py to one request per second; --max-workers currently defaults to 4.",
+    "Change the pipeline/bedrock_extract.py default region from ap-northeast-1, which is outside the permitted deployment regions.",
+    "Re-measure both arms on the untouched [4400,5400) window with full-scale training before any release claim."
+  ]
+}

@@ -88,6 +88,20 @@ QUALITY_MINIMAL_FEATURES = [
     *BEHAVIOR_GRAPH_FEATURES,
     "retrieval_reciprocal_rank",
 ]
+# Amazon Bedrock structured-extraction nodes only. Kept as a separate family so
+# the generative-AI contribution is ablatable without disturbing the frozen
+# quality_minimal release model.
+LLM_GRAPH_FEATURES = [
+    "llm_graph_raw",
+    "llm_direct_match_count",
+    "llm_related_path_count",
+    "llm_job_skill_count",
+    "llm_graph_cold_start",
+]
+QUALITY_LLM_FEATURES = [
+    *QUALITY_MINIMAL_FEATURES,
+    *LLM_GRAPH_FEATURES,
+]
 QUALITY_COMPANY_FEATURES = [
     *[
         name
@@ -145,6 +159,7 @@ def main() -> None:
             "quality",
             "quality_minimal",
             "quality_company",
+            "quality_llm",
         ],
         required=True,
     )
@@ -169,6 +184,7 @@ def main() -> None:
         "quality": QUALITY_FEATURES,
         "quality_minimal": QUALITY_MINIMAL_FEATURES,
         "quality_company": QUALITY_COMPANY_FEATURES,
+        "quality_llm": QUALITY_LLM_FEATURES,
     }[args.feature_set]
     train_parts = [
         load_groups(path, features)
