@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_VOCAB_PATH = ROOT / "config" / "query-intent-vocab.json"
 DEFAULT_PROMPT_PATH = ROOT / "config" / "query-intent-prompt.txt"
 DEFAULT_TOP_QUERIES_PATH = ROOT / "config" / "top-queries.json"
+DEFAULT_INTENTS_PATH = ROOT / "config" / "query-intents.json"
 MAX_QUERY_CHARS = 500
 MAX_EXPANSION_CHARS = 480
 
@@ -118,6 +119,27 @@ class StructuredQueryIntent:
     # Taxonomy expansion the ranker may use as a second-pass rescue. Carried on
     # the intent so callers wire one object through instead of two.
     recall_expansion: str = ""
+
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> StructuredQueryIntent:
+        def strings(key: str) -> tuple[str, ...]:
+            value = payload.get(key)
+            return tuple(str(item) for item in value) if isinstance(value, list) else ()
+
+        salary = payload.get("salary_type")
+        company = payload.get("company")
+        return cls(
+            intent_type=str(payload.get("intent_type", "unknown")),
+            duty_categories=strings("duty_categories"),
+            locations=strings("locations"),
+            employment_types=strings("employment_types"),
+            shifts=strings("shifts"),
+            salary_type=salary if isinstance(salary, str) else None,
+            company=company if isinstance(company, str) else None,
+            keep_terms=strings("keep_terms"),
+            confidence=float(payload.get("confidence", 0.0) or 0.0),
+            recall_expansion=str(payload.get("recall_expansion", "")),
+        )
 
     def is_empty(self) -> bool:
         return not (
@@ -584,11 +606,13 @@ class BedrockQueryNormalizer:
         self._client_lock = threading.Lock()
         self._system_prompt: str | None = None
         self._cache: OrderedDict[str, StructuredQueryIntent] = OrderedDict()
+        self._preloaded: dict[str, StructuredQueryIntent] = {}
         self._cache_size = max(0, int(cache_size))
         self._cache_lock = threading.Lock()
         self.cache_hits = 0
         self.cache_misses = 0
         self.prewarmed = 0
+        self.prewarm_requests = 0
         self._coalescer = BatchCoalescer(
             self._normalize_batch,
             max_batch=max_batch,
@@ -597,7 +621,7 @@ class BedrockQueryNormalizer:
 
     @classmethod
     def from_environment(cls) -> BedrockQueryNormalizer:
-        return cls(
+        normalizer = cls(
             os.getenv("BEDROCK_QUERY_MODEL_ID"),
             max_tokens=int(os.getenv("BEDROCK_QUERY_MAX_TOKENS", "4000")),
             max_batch=int(os.getenv("BEDROCK_QUERY_MAX_BATCH", "10")),
@@ -605,6 +629,10 @@ class BedrockQueryNormalizer:
             deadline_seconds=float(os.getenv("BEDROCK_QUERY_DEADLINE_SECONDS", "2.5")),
             cache_size=int(os.getenv("BEDROCK_QUERY_CACHE_SIZE", "4096")),
         )
+        loaded = normalizer.load_intents()
+        if loaded:
+            LOGGER.info("Loaded %d precomputed query intents", loaded)
+        return normalizer
 
     @property
     def enabled(self) -> bool:
@@ -619,6 +647,8 @@ class BedrockQueryNormalizer:
             "cache_misses": self.cache_misses,
             "prewarmed": self.prewarmed,
             "cached_queries": len(self._cache),
+            "precomputed_intents": len(self._preloaded),
+            "prewarm_requests": self.prewarm_requests,
         }
 
     def _get_client(self) -> Any:
@@ -657,7 +687,42 @@ class BedrockQueryNormalizer:
             )
         return self._system_prompt
 
+    def load_intents(self, path: str | Path | None = None) -> int:
+        """Seed intents precomputed offline by scripts/build_query_intents.py.
+
+        A Lambda invocation serves one request, so neither batching nor
+        background pre-warming can help there: there is no sibling query to
+        coalesce with and the container is frozen between calls. Shipping the
+        head of the query distribution as a lookup is what makes structured
+        normalization actually reachable on the serverless path.
+        """
+        intents_path = Path(path or os.getenv("QUERY_INTENTS_PATH", DEFAULT_INTENTS_PATH))
+        if not intents_path.is_file():
+            return 0
+        try:
+            payload = json.loads(intents_path.read_text(encoding="utf-8"))
+            entries = payload["intents"]
+        except (ValueError, KeyError, OSError) as exc:
+            LOGGER.warning(
+                "Ignoring unreadable precomputed intents at %s: %s",
+                intents_path,
+                type(exc).__name__,
+            )
+            return 0
+        loaded = {
+            deterministic_fallback(query): StructuredQueryIntent.from_dict(value)
+            for query, value in entries.items()
+            if isinstance(value, dict)
+        }
+        # Held outside the LRU: runtime misses must never evict the shipped head
+        # of the distribution.
+        self._preloaded = loaded
+        return len(loaded)
+
     def _cache_get(self, query: str) -> StructuredQueryIntent | None:
+        preloaded = self._preloaded.get(query)
+        if preloaded is not None:
+            return preloaded
         if self._cache_size <= 0:
             return None
         with self._cache_lock:
@@ -754,15 +819,16 @@ class BedrockQueryNormalizer:
         cleaned = deterministic_fallback(query)
         if self.vocabulary is None:
             return QueryNormalization(cleaned, "deterministic", None)
-        if not self.enabled:
-            return self._result(
-                query, self.vocabulary.parse_deterministically(query), "deterministic"
-            )
-
+        # Checked before the enabled/disabled split: a precomputed intent is
+        # most valuable exactly when Bedrock is unreachable or unconfigured.
         cached = self._cache_get(cleaned)
         if cached is not None:
             self.cache_hits += 1
             return self._result(query, cached, "amazon_bedrock_cached")
+        if not self.enabled:
+            return self._result(
+                query, self.vocabulary.parse_deterministically(query), "deterministic"
+            )
         self.cache_misses += 1
         intent, completed = self._coalescer.submit(cleaned, self.deadline_seconds)
         if completed and intent is not None:
@@ -827,7 +893,10 @@ class BedrockQueryNormalizer:
                 if delay > 0:
                     time.sleep(delay)
                 try:
-                    return len(self._normalize_batch(batch))
+                    resolved = len(self._normalize_batch(batch))
+                    with gate:
+                        self.prewarm_requests += 1
+                    return resolved
                 except Exception as exc:
                     LOGGER.warning(
                         "Prewarm batch of %d failed: %s", len(batch), type(exc).__name__

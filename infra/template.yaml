@@ -83,6 +83,10 @@ Globals:
         # multi-request container (ECS Fargate) set this to 1.0.
         BEDROCK_QUERY_MAX_WAIT_SECONDS: "0"
         BEDROCK_QUERY_DEADLINE_SECONDS: "2.5"
+        # Precomputed intents for the head of the query distribution, shipped in
+        # the bundle. Present only when the file was built before packaging.
+        QUERY_INTENTS_PATH: /var/task/config/query-intents.json
+        QUERY_VOCAB_PATH: /var/task/config/query-intent-vocab.json
 
 Resources:
   HttpApi:

@@ -21,6 +21,14 @@ def main() -> None:
         # string contract: no closed vocabulary, no validation, no structure.
         ROOT / "config" / "query-intent-vocab.json",
         ROOT / "config" / "query-intent-prompt.txt",
+        # Optional: a Lambda invocation serves one request, so neither batching
+        # nor pre-warming applies there. Shipping the precomputed head of the
+        # query distribution is what makes structured intents reachable.
+        *(
+            [ROOT / "config" / "query-intents.json"]
+            if (ROOT / "config" / "query-intents.json").is_file()
+            else []
+        ),
         ROOT / "artifacts" / "demo-index.json",
         (
             ROOT

@@ -8,8 +8,10 @@ __pycache__/
 # Organizer-provided data must not be published.
 data/dataset/*.csv
 docs/*.pdf
-# Verbatim job-seeker search strings; rebuild with scripts/build_top_queries.py.
+# Verbatim job-seeker search strings; rebuild with scripts/build_top_queries.py
+# and scripts/build_query_intents.py.
 config/top-queries.json
+config/query-intents.json
 # Per-job view/apply aggregates; rebuild with scripts/build_job_behavior.py.
 artifacts/job-behavior.json
 

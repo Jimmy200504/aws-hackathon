@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import tempfile
 import threading
 import time
 import unittest
+from pathlib import Path
 
 from app.query_normalizer import (
     BedrockQueryNormalizer,
@@ -284,6 +286,54 @@ class FallbackTests(unittest.TestCase):
                 "normalized_query": "React 前端",
             },
         )
+
+    def test_precomputed_intents_serve_without_bedrock(self) -> None:
+        """Lambda cannot batch or pre-warm, so the shipped head must be enough."""
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "query-intents.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "schema": "skillweave-query-intents-v1",
+                        "intents": {
+                            "現領": {
+                                "intent_type": "attribute",
+                                "duty_categories": ["門市／店員／專櫃人員"],
+                                "locations": [],
+                                "employment_types": ["全職"],
+                                "shifts": [],
+                                "salary_type": None,
+                                "company": None,
+                                "keep_terms": ["現領"],
+                                "confidence": 0.45,
+                            }
+                        },
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+            subject = BedrockQueryNormalizer(None, vocabulary=VOCAB)
+            self.assertEqual(subject.load_intents(path), 1)
+
+            hit = subject.normalize("  現領  ")
+            miss = subject.normalize("宇宙飛船駕駛員")
+
+        self.assertEqual(hit.source, "amazon_bedrock_cached")
+        self.assertEqual(hit.intent.duty_categories, ("門市／店員／專櫃人員",))
+        self.assertEqual(hit.intent.employment_types, ("全職",))
+        self.assertTrue(hit.expansion.startswith("門市／店員／專櫃人員"))
+        self.assertEqual(miss.source, "deterministic")
+
+    def test_precomputed_intents_survive_cache_pressure(self) -> None:
+        client = FakeBedrock()
+        subject = normalizer(client, cache_size=1)
+        subject._preloaded = {"現領": VOCAB.validate(intent_payload(0, "現領"), "現領")}
+
+        for index in range(5):
+            subject.normalize(f"filler-{index}")
+
+        self.assertEqual(subject.normalize("現領").source, "amazon_bedrock_cached")
 
     def test_rejects_oversized_query_before_calling_bedrock(self) -> None:
         client = FakeBedrock()
