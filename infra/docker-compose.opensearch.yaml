@@ -6,6 +6,7 @@ services:
       - discovery.type=single-node
       - DISABLE_SECURITY_PLUGIN=true
       - OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g
+      - path.repo=/usr/share/opensearch/snapshots
     ports:
       - "127.0.0.1:9200:9200"
       - "127.0.0.1:9600:9600"
@@ -18,6 +19,7 @@ services:
         hard: 65536
     volumes:
       - skillweave-opensearch-data:/usr/share/opensearch/data
+      - ../snapshots/opensearch:/usr/share/opensearch/snapshots
 
 volumes:
   skillweave-opensearch-data:

@@ -76,10 +76,10 @@
     "reports/submission-audit.json": "5deff83203be01ce16803ab5aaa38061ff6b3afa24312626090d86f77a90efc3",
     "reports/load-smoke.json": "d476cafd0e62204c488495bc3f4ecdcd685b7ac10c9a6b6d89e5df1399d5c89c",
     "docs/submission-packet.md": "257ebdbbeb481c1df176a5c4e9ea97bd71538c25826ea66747f3ee816eda7b1a",
-    "reports/aws-production-smoke.json": "a75eb681a894cf9528cda050d08e56a4abbf5bf5b836ccadfd501d1345a60d7c"
+    "reports/aws-production-smoke.json": "c9a003f29d52a7904e0330400459e005da4be150c661713020bb0849bab60990"
   },
   "external_deliverables": {
-    "aws_url": "https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/",
+    "aws_url": "https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/",
     "github_url": "https://github.com/Jimmy200504/aws-hackathon/releases/tag/skillweave-2026.07.28-rc6",
     "demo_video_url": "https://github.com/Jimmy200504/aws-hackathon/releases/download/skillweave-2026.07.28-rc6/skillweave-demo-5min.mp4"
   }

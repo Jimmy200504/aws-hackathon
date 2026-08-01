@@ -31,4 +31,5 @@ reports/ltr-tuning-*.json
 .aws-sam/
 cdk.out/
 dist/
+snapshots/
 *.log

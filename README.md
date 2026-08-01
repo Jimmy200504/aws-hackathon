@@ -160,6 +160,516 @@ Bedrock 成功時，搜尋回應還應包含：
 make opensearch-local-down
 ```
 
+## AWS 完整部署：Frontend + API + Provisioned OpenSearch
+
+以下是目前實際使用、可從零重現的 judge deployment。它會建立計費資源；評審
+期間請保留，活動結束後依最下方步驟清理。
+
+### 已部署架構與邊界
+
+```text
+Public HTTPS
+  → API Gateway HTTP API
+  → Lambda（同時提供 web/ frontend 與 JSON API）
+      → Amazon Bedrock query normalization
+      → Provisioned Amazon OpenSearch Service domain
+          → skillweave-jobs-v1，1,218,635 documents
+      → Embedded Skill Graph artifact + portable LambdaMART reranker
+
+Local OpenSearch index
+  → FIXED-layout snapshot
+  → private S3 snapshot bucket
+  → provisioned OpenSearch restore
+```
+
+目前 skill graph 功能已在 AWS Lambda 上運作，`/api/v1/graph/trace` 可回傳 evidence
+paths；它不是獨立 Neptune database。OpenSearch 文件本身包含每個職缺的 `skills`、
+`skill_evidence`、`skill_confidence` 與 `skill_provenance`。
+
+截至 2026-08-01 的公開 judge endpoints：
+
+- Frontend：<https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/>
+- Metadata：<https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/api/v1/meta>
+- Search：<https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/api/v1/jobs/search>
+- Graph trace：<https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/api/v1/graph/trace>
+
+### 1. 安裝工具並確認 AWS identity
+
+需要 AWS CLI v2、AWS SAM CLI、Docker Desktop、Python 3.11+、`curl` 與 `jq`。
+執行 deployment 的 IAM role 至少要能操作 CloudFormation、IAM、Lambda、API
+Gateway、CloudWatch、S3、Bedrock 與 OpenSearch Service，並具有 `iam:PassRole`。
+
+```bash
+cd "/Users/jen/Desktop/Code/AWS Hackathon"
+python3 -m venv .venv
+.venv/bin/pip install -r requirements-production.lock
+
+aws login
+aws sts get-caller-identity
+sam --version
+docker --version
+```
+
+設定共用變數。`DEPLOYMENT_PRINCIPAL_ARN` 必須是 IAM role ARN，不能使用
+`arn:aws:sts::...:assumed-role/...` session ARN。
+
+```bash
+export AWS_REGION=us-east-1
+export APP_STACK=skillweave-demo
+export SEARCH_STACK=skillweave-provisioned-search
+export DOMAIN_NAME=skillweave-jobs
+export INDEX_NAME=skillweave-jobs-v1
+export DOCUMENT_COUNT=1218635
+export SNAPSHOT_NAME=skillweave-full-fixed-2026-08-01
+export DEPLOYMENT_PRINCIPAL_ARN=arn:aws:iam::123456789012:role/YourDeploymentRole
+```
+
+### 2. Bootstrap frontend/API stack
+
+先建立不連 OpenSearch 的 Lambda stack，目的是取得穩定的 Lambda execution role。
+Frontend 位於 `web/`，由 Lambda 同時提供，不需要額外建立 Amplify、CloudFront、
+S3 website 或 Node build。
+
+```bash
+python3 scripts/package_lambda.py
+python3 -m zipfile -t dist/skillweave-lambda.zip
+sam validate --lint --template-file infra/template.yaml
+sam build --template-file infra/template.yaml
+
+sam deploy \
+  --stack-name "$APP_STACK" \
+  --region "$AWS_REGION" \
+  --resolve-s3 \
+  --capabilities CAPABILITY_IAM \
+  --no-confirm-changeset \
+  --no-fail-on-empty-changeset \
+  --parameter-overrides \
+    StageName=prod \
+    ReservedConcurrency=0 \
+    OpenSearchService=none \
+    OpenSearchDocumentCount=0
+```
+
+取得 SAM 建立的 runtime role：
+
+```bash
+export LAMBDA_ROLE_NAME="$(aws cloudformation describe-stack-resources \
+  --stack-name "$APP_STACK" \
+  --region "$AWS_REGION" \
+  --logical-resource-id SearchFunctionRole \
+  --query 'StackResources[0].PhysicalResourceId' \
+  --output text)"
+
+export LAMBDA_ROLE_ARN="$(aws iam get-role \
+  --role-name "$LAMBDA_ROLE_NAME" \
+  --query 'Role.Arn' \
+  --output text)"
+
+printf '%s\n' "$LAMBDA_ROLE_ARN"
+```
+
+已經存在 `skillweave-demo` stack 時，不要另建 bootstrap stack；直接執行上面的
+兩段查詢取得既有 role。
+
+### 3. 建立 provisioned OpenSearch domain 與 snapshot bucket
+
+目前經過 smoke test 的最小 judge 規格是 OpenSearch 3.3、單一
+`m6g.large.search`、20 GiB gp3。這個配置沒有 HA，只適合 bounded hackathon demo；
+正式 production 應使用多 AZ、replica、容量監控與 VPC access。
+
+```bash
+aws cloudformation deploy \
+  --template-file infra/opensearch-provisioned.yaml \
+  --stack-name "$SEARCH_STACK" \
+  --region "$AWS_REGION" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --no-fail-on-empty-changeset \
+  --parameter-overrides \
+    DomainName="$DOMAIN_NAME" \
+    EngineVersion=OpenSearch_3.3 \
+    InstanceType=m6g.large.search \
+    VolumeSize=20 \
+    RuntimePrincipalArn="$LAMBDA_ROLE_ARN" \
+    DeploymentPrincipalArn="$DEPLOYMENT_PRINCIPAL_ARN"
+```
+
+Domain 建立通常需要數十分鐘。完成後讀取 outputs：
+
+```bash
+export OPENSEARCH_ENDPOINT="$(aws cloudformation describe-stacks \
+  --stack-name "$SEARCH_STACK" \
+  --region "$AWS_REGION" \
+  --query 'Stacks[0].Outputs[?OutputKey==`DomainEndpoint`].OutputValue | [0]' \
+  --output text)"
+
+export OPENSEARCH_DOMAIN_ARN="$(aws cloudformation describe-stacks \
+  --stack-name "$SEARCH_STACK" \
+  --region "$AWS_REGION" \
+  --query 'Stacks[0].Outputs[?OutputKey==`DomainArn`].OutputValue | [0]' \
+  --output text)"
+
+export SNAPSHOT_BUCKET="$(aws cloudformation describe-stacks \
+  --stack-name "$SEARCH_STACK" \
+  --region "$AWS_REGION" \
+  --query 'Stacks[0].Outputs[?OutputKey==`SnapshotBucketName`].OutputValue | [0]' \
+  --output text)"
+
+export SNAPSHOT_ROLE_ARN="$(aws cloudformation describe-stacks \
+  --stack-name "$SEARCH_STACK" \
+  --region "$AWS_REGION" \
+  --query 'Stacks[0].Outputs[?OutputKey==`SnapshotRoleArn`].OutputValue | [0]' \
+  --output text)"
+
+printf '%s\n' \
+  "$OPENSEARCH_ENDPOINT" \
+  "$OPENSEARCH_DOMAIN_ARN" \
+  "$SNAPSHOT_BUCKET" \
+  "$SNAPSHOT_ROLE_ARN"
+```
+
+### 4. 從既有本機索引建立 FIXED snapshot
+
+先確認本機 container 與完整 index。已有 named volume 時不要重跑全量 ingestion：
+
+```bash
+make opensearch-local-up
+curl --fail-with-body -sS \
+  "http://127.0.0.1:9200/$INDEX_NAME/_count" | jq
+```
+
+預期 `count` 必須精確等於 `1218635`。建立獨立的 `FIXED` repository：
+
+```bash
+docker exec skillweave-opensearch \
+  mkdir -p /usr/share/opensearch/snapshots/fixed
+
+curl --fail-with-body -sS -X PUT \
+  http://127.0.0.1:9200/_snapshot/skillweave-local-fixed \
+  -H 'content-type: application/json' \
+  -d '{
+    "type":"fs",
+    "settings":{
+      "location":"/usr/share/opensearch/snapshots/fixed",
+      "compress":true,
+      "shard_path_type":"FIXED"
+    }
+  }' | jq
+```
+
+建立 snapshot。`wait_for_completion=true` 只會在 snapshot 完成後返回：
+
+```bash
+curl --fail-with-body -sS -X PUT \
+  "http://127.0.0.1:9200/_snapshot/skillweave-local-fixed/$SNAPSHOT_NAME?wait_for_completion=true" \
+  -H 'content-type: application/json' \
+  -d "{
+    \"indices\":\"$INDEX_NAME\",
+    \"include_global_state\":false,
+    \"metadata\":{
+      \"source_count\":\"$DOCUMENT_COUNT\",
+      \"layout\":\"FIXED\"
+    }
+  }" | jq
+
+curl --fail-with-body -sS \
+  "http://127.0.0.1:9200/_snapshot/skillweave-local-fixed/$SNAPSHOT_NAME" | jq
+```
+
+最後一個結果必須是 `state=SUCCESS`、`failed=0`、`successful=1`。
+
+不要使用 OpenSearch 3 預設的 `HASHED_PREFIX` snapshot 再直接加 S3
+`base_path`；hash 會位於 base path 前方，metadata 雖可列出，restore worker 卻可能
+找不到 shard blobs。此 runbook 固定使用 `FIXED` layout 避免路徑歧義。
+
+### 5. 上傳 snapshot 到 private S3 bucket
+
+```bash
+aws s3 sync \
+  snapshots/opensearch/fixed \
+  "s3://$SNAPSHOT_BUCKET/fixed" \
+  --only-show-errors
+
+aws s3api list-objects-v2 \
+  --bucket "$SNAPSHOT_BUCKET" \
+  --prefix fixed/ \
+  --query '[length(Contents),sum(Contents[].Size)]' \
+  --output text
+```
+
+目前 snapshot 的已驗證結果是 101 objects、1,956,333,725 bytes。不同 index
+segment merge 狀態可能產生不同 object 數與 bytes，因此真正的必要條件是後續 AWS
+repository 能列出 `SUCCESS` snapshot，restore 後 `_count` 完全相同。
+
+### 6. 在 AWS domain 註冊 repository 並 restore
+
+OpenSearch domain 使用 IAM/SigV4，不能用未簽章的普通 `curl`。以下程式使用
+`botocore` 的既有 AWS credential chain，不會把 access key 印到 terminal。
+
+如果 target domain 已有同名 index，restore 前的 `DELETE` 會永久刪除該 AWS index。
+只應在新 domain 或已確認 S3/local snapshot 完整時執行；本機 index 不受影響。
+
+```bash
+.venv/bin/python - <<'PY'
+import json
+import os
+
+from scripts.index_full_opensearch import SignedOpenSearchClient
+
+endpoint = os.environ["OPENSEARCH_ENDPOINT"]
+region = os.environ["AWS_REGION"]
+bucket = os.environ["SNAPSHOT_BUCKET"]
+role_arn = os.environ["SNAPSHOT_ROLE_ARN"]
+index = os.environ["INDEX_NAME"]
+snapshot = os.environ["SNAPSHOT_NAME"]
+
+client = SignedOpenSearchClient(endpoint, region, 60)
+repository = {
+    "type": "s3",
+    "settings": {
+        "bucket": bucket,
+        "base_path": "fixed",
+        "region": region,
+        "role_arn": role_arn,
+        "readonly": True,
+        "shard_path_type": "FIXED",
+    },
+}
+print(client.request(
+    "PUT",
+    "/_snapshot/skillweave-s3-fixed",
+    json.dumps(repository).encode(),
+))
+
+metadata = client.request(
+    "GET",
+    f"/_snapshot/skillweave-s3-fixed/{snapshot}",
+)
+print(json.dumps(metadata, indent=2))
+if metadata["snapshots"][0]["state"] != "SUCCESS":
+    raise SystemExit("snapshot is not restorable")
+
+print(client.request("DELETE", f"/{index}", acceptable=(200, 404)))
+restore = {
+    "indices": index,
+    "include_global_state": False,
+    "ignore_unavailable": False,
+    "index_settings": {"index.number_of_replicas": 0},
+}
+print(client.request(
+    "POST",
+    f"/_snapshot/skillweave-s3-fixed/{snapshot}/_restore",
+    json.dumps(restore).encode(),
+))
+PY
+```
+
+等待 restore 完成並驗證 cluster 與筆數：
+
+```bash
+.venv/bin/python - <<'PY'
+import json
+import os
+
+from scripts.index_full_opensearch import SignedOpenSearchClient
+
+client = SignedOpenSearchClient(
+    os.environ["OPENSEARCH_ENDPOINT"],
+    os.environ["AWS_REGION"],
+    60,
+)
+index = os.environ["INDEX_NAME"]
+health = client.request(
+    "GET",
+    f"/_cluster/health/{index}?wait_for_status=green&timeout=60s",
+)
+count = client.request("GET", f"/{index}/_count")
+print(json.dumps({
+    "cluster_status": health["status"],
+    "unassigned_shards": health["unassigned_shards"],
+    "count": count["count"],
+}, indent=2))
+if health["status"] != "green" or count["count"] != 1_218_635:
+    raise SystemExit("OpenSearch restore verification failed")
+PY
+```
+
+預期結果：`cluster_status=green`、`unassigned_shards=0`、
+`count=1218635`。
+
+### 7. 將 Lambda/API 切換到 provisioned domain
+
+Template 參數仍名為 `OpenSearchCollectionArn`，是為了相容原本 Serverless
+deployment；provisioned 模式傳入的是 domain ARN，並設定 `OpenSearchService=es`，
+讓 Lambda IAM 使用 `es:ESHttpGet/Post/Head`。
+
+在乾淨、完整的 release branch 上可使用：
+
+```bash
+AWS_REGION="$AWS_REGION" \
+OPENSEARCH_ENDPOINT="$OPENSEARCH_ENDPOINT" \
+OPENSEARCH_COLLECTION_ARN="$OPENSEARCH_DOMAIN_ARN" \
+OPENSEARCH_INDEX="$INDEX_NAME" \
+OPENSEARCH_DOCUMENT_COUNT="$DOCUMENT_COUNT" \
+OPENSEARCH_SERVICE=es \
+BEDROCK_QUERY_MODEL_ID=us.anthropic.claude-sonnet-4-6 \
+./scripts/deploy_compact_aws.sh
+```
+
+此腳本會先跑完整 release gate，再執行 SAM deployment。若 release gate 已在 CI
+獨立通過，也可做 targeted deployment：
+
+```bash
+python3 scripts/package_lambda.py
+sam validate --lint --template-file infra/template.yaml
+sam build --template-file infra/template.yaml
+
+sam deploy \
+  --stack-name "$APP_STACK" \
+  --region "$AWS_REGION" \
+  --resolve-s3 \
+  --capabilities CAPABILITY_IAM \
+  --no-confirm-changeset \
+  --no-fail-on-empty-changeset \
+  --parameter-overrides \
+    StageName=prod \
+    ReservedConcurrency=0 \
+    OpenSearchEndpoint="$OPENSEARCH_ENDPOINT" \
+    OpenSearchCollectionArn="$OPENSEARCH_DOMAIN_ARN" \
+    OpenSearchIndex="$INDEX_NAME" \
+    OpenSearchDocumentCount="$DOCUMENT_COUNT" \
+    OpenSearchService=es \
+    BedrockQueryModelId=us.anthropic.claude-sonnet-4-6
+```
+
+取得 public URL 並更新 release evidence：
+
+```bash
+export DEMO_URL="$(aws cloudformation describe-stacks \
+  --stack-name "$APP_STACK" \
+  --region "$AWS_REGION" \
+  --query 'Stacks[0].Outputs[?OutputKey==`DemoUrl`].OutputValue | [0]' \
+  --output text)"
+
+python3 scripts/update_release_urls.py --aws-url "$DEMO_URL"
+printf '%s\n' "$DEMO_URL"
+```
+
+### 8. Judge-facing 驗收
+
+Metadata 必須同時揭露 embedded fallback 與正式搜尋全集，避免把 12,000 fallback
+誤認為完整 corpus：
+
+```bash
+curl --fail-with-body -sS "${DEMO_URL%/}/api/v1/meta" | jq '{
+  embedded_job_count,
+  full_corpus_job_count,
+  search_corpus_job_count,
+  search_scope
+}'
+```
+
+預期：
+
+```json
+{
+  "embedded_job_count": 12000,
+  "full_corpus_job_count": 1218635,
+  "search_corpus_job_count": 1218635,
+  "search_scope": "full_corpus_opensearch"
+}
+```
+
+搜尋與 graph trace：
+
+```bash
+curl --fail-with-body -sS -X POST \
+  "${DEMO_URL%/}/api/v1/jobs/search" \
+  -H 'content-type: application/json' \
+  -d '{
+    "query":"後端工程師 Node.js",
+    "location_code":["100100"],
+    "top_k":10,
+    "use_graph":true
+  }' | jq '{meta,results:[.result[]|{rank,job_id,title}]}'
+
+curl --fail-with-body -sS -X POST \
+  "${DEMO_URL%/}/api/v1/graph/trace" \
+  -H 'content-type: application/json' \
+  -d '{"query":"AWS Docker Kubernetes","top_k":3}' | jq
+```
+
+搜尋 response 必須有：
+
+```json
+{
+  "candidate_source": "opensearch_full_corpus",
+  "degraded_components": [],
+  "ranking_model": "ltr-quality-final.ubj",
+  "query_normalization": {"source": "amazon_bedrock"}
+}
+```
+
+最後跑無 AWS authentication 的 public HTTPS bounded smoke：
+
+```bash
+python3 scripts/run_aws_production_smoke.py \
+  --url "$DEMO_URL" \
+  --requests 30 \
+  --concurrency 5 \
+  --require-full-corpus
+
+python3 scripts/build_submission_packet.py
+python3 scripts/audit_submission.py
+python3 scripts/verify_release.py
+```
+
+正式驗收要求 30/30 HTTP 200、30/30 Top 10、30/30
+`opensearch_full_corpus`、p95 小於 10 秒、沒有 client errors 或 degraded
+components。結果保存在 `reports/aws-production-smoke.json` 與
+`reports/verify-release.json`。
+
+### 9. Rollback、停止計費與保留資料
+
+只回滾 Lambda 時，不需要刪 OpenSearch：重新部署上一個 Lambda ZIP/template，或把
+OpenSearch parameters 設回空字串與 `OpenSearchService=none`，API 就會使用 embedded
+fallback。
+
+評審結束後刪除計費 stack：
+
+```bash
+aws cloudformation delete-stack \
+  --stack-name "$APP_STACK" \
+  --region "$AWS_REGION"
+aws cloudformation wait stack-delete-complete \
+  --stack-name "$APP_STACK" \
+  --region "$AWS_REGION"
+
+aws cloudformation delete-stack \
+  --stack-name "$SEARCH_STACK" \
+  --region "$AWS_REGION"
+aws cloudformation wait stack-delete-complete \
+  --stack-name "$SEARCH_STACK" \
+  --region "$AWS_REGION"
+```
+
+刪除 `$SEARCH_STACK` 會永久刪除 provisioned domain 與其 restored index。
+Snapshot bucket 在 template 中使用 `DeletionPolicy: Retain`，所以 stack 刪除後 S3
+backup 仍存在並持續產生儲存費；確認不再需要 restore 後，才另外清空及刪除該
+bucket。本機 Docker named volume 與 `snapshots/opensearch/fixed` 不會被
+CloudFormation 刪除。
+
+若帳號裡還有舊的 `skillweave-full-search` OpenSearch Serverless stack，確認
+provisioned smoke 通過後再刪除，避免兩套搜尋服務重複計費：
+
+```bash
+aws cloudformation delete-stack \
+  --stack-name skillweave-full-search \
+  --region "$AWS_REGION"
+aws cloudformation wait stack-delete-complete \
+  --stack-name skillweave-full-search \
+  --region "$AWS_REGION"
+```
+
 ## API
 
 ```http
@@ -242,7 +752,7 @@ app/        API、OpenSearch retrieval、排序與 Lambda handler
 web/        Live Demo
 pipeline/   Bedrock 萃取、LTR 特徵、訓練與評估
 scripts/    建索引、驗證、打包與部署
-infra/      SAM 與 OpenSearch Serverless
+infra/      SAM、provisioned OpenSearch 與選配 Serverless／Neptune templates
 artifacts/  Demo index 與 portable 模型
 reports/    品質、效能與部署證據
 docs/       架構、資料、安全與部署細節

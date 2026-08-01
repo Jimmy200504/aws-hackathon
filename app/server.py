@@ -23,6 +23,9 @@ DEFAULT_ARTIFACT = ROOT / "artifacts" / "demo-index.json"
 DEFAULT_LTR_MODEL = (
     ROOT / "artifacts" / "models" / "ltr-quality-final.trees.json"
 )
+FULL_CORPUS_JOB_COUNT = max(
+    0, int(os.getenv("OPENSEARCH_DOCUMENT_COUNT", "0"))
+)
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -58,6 +61,12 @@ class Handler(BaseHTTPRequestHandler):
                     "service": "skillweave-search",
                     "index_version": self.ranker.metadata.get("index_version"),
                     "jobs": len(self.ranker.jobs),
+                    "full_corpus_jobs": (
+                        FULL_CORPUS_JOB_COUNT
+                        if self.ranker.candidate_retriever is not None
+                        and FULL_CORPUS_JOB_COUNT > 0
+                        else None
+                    ),
                     "full_corpus_retrieval": self.ranker.candidate_retriever is not None,
                     "bedrock_query_normalization": self.query_normalizer.enabled,
                 }
@@ -68,6 +77,19 @@ class Handler(BaseHTTPRequestHandler):
                 {
                     "metadata": self.ranker.metadata,
                     "job_count": len(self.ranker.jobs),
+                    "embedded_job_count": len(self.ranker.jobs),
+                    "full_corpus_job_count": (
+                        FULL_CORPUS_JOB_COUNT
+                        if self.ranker.candidate_retriever is not None
+                        and FULL_CORPUS_JOB_COUNT > 0
+                        else None
+                    ),
+                    "search_corpus_job_count": (
+                        FULL_CORPUS_JOB_COUNT
+                        if self.ranker.candidate_retriever is not None
+                        and FULL_CORPUS_JOB_COUNT > 0
+                        else len(self.ranker.jobs)
+                    ),
                     "skill_count": len(self.ranker.skills),
                     "search_scope": (
                         "full_corpus_opensearch"

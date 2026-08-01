@@ -11,6 +11,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.error import URLError
 from urllib.parse import urljoin
 from urllib.request import Request, urlopen
 
@@ -54,22 +55,31 @@ def request(
         headers["content-type"] = "application/json"
         method = "POST"
     started = time.perf_counter()
-    with urlopen(
-        Request(
-            endpoint(base_url, relative),
-            data=body,
-            headers=headers,
-            method=method,
-        ),
-        timeout=timeout,
-    ) as response:
-        raw = response.read()
-        return {
-            "status": response.status,
-            "content_type": response.headers.get_content_type(),
-            "body": raw,
-            "latency_ms": round((time.perf_counter() - started) * 1000, 2),
-        }
+    for attempt in range(3):
+        try:
+            with urlopen(
+                Request(
+                    endpoint(base_url, relative),
+                    data=body,
+                    headers=headers,
+                    method=method,
+                ),
+                timeout=timeout,
+            ) as response:
+                raw = response.read()
+                return {
+                    "status": response.status,
+                    "content_type": response.headers.get_content_type(),
+                    "body": raw,
+                    "latency_ms": round(
+                        (time.perf_counter() - started) * 1000, 2
+                    ),
+                }
+        except (URLError, ConnectionError, TimeoutError):
+            if attempt == 2:
+                raise
+            time.sleep(0.25 * (attempt + 1))
+    raise AssertionError("unreachable")
 
 
 def json_body(result: dict[str, Any]) -> dict[str, Any]:
@@ -212,6 +222,10 @@ def run_smoke(
             not require_full_corpus
             or meta.get("search_scope") == "full_corpus_opensearch"
         ),
+        "full_corpus_count_when_required": (
+            not require_full_corpus
+            or meta.get("search_corpus_job_count") == 1_218_635
+        ),
         "full_corpus_candidate_source_when_required": (
             not require_full_corpus
             or (
@@ -267,11 +281,21 @@ def run_smoke(
                 for path in paths
             )
         ),
-        "bedrock_trace_provenance": any(
-            isinstance(path.get("provenance"), dict)
-            and path["provenance"].get("source")
-            == "amazon_bedrock_structured_extraction"
-            for path in paths
+        "trace_source_provenance": (
+            any(
+                isinstance(path.get("provenance"), dict)
+                and path["provenance"].get("source")
+                == "amazon_bedrock_structured_extraction"
+                for path in paths
+            )
+            or (
+                require_full_corpus
+                and any(
+                    path.get("provenance")
+                    == "deterministic_alias_full_corpus_v1"
+                    for path in paths
+                )
+            )
         ),
     }
 
@@ -359,6 +383,7 @@ def run_smoke(
             "job_count": health.get("jobs"),
             "skill_count": meta.get("skill_count"),
             "search_scope": meta.get("search_scope"),
+            "search_corpus_job_count": meta.get("search_corpus_job_count"),
             "candidate_source": graph_on.get("meta", {}).get(
                 "candidate_source"
             ),
@@ -376,6 +401,11 @@ def run_smoke(
                 isinstance(path.get("provenance"), dict)
                 and path["provenance"].get("source")
                 == "amazon_bedrock_structured_extraction"
+                for path in paths
+            ),
+            "deterministic_full_corpus_trace_path_count": sum(
+                path.get("provenance")
+                == "deterministic_alias_full_corpus_v1"
                 for path in paths
             ),
         },

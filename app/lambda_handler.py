@@ -24,6 +24,9 @@ LTR_MODEL_PATH = Path(
         ROOT / "artifacts" / "models" / "ltr-quality-final.trees.json",
     )
 )
+FULL_CORPUS_JOB_COUNT = max(
+    0, int(os.getenv("OPENSEARCH_DOCUMENT_COUNT", "0"))
+)
 RANKER = SkillWeaveRanker(
     INDEX_PATH,
     ltr_model_path=LTR_MODEL_PATH,
@@ -171,6 +174,12 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
                     "service": "skillweave-search",
                     "index_version": RANKER.metadata.get("index_version"),
                     "jobs": len(RANKER.jobs),
+                    "full_corpus_jobs": (
+                        FULL_CORPUS_JOB_COUNT
+                        if RANKER.candidate_retriever is not None
+                        and FULL_CORPUS_JOB_COUNT > 0
+                        else None
+                    ),
                     "full_corpus_retrieval": RANKER.candidate_retriever is not None,
                     "bedrock_query_normalization": QUERY_NORMALIZER.enabled,
                 },
@@ -181,6 +190,19 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
                 {
                     "metadata": RANKER.metadata,
                     "job_count": len(RANKER.jobs),
+                    "embedded_job_count": len(RANKER.jobs),
+                    "full_corpus_job_count": (
+                        FULL_CORPUS_JOB_COUNT
+                        if RANKER.candidate_retriever is not None
+                        and FULL_CORPUS_JOB_COUNT > 0
+                        else None
+                    ),
+                    "search_corpus_job_count": (
+                        FULL_CORPUS_JOB_COUNT
+                        if RANKER.candidate_retriever is not None
+                        and FULL_CORPUS_JOB_COUNT > 0
+                        else len(RANKER.jobs)
+                    ),
                     "skill_count": len(RANKER.skills),
                     "search_scope": (
                         "full_corpus_opensearch"

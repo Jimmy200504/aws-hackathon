@@ -32,6 +32,23 @@ class LambdaHandlerTests(unittest.TestCase):
         self.assertEqual(result["statusCode"], 200)
         self.assertEqual(json.loads(result["body"])["status"], "ok")
 
+    def test_meta_discloses_full_corpus_and_embedded_counts(self) -> None:
+        with (
+            patch.object(lambda_handler, "FULL_CORPUS_JOB_COUNT", 1_218_635),
+            patch.object(
+                lambda_handler.RANKER,
+                "candidate_retriever",
+                object(),
+            ),
+        ):
+            result = handler(event("GET", "/api/v1/meta"), None)
+
+        body = json.loads(result["body"])
+        self.assertEqual(body["embedded_job_count"], 12_000)
+        self.assertEqual(body["full_corpus_job_count"], 1_218_635)
+        self.assertEqual(body["search_corpus_job_count"], 1_218_635)
+        self.assertEqual(body["search_scope"], "full_corpus_opensearch")
+
     def test_search_contract(self) -> None:
         result = handler(
             event("POST", "/api/v1/jobs/search", {"query": "行政助理", "top_k": 10}),
