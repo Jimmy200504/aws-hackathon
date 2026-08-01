@@ -602,8 +602,8 @@ class BedrockQueryNormalizer:
         vocabulary: QueryIntentVocabulary | None = None,
         prompt_path: str | Path | None = None,
         max_batch: int = 10,
-        max_wait_seconds: float = 1.0,
-        deadline_seconds: float = 2.5,
+        max_wait_seconds: float = 0.05,
+        deadline_seconds: float = 6.0,
         cache_size: int = 4096,
     ) -> None:
         self.model_id = (model_id or "").strip() or None
@@ -635,8 +635,8 @@ class BedrockQueryNormalizer:
             os.getenv("BEDROCK_QUERY_MODEL_ID"),
             max_tokens=int(os.getenv("BEDROCK_QUERY_MAX_TOKENS", "4000")),
             max_batch=int(os.getenv("BEDROCK_QUERY_MAX_BATCH", "10")),
-            max_wait_seconds=float(os.getenv("BEDROCK_QUERY_MAX_WAIT_SECONDS", "1.0")),
-            deadline_seconds=float(os.getenv("BEDROCK_QUERY_DEADLINE_SECONDS", "2.5")),
+            max_wait_seconds=float(os.getenv("BEDROCK_QUERY_MAX_WAIT_SECONDS", "0.05")),
+            deadline_seconds=float(os.getenv("BEDROCK_QUERY_DEADLINE_SECONDS", "6.0")),
             cache_size=int(os.getenv("BEDROCK_QUERY_CACHE_SIZE", "4096")),
             vocabulary=QueryIntentVocabulary.load(),
         )

@@ -1,6 +1,6 @@
 {
   "verifier_version": "1",
-  "verified_at_utc": "2026-08-01T12:33:49Z",
+  "verified_at_utc": "2026-08-01T13:27:27Z",
   "release": "skillweave-2026.07.28-rc6",
   "passed": true,
   "summary": {
@@ -456,7 +456,7 @@
         {
           "id": "G12.4",
           "status": "PASS",
-          "message": "Absent rebuildable video is covered by its source and report hash."
+          "message": "Local demo video hash matches the report."
         },
         {
           "id": "G12.5",

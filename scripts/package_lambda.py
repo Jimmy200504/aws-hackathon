@@ -18,8 +18,8 @@ def main() -> None:
         *sorted((ROOT / "app").glob("*.py")),
         ROOT / "config" / "query-intent-vocab.json",
         ROOT / "config" / "query-intent-prompt.txt",
-    ROOT / "config" / "query-intents.json",
-    ROOT / "config" / "query-intents-release.json",
+        ROOT / "config" / "query-intents.json",
+        ROOT / "config" / "query-intents-release.json",
         *sorted((ROOT / "web").glob("*")),
         ROOT / "artifacts" / "demo-index.json",
         (

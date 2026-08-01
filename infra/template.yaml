@@ -89,8 +89,8 @@ Globals:
         BEDROCK_QUERY_MODEL_ID: !Ref BedrockQueryModelId
         BEDROCK_QUERY_MAX_TOKENS: "4000"
         BEDROCK_QUERY_MAX_BATCH: "10"
-        BEDROCK_QUERY_MAX_WAIT_SECONDS: "1.0"
-        BEDROCK_QUERY_DEADLINE_SECONDS: "2.5"
+        BEDROCK_QUERY_MAX_WAIT_SECONDS: "0.05"
+        BEDROCK_QUERY_DEADLINE_SECONDS: "6.0"
         NEPTUNE_GRAPH_ID: !Ref NeptuneGraphId
         NEPTUNE_GRAPH_REGION: !Ref NeptuneGraphRegion
         GRAPH_VERSION: !Ref GraphVersion

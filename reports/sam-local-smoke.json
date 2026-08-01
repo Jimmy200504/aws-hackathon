@@ -1,7 +1,7 @@
 {
   "metadata": {
     "schema": "skillweave-sam-local-smoke-v1",
-    "verified_at_utc": "2026-07-29T13:08:17Z",
+    "verified_at_utc": "2026-08-01T13:18:01Z",
     "runtime": "python3.13",
     "architecture": "arm64",
     "event": "tests/fixtures/search-event.json",
@@ -23,6 +23,6 @@
     "result_count": 10,
     "resolved_skill_count": 2,
     "graph_path_count": 12,
-    "duration_ms": 1037.0
+    "duration_ms": 1109.0
   }
 }

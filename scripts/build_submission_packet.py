@@ -130,6 +130,9 @@ def build_packet(root: Path = ROOT) -> str:
             "latency_ms": {"p95": 0.0},
         },
     )
+    aws_service_latency = aws_load.get(
+        "service_latency_ms", aws_load.get("latency_ms", {"p95": 0.0})
+    )
 
     return f"""# SkillWeave 決賽提交包
 
@@ -154,12 +157,12 @@ Unbiased LambdaMART 重排搜尋結果；每條圖譜路徑都可追溯、可消
 
 1111 的七日資料包含 6,139,952 次搜尋、8,241,233 次職缺瀏覽與 225,999 次
 主動應徵，但既有結構化技能欄位大量缺漏，同一技能也有多種寫法。SkillWeave
-在索引前使用生成式 AI 提出 skill／alias／relation，只有通過 evidence
-substring、temporal cutoff、type whitelist 與 confidence gate 的邊才能發布。
+在索引前使用 reviewed ontology exact matching 與 deterministic validator；未知
+surface 只進人工審閱佇列，技能關係則由有門檻的全量共現統計產生。
 線上以 Query → Skill → Job 的一跳路徑產生可解釋 ranking features；無信心或
 新職缺則回退 lexical cold-start，不用生成式 AI 自由撰寫結果文案。
 
-真實 Amazon Bedrock Claude Haiku 4.5 pilot 已處理
+歷史 Amazon Bedrock Claude Haiku 4.5 pilot 曾處理
 {bedrock["records"]["input"]} 筆 train-only 職缺：
 {bedrock["records"]["accepted"]} 筆通過、{bedrock["records"]["quarantined"]}
 筆隔離、{bedrock["validated_graph"]["mentions"]:,} 個 grounded mentions、
@@ -176,25 +179,25 @@ pilot，不冒充完整 production corpus。
 
 ## 原創性與生成式 AI 必要性
 
-- LLM 的核心輸出是可驗證的 ranking asset，不是結果後方的裝飾性摘要。
-- 每條 edge 保存 evidence、source timestamp、model/prompt version。
+- Production graph 的核心輸出是可驗證的 deterministic ranking asset；LLM
+  只做線上 Query normalization，不參與正式離線 graph build。
+- 每條 edge 保存 evidence、source timestamp、rules version 與 corpus hash。
 - JD cutoff、title escrow、strictly-earlier-day rolling graph 與 disjoint
   buckets 防止 future leakage。
-- Confidence abstention、OOV ephemeral node、cold-start quarantine 與
+- Exact collision rules、candidate isolation、cold-start quarantine 與
   deterministic fallback 讓錯誤可以被拒絕。
 - Graph-on/off 使用同一模型，只歸零 graph feature family，因此 ablation
   直接量測圖譜訊號的增量價值。
 
 ## AWS 技術路徑
 
-- Compact judge demo：API Gateway HTTP API + Lambda Python 3.13 arm64 +
-  CloudWatch；exact bundle 已通過 SAM validate/build/local invoke。
-- Production design：S3/Glue → Step Functions → Bedrock structured batch →
-  evidence validator → OpenSearch + Neptune → SageMaker Unbiased LambdaMART →
-  API Gateway/WAF。
+- Judge production：API Gateway HTTP API + Lambda Python 3.13 arm64 +
+  1,218,635 筆 provisioned OpenSearch + Neptune Analytics + CloudWatch；Lambda
+  內載 frozen portable LTR，exact bundle 已通過 SAM validate/build/local invoke。
+- Offline graph：S3 → Step Functions／ECS Fargate → deterministic extraction →
+  exact alias resolution → statistical relations → validation／Neptune import。
+- Bedrock 僅做線上 Query normalization，逾時時使用 deterministic fallback。
 - 任一 managed service timeout 都回傳 contract-safe fallback ranking。
-- Compact demo 不冒充完整 OpenSearch／Neptune／SageMaker production
-  deployment。
 
 ## 量化證據
 
@@ -207,12 +210,12 @@ pilot，不冒充完整 production corpus。
 | Locked Hit@10 relative lift | {percent(lift["hit@10"])} | 不隱藏小幅負值 |
 | Paired NDCG 95% CI | [{ci["ci95_low"]:.5f}, {ci["ci95_high"]:.5f}] | 差異全為正 |
 | Lambda/native model parity | {portable["max_centered_absolute_error"]:.2e} max error | {portable["metadata"]["rows"]:,} rows；tolerance {portable["tolerance"]:.0e} |
-| Real Bedrock structured extraction | {bedrock["records"]["accepted"]}/{bedrock["records"]["input"]} accepted；{bedrock["validated_graph"]["mentions"]:,} mentions | train-only bounded pilot；US${bedrock["usage"]["estimated_usd"]:.2f} |
+| Historical Bedrock structured extraction | {bedrock["records"]["accepted"]}/{bedrock["records"]["input"]} accepted；{bedrock["validated_graph"]["mentions"]:,} mentions | 舊 bounded pilot；US${bedrock["usage"]["estimated_usd"]:.2f}；非 production graph |
 | Relevant-row graph coverage | {relevant_coverage * 100:.2f}% | Coverage 是下一個瓶頸 |
 | Gate-active subgroup | {active["queries"]} queries；NDCG {percent(active["ndcg_at_10_relative_lift"])} | Post-hoc，不能取代整體 |
 | 七日規模換算 | 約 {scale:,} 次額外 Top-1 relevance events | 非 conversion、apply、hire 或營收 |
 | Release verifier | {summary["passed"]} PASS / {summary["failed"]} FAIL / {summary["warnings"]} WARN | WARN 僅代表尚未登錄的外部 URL |
-| AWS production smoke | {aws_load["http_200"]}/{aws_load["requests"]} HTTP 200；concurrency {aws_load["concurrency"]}；p95 {aws_load["latency_ms"]["p95"] / 1000:.2f}s | Public HTTPS；低於 10s Lambda timeout |
+| AWS production smoke | {aws_load["http_200"]}/{aws_load["requests"]} HTTP 200；concurrency {aws_load["concurrency"]}；service p95 {aws_service_latency["p95"]:.2f}ms | Public HTTPS；低於 800ms release gate |
 
 ## 商業應用
 
@@ -253,7 +256,7 @@ gap。目前沒有因果轉換或單次相關曝光的貨幣價值，因此**不
 - 可宣稱內部時間切分 confirmation 的 NDCG 提升
   {percent(lift["ndcg@10"])}；必須說明它不是主辦方官方 holdout。
 - 不可只展示成功模型而隱藏歷史負向 holdout或 rejected candidate。
-- 不可把 bootstrap fixture 說成完整 Bedrock batch 產物。
+- 不可把歷史 Bedrock pilot 或 bootstrap fixture 說成新的 deterministic production graph 產物。
 - 不可把 30 分鐘 attribution qrels 說成主辦方正式 relevance ground truth。
 - 不可把約 {scale:,} 次 Top-1 relevance proxy 說成應徵、錄取或營收。
 - AWS production smoke 是 bounded judge-demo 證據，不等同大規模壓力測試。

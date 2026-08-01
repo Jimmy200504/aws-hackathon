@@ -21,8 +21,8 @@ Unbiased LambdaMART 重排搜尋結果；每條圖譜路徑都可追溯、可消
 
 1111 的七日資料包含 6,139,952 次搜尋、8,241,233 次職缺瀏覽與 225,999 次
 主動應徵，但既有結構化技能欄位大量缺漏，同一技能也有多種寫法。SkillWeave
-在索引前使用生成式 AI 提出 skill／alias／relation，只有通過 evidence
-substring、temporal cutoff、type whitelist 與 confidence gate 的邊才能發布。
+在索引前使用 reviewed ontology exact matching 與 deterministic validator；未知
+surface 只進人工審閱佇列，技能關係則由有門檻的全量共現統計產生。
 線上以 Query → Skill → Job 的一跳路徑產生可解釋 ranking features；無信心或
 新職缺則回退 lexical cold-start，不用生成式 AI 自由撰寫結果文案。
 
@@ -43,25 +43,25 @@ pilot，不冒充完整 production corpus。
 
 ## 原創性與生成式 AI 必要性
 
-- Production graph 的核心輸出是可驗證的 deterministic ranking asset，不是結果後方的裝飾性摘要；LLM 只做線上 Query normalization。
-- 每條 edge 保存 evidence、source timestamp、model/prompt version。
+- Production graph 的核心輸出是可驗證的 deterministic ranking asset；LLM
+  只做線上 Query normalization，不參與正式離線 graph build。
+- 每條 edge 保存 evidence、source timestamp、rules version 與 corpus hash。
 - JD cutoff、title escrow、strictly-earlier-day rolling graph 與 disjoint
   buckets 防止 future leakage。
-- Confidence abstention、OOV ephemeral node、cold-start quarantine 與
+- Exact collision rules、candidate isolation、cold-start quarantine 與
   deterministic fallback 讓錯誤可以被拒絕。
 - Graph-on/off 使用同一模型，只歸零 graph feature family，因此 ablation
   直接量測圖譜訊號的增量價值。
 
 ## AWS 技術路徑
 
-- Compact judge demo：API Gateway HTTP API + Lambda Python 3.13 arm64 +
-  CloudWatch；exact bundle 已通過 SAM validate/build/local invoke。
-- Production design：S3/Glue → Step Functions → deterministic exact extraction →
-  evidence validator → OpenSearch + Neptune → SageMaker Unbiased LambdaMART →
-  API Gateway/WAF。
+- Judge production：API Gateway HTTP API + Lambda Python 3.13 arm64 +
+  1,218,635 筆 provisioned OpenSearch + Neptune Analytics + CloudWatch；Lambda
+  內載 frozen portable LTR，exact bundle 已通過 SAM validate/build/local invoke。
+- Offline graph：S3 → Step Functions／ECS Fargate → deterministic extraction →
+  exact alias resolution → statistical relations → validation／Neptune import。
+- Bedrock 僅做線上 Query normalization，逾時時使用 deterministic fallback。
 - 任一 managed service timeout 都回傳 contract-safe fallback ranking。
-- Compact demo 不冒充完整 OpenSearch／Neptune／SageMaker production
-  deployment。
 
 ## 量化證據
 
@@ -79,8 +79,8 @@ pilot，不冒充完整 production corpus。
 | Relevant-row graph coverage | 40.53% | Coverage 是下一個瓶頸 |
 | Gate-active subgroup | 285 queries；NDCG +11.41% | Post-hoc，不能取代整體 |
 | 七日規模換算 | 約 160,360 次額外 Top-1 relevance events | 非 conversion、apply、hire 或營收 |
-| Release verifier | 89 PASS / 0 FAIL / 0 WARN | WARN 僅代表尚未登錄的外部 URL |
-| AWS production smoke | 30/30 HTTP 200；concurrency 5；p95 4.91s | Public HTTPS；低於 10s Lambda timeout |
+| Release verifier | 94 PASS / 0 FAIL / 0 WARN | WARN 僅代表尚未登錄的外部 URL |
+| AWS production smoke | 30/30 HTTP 200；concurrency 5；service p95 302.69ms | Public HTTPS；低於 800ms release gate |
 
 ## 商業應用
 
