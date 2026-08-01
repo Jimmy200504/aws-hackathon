@@ -1,0 +1,2083 @@
+{
+  "metadata": {
+    "schema": "skillweave-region-graph-v1",
+    "method": "behaviour-derived; no hand-assigned edge weight",
+    "dataset_version": "1111-2026-06-01_2026-06-07",
+    "graph_cutoff": "2026-06-05 23:59:59.999000",
+    "train_days": [
+      "2026-06-01",
+      "2026-06-02",
+      "2026-06-03",
+      "2026-06-04",
+      "2026-06-05"
+    ],
+    "leakage_policy": "co-selection restricted to train days; applications restricted to on-or-before the graph cutoff",
+    "domestic_only": true,
+    "overseas_excluded_reason": "co-selecting continents expresses 'anywhere abroad', not substitutability between two labour markets",
+    "min_co_selected": 100,
+    "min_flow": 30,
+    "random_seed": 1111
+  },
+  "stats": {
+    "counties": 22,
+    "train_searches_with_region_filter": 2248053,
+    "searches_spanning_multiple_counties": 437454,
+    "multi_county_rate": 0.1946,
+    "eval_window_searches_skipped": 819411,
+    "applications_resolved": 121419,
+    "applications_inside_searched_counties": 117002,
+    "applications_outside_searched_counties": 4417,
+    "cross_county_rate": 0.0364,
+    "applications_unresolved": 59797,
+    "applications_after_cutoff_excluded": 44783,
+    "substitutable_edges": 201,
+    "commute_edges": 62,
+    "elapsed_seconds": 78.0
+  },
+  "substitutable_with": [
+    {
+      "a": "嘉義市",
+      "b": "嘉義縣",
+      "co_selected": 28775,
+      "jaccard": 0.47278,
+      "conditional_a_given_b": 0.68245,
+      "conditional_b_given_a": 0.60612
+    },
+    {
+      "a": "新竹市",
+      "b": "新竹縣",
+      "co_selected": 35360,
+      "jaccard": 0.39407,
+      "conditional_a_given_b": 0.56535,
+      "conditional_b_given_a": 0.56534
+    },
+    {
+      "a": "台北市",
+      "b": "新北市",
+      "co_selected": 218308,
+      "jaccard": 0.36877,
+      "conditional_a_given_b": 0.4612,
+      "conditional_b_given_a": 0.64791
+    },
+    {
+      "a": "澎湖縣",
+      "b": "連江縣",
+      "co_selected": 391,
+      "jaccard": 0.20655,
+      "conditional_a_given_b": 0.87082,
+      "conditional_b_given_a": 0.21308
+    },
+    {
+      "a": "澎湖縣",
+      "b": "金門縣",
+      "co_selected": 550,
+      "jaccard": 0.18009,
+      "conditional_a_given_b": 0.31091,
+      "conditional_b_given_a": 0.29973
+    },
+    {
+      "a": "連江縣",
+      "b": "金門縣",
+      "co_selected": 328,
+      "jaccard": 0.17354,
+      "conditional_a_given_b": 0.18542,
+      "conditional_b_given_a": 0.73051
+    },
+    {
+      "a": "嘉義縣",
+      "b": "雲林縣",
+      "co_selected": 8624,
+      "jaccard": 0.10002,
+      "conditional_a_given_b": 0.1637,
+      "conditional_b_given_a": 0.20453
+    },
+    {
+      "a": "新竹市",
+      "b": "苗栗縣",
+      "co_selected": 7455,
+      "jaccard": 0.08372,
+      "conditional_a_given_b": 0.21956,
+      "conditional_b_given_a": 0.11919
+    },
+    {
+      "a": "新北市",
+      "b": "桃園市",
+      "co_selected": 52692,
+      "jaccard": 0.07676,
+      "conditional_a_given_b": 0.19827,
+      "conditional_b_given_a": 0.11132
+    },
+    {
+      "a": "南投縣",
+      "b": "彰化縣",
+      "co_selected": 10238,
+      "jaccard": 0.07114,
+      "conditional_a_given_b": 0.08806,
+      "conditional_b_given_a": 0.27011
+    },
+    {
+      "a": "嘉義市",
+      "b": "雲林縣",
+      "co_selected": 6303,
+      "jaccard": 0.06716,
+      "conditional_a_given_b": 0.11964,
+      "conditional_b_given_a": 0.13277
+    },
+    {
+      "a": "屏東縣",
+      "b": "高雄市",
+      "co_selected": 28634,
+      "jaccard": 0.06417,
+      "conditional_a_given_b": 0.07198,
+      "conditional_b_given_a": 0.37174
+    },
+    {
+      "a": "新竹縣",
+      "b": "苗栗縣",
+      "co_selected": 5813,
+      "jaccard": 0.0641,
+      "conditional_a_given_b": 0.1712,
+      "conditional_b_given_a": 0.09294
+    },
+    {
+      "a": "台北市",
+      "b": "桃園市",
+      "co_selected": 28720,
+      "jaccard": 0.05004,
+      "conditional_a_given_b": 0.10807,
+      "conditional_b_given_a": 0.08524
+    },
+    {
+      "a": "台中市",
+      "b": "彰化縣",
+      "co_selected": 28111,
+      "jaccard": 0.04873,
+      "conditional_a_given_b": 0.2418,
+      "conditional_b_given_a": 0.05752
+    },
+    {
+      "a": "新竹縣",
+      "b": "桃園市",
+      "co_selected": 14483,
+      "jaccard": 0.04615,
+      "conditional_a_given_b": 0.0545,
+      "conditional_b_given_a": 0.23156
+    },
+    {
+      "a": "台南市",
+      "b": "高雄市",
+      "co_selected": 27428,
+      "jaccard": 0.04564,
+      "conditional_a_given_b": 0.06895,
+      "conditional_b_given_a": 0.11895
+    },
+    {
+      "a": "南投縣",
+      "b": "雲林縣",
+      "co_selected": 3839,
+      "jaccard": 0.04426,
+      "conditional_a_given_b": 0.07287,
+      "conditional_b_given_a": 0.10128
+    },
+    {
+      "a": "台北市",
+      "b": "基隆市",
+      "co_selected": 15607,
+      "jaccard": 0.04402,
+      "conditional_a_given_b": 0.46975,
+      "conditional_b_given_a": 0.04632
+    },
+    {
+      "a": "彰化縣",
+      "b": "雲林縣",
+      "co_selected": 7062,
+      "jaccard": 0.04363,
+      "conditional_a_given_b": 0.13405,
+      "conditional_b_given_a": 0.06074
+    },
+    {
+      "a": "新竹市",
+      "b": "桃園市",
+      "co_selected": 11834,
+      "jaccard": 0.03739,
+      "conditional_a_given_b": 0.04453,
+      "conditional_b_given_a": 0.1892
+    },
+    {
+      "a": "台東縣",
+      "b": "花蓮縣",
+      "co_selected": 974,
+      "jaccard": 0.03689,
+      "conditional_a_given_b": 0.05313,
+      "conditional_b_given_a": 0.10768
+    },
+    {
+      "a": "基隆市",
+      "b": "新北市",
+      "co_selected": 17853,
+      "jaccard": 0.03653,
+      "conditional_a_given_b": 0.03772,
+      "conditional_b_given_a": 0.53735
+    },
+    {
+      "a": "台東縣",
+      "b": "澎湖縣",
+      "co_selected": 343,
+      "jaccard": 0.03255,
+      "conditional_a_given_b": 0.18692,
+      "conditional_b_given_a": 0.03792
+    },
+    {
+      "a": "台南市",
+      "b": "嘉義縣",
+      "co_selected": 7996,
+      "jaccard": 0.0302,
+      "conditional_a_given_b": 0.18964,
+      "conditional_b_given_a": 0.03468
+    },
+    {
+      "a": "台南市",
+      "b": "嘉義市",
+      "co_selected": 7822,
+      "jaccard": 0.02895,
+      "conditional_a_given_b": 0.16476,
+      "conditional_b_given_a": 0.03392
+    },
+    {
+      "a": "南投縣",
+      "b": "台中市",
+      "co_selected": 14222,
+      "jaccard": 0.02775,
+      "conditional_a_given_b": 0.0291,
+      "conditional_b_given_a": 0.37522
+    },
+    {
+      "a": "台北市",
+      "b": "新竹市",
+      "co_selected": 8975,
+      "jaccard": 0.02298,
+      "conditional_a_given_b": 0.14349,
+      "conditional_b_given_a": 0.02664
+    },
+    {
+      "a": "台東縣",
+      "b": "連江縣",
+      "co_selected": 211,
+      "jaccard": 0.02273,
+      "conditional_a_given_b": 0.46993,
+      "conditional_b_given_a": 0.02333
+    },
+    {
+      "a": "台中市",
+      "b": "苗栗縣",
+      "co_selected": 8890,
+      "jaccard": 0.0173,
+      "conditional_a_given_b": 0.26182,
+      "conditional_b_given_a": 0.01819
+    },
+    {
+      "a": "宜蘭縣",
+      "b": "花蓮縣",
+      "co_selected": 825,
+      "jaccard": 0.01644,
+      "conditional_a_given_b": 0.045,
+      "conditional_b_given_a": 0.02525
+    },
+    {
+      "a": "台北市",
+      "b": "新竹縣",
+      "co_selected": 6307,
+      "jaccard": 0.01604,
+      "conditional_a_given_b": 0.10084,
+      "conditional_b_given_a": 0.01872
+    },
+    {
+      "a": "嘉義市",
+      "b": "彰化縣",
+      "co_selected": 2526,
+      "jaccard": 0.01567,
+      "conditional_a_given_b": 0.02173,
+      "conditional_b_given_a": 0.05321
+    },
+    {
+      "a": "台東縣",
+      "b": "金門縣",
+      "co_selected": 165,
+      "jaccard": 0.01549,
+      "conditional_a_given_b": 0.09327,
+      "conditional_b_given_a": 0.01824
+    },
+    {
+      "a": "新北市",
+      "b": "新竹市",
+      "co_selected": 8114,
+      "jaccard": 0.01537,
+      "conditional_a_given_b": 0.12973,
+      "conditional_b_given_a": 0.01714
+    },
+    {
+      "a": "澎湖縣",
+      "b": "花蓮縣",
+      "co_selected": 299,
+      "jaccard": 0.01505,
+      "conditional_a_given_b": 0.01631,
+      "conditional_b_given_a": 0.16294
+    },
+    {
+      "a": "台南市",
+      "b": "屏東縣",
+      "co_selected": 4260,
+      "jaccard": 0.01404,
+      "conditional_a_given_b": 0.05531,
+      "conditional_b_given_a": 0.01848
+    },
+    {
+      "a": "南投縣",
+      "b": "嘉義市",
+      "co_selected": 1163,
+      "jaccard": 0.01381,
+      "conditional_a_given_b": 0.0245,
+      "conditional_b_given_a": 0.03068
+    },
+    {
+      "a": "嘉義縣",
+      "b": "彰化縣",
+      "co_selected": 2125,
+      "jaccard": 0.0136,
+      "conditional_a_given_b": 0.01828,
+      "conditional_b_given_a": 0.0504
+    },
+    {
+      "a": "南投縣",
+      "b": "苗栗縣",
+      "co_selected": 939,
+      "jaccard": 0.01324,
+      "conditional_a_given_b": 0.02765,
+      "conditional_b_given_a": 0.02477
+    },
+    {
+      "a": "台南市",
+      "b": "新竹市",
+      "co_selected": 3693,
+      "jaccard": 0.01276,
+      "conditional_a_given_b": 0.05904,
+      "conditional_b_given_a": 0.01602
+    },
+    {
+      "a": "台中市",
+      "b": "台北市",
+      "co_selected": 10160,
+      "jaccard": 0.01246,
+      "conditional_a_given_b": 0.03015,
+      "conditional_b_given_a": 0.02079
+    },
+    {
+      "a": "基隆市",
+      "b": "桃園市",
+      "co_selected": 3574,
+      "jaccard": 0.0121,
+      "conditional_a_given_b": 0.01345,
+      "conditional_b_given_a": 0.10757
+    },
+    {
+      "a": "台中市",
+      "b": "新竹市",
+      "co_selected": 6469,
+      "jaccard": 0.01187,
+      "conditional_a_given_b": 0.10343,
+      "conditional_b_given_a": 0.01324
+    },
+    {
+      "a": "南投縣",
+      "b": "嘉義縣",
+      "co_selected": 920,
+      "jaccard": 0.01162,
+      "conditional_a_given_b": 0.02182,
+      "conditional_b_given_a": 0.02427
+    },
+    {
+      "a": "台中市",
+      "b": "台南市",
+      "co_selected": 8126,
+      "jaccard": 0.01143,
+      "conditional_a_given_b": 0.03524,
+      "conditional_b_given_a": 0.01663
+    },
+    {
+      "a": "新北市",
+      "b": "新竹縣",
+      "co_selected": 6029,
+      "jaccard": 0.01138,
+      "conditional_a_given_b": 0.09639,
+      "conditional_b_given_a": 0.01274
+    },
+    {
+      "a": "基隆市",
+      "b": "新竹市",
+      "co_selected": 1065,
+      "jaccard": 0.01125,
+      "conditional_a_given_b": 0.01703,
+      "conditional_b_given_a": 0.03206
+    },
+    {
+      "a": "花蓮縣",
+      "b": "連江縣",
+      "co_selected": 206,
+      "jaccard": 0.01109,
+      "conditional_a_given_b": 0.4588,
+      "conditional_b_given_a": 0.01124
+    },
+    {
+      "a": "台南市",
+      "b": "雲林縣",
+      "co_selected": 2809,
+      "jaccard": 0.01002,
+      "conditional_a_given_b": 0.05332,
+      "conditional_b_given_a": 0.01218
+    },
+    {
+      "a": "台中市",
+      "b": "新竹縣",
+      "co_selected": 5410,
+      "jaccard": 0.00991,
+      "conditional_a_given_b": 0.0865,
+      "conditional_b_given_a": 0.01107
+    },
+    {
+      "a": "彰化縣",
+      "b": "苗栗縣",
+      "co_selected": 1469,
+      "jaccard": 0.00988,
+      "conditional_a_given_b": 0.04326,
+      "conditional_b_given_a": 0.01264
+    },
+    {
+      "a": "基隆市",
+      "b": "宜蘭縣",
+      "co_selected": 622,
+      "jaccard": 0.00953,
+      "conditional_a_given_b": 0.01903,
+      "conditional_b_given_a": 0.01872
+    },
+    {
+      "a": "台中市",
+      "b": "雲林縣",
+      "co_selected": 4961,
+      "jaccard": 0.00925,
+      "conditional_a_given_b": 0.09417,
+      "conditional_b_given_a": 0.01015
+    },
+    {
+      "a": "南投縣",
+      "b": "新竹縣",
+      "co_selected": 920,
+      "jaccard": 0.00924,
+      "conditional_a_given_b": 0.01471,
+      "conditional_b_given_a": 0.02427
+    },
+    {
+      "a": "彰化縣",
+      "b": "新竹市",
+      "co_selected": 1632,
+      "jaccard": 0.00921,
+      "conditional_a_given_b": 0.02609,
+      "conditional_b_given_a": 0.01404
+    },
+    {
+      "a": "嘉義市",
+      "b": "高雄市",
+      "co_selected": 3988,
+      "jaccard": 0.00904,
+      "conditional_a_given_b": 0.01002,
+      "conditional_b_given_a": 0.084
+    },
+    {
+      "a": "台中市",
+      "b": "高雄市",
+      "co_selected": 7879,
+      "jaccard": 0.00897,
+      "conditional_a_given_b": 0.01981,
+      "conditional_b_given_a": 0.01612
+    },
+    {
+      "a": "嘉義市",
+      "b": "新竹市",
+      "co_selected": 950,
+      "jaccard": 0.00871,
+      "conditional_a_given_b": 0.01519,
+      "conditional_b_given_a": 0.02001
+    },
+    {
+      "a": "花蓮縣",
+      "b": "金門縣",
+      "co_selected": 173,
+      "jaccard": 0.00868,
+      "conditional_a_given_b": 0.0978,
+      "conditional_b_given_a": 0.00944
+    },
+    {
+      "a": "台北市",
+      "b": "宜蘭縣",
+      "co_selected": 3093,
+      "jaccard": 0.00844,
+      "conditional_a_given_b": 0.09465,
+      "conditional_b_given_a": 0.00918
+    },
+    {
+      "a": "台南市",
+      "b": "彰化縣",
+      "co_selected": 2878,
+      "jaccard": 0.00837,
+      "conditional_a_given_b": 0.02476,
+      "conditional_b_given_a": 0.01248
+    },
+    {
+      "a": "台南市",
+      "b": "新竹縣",
+      "co_selected": 2433,
+      "jaccard": 0.00837,
+      "conditional_a_given_b": 0.0389,
+      "conditional_b_given_a": 0.01055
+    },
+    {
+      "a": "基隆市",
+      "b": "澎湖縣",
+      "co_selected": 290,
+      "jaccard": 0.00834,
+      "conditional_a_given_b": 0.15804,
+      "conditional_b_given_a": 0.00873
+    },
+    {
+      "a": "嘉義縣",
+      "b": "新竹市",
+      "co_selected": 865,
+      "jaccard": 0.00833,
+      "conditional_a_given_b": 0.01383,
+      "conditional_b_given_a": 0.02052
+    },
+    {
+      "a": "台中市",
+      "b": "新北市",
+      "co_selected": 7897,
+      "jaccard": 0.00828,
+      "conditional_a_given_b": 0.01668,
+      "conditional_b_given_a": 0.01616
+    },
+    {
+      "a": "桃園市",
+      "b": "苗栗縣",
+      "co_selected": 2454,
+      "jaccard": 0.00826,
+      "conditional_a_given_b": 0.07227,
+      "conditional_b_given_a": 0.00923
+    },
+    {
+      "a": "台中市",
+      "b": "桃園市",
+      "co_selected": 6169,
+      "jaccard": 0.00824,
+      "conditional_a_given_b": 0.02321,
+      "conditional_b_given_a": 0.01262
+    },
+    {
+      "a": "彰化縣",
+      "b": "新竹縣",
+      "co_selected": 1455,
+      "jaccard": 0.0082,
+      "conditional_a_given_b": 0.02326,
+      "conditional_b_given_a": 0.01252
+    },
+    {
+      "a": "嘉義縣",
+      "b": "屏東縣",
+      "co_selected": 968,
+      "jaccard": 0.00819,
+      "conditional_a_given_b": 0.01257,
+      "conditional_b_given_a": 0.02296
+    },
+    {
+      "a": "台北市",
+      "b": "台南市",
+      "co_selected": 4591,
+      "jaccard": 0.00816,
+      "conditional_a_given_b": 0.01991,
+      "conditional_b_given_a": 0.01363
+    },
+    {
+      "a": "台北市",
+      "b": "高雄市",
+      "co_selected": 5913,
+      "jaccard": 0.00811,
+      "conditional_a_given_b": 0.01486,
+      "conditional_b_given_a": 0.01755
+    },
+    {
+      "a": "嘉義市",
+      "b": "屏東縣",
+      "co_selected": 1002,
+      "jaccard": 0.00811,
+      "conditional_a_given_b": 0.01301,
+      "conditional_b_given_a": 0.02111
+    },
+    {
+      "a": "南投縣",
+      "b": "新竹市",
+      "co_selected": 805,
+      "jaccard": 0.00808,
+      "conditional_a_given_b": 0.01287,
+      "conditional_b_given_a": 0.02124
+    },
+    {
+      "a": "基隆市",
+      "b": "新竹縣",
+      "co_selected": 757,
+      "jaccard": 0.00797,
+      "conditional_a_given_b": 0.0121,
+      "conditional_b_given_a": 0.02278
+    },
+    {
+      "a": "嘉義縣",
+      "b": "高雄市",
+      "co_selected": 3383,
+      "jaccard": 0.00775,
+      "conditional_a_given_b": 0.0085,
+      "conditional_b_given_a": 0.08023
+    },
+    {
+      "a": "新竹市",
+      "b": "高雄市",
+      "co_selected": 3519,
+      "jaccard": 0.0077,
+      "conditional_a_given_b": 0.00885,
+      "conditional_b_given_a": 0.05626
+    },
+    {
+      "a": "新竹市",
+      "b": "雲林縣",
+      "co_selected": 848,
+      "jaccard": 0.00741,
+      "conditional_a_given_b": 0.0161,
+      "conditional_b_given_a": 0.01356
+    },
+    {
+      "a": "台東縣",
+      "b": "宜蘭縣",
+      "co_selected": 306,
+      "jaccard": 0.00739,
+      "conditional_a_given_b": 0.00936,
+      "conditional_b_given_a": 0.03383
+    },
+    {
+      "a": "嘉義縣",
+      "b": "新竹縣",
+      "co_selected": 745,
+      "jaccard": 0.00717,
+      "conditional_a_given_b": 0.01191,
+      "conditional_b_given_a": 0.01767
+    },
+    {
+      "a": "嘉義市",
+      "b": "新竹縣",
+      "co_selected": 766,
+      "jaccard": 0.00701,
+      "conditional_a_given_b": 0.01225,
+      "conditional_b_given_a": 0.01614
+    },
+    {
+      "a": "台南市",
+      "b": "桃園市",
+      "co_selected": 3388,
+      "jaccard": 0.00687,
+      "conditional_a_given_b": 0.01275,
+      "conditional_b_given_a": 0.01469
+    },
+    {
+      "a": "苗栗縣",
+      "b": "雲林縣",
+      "co_selected": 585,
+      "jaccard": 0.0068,
+      "conditional_a_given_b": 0.0111,
+      "conditional_b_given_a": 0.01723
+    },
+    {
+      "a": "台中市",
+      "b": "嘉義市",
+      "co_selected": 3505,
+      "jaccard": 0.00658,
+      "conditional_a_given_b": 0.07383,
+      "conditional_b_given_a": 0.00717
+    },
+    {
+      "a": "南投縣",
+      "b": "花蓮縣",
+      "co_selected": 355,
+      "jaccard": 0.00635,
+      "conditional_a_given_b": 0.01936,
+      "conditional_b_given_a": 0.00937
+    },
+    {
+      "a": "新竹縣",
+      "b": "雲林縣",
+      "co_selected": 726,
+      "jaccard": 0.00634,
+      "conditional_a_given_b": 0.01378,
+      "conditional_b_given_a": 0.01161
+    },
+    {
+      "a": "台東縣",
+      "b": "屏東縣",
+      "co_selected": 525,
+      "jaccard": 0.00614,
+      "conditional_a_given_b": 0.00682,
+      "conditional_b_given_a": 0.05804
+    },
+    {
+      "a": "新竹縣",
+      "b": "高雄市",
+      "co_selected": 2649,
+      "jaccard": 0.00579,
+      "conditional_a_given_b": 0.00666,
+      "conditional_b_given_a": 0.04235
+    },
+    {
+      "a": "基隆市",
+      "b": "苗栗縣",
+      "co_selected": 368,
+      "jaccard": 0.00551,
+      "conditional_a_given_b": 0.01084,
+      "conditional_b_given_a": 0.01108
+    },
+    {
+      "a": "新北市",
+      "b": "高雄市",
+      "co_selected": 4670,
+      "jaccard": 0.00539,
+      "conditional_a_given_b": 0.01174,
+      "conditional_b_given_a": 0.00987
+    },
+    {
+      "a": "台南市",
+      "b": "新北市",
+      "co_selected": 3753,
+      "jaccard": 0.00536,
+      "conditional_a_given_b": 0.00793,
+      "conditional_b_given_a": 0.01628
+    },
+    {
+      "a": "雲林縣",
+      "b": "高雄市",
+      "co_selected": 2342,
+      "jaccard": 0.00523,
+      "conditional_a_given_b": 0.00589,
+      "conditional_b_given_a": 0.04445
+    },
+    {
+      "a": "桃園市",
+      "b": "高雄市",
+      "co_selected": 3402,
+      "jaccard": 0.00515,
+      "conditional_a_given_b": 0.00855,
+      "conditional_b_given_a": 0.0128
+    },
+    {
+      "a": "嘉義市",
+      "b": "苗栗縣",
+      "co_selected": 408,
+      "jaccard": 0.00504,
+      "conditional_a_given_b": 0.01202,
+      "conditional_b_given_a": 0.00859
+    },
+    {
+      "a": "台中市",
+      "b": "嘉義縣",
+      "co_selected": 2575,
+      "jaccard": 0.00487,
+      "conditional_a_given_b": 0.06107,
+      "conditional_b_given_a": 0.00527
+    },
+    {
+      "a": "宜蘭縣",
+      "b": "澎湖縣",
+      "co_selected": 162,
+      "jaccard": 0.00472,
+      "conditional_a_given_b": 0.08828,
+      "conditional_b_given_a": 0.00496
+    },
+    {
+      "a": "基隆市",
+      "b": "花蓮縣",
+      "co_selected": 238,
+      "jaccard": 0.00464,
+      "conditional_a_given_b": 0.01298,
+      "conditional_b_given_a": 0.00716
+    },
+    {
+      "a": "屏東縣",
+      "b": "雲林縣",
+      "co_selected": 597,
+      "jaccard": 0.00462,
+      "conditional_a_given_b": 0.01133,
+      "conditional_b_given_a": 0.00775
+    },
+    {
+      "a": "宜蘭縣",
+      "b": "新北市",
+      "co_selected": 2270,
+      "jaccard": 0.00451,
+      "conditional_a_given_b": 0.0048,
+      "conditional_b_given_a": 0.06947
+    },
+    {
+      "a": "彰化縣",
+      "b": "高雄市",
+      "co_selected": 2293,
+      "jaccard": 0.00448,
+      "conditional_a_given_b": 0.00576,
+      "conditional_b_given_a": 0.01972
+    },
+    {
+      "a": "南投縣",
+      "b": "宜蘭縣",
+      "co_selected": 314,
+      "jaccard": 0.00447,
+      "conditional_a_given_b": 0.00961,
+      "conditional_b_given_a": 0.00828
+    },
+    {
+      "a": "台北市",
+      "b": "苗栗縣",
+      "co_selected": 1595,
+      "jaccard": 0.00432,
+      "conditional_a_given_b": 0.04697,
+      "conditional_b_given_a": 0.00473
+    },
+    {
+      "a": "台南市",
+      "b": "苗栗縣",
+      "co_selected": 1129,
+      "jaccard": 0.00429,
+      "conditional_a_given_b": 0.03325,
+      "conditional_b_given_a": 0.0049
+    },
+    {
+      "a": "宜蘭縣",
+      "b": "桃園市",
+      "co_selected": 1211,
+      "jaccard": 0.00407,
+      "conditional_a_given_b": 0.00456,
+      "conditional_b_given_a": 0.03706
+    },
+    {
+      "a": "宜蘭縣",
+      "b": "新竹市",
+      "co_selected": 385,
+      "jaccard": 0.00406,
+      "conditional_a_given_b": 0.00616,
+      "conditional_b_given_a": 0.01178
+    },
+    {
+      "a": "屏東縣",
+      "b": "新竹市",
+      "co_selected": 560,
+      "jaccard": 0.00403,
+      "conditional_a_given_b": 0.00895,
+      "conditional_b_given_a": 0.00727
+    },
+    {
+      "a": "台北市",
+      "b": "彰化縣",
+      "co_selected": 1785,
+      "jaccard": 0.00395,
+      "conditional_a_given_b": 0.01535,
+      "conditional_b_given_a": 0.0053
+    },
+    {
+      "a": "南投縣",
+      "b": "台南市",
+      "co_selected": 1012,
+      "jaccard": 0.00378,
+      "conditional_a_given_b": 0.00439,
+      "conditional_b_given_a": 0.0267
+    },
+    {
+      "a": "嘉義縣",
+      "b": "苗栗縣",
+      "co_selected": 284,
+      "jaccard": 0.00374,
+      "conditional_a_given_b": 0.00836,
+      "conditional_b_given_a": 0.00674
+    },
+    {
+      "a": "宜蘭縣",
+      "b": "新竹縣",
+      "co_selected": 351,
+      "jaccard": 0.0037,
+      "conditional_a_given_b": 0.00561,
+      "conditional_b_given_a": 0.01074
+    },
+    {
+      "a": "嘉義市",
+      "b": "花蓮縣",
+      "co_selected": 235,
+      "jaccard": 0.00358,
+      "conditional_a_given_b": 0.01282,
+      "conditional_b_given_a": 0.00495
+    },
+    {
+      "a": "嘉義市",
+      "b": "澎湖縣",
+      "co_selected": 176,
+      "jaccard": 0.00358,
+      "conditional_a_given_b": 0.09591,
+      "conditional_b_given_a": 0.00371
+    },
+    {
+      "a": "彰化縣",
+      "b": "桃園市",
+      "co_selected": 1355,
+      "jaccard": 0.00356,
+      "conditional_a_given_b": 0.0051,
+      "conditional_b_given_a": 0.01166
+    },
+    {
+      "a": "宜蘭縣",
+      "b": "金門縣",
+      "co_selected": 119,
+      "jaccard": 0.00347,
+      "conditional_a_given_b": 0.06727,
+      "conditional_b_given_a": 0.00364
+    },
+    {
+      "a": "南投縣",
+      "b": "金門縣",
+      "co_selected": 133,
+      "jaccard": 0.00336,
+      "conditional_a_given_b": 0.07518,
+      "conditional_b_given_a": 0.00351
+    },
+    {
+      "a": "台東縣",
+      "b": "嘉義市",
+      "co_selected": 181,
+      "jaccard": 0.00321,
+      "conditional_a_given_b": 0.00381,
+      "conditional_b_given_a": 0.02001
+    },
+    {
+      "a": "新北市",
+      "b": "苗栗縣",
+      "co_selected": 1612,
+      "jaccard": 0.00319,
+      "conditional_a_given_b": 0.04747,
+      "conditional_b_given_a": 0.00341
+    },
+    {
+      "a": "台北市",
+      "b": "嘉義市",
+      "co_selected": 1205,
+      "jaccard": 0.00314,
+      "conditional_a_given_b": 0.02538,
+      "conditional_b_given_a": 0.00358
+    },
+    {
+      "a": "南投縣",
+      "b": "台東縣",
+      "co_selected": 147,
+      "jaccard": 0.00314,
+      "conditional_a_given_b": 0.01625,
+      "conditional_b_given_a": 0.00388
+    },
+    {
+      "a": "南投縣",
+      "b": "屏東縣",
+      "co_selected": 350,
+      "jaccard": 0.00305,
+      "conditional_a_given_b": 0.00454,
+      "conditional_b_given_a": 0.00923
+    },
+    {
+      "a": "嘉義縣",
+      "b": "澎湖縣",
+      "co_selected": 133,
+      "jaccard": 0.00303,
+      "conditional_a_given_b": 0.07248,
+      "conditional_b_given_a": 0.00315
+    },
+    {
+      "a": "屏東縣",
+      "b": "新竹縣",
+      "co_selected": 417,
+      "jaccard": 0.003,
+      "conditional_a_given_b": 0.00667,
+      "conditional_b_given_a": 0.00541
+    },
+    {
+      "a": "嘉義市",
+      "b": "宜蘭縣",
+      "co_selected": 237,
+      "jaccard": 0.00297,
+      "conditional_a_given_b": 0.00725,
+      "conditional_b_given_a": 0.00499
+    },
+    {
+      "a": "南投縣",
+      "b": "澎湖縣",
+      "co_selected": 117,
+      "jaccard": 0.00295,
+      "conditional_a_given_b": 0.06376,
+      "conditional_b_given_a": 0.00309
+    },
+    {
+      "a": "屏東縣",
+      "b": "花蓮縣",
+      "co_selected": 279,
+      "jaccard": 0.00293,
+      "conditional_a_given_b": 0.01522,
+      "conditional_b_given_a": 0.00362
+    },
+    {
+      "a": "桃園市",
+      "b": "雲林縣",
+      "co_selected": 928,
+      "jaccard": 0.00292,
+      "conditional_a_given_b": 0.01761,
+      "conditional_b_given_a": 0.00349
+    },
+    {
+      "a": "台東縣",
+      "b": "嘉義縣",
+      "co_selected": 148,
+      "jaccard": 0.0029,
+      "conditional_a_given_b": 0.00351,
+      "conditional_b_given_a": 0.01636
+    },
+    {
+      "a": "屏東縣",
+      "b": "澎湖縣",
+      "co_selected": 210,
+      "jaccard": 0.00267,
+      "conditional_a_given_b": 0.11444,
+      "conditional_b_given_a": 0.00273
+    },
+    {
+      "a": "台東縣",
+      "b": "基隆市",
+      "co_selected": 111,
+      "jaccard": 0.00263,
+      "conditional_a_given_b": 0.00334,
+      "conditional_b_given_a": 0.01227
+    },
+    {
+      "a": "南投縣",
+      "b": "桃園市",
+      "co_selected": 783,
+      "jaccard": 0.00259,
+      "conditional_a_given_b": 0.00295,
+      "conditional_b_given_a": 0.02066
+    },
+    {
+      "a": "台東縣",
+      "b": "新竹縣",
+      "co_selected": 184,
+      "jaccard": 0.00258,
+      "conditional_a_given_b": 0.00294,
+      "conditional_b_given_a": 0.02034
+    },
+    {
+      "a": "台東縣",
+      "b": "新竹市",
+      "co_selected": 180,
+      "jaccard": 0.00252,
+      "conditional_a_given_b": 0.00288,
+      "conditional_b_given_a": 0.0199
+    },
+    {
+      "a": "屏東縣",
+      "b": "彰化縣",
+      "co_selected": 484,
+      "jaccard": 0.00251,
+      "conditional_a_given_b": 0.00416,
+      "conditional_b_given_a": 0.00628
+    },
+    {
+      "a": "新竹市",
+      "b": "澎湖縣",
+      "co_selected": 161,
+      "jaccard": 0.00251,
+      "conditional_a_given_b": 0.08774,
+      "conditional_b_given_a": 0.00257
+    },
+    {
+      "a": "宜蘭縣",
+      "b": "苗栗縣",
+      "co_selected": 163,
+      "jaccard": 0.00245,
+      "conditional_a_given_b": 0.0048,
+      "conditional_b_given_a": 0.00499
+    },
+    {
+      "a": "苗栗縣",
+      "b": "高雄市",
+      "co_selected": 1052,
+      "jaccard": 0.00244,
+      "conditional_a_given_b": 0.00264,
+      "conditional_b_given_a": 0.03098
+    },
+    {
+      "a": "新竹市",
+      "b": "花蓮縣",
+      "co_selected": 196,
+      "jaccard": 0.00243,
+      "conditional_a_given_b": 0.01069,
+      "conditional_b_given_a": 0.00313
+    },
+    {
+      "a": "嘉義市",
+      "b": "桃園市",
+      "co_selected": 760,
+      "jaccard": 0.00243,
+      "conditional_a_given_b": 0.00286,
+      "conditional_b_given_a": 0.01601
+    },
+    {
+      "a": "新竹縣",
+      "b": "花蓮縣",
+      "co_selected": 191,
+      "jaccard": 0.00237,
+      "conditional_a_given_b": 0.01042,
+      "conditional_b_given_a": 0.00305
+    },
+    {
+      "a": "台中市",
+      "b": "屏東縣",
+      "co_selected": 1334,
+      "jaccard": 0.00236,
+      "conditional_a_given_b": 0.01732,
+      "conditional_b_given_a": 0.00273
+    },
+    {
+      "a": "彰化縣",
+      "b": "新北市",
+      "co_selected": 1366,
+      "jaccard": 0.00232,
+      "conditional_a_given_b": 0.00289,
+      "conditional_b_given_a": 0.01175
+    },
+    {
+      "a": "桃園市",
+      "b": "花蓮縣",
+      "co_selected": 655,
+      "jaccard": 0.00231,
+      "conditional_a_given_b": 0.03573,
+      "conditional_b_given_a": 0.00246
+    },
+    {
+      "a": "基隆市",
+      "b": "彰化縣",
+      "co_selected": 344,
+      "jaccard": 0.00231,
+      "conditional_a_given_b": 0.00296,
+      "conditional_b_given_a": 0.01035
+    },
+    {
+      "a": "台北市",
+      "b": "花蓮縣",
+      "co_selected": 817,
+      "jaccard": 0.0023,
+      "conditional_a_given_b": 0.04456,
+      "conditional_b_given_a": 0.00242
+    },
+    {
+      "a": "台北市",
+      "b": "嘉義縣",
+      "co_selected": 860,
+      "jaccard": 0.00227,
+      "conditional_a_given_b": 0.0204,
+      "conditional_b_given_a": 0.00255
+    },
+    {
+      "a": "嘉義市",
+      "b": "金門縣",
+      "co_selected": 111,
+      "jaccard": 0.00226,
+      "conditional_a_given_b": 0.06275,
+      "conditional_b_given_a": 0.00234
+    },
+    {
+      "a": "台東縣",
+      "b": "高雄市",
+      "co_selected": 913,
+      "jaccard": 0.00225,
+      "conditional_a_given_b": 0.0023,
+      "conditional_b_given_a": 0.10094
+    },
+    {
+      "a": "嘉義市",
+      "b": "新北市",
+      "co_selected": 1169,
+      "jaccard": 0.00225,
+      "conditional_a_given_b": 0.00247,
+      "conditional_b_given_a": 0.02462
+    },
+    {
+      "a": "台南市",
+      "b": "台東縣",
+      "co_selected": 532,
+      "jaccard": 0.00223,
+      "conditional_a_given_b": 0.05882,
+      "conditional_b_given_a": 0.00231
+    },
+    {
+      "a": "屏東縣",
+      "b": "苗栗縣",
+      "co_selected": 245,
+      "jaccard": 0.00221,
+      "conditional_a_given_b": 0.00722,
+      "conditional_b_given_a": 0.00318
+    },
+    {
+      "a": "新竹市",
+      "b": "金門縣",
+      "co_selected": 140,
+      "jaccard": 0.00218,
+      "conditional_a_given_b": 0.07914,
+      "conditional_b_given_a": 0.00224
+    },
+    {
+      "a": "台中市",
+      "b": "基隆市",
+      "co_selected": 1131,
+      "jaccard": 0.00217,
+      "conditional_a_given_b": 0.03404,
+      "conditional_b_given_a": 0.00231
+    },
+    {
+      "a": "屏東縣",
+      "b": "金門縣",
+      "co_selected": 168,
+      "jaccard": 0.00214,
+      "conditional_a_given_b": 0.09497,
+      "conditional_b_given_a": 0.00218
+    },
+    {
+      "a": "南投縣",
+      "b": "高雄市",
+      "co_selected": 925,
+      "jaccard": 0.00213,
+      "conditional_a_given_b": 0.00233,
+      "conditional_b_given_a": 0.0244
+    },
+    {
+      "a": "台南市",
+      "b": "基隆市",
+      "co_selected": 555,
+      "jaccard": 0.00211,
+      "conditional_a_given_b": 0.0167,
+      "conditional_b_given_a": 0.00241
+    },
+    {
+      "a": "台東縣",
+      "b": "桃園市",
+      "co_selected": 569,
+      "jaccard": 0.00207,
+      "conditional_a_given_b": 0.00214,
+      "conditional_b_given_a": 0.06291
+    },
+    {
+      "a": "嘉義縣",
+      "b": "基隆市",
+      "co_selected": 146,
+      "jaccard": 0.00194,
+      "conditional_a_given_b": 0.00439,
+      "conditional_b_given_a": 0.00346
+    },
+    {
+      "a": "金門縣",
+      "b": "雲林縣",
+      "co_selected": 103,
+      "jaccard": 0.0019,
+      "conditional_a_given_b": 0.00196,
+      "conditional_b_given_a": 0.05822
+    },
+    {
+      "a": "台北市",
+      "b": "台東縣",
+      "co_selected": 639,
+      "jaccard": 0.00185,
+      "conditional_a_given_b": 0.07065,
+      "conditional_b_given_a": 0.0019
+    },
+    {
+      "a": "嘉義縣",
+      "b": "宜蘭縣",
+      "co_selected": 138,
+      "jaccard": 0.00185,
+      "conditional_a_given_b": 0.00422,
+      "conditional_b_given_a": 0.00327
+    },
+    {
+      "a": "嘉義縣",
+      "b": "桃園市",
+      "co_selected": 570,
+      "jaccard": 0.00185,
+      "conditional_a_given_b": 0.00214,
+      "conditional_b_given_a": 0.01352
+    },
+    {
+      "a": "南投縣",
+      "b": "基隆市",
+      "co_selected": 123,
+      "jaccard": 0.00173,
+      "conditional_a_given_b": 0.0037,
+      "conditional_b_given_a": 0.00325
+    },
+    {
+      "a": "嘉義市",
+      "b": "基隆市",
+      "co_selected": 134,
+      "jaccard": 0.00166,
+      "conditional_a_given_b": 0.00403,
+      "conditional_b_given_a": 0.00282
+    },
+    {
+      "a": "南投縣",
+      "b": "台北市",
+      "co_selected": 612,
+      "jaccard": 0.00164,
+      "conditional_a_given_b": 0.00182,
+      "conditional_b_given_a": 0.01615
+    },
+    {
+      "a": "宜蘭縣",
+      "b": "雲林縣",
+      "co_selected": 140,
+      "jaccard": 0.00164,
+      "conditional_a_given_b": 0.00266,
+      "conditional_b_given_a": 0.00428
+    },
+    {
+      "a": "嘉義縣",
+      "b": "新北市",
+      "co_selected": 828,
+      "jaccard": 0.00161,
+      "conditional_a_given_b": 0.00175,
+      "conditional_b_given_a": 0.01964
+    },
+    {
+      "a": "台北市",
+      "b": "金門縣",
+      "co_selected": 534,
+      "jaccard": 0.00158,
+      "conditional_a_given_b": 0.30187,
+      "conditional_b_given_a": 0.00158
+    },
+    {
+      "a": "新北市",
+      "b": "花蓮縣",
+      "co_selected": 766,
+      "jaccard": 0.00156,
+      "conditional_a_given_b": 0.04178,
+      "conditional_b_given_a": 0.00162
+    },
+    {
+      "a": "南投縣",
+      "b": "新北市",
+      "co_selected": 776,
+      "jaccard": 0.00152,
+      "conditional_a_given_b": 0.00164,
+      "conditional_b_given_a": 0.02047
+    },
+    {
+      "a": "台北市",
+      "b": "雲林縣",
+      "co_selected": 585,
+      "jaccard": 0.0015,
+      "conditional_a_given_b": 0.0111,
+      "conditional_b_given_a": 0.00174
+    },
+    {
+      "a": "基隆市",
+      "b": "屏東縣",
+      "co_selected": 159,
+      "jaccard": 0.00144,
+      "conditional_a_given_b": 0.00206,
+      "conditional_b_given_a": 0.00479
+    },
+    {
+      "a": "基隆市",
+      "b": "高雄市",
+      "co_selected": 617,
+      "jaccard": 0.00143,
+      "conditional_a_given_b": 0.00155,
+      "conditional_b_given_a": 0.01857
+    },
+    {
+      "a": "台北市",
+      "b": "屏東縣",
+      "co_selected": 591,
+      "jaccard": 0.00143,
+      "conditional_a_given_b": 0.00767,
+      "conditional_b_given_a": 0.00175
+    },
+    {
+      "a": "台北市",
+      "b": "澎湖縣",
+      "co_selected": 455,
+      "jaccard": 0.00134,
+      "conditional_a_given_b": 0.24796,
+      "conditional_b_given_a": 0.00135
+    },
+    {
+      "a": "宜蘭縣",
+      "b": "彰化縣",
+      "co_selected": 198,
+      "jaccard": 0.00133,
+      "conditional_a_given_b": 0.0017,
+      "conditional_b_given_a": 0.00606
+    },
+    {
+      "a": "台南市",
+      "b": "澎湖縣",
+      "co_selected": 303,
+      "jaccard": 0.00131,
+      "conditional_a_given_b": 0.16512,
+      "conditional_b_given_a": 0.00131
+    },
+    {
+      "a": "新北市",
+      "b": "雲林縣",
+      "co_selected": 685,
+      "jaccard": 0.0013,
+      "conditional_a_given_b": 0.013,
+      "conditional_b_given_a": 0.00145
+    },
+    {
+      "a": "花蓮縣",
+      "b": "高雄市",
+      "co_selected": 539,
+      "jaccard": 0.0013,
+      "conditional_a_given_b": 0.00135,
+      "conditional_b_given_a": 0.0294
+    },
+    {
+      "a": "澎湖縣",
+      "b": "高雄市",
+      "co_selected": 495,
+      "jaccard": 0.00124,
+      "conditional_a_given_b": 0.00124,
+      "conditional_b_given_a": 0.26975
+    },
+    {
+      "a": "屏東縣",
+      "b": "桃園市",
+      "co_selected": 419,
+      "jaccard": 0.00122,
+      "conditional_a_given_b": 0.00158,
+      "conditional_b_given_a": 0.00544
+    },
+    {
+      "a": "台東縣",
+      "b": "新北市",
+      "co_selected": 575,
+      "jaccard": 0.00119,
+      "conditional_a_given_b": 0.00121,
+      "conditional_b_given_a": 0.06357
+    },
+    {
+      "a": "彰化縣",
+      "b": "花蓮縣",
+      "co_selected": 159,
+      "jaccard": 0.00118,
+      "conditional_a_given_b": 0.00867,
+      "conditional_b_given_a": 0.00137
+    },
+    {
+      "a": "台中市",
+      "b": "宜蘭縣",
+      "co_selected": 611,
+      "jaccard": 0.00117,
+      "conditional_a_given_b": 0.0187,
+      "conditional_b_given_a": 0.00125
+    },
+    {
+      "a": "台中市",
+      "b": "花蓮縣",
+      "co_selected": 591,
+      "jaccard": 0.00117,
+      "conditional_a_given_b": 0.03224,
+      "conditional_b_given_a": 0.00121
+    },
+    {
+      "a": "台中市",
+      "b": "台東縣",
+      "co_selected": 559,
+      "jaccard": 0.00112,
+      "conditional_a_given_b": 0.0618,
+      "conditional_b_given_a": 0.00114
+    },
+    {
+      "a": "台南市",
+      "b": "花蓮縣",
+      "co_selected": 274,
+      "jaccard": 0.0011,
+      "conditional_a_given_b": 0.01495,
+      "conditional_b_given_a": 0.00119
+    },
+    {
+      "a": "宜蘭縣",
+      "b": "屏東縣",
+      "co_selected": 119,
+      "jaccard": 0.00109,
+      "conditional_a_given_b": 0.00154,
+      "conditional_b_given_a": 0.00364
+    },
+    {
+      "a": "台南市",
+      "b": "宜蘭縣",
+      "co_selected": 283,
+      "jaccard": 0.00108,
+      "conditional_a_given_b": 0.00866,
+      "conditional_b_given_a": 0.00123
+    },
+    {
+      "a": "宜蘭縣",
+      "b": "高雄市",
+      "co_selected": 412,
+      "jaccard": 0.00096,
+      "conditional_a_given_b": 0.00104,
+      "conditional_b_given_a": 0.01261
+    },
+    {
+      "a": "金門縣",
+      "b": "高雄市",
+      "co_selected": 381,
+      "jaccard": 0.00095,
+      "conditional_a_given_b": 0.00096,
+      "conditional_b_given_a": 0.21538
+    },
+    {
+      "a": "台南市",
+      "b": "金門縣",
+      "co_selected": 219,
+      "jaccard": 0.00094,
+      "conditional_a_given_b": 0.1238,
+      "conditional_b_given_a": 0.00095
+    },
+    {
+      "a": "桃園市",
+      "b": "金門縣",
+      "co_selected": 247,
+      "jaccard": 0.00092,
+      "conditional_a_given_b": 0.13963,
+      "conditional_b_given_a": 0.00093
+    },
+    {
+      "a": "新北市",
+      "b": "金門縣",
+      "co_selected": 422,
+      "jaccard": 0.00089,
+      "conditional_a_given_b": 0.23855,
+      "conditional_b_given_a": 0.00089
+    },
+    {
+      "a": "桃園市",
+      "b": "澎湖縣",
+      "co_selected": 234,
+      "jaccard": 0.00088,
+      "conditional_a_given_b": 0.12752,
+      "conditional_b_given_a": 0.00088
+    },
+    {
+      "a": "台中市",
+      "b": "澎湖縣",
+      "co_selected": 416,
+      "jaccard": 0.00085,
+      "conditional_a_given_b": 0.2267,
+      "conditional_b_given_a": 0.00085
+    },
+    {
+      "a": "新北市",
+      "b": "澎湖縣",
+      "co_selected": 398,
+      "jaccard": 0.00084,
+      "conditional_a_given_b": 0.21689,
+      "conditional_b_given_a": 0.00084
+    },
+    {
+      "a": "屏東縣",
+      "b": "新北市",
+      "co_selected": 449,
+      "jaccard": 0.00082,
+      "conditional_a_given_b": 0.00095,
+      "conditional_b_given_a": 0.00583
+    },
+    {
+      "a": "台中市",
+      "b": "金門縣",
+      "co_selected": 400,
+      "jaccard": 0.00082,
+      "conditional_a_given_b": 0.22612,
+      "conditional_b_given_a": 0.00082
+    },
+    {
+      "a": "台北市",
+      "b": "連江縣",
+      "co_selected": 124,
+      "jaccard": 0.00037,
+      "conditional_a_given_b": 0.27617,
+      "conditional_b_given_a": 0.00037
+    },
+    {
+      "a": "連江縣",
+      "b": "高雄市",
+      "co_selected": 119,
+      "jaccard": 0.0003,
+      "conditional_a_given_b": 0.0003,
+      "conditional_b_given_a": 0.26503
+    },
+    {
+      "a": "新北市",
+      "b": "連江縣",
+      "co_selected": 114,
+      "jaccard": 0.00024,
+      "conditional_a_given_b": 0.2539,
+      "conditional_b_given_a": 0.00024
+    }
+  ],
+  "commutes_to": [
+    {
+      "source": "新北市",
+      "target": "台北市",
+      "applications": 459,
+      "reverse_applications": 327,
+      "asymmetry": 0.1679
+    },
+    {
+      "source": "桃園市",
+      "target": "新北市",
+      "applications": 446,
+      "reverse_applications": 135,
+      "asymmetry": 0.5353
+    },
+    {
+      "source": "台北市",
+      "target": "新北市",
+      "applications": 327,
+      "reverse_applications": 459,
+      "asymmetry": -0.1679
+    },
+    {
+      "source": "雲林縣",
+      "target": "高雄市",
+      "applications": 284,
+      "reverse_applications": 17,
+      "asymmetry": 0.887
+    },
+    {
+      "source": "桃園市",
+      "target": "台中市",
+      "applications": 168,
+      "reverse_applications": 146,
+      "asymmetry": 0.0701
+    },
+    {
+      "source": "台北市",
+      "target": "台中市",
+      "applications": 167,
+      "reverse_applications": 77,
+      "asymmetry": 0.3689
+    },
+    {
+      "source": "新竹市",
+      "target": "新北市",
+      "applications": 163,
+      "reverse_applications": 6,
+      "asymmetry": 0.929
+    },
+    {
+      "source": "台中市",
+      "target": "桃園市",
+      "applications": 146,
+      "reverse_applications": 168,
+      "asymmetry": -0.0701
+    },
+    {
+      "source": "桃園市",
+      "target": "台北市",
+      "applications": 141,
+      "reverse_applications": 56,
+      "asymmetry": 0.4315
+    },
+    {
+      "source": "台北市",
+      "target": "高雄市",
+      "applications": 140,
+      "reverse_applications": 32,
+      "asymmetry": 0.6279
+    },
+    {
+      "source": "台中市",
+      "target": "新北市",
+      "applications": 137,
+      "reverse_applications": 68,
+      "asymmetry": 0.3366
+    },
+    {
+      "source": "新北市",
+      "target": "桃園市",
+      "applications": 135,
+      "reverse_applications": 446,
+      "asymmetry": -0.5353
+    },
+    {
+      "source": "南投縣",
+      "target": "台中市",
+      "applications": 132,
+      "reverse_applications": 50,
+      "asymmetry": 0.4505
+    },
+    {
+      "source": "雲林縣",
+      "target": "桃園市",
+      "applications": 110,
+      "reverse_applications": 4,
+      "asymmetry": 0.9298
+    },
+    {
+      "source": "台南市",
+      "target": "高雄市",
+      "applications": 108,
+      "reverse_applications": 27,
+      "asymmetry": 0.6
+    },
+    {
+      "source": "基隆市",
+      "target": "台中市",
+      "applications": 105,
+      "reverse_applications": 2,
+      "asymmetry": 0.9626
+    },
+    {
+      "source": "彰化縣",
+      "target": "桃園市",
+      "applications": 94,
+      "reverse_applications": 40,
+      "asymmetry": 0.403
+    },
+    {
+      "source": "苗栗縣",
+      "target": "新北市",
+      "applications": 92,
+      "reverse_applications": 57,
+      "asymmetry": 0.2349
+    },
+    {
+      "source": "新北市",
+      "target": "高雄市",
+      "applications": 90,
+      "reverse_applications": 36,
+      "asymmetry": 0.4286
+    },
+    {
+      "source": "高雄市",
+      "target": "台中市",
+      "applications": 82,
+      "reverse_applications": 49,
+      "asymmetry": 0.2519
+    },
+    {
+      "source": "台中市",
+      "target": "台北市",
+      "applications": 77,
+      "reverse_applications": 167,
+      "asymmetry": -0.3689
+    },
+    {
+      "source": "台南市",
+      "target": "台中市",
+      "applications": 74,
+      "reverse_applications": 21,
+      "asymmetry": 0.5579
+    },
+    {
+      "source": "台北市",
+      "target": "宜蘭縣",
+      "applications": 74,
+      "reverse_applications": 7,
+      "asymmetry": 0.8272
+    },
+    {
+      "source": "彰化縣",
+      "target": "台中市",
+      "applications": 70,
+      "reverse_applications": 36,
+      "asymmetry": 0.3208
+    },
+    {
+      "source": "新北市",
+      "target": "台中市",
+      "applications": 68,
+      "reverse_applications": 137,
+      "asymmetry": -0.3366
+    },
+    {
+      "source": "高雄市",
+      "target": "屏東縣",
+      "applications": 62,
+      "reverse_applications": 50,
+      "asymmetry": 0.1071
+    },
+    {
+      "source": "南投縣",
+      "target": "桃園市",
+      "applications": 61,
+      "reverse_applications": 4,
+      "asymmetry": 0.8769
+    },
+    {
+      "source": "新竹縣",
+      "target": "新北市",
+      "applications": 61,
+      "reverse_applications": 19,
+      "asymmetry": 0.525
+    },
+    {
+      "source": "基隆市",
+      "target": "新北市",
+      "applications": 61,
+      "reverse_applications": 11,
+      "asymmetry": 0.6944
+    },
+    {
+      "source": "新竹市",
+      "target": "新竹縣",
+      "applications": 59,
+      "reverse_applications": 22,
+      "asymmetry": 0.4568
+    },
+    {
+      "source": "新北市",
+      "target": "苗栗縣",
+      "applications": 57,
+      "reverse_applications": 92,
+      "asymmetry": -0.2349
+    },
+    {
+      "source": "台北市",
+      "target": "桃園市",
+      "applications": 56,
+      "reverse_applications": 141,
+      "asymmetry": -0.4315
+    },
+    {
+      "source": "雲林縣",
+      "target": "台北市",
+      "applications": 52,
+      "reverse_applications": 3,
+      "asymmetry": 0.8909
+    },
+    {
+      "source": "雲林縣",
+      "target": "嘉義縣",
+      "applications": 50,
+      "reverse_applications": 20,
+      "asymmetry": 0.4286
+    },
+    {
+      "source": "台中市",
+      "target": "南投縣",
+      "applications": 50,
+      "reverse_applications": 132,
+      "asymmetry": -0.4505
+    },
+    {
+      "source": "屏東縣",
+      "target": "高雄市",
+      "applications": 50,
+      "reverse_applications": 62,
+      "asymmetry": -0.1071
+    },
+    {
+      "source": "台中市",
+      "target": "嘉義縣",
+      "applications": 49,
+      "reverse_applications": 15,
+      "asymmetry": 0.5312
+    },
+    {
+      "source": "台中市",
+      "target": "高雄市",
+      "applications": 49,
+      "reverse_applications": 82,
+      "asymmetry": -0.2519
+    },
+    {
+      "source": "台中市",
+      "target": "新竹市",
+      "applications": 46,
+      "reverse_applications": 33,
+      "asymmetry": 0.1646
+    },
+    {
+      "source": "彰化縣",
+      "target": "台北市",
+      "applications": 45,
+      "reverse_applications": 41,
+      "asymmetry": 0.0465
+    },
+    {
+      "source": "雲林縣",
+      "target": "新北市",
+      "applications": 45,
+      "reverse_applications": 23,
+      "asymmetry": 0.3235
+    },
+    {
+      "source": "桃園市",
+      "target": "高雄市",
+      "applications": 44,
+      "reverse_applications": 30,
+      "asymmetry": 0.1892
+    },
+    {
+      "source": "嘉義縣",
+      "target": "台南市",
+      "applications": 42,
+      "reverse_applications": 16,
+      "asymmetry": 0.4483
+    },
+    {
+      "source": "台北市",
+      "target": "彰化縣",
+      "applications": 41,
+      "reverse_applications": 45,
+      "asymmetry": -0.0465
+    },
+    {
+      "source": "高雄市",
+      "target": "新竹縣",
+      "applications": 40,
+      "reverse_applications": 16,
+      "asymmetry": 0.4286
+    },
+    {
+      "source": "彰化縣",
+      "target": "高雄市",
+      "applications": 40,
+      "reverse_applications": 8,
+      "asymmetry": 0.6667
+    },
+    {
+      "source": "桃園市",
+      "target": "彰化縣",
+      "applications": 40,
+      "reverse_applications": 94,
+      "asymmetry": -0.403
+    },
+    {
+      "source": "嘉義縣",
+      "target": "嘉義市",
+      "applications": 39,
+      "reverse_applications": 19,
+      "asymmetry": 0.3448
+    },
+    {
+      "source": "台南市",
+      "target": "新北市",
+      "applications": 39,
+      "reverse_applications": 14,
+      "asymmetry": 0.4717
+    },
+    {
+      "source": "南投縣",
+      "target": "新北市",
+      "applications": 38,
+      "reverse_applications": 4,
+      "asymmetry": 0.8095
+    },
+    {
+      "source": "台中市",
+      "target": "新竹縣",
+      "applications": 38,
+      "reverse_applications": 28,
+      "asymmetry": 0.1515
+    },
+    {
+      "source": "台中市",
+      "target": "苗栗縣",
+      "applications": 37,
+      "reverse_applications": 8,
+      "asymmetry": 0.6444
+    },
+    {
+      "source": "彰化縣",
+      "target": "嘉義縣",
+      "applications": 37,
+      "reverse_applications": 10,
+      "asymmetry": 0.5745
+    },
+    {
+      "source": "台中市",
+      "target": "彰化縣",
+      "applications": 36,
+      "reverse_applications": 70,
+      "asymmetry": -0.3208
+    },
+    {
+      "source": "高雄市",
+      "target": "新北市",
+      "applications": 36,
+      "reverse_applications": 90,
+      "asymmetry": -0.4286
+    },
+    {
+      "source": "桃園市",
+      "target": "新竹縣",
+      "applications": 35,
+      "reverse_applications": 19,
+      "asymmetry": 0.2963
+    },
+    {
+      "source": "新竹市",
+      "target": "台中市",
+      "applications": 33,
+      "reverse_applications": 46,
+      "asymmetry": -0.1646
+    },
+    {
+      "source": "屏東縣",
+      "target": "台北市",
+      "applications": 33,
+      "reverse_applications": 3,
+      "asymmetry": 0.8333
+    },
+    {
+      "source": "高雄市",
+      "target": "台北市",
+      "applications": 32,
+      "reverse_applications": 140,
+      "asymmetry": -0.6279
+    },
+    {
+      "source": "彰化縣",
+      "target": "南投縣",
+      "applications": 32,
+      "reverse_applications": 19,
+      "asymmetry": 0.2549
+    },
+    {
+      "source": "新竹縣",
+      "target": "台北市",
+      "applications": 32,
+      "reverse_applications": 22,
+      "asymmetry": 0.1852
+    },
+    {
+      "source": "高雄市",
+      "target": "桃園市",
+      "applications": 30,
+      "reverse_applications": 44,
+      "asymmetry": -0.1892
+    }
+  ]
+}
