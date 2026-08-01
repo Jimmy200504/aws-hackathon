@@ -1,4 +1,10 @@
-.PHONY: demo test verify release audit coverage business sam-smoke aws-smoke video submission external-preflight index benchmark quality package opensearch-local-up opensearch-local-down full-index-local full-demo-local graph-full-plan graph-full-build graph-review graph-review-score
+.PHONY: demo test verify release audit coverage business sam-smoke aws-smoke video submission external-preflight index benchmark quality package opensearch-local-up opensearch-local-down full-index-local full-demo-local query-artifacts graph-full-plan graph-full-build graph-review graph-review-score
+
+# Build inputs for query normalization and the behavior-aware index.
+query-artifacts:
+	.venv/bin/python scripts/build_query_vocab.py
+	.venv/bin/python scripts/build_top_queries.py
+	.venv/bin/python scripts/build_job_behavior.py
 
 demo:
 	python3 -m app.server --port 8080

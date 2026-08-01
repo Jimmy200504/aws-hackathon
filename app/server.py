@@ -69,6 +69,7 @@ class Handler(BaseHTTPRequestHandler):
                     ),
                     "full_corpus_retrieval": self.ranker.candidate_retriever is not None,
                     "bedrock_query_normalization": self.query_normalizer.enabled,
+                    "query_intent_cache": self.query_normalizer.batch_stats,
                 }
             )
             return
@@ -137,6 +138,7 @@ class Handler(BaseHTTPRequestHandler):
                 top_k=top_k,
                 include_graph=include_graph,
                 normalized_query=normalization.query,
+                structured_intent=normalization.intent,
             )
             request_id = "req_" + uuid.uuid4().hex[:16]
             elapsed_ms = round((time.perf_counter() - started) * 1000, 2)
@@ -228,7 +230,19 @@ def main() -> None:
         ltr_model_path=args.ltr_model,
         candidate_retriever=OpenSearchRetriever.from_environment(),
     )
+    # This process serves many concurrent requests, which is the only shape
+    # where coalescing pays off: the library default is tuned for Lambda, where
+    # one invocation serves one request and a long window is pure added latency.
+    # Here a full window is what turns ten concurrent queries into one Bedrock
+    # request. An explicit environment value still wins.
+    os.environ.setdefault("BEDROCK_QUERY_MAX_WAIT_SECONDS", "1.0")
     Handler.query_normalizer = BedrockQueryNormalizer.from_environment()
+    # Warming the head of the query distribution turns most traffic into a
+    # microsecond cache hit. Backgrounded so the port opens immediately; only
+    # done here, not in the Lambda handler, because Lambda freezes the container
+    # between invocations and a warming thread would not run to completion.
+    if Handler.query_normalizer.prewarm_from_config() is not None:
+        print("Pre-warming query intents from config/top-queries.json in background")
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     print(f"SkillWeave listening on http://{args.host}:{args.port}")
     print(f"Loaded {len(Handler.ranker.jobs):,} jobs from {args.artifact}")

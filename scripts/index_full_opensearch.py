@@ -2,13 +2,15 @@
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import csv
-import hashlib
 import json
 import os
+import re
 import sys
+import threading
 import time
-from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable
@@ -22,18 +24,20 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from app.embeddings import BedrockEmbeddingClient, EMBEDDING_DIM, job_embedding_text
+from app.alias_matcher import AliasMatcher
 from app.job_fields import derive_job_fields
-from pipeline.deterministic_extract import (
-    ExactAliasMatcher,
-    OntologyTerm,
-    extract_job,
-    load_ontology,
-)
 
 DATA = ROOT / "data" / "dataset"
 DEMO_INDEX = ROOT / "artifacts" / "demo-index.json"
+BEHAVIOR = ROOT / "artifacts" / "job-behavior.json"
 TRAIN_CUTOFF = datetime.fromisoformat("2026-06-05 23:59:59.999")
 MIN_DATE = datetime.fromisoformat("2024-01-01 00:00:00")
+
+
+def norm(value: str | None) -> str:
+    text = unicodedata.normalize("NFKC", value or "").lower().replace("臺", "台")
+    return re.sub(r"\s+", " ", text).strip()
+
 
 def parse_time(value: str) -> datetime:
     try:
@@ -44,19 +48,16 @@ def parse_time(value: str) -> datetime:
 
 def compile_alias_matcher(
     skills: dict[str, dict[str, Any]],
-) -> tuple[ExactAliasMatcher, dict[str, list[str]]]:
-    matcher = ExactAliasMatcher(
-        OntologyTerm(
-            node_id=skill_id,
-            label=str(spec.get("label", skill_id)),
-            aliases=tuple(str(value) for value in spec.get("aliases", ())),
-            node_type=str(spec.get("type", "Skill")),
-        )
-        for skill_id, spec in sorted(skills.items())
-    )
-    return matcher, {
-        alias: [node_id] for alias, node_id in matcher.alias_to_node.items()
-    }
+) -> tuple[AliasMatcher, dict[str, list[str]]]:
+    alias_to_skills: dict[str, list[str]] = {}
+    for skill_id, spec in skills.items():
+        for value in [spec.get("label", ""), *spec.get("aliases", [])]:
+            alias = norm(str(value))
+            if alias and (alias.isascii() or len(alias) >= 2):
+                alias_to_skills.setdefault(alias, []).append(skill_id)
+    # A single regex alternation becomes unusable once the ontology grows past
+    # a few thousand aliases; the automaton scans each string once.
+    return AliasMatcher(alias_to_skills), alias_to_skills
 
 
 def mapping(
@@ -94,11 +95,14 @@ def mapping(
                 },
                 "industry": {"type": "text", "analyzer": "cjk"},
                 "company_id": {"type": "keyword"},
+                "employment_type": {"type": "keyword"},
+                "shifts": {"type": "keyword"},
+                "education": {"type": "keyword"},
+                "experience": {"type": "keyword"},
                 "modified_at": {"type": "keyword"},
                 "post_cutoff_jd": {"type": "boolean"},
                 "graph_eligible": {"type": "boolean"},
                 "skills": {"type": "keyword"},
-                "latest_skills": {"type": "keyword"},
                 "skill_labels": {"type": "text", "analyzer": "cjk"},
                 "skill_evidence": {"type": "object", "enabled": False},
                 "skill_confidence": {"type": "object", "enabled": False},
@@ -113,10 +117,7 @@ def mapping(
                         "name": "hnsw",
                         "space_type": "cosinesimil",
                         "engine": "lucene",
-                        "parameters": {
-                            "ef_construction": 256,
-                            "m": 16,
-                        },
+                        "parameters": {"ef_construction": 256, "m": 16},
                     },
                 },
             },
@@ -164,54 +165,77 @@ class SignedOpenSearchClient:
         *,
         content_type: str = "application/json",
         acceptable: tuple[int, ...] = (200, 201),
+        attempts: int = 5,
+    ) -> dict[str, Any]:
+        """Send one signed request, retrying transient transport failures.
+
+        A full-corpus pass is thousands of sequential bulk requests over tens of
+        minutes; a single dropped connection would otherwise discard the whole
+        run. Each attempt is re-signed because SigV4 covers the timestamp.
+        """
+        last_error: Exception | None = None
+        for attempt in range(1, max(1, attempts) + 1):
+            try:
+                return self._request_once(
+                    method, path, payload, content_type, acceptable
+                )
+            except (URLError, ConnectionError, TimeoutError, OSError) as exc:
+                last_error = exc
+                if attempt == attempts:
+                    break
+                delay = min(30.0, 2.0**attempt)
+                print(
+                    f"  transient {type(exc).__name__} on {method} {path}; "
+                    f"retry {attempt}/{attempts - 1} in {delay:.0f}s",
+                    flush=True,
+                )
+                time.sleep(delay)
+        raise RuntimeError(
+            f"OpenSearch {method} {path} failed after {attempts} attempts: {last_error}"
+        ) from last_error
+
+    def _request_once(
+        self,
+        method: str,
+        path: str,
+        payload: bytes,
+        content_type: str,
+        acceptable: tuple[int, ...],
     ) -> dict[str, Any]:
         url = self.endpoint + path
-        for attempt in range(12):
-            headers = {"content-type": content_type}
-            if self.service == "aoss":
-                headers["x-amz-content-sha256"] = hashlib.sha256(
-                    payload
-                ).hexdigest()
-            if self.sign_requests:
-                from botocore.auth import SigV4Auth
-                from botocore.awsrequest import AWSRequest
+        headers = {"content-type": content_type}
+        if self.sign_requests:
+            from botocore.auth import SigV4Auth
+            from botocore.awsrequest import AWSRequest
 
-                credentials = self._session.get_credentials()
-                if credentials is None:
-                    raise RuntimeError("AWS credentials are unavailable")
-                request_to_sign = AWSRequest(
-                    method=method,
-                    url=url,
-                    data=payload,
-                    headers=headers,
-                )
-                SigV4Auth(
-                    credentials.get_frozen_credentials(),
-                    self.service,
-                    self.region,
-                ).add_auth(request_to_sign)
-                headers = dict(request_to_sign.headers.items())
-            request = Request(
-                url,
-                data=payload or None,
+            credentials = self._session.get_credentials()
+            if credentials is None:
+                raise RuntimeError("AWS credentials are unavailable")
+            request_to_sign = AWSRequest(
                 method=method,
+                url=url,
+                data=payload,
                 headers=headers,
             )
-            try:
-                with urlopen(request, timeout=self.timeout_seconds) as response:
-                    status = response.status
-                    body = response.read()
-            except HTTPError as exc:
-                status = exc.code
-                body = exc.read()
-            except (URLError, ConnectionError, TimeoutError):
-                if attempt == 11:
-                    raise
-                time.sleep(5)
-                continue
-            if status not in {403, 429, 500, 502, 503, 504} or attempt == 11:
-                break
-            time.sleep(5)
+            SigV4Auth(
+                credentials.get_frozen_credentials(),
+                self.service,
+                self.region,
+            ).add_auth(request_to_sign)
+            headers = dict(request_to_sign.headers.items())
+        request = Request(
+            url,
+            data=payload or None,
+            method=method,
+            headers=headers,
+        )
+        try:
+            with urlopen(request, timeout=self.timeout_seconds) as response:
+                status = response.status
+                body = response.read()
+        except HTTPError as exc:
+            status = exc.code
+            body = exc.read()
         if status not in acceptable:
             detail = body.decode("utf-8", errors="replace")[:2000]
             raise RuntimeError(f"OpenSearch {method} {path} returned {status}: {detail}")
@@ -225,38 +249,62 @@ class SignedOpenSearchClient:
 
 def matched_skills(
     row: dict[str, str],
-    pattern: ExactAliasMatcher,
+    pattern: AliasMatcher,
     alias_to_skills: dict[str, list[str]],
 ) -> tuple[list[str], dict[str, str], dict[str, float]]:
-    del alias_to_skills
-    extracted = extract_job(row, pattern)
+    fields = [
+        ("職務名稱", row["職務名稱"], 0.96),
+        (
+            "結構化技能欄位",
+            " ".join(
+                [row["電腦技能資料"], row["工作技能"], row["專業證照"]]
+            ),
+            0.93,
+        ),
+        (
+            "職務分類",
+            " ".join([row["職務大類"], row["職務中類"], row["職務小類"]]),
+            0.84,
+        ),
+        ("職務內容", row["職務內容"], 0.79),
+    ]
+    resolved: dict[str, tuple[str, str, float]] = {}
+    searchable = norm(" ".join(value for _, value, _ in fields))
+    for match in pattern.finditer(searchable):
+        alias = norm(match.group(0))
+        for skill_id in alias_to_skills.get(alias, []):
+            if skill_id in resolved:
+                continue
+            for field_name, source, confidence in fields:
+                if alias and alias in norm(source):
+                    resolved[skill_id] = (field_name, alias, confidence)
+                    break
     evidence = {
-        mention["node_id"]: str(mention["evidence"])
-        for mention in extracted["mentions"]
+        skill_id: f"{field_name}：{alias}"
+        for skill_id, (field_name, alias, _) in resolved.items()
     }
     confidence = {
-        mention["node_id"]: float(mention["confidence"])
-        for mention in extracted["mentions"]
+        skill_id: score for skill_id, (_, _, score) in resolved.items()
     }
-    return sorted(evidence), evidence, confidence
+    return sorted(resolved), evidence, confidence
 
 
 def job_document(
     row: dict[str, str],
     skills: dict[str, dict[str, Any]],
-    pattern: ExactAliasMatcher,
+    pattern: AliasMatcher,
     alias_to_skills: dict[str, list[str]],
-    embedding_client: BedrockEmbeddingClient | None = None,
+    behavior: dict[str, list[int]] | None = None,
+    embedding_client: Any = None,
 ) -> dict[str, Any]:
     modified = parse_time(row["職缺最後修改時間"])
     graph_eligible = modified <= TRAIN_CUTOFF
-    latest_skill_ids, latest_evidence, latest_confidence = matched_skills(
-        row, pattern, alias_to_skills
-    )
-    if graph_eligible:
-        skill_ids, evidence, confidence = latest_skill_ids, latest_evidence, latest_confidence
-    else:
-        skill_ids, evidence, confidence = [], {}, {}
+    # The cutoff exists to keep the offline graph/no-graph ablation free of
+    # future information. The live index has no such leakage concern, and
+    # withholding skills from the 24% of postings modified after the cutoff
+    # only removes signal from a quarter of the corpus. Keep `graph_eligible`
+    # as the honest provenance flag; annotate every posting.
+    skill_ids, evidence, confidence = matched_skills(row, pattern, alias_to_skills)
     categories = [
         value
         for value in [row["職務大類"], row["職務中類"], row["職務小類"]]
@@ -270,6 +318,7 @@ def job_document(
             / max(1.0, (TRAIN_CUTOFF - MIN_DATE).total_seconds()),
         ),
     )
+    views, applies = (behavior or {}).get(row["職缺編號"], (0, 0))
     document = {
         "id": row["職缺編號"],
         "title": row["職務名稱"].strip(),
@@ -281,11 +330,21 @@ def job_document(
         "categories": categories,
         "industry": row["產業中類"] or row["產業大類"],
         "company_id": row["廠商編號"],
+        # Attribute queries (現領/正職/兼職/工讀/晚班/暑期) are a double-digit
+        # share of the search log but occur in job free text far less often than
+        # they are searched for. Their answer is these structured columns.
+        "employment_type": row.get("職缺屬性", "").strip(),
+        "shifts": [
+            value.strip()
+            for value in row.get("工時", "").split(",")
+            if value.strip() and value.strip() != "NULL"
+        ],
+        "education": row.get("學歷需求", "").strip(),
+        "experience": row.get("工作經驗需求", "").strip(),
         "modified_at": row["職缺最後修改時間"],
         "post_cutoff_jd": not graph_eligible,
         "graph_eligible": graph_eligible,
         "skills": skill_ids,
-        "latest_skills": latest_skill_ids,
         "skill_labels": [
             str(skills[skill_id].get("label", skill_id))
             for skill_id in skill_ids
@@ -298,10 +357,14 @@ def job_document(
             for skill_id in skill_ids
         },
         "freshness": round(freshness, 4),
-        "view_count": 0,
-        "apply_count": 0,
+        # Train-window aggregates from scripts/build_job_behavior.py. Publishing
+        # zeroes here silently disabled the `behavior` ranking feature for the
+        # entire live corpus.
+        "view_count": views,
+        "apply_count": applies,
     }
-    # Generate embedding for hybrid retrieval
+    # Hybrid retrieval is opt-in: embedding generation is a synchronous
+    # per-document Bedrock call, which dominates the whole pass when enabled.
     if embedding_client is not None:
         embedding = embedding_client.embed(job_embedding_text(row))
         if embedding is not None:
@@ -324,30 +387,6 @@ def bulk_payload(index: str, documents: Iterable[dict[str, Any]]) -> bytes:
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 
-def send_bulk_batch(
-    client: SignedOpenSearchClient,
-    index: str,
-    documents: list[dict[str, Any]],
-) -> int:
-    response = client.request(
-        "POST",
-        "/_bulk",
-        bulk_payload(index, documents),
-        content_type="application/x-ndjson",
-    )
-    if response.get("errors"):
-        failures = [
-            item
-            for item in response.get("items", [])
-            if int(next(iter(item.values())).get("status", 500)) >= 300
-        ]
-        raise RuntimeError(
-            "OpenSearch bulk indexing failed: "
-            + json.dumps(failures[:3], ensure_ascii=False)
-        )
-    return len(documents)
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Index every supplied job into a full-corpus OpenSearch index"
@@ -366,11 +405,24 @@ def main() -> None:
     parser.add_argument(
         "--region", default=os.getenv("AWS_REGION", "us-east-1")
     )
-    parser.add_argument("--batch-size", type=int, default=400)
-    parser.add_argument("--workers", type=int, default=1)
-    parser.add_argument("--start-record", type=int, default=0)
-    parser.add_argument("--expected-count", type=int, default=0)
+    parser.add_argument("--batch-size", type=int, default=250)
+    parser.add_argument(
+        "--max-workers",
+        type=int,
+        default=8,
+        help="Bulk requests kept in flight; overlaps parsing with network round trips",
+    )
     parser.add_argument("--max-records", type=int, default=0)
+    parser.add_argument(
+        "--skip-records",
+        type=int,
+        default=0,
+        help=(
+            "Resume a full-corpus pass by skipping this many leading CSV rows. "
+            "Writes are keyed by _id, so re-covering rows is harmless; this only "
+            "avoids repeating work after a dropped connection."
+        ),
+    )
     parser.add_argument("--timeout-seconds", type=float, default=60.0)
     parser.add_argument(
         "--skip-create",
@@ -378,43 +430,54 @@ def main() -> None:
         help="Index into an existing compatible index",
     )
     parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Parse and validate records without sending them",
+        "--behavior",
+        type=Path,
+        default=BEHAVIOR,
+        help="Aggregates from scripts/build_job_behavior.py; skipped if missing",
     )
     parser.add_argument(
         "--embed",
         action="store_true",
-        help="Generate embeddings via Bedrock for hybrid retrieval",
+        help="Generate embeddings via Bedrock for hybrid retrieval (slow)",
+    )
+    parser.add_argument(
+        "--update-mapping",
+        action="store_true",
+        help=(
+            "PUT the new field properties onto an existing index before "
+            "indexing. Adding fields is a non-breaking mapping update on a "
+            "provisioned domain, so an already-deployed index can be upgraded "
+            "in place: --update-mapping --skip-create re-bulks every document "
+            "by _id and no delete or alias swap is needed."
+        ),
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Parse and validate records without sending them",
     )
     args = parser.parse_args()
     if not args.dry_run and not args.endpoint:
         raise SystemExit("--endpoint or OPENSEARCH_ENDPOINT is required")
     if args.batch_size < 1 or args.batch_size > 2000:
         raise SystemExit("--batch-size must be between 1 and 2000")
-    if args.workers < 1 or args.workers > 8:
-        raise SystemExit("--workers must be between 1 and 8")
-    if args.start_record < 0 or args.expected_count < 0:
-        raise SystemExit("--start-record and --expected-count must be non-negative")
 
-    ontology_path = ROOT / "config" / "skill_ontology.seed.json"
-    icap_path = ROOT / "config" / "icap_vocabulary.reviewed.json"
-    terms = load_ontology(ontology_path, icap_path)
-    skills = {
-        term.node_id: {
-            "type": term.node_type,
-            "label": term.label,
-            "aliases": list(term.aliases),
-        }
-        for term in terms
-    }
+    demo = json.loads(args.demo_index.read_text(encoding="utf-8"))
+    skills = demo["skills"]
     pattern, alias_to_skills = compile_alias_matcher(skills)
     embedding_client = (
         BedrockEmbeddingClient.from_environment() if args.embed else None
     )
-    if embedding_client is not None and not embedding_client.enabled:
-        print("WARNING: --embed specified but BEDROCK_EMBEDDING_MODEL_ID not set; "
-              "using default amazon.titan-embed-text-v2:0")
+    behavior: dict[str, list[int]] = {}
+    if args.behavior and args.behavior.is_file():
+        behavior = json.loads(args.behavior.read_text(encoding="utf-8"))["counts"]
+        print(f"Loaded behavior for {len(behavior):,} jobs", flush=True)
+    else:
+        print(
+            "No behavior artifact; view_count/apply_count will be 0. "
+            "Run scripts/build_job_behavior.py first.",
+            flush=True,
+        )
     client = (
         None
         if args.dry_run
@@ -437,83 +500,106 @@ def main() -> None:
                 separators=(",", ":"),
             ).encode("utf-8"),
         )
+    if client is not None and args.update_mapping:
+        properties = mapping(serverless=client.service == "aoss")["mappings"][
+            "properties"
+        ]
+        client.request(
+            "PUT",
+            f"{index_path}/_mapping",
+            json.dumps({"properties": properties}, separators=(",", ":")).encode(
+                "utf-8"
+            ),
+        )
+        print(f"Updated mapping on {args.index} with {len(properties)} properties")
 
-    indexed = graph_jobs = completed = source_rows_seen = 0
+    def send(payload: bytes) -> None:
+        response = client.request(
+            "POST",
+            "/_bulk",
+            payload,
+            content_type="application/x-ndjson",
+        )
+        if response.get("errors"):
+            failures = [
+                item
+                for item in response.get("items", [])
+                if int(next(iter(item.values())).get("status", 500)) >= 300
+            ]
+            raise RuntimeError(
+                "OpenSearch bulk indexing failed: "
+                + json.dumps(failures[:3], ensure_ascii=False)
+            )
+
+    indexed = graph_jobs = batches = 0
     started = time.monotonic()
     pending: list[dict[str, Any]] = []
-    in_flight: set[Future[int]] = set()
-    next_progress = 10_000
     source_path = args.data_dir / "職缺.csv"
-    executor = (
-        ThreadPoolExecutor(max_workers=args.workers)
-        if client is not None
-        else None
-    )
+    # Sending one bulk request at a time leaves the whole round trip idle while
+    # the next batch is parsed. Overlapping a bounded number of in-flight
+    # requests is what turns a multi-hour full-corpus pass into minutes; the
+    # semaphore keeps queued payloads from growing without limit.
+    in_flight = threading.Semaphore(max(1, args.max_workers))
+    failures: list[BaseException] = []
+    failure_lock = threading.Lock()
 
-    def collect(done: set[Future[int]]) -> None:
-        nonlocal completed, next_progress
-        for future in done:
-            in_flight.remove(future)
-            completed += future.result()
-        if completed >= next_progress:
-            elapsed = max(0.001, time.monotonic() - started)
-            print(
-                f"Indexed {completed:,} jobs · {completed / elapsed:,.0f} jobs/s",
-                flush=True,
-            )
-            next_progress = (completed // 10_000 + 1) * 10_000
+    def dispatch(payload: bytes) -> None:
+        try:
+            send(payload)
+        except BaseException as exc:  # surfaced on the main thread below
+            with failure_lock:
+                failures.append(exc)
+        finally:
+            in_flight.release()
 
-    try:
+    def submit(pool: Any, payload: bytes) -> None:
+        with failure_lock:
+            if failures:
+                raise failures[0]
+        in_flight.acquire()
+        pool.submit(dispatch, payload)
+
+    with concurrent.futures.ThreadPoolExecutor(
+        max_workers=max(1, args.max_workers)
+    ) as pool:
         with source_path.open(encoding="utf-8-sig", newline="") as handle:
-            for row in csv.DictReader(handle):
+            reader = csv.DictReader(handle)
+            for skipped, _ in enumerate(reader, 1):
+                if skipped >= args.skip_records:
+                    break
+            if args.skip_records:
+                print(f"Resuming after {args.skip_records:,} rows", flush=True)
+            for row in reader:
                 if args.max_records > 0 and indexed >= args.max_records:
                     break
-                source_rows_seen += 1
-                graph_jobs += int(
-                    parse_time(row["職缺最後修改時間"]) <= TRAIN_CUTOFF
-                )
-                if source_rows_seen <= args.start_record:
-                    continue
                 document = job_document(
-                    row,
-                    skills,
-                    pattern,
-                    alias_to_skills,
-                    embedding_client,
+                    row, skills, pattern, alias_to_skills, behavior, embedding_client
                 )
                 pending.append(document)
+                graph_jobs += int(document["graph_eligible"])
                 indexed += 1
                 if len(pending) < args.batch_size:
                     continue
-                documents, pending = pending, []
-                if executor is None:
-                    completed += len(documents)
-                    collect(set())
-                    continue
-                in_flight.add(
-                    executor.submit(send_bulk_batch, client, args.index, documents)
-                )
-                if len(in_flight) >= args.workers * 2:
-                    done, _ = wait(in_flight, return_when=FIRST_COMPLETED)
-                    collect(done)
+                if client is not None:
+                    submit(pool, bulk_payload(args.index, pending))
+                pending.clear()
+                batches += 1
+                if batches % 25 == 0:
+                    elapsed = max(0.001, time.monotonic() - started)
+                    print(
+                        f"Indexed {indexed:,} jobs · {indexed / elapsed:,.0f} jobs/s",
+                        flush=True,
+                    )
+        if pending and client is not None:
+            submit(pool, bulk_payload(args.index, pending))
+    if failures:
+        raise failures[0]
 
-        if pending:
-            if executor is None:
-                completed += len(pending)
-                collect(set())
-            else:
-                in_flight.add(
-                    executor.submit(send_bulk_batch, client, args.index, pending)
-                )
-        while in_flight:
-            done, _ = wait(in_flight, return_when=FIRST_COMPLETED)
-            collect(done)
-    finally:
-        if executor is not None:
-            executor.shutdown(wait=True, cancel_futures=True)
-
-    expected_count = args.expected_count or source_rows_seen
     verified_count = None
+    # A partial run (--max-records) or an in-place field upgrade (--skip-create)
+    # overwrites documents by _id inside an index that already holds the whole
+    # corpus, so the document count is expected not to equal this run's total.
+    partial_update = args.max_records > 0 or args.skip_create
     if client is not None:
         if client.service != "aoss":
             client.request("POST", f"{index_path}/_refresh", b"{}")
@@ -523,29 +609,31 @@ def main() -> None:
         while True:
             count = client.request("POST", f"{index_path}/_count", b"{}")
             verified_count = int(count.get("count", -1))
-            if verified_count == expected_count or time.monotonic() >= deadline:
+            if verified_count >= indexed or time.monotonic() >= deadline:
                 break
             time.sleep(5)
-        if verified_count != expected_count:
+        if not partial_update and verified_count != indexed:
             raise RuntimeError(
-                f"index count mismatch: expected {expected_count:,}, got {verified_count:,}"
+                f"index count mismatch: expected {indexed:,}, got {verified_count:,}"
+            )
+        if partial_update and verified_count < indexed:
+            raise RuntimeError(
+                f"index holds {verified_count:,} documents after writing {indexed:,}"
             )
 
     report = {
         "schema": "skillweave-full-corpus-index-v1",
         "index": args.index,
         "source": str(source_path),
-        "source_jobs_indexed": expected_count,
-        "jobs_processed_this_run": indexed,
-        "start_record": args.start_record,
+        "source_jobs_indexed": indexed,
         "verified_index_count": verified_count,
         "graph_eligible_jobs": graph_jobs,
-        "cold_start_jobs": expected_count - graph_jobs,
+        "cold_start_jobs": indexed - graph_jobs,
+        "partial_update": partial_update,
         "all_source_jobs_are_search_targets": (
-            verified_count == expected_count if verified_count is not None else None
+            verified_count >= indexed if verified_count is not None else None
         ),
         "dry_run": args.dry_run,
-        "workers": args.workers,
         "elapsed_seconds": round(time.monotonic() - started, 2),
     }
     print(json.dumps(report, ensure_ascii=False, indent=2))

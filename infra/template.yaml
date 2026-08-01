@@ -87,10 +87,21 @@ Globals:
         OPENSEARCH_DOCUMENT_COUNT: !Ref OpenSearchDocumentCount
         OPENSEARCH_TIMEOUT_SECONDS: "4.0"
         BEDROCK_QUERY_MODEL_ID: !Ref BedrockQueryModelId
+        # A batch of ten structured intents needs far more than the 128 tokens
+        # a single-answer budget allowed; the old value truncated every response.
         BEDROCK_QUERY_MAX_TOKENS: "4000"
         BEDROCK_QUERY_MAX_BATCH: "10"
+        # A Lambda invocation serves one request, so there is no sibling query
+        # to coalesce with and a long window would be pure added latency. The
+        # multi-request path (app/server.py, ECS Fargate) uses a full window.
         BEDROCK_QUERY_MAX_WAIT_SECONDS: "0.05"
+        # A single live Bedrock call measures ~2.1s; 2.5s degraded requests that
+        # would have completed.
         BEDROCK_QUERY_DEADLINE_SECONDS: "6.0"
+        # Precomputed intents for the head of the query distribution, shipped in
+        # the bundle. Present only when the file was built before packaging.
+        QUERY_INTENTS_PATH: /var/task/config/query-intents.json
+        QUERY_VOCAB_PATH: /var/task/config/query-intent-vocab.json
         NEPTUNE_GRAPH_ID: !Ref NeptuneGraphId
         NEPTUNE_GRAPH_REGION: !Ref NeptuneGraphRegion
         GRAPH_VERSION: !Ref GraphVersion

@@ -111,8 +111,56 @@ AWS_REGION=us-east-1 \
 BEDROCK_QUERY_MODEL_ID=global.anthropic.claude-haiku-4-5-20251001-v1:0 \
 OPENSEARCH_ENDPOINT=http://127.0.0.1:9200 \
 OPENSEARCH_INDEX=skillweave-jobs-v1 \
+QUERY_PREWARM_LIMIT=2000 \
 .venv/bin/python -m app.server --port 8080
 ```
+
+Query 正規化相關環境變數：
+
+| 變數 | 預設 | 說明 |
+|---|---|---|
+| `BEDROCK_QUERY_MAX_BATCH` | `10` | 一次 Bedrock 請求最多帶幾筆查詢。Bedrock 的限制是每分鐘請求數，與單次帶幾筆無關 |
+| `BEDROCK_QUERY_MAX_WAIT_SECONDS` | 長駐 `1.0` / Lambda `0.05` | 批次視窗；湊滿 batch 或等滿這個秒數就送出。`app/server.py` 預設 `1.0`（可合併併發請求），Lambda 一次 invocation 只服務一個 request、無同批夥伴，故用 `0.05` |
+| `BEDROCK_QUERY_DEADLINE_SECONDS` | `6.0` | 單一 request 最多等多久；逾時回封閉字彙的 deterministic 解讀，批次仍會完成並暖 cache。實測單筆 Bedrock 呼叫約 2.1 秒，複雜查詢可達 4.6 秒 |
+| `QUERY_INTENTS_PATH` | `config/query-intents.json` | 離線算好的 intent 查表，載入後放在 LRU 之外，不受執行期 miss 淘汰 |
+| `QUERY_PREWARM_LIMIT` | `0`（關閉） | 啟動時背景預熱 `config/top-queries.json` 的前 N 筆。2000 筆約 6 分鐘、涵蓋 61% 搜尋量。**僅適用長駐進程**；Lambda 請改用 `QUERY_INTENTS_PATH` |
+| `QUERY_PREWARM_RPM` | `45` | 預熱的請求速率上限（Bedrock quota 為 50 RPM） |
+
+預熱與快取狀態可在 `GET /health` 的 `query_intent_cache` 觀察。
+
+### 重建衍生資料
+
+`config/query-intent-vocab.json`、`config/top-queries.json` 與
+`artifacts/job-behavior.json` 都是從主辦方資料衍生的建置產物，不入版控：
+
+```bash
+make query-artifacts        # vocab + top-queries + job-behavior
+
+# 頭部查詢的結構化 intent（約 5 分鐘 / 199 次 Bedrock 請求）
+AWS_REGION=us-east-1 .venv/bin/python scripts/build_query_intents.py \
+    --model-id global.anthropic.claude-haiku-4-5-20251001-v1:0
+```
+
+### 升級已部署的全量索引
+
+新增欄位對 provisioned domain 是非破壞性的 mapping 更新，不需刪除索引或切換 alias：
+
+```bash
+export AWS_REGION=us-east-1
+export OPENSEARCH_ENDPOINT=https://<domain-endpoint>
+export OPENSEARCH_INDEX=skillweave-jobs-v1 OPENSEARCH_SERVICE=es
+
+.venv/bin/python scripts/index_full_opensearch.py \
+    --update-mapping --skip-create --batch-size 250 --max-workers 8
+```
+
+`--skip-create` 以 `_id` 就地覆寫，過程中索引持續可查詢。中斷後用
+`--skip-records <最後回報的筆數>` 續傳。實測 1,218,635 筆，純索引時間約 139 分鐘
+（平均 148 jobs/s，視網路狀況 124–172 jobs/s）。
+
+`--embed` 會為每筆職缺產生 Bedrock embedding 供 hybrid kNN 使用，**預設關閉**：
+它是同步逐筆呼叫，會主宰整個索引時間；且 `index.knn` 是 static setting，無法對
+開啟中的索引啟用，需另建索引重灌。
 
 開啟前端：<http://127.0.0.1:8080>。後端 API 與前端使用同一個 port：
 
