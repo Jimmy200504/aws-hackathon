@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <a class="skip-link" href="#main-content">跳到主要內容</a>
     <div class="ambient ambient-a"></div>
     <div class="ambient ambient-b"></div>
     <header class="topbar">
@@ -25,20 +26,17 @@
       </a>
       <div class="header-actions">
         <span class="status-pill"><i></i> API READY</span>
-        <a href="#evidence">模型證據</a>
+        <nav aria-label="主要導覽">
+          <a href="#search-form">搜尋職缺</a>
+          <a href="#evidence">模型證據</a>
+        </nav>
       </div>
     </header>
 
-    <main>
+    <main id="main-content">
       <section class="hero">
-        <div class="eyebrow"><span>01</span> SEARCH × GRAPH × RANK</div>
-        <h1>不是「找得到」<br />是<span>第一個就對。</span></h1>
-        <p>
-          把職缺文字轉成可查詢的技能關係，再以真實瀏覽與應徵訊號排序。
-          每一個推薦，都能說明它為什麼在這裡。
-        </p>
-
         <form id="search-form" class="search-shell">
+          <div class="search-label"><span>AI JOB SEARCH</span><i>技能圖譜已連線</i></div>
           <div class="search-main">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="m21 21-4.4-4.4m2.4-5.1a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" />
@@ -53,7 +51,7 @@
               value="AWS Docker Kubernetes"
               required
             />
-            <button type="submit">精準搜尋 <span>↗</span></button>
+            <button type="submit"><span class="button-label">精準搜尋</span> <span aria-hidden="true">↗</span></button>
           </div>
           <div class="filters">
             <label>
@@ -103,11 +101,11 @@
             </div>
             <div id="result-meta" class="result-meta">等待搜尋</div>
           </div>
-          <div id="loading" class="loading hidden" aria-live="polite">
+          <div id="loading" class="loading hidden" aria-live="polite" role="status">
             <span></span><span></span><span></span>
             <p>解析意圖、走訪圖譜、重排候選職缺…</p>
           </div>
-          <div id="error" class="message hidden"></div>
+          <div id="error" class="message hidden" role="alert"></div>
           <div id="results" class="result-list" aria-live="polite">
             <div class="initial-state">
               <div class="initial-graph" aria-hidden="true">
@@ -133,55 +131,6 @@
             <div id="intent-graph" class="intent-graph">
               <p class="panel-empty">搜尋後顯示 Query → Skill → Job 的實際遍歷證據。</p>
             </div>
-          </div>
-
-          <div class="panel score-panel">
-            <div class="panel-head">
-              <div>
-                <span class="kicker">HONEST METRICS</span>
-                <h3>驗證狀態</h3>
-              </div>
-            </div>
-            <div class="metric-grid">
-              <div>
-                <span>Demo index</span>
-                <strong id="job-count">—</strong>
-                <small>真實職缺子集</small>
-              </div>
-              <div>
-                <span>NDCG@10 lift</span>
-                <strong id="ndcg-status">+1.34%</strong>
-                <small>1,993 queries · 95% CI &gt; 0 · 尚未達 5%</small>
-              </div>
-              <div>
-                <span>Gate-active lift</span>
-                <strong>+11.41%</strong>
-                <small>285 queries · post-hoc diagnostic</small>
-              </div>
-              <div>
-                <span>Top-1 scale proxy</span>
-                <strong>≈40K</strong>
-                <small>每週 relevance events · 非轉換預測</small>
-              </div>
-            </div>
-            <div class="provenance">
-              <i></i>
-              <p>
-                <strong>時間防洩漏已啟用</strong>
-                圖譜只使用 2026-06-05 前已存在的 JD／職稱證據；其餘職缺走 cold-start 降級。
-              </p>
-            </div>
-          </div>
-
-          <div class="panel architecture-panel">
-            <span class="kicker">PRODUCTION PATH</span>
-            <h3>AWS 即時排序路徑</h3>
-            <ol>
-              <li><span>01</span><div><strong>OpenSearch</strong><small>Hybrid Top-200 candidates</small></div></li>
-              <li><span>02</span><div><strong>Neptune</strong><small>1-hop skill aggregation</small></div></li>
-              <li><span>03</span><div><strong>SageMaker</strong><small>IPS-aware LambdaMART</small></div></li>
-              <li><span>04</span><div><strong>API Gateway</strong><small>Contract-safe Top-20</small></div></li>
-            </ol>
           </div>
         </aside>
       </section>
