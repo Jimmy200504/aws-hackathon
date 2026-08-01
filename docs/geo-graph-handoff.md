@@ -249,7 +249,35 @@ suffix_dropped  信義、板橋              167,758 筆命中
 步驟 1 要花額度、受 1 RPS 限制、且可能量出「準確率不夠不能用」。
 先做 2 再做 1，最壞情況仍有一張完整的圖。本次即照此順序執行。
 
-### 步驟 1：LLM collocation 判斷（唯一待跑項）
+### 步驟 1：LLM collocation 判斷 —— **已跑完，結論是不採用模型判定**
+
+完整分析見 [`docs/evaluation-limits.md`](evaluation-limits.md) 的「行政區 occurrence 判斷」一節，
+證據檔 [`reports/district-collocation-effect.json`](../reports/district-collocation-effect.json)。
+
+摘要：
+
+- 第一版 prompt 在標註集只有 **66.54%**，被 `--min-accuracy` 擋下，沒有進到套用階段
+- 改寫 + dev/holdout 切分後，holdout **87.18%**（dev 89.50%），過關
+- 套用到 2,558 筆中間帶才發現分數不能外推：標註帶的 place/not_place 加權精確度分離度 **0.8314**，
+  中間帶只有 **0.0872**。標註帶是用誤留率切出來的，依定義可分；中間帶沒標註正是因為分不開
+- 模型把 `北區和緯`（實測 0.8050）判成 not_place —— **在 occurrence 層重現了 surface 層的錯誤答案**
+- **採用**：511 筆實測標註驅動的 occurrence 過濾（255,119 → **256,014** 筆、覆蓋率 26.53% → **26.62%**）
+- **不採用**：2,558 筆模型判定（加上去覆蓋率掉到 26.45%）
+
+根因不是提示詞：collocation 的 key 只有一個後續漢字，`南區)` 這四個字裡沒有可判定的資訊。
+要解中間帶需要換特徵（整段職缺文字），不是換模型。
+
+**預設沒有開啟。** `--collocation-judgements` 旗標預設關閉，
+`reports/job-district-extraction.json` 與所有引用它的數字都未變動。
+要套用實測標註那一版：
+
+```powershell
+.\.venv\Scripts\python.exe scripts\extract_job_districts.py `
+    --collocation-judgements artifacts\district-collocations.jsonl
+```
+
+<details>
+<summary>原本的規劃（保留作為脈絡）</summary>
 
 **問題。** surface 層級的通過/拒絕在數學上無法處理 occurrence 層級的錯誤。`北區` 是最清楚的例子：
 
@@ -303,11 +331,12 @@ collocation 的 key 是 surface 後面**一個**漢字，每筆附 `example` 片
 - 1.05 秒間隔（沿用 `scripts/normalize_eval_queries.py` 實測 0.7604 RPS 的限流器）
 - `--region` 不是 us-east-1 / us-west-2 直接拒絕，不會跑到一半才炸
 
-**尚未執行的第 4 步：** 判斷結果回寫抽取器、套用 occurrence 層級判定，看單一行政區佔比與覆蓋率怎麼變。
+**一個好的測試題。** `林口長庚 n=934 p=19.06%` —— 林口長庚醫院行政上屬**桃園市龜山區**，不是新北市林口區。
+它落在**實測標註**帶（not_place），所以模型答對與否不影響結果。
+**行為圖獨立地證實了同一件事**：`林口區 ↔ 龜山區` 的 Jaccard 是 0.1978、共同勾選 10,723 次，
+是全部跨縣市邊的第三強。
 
-**一個好的測試題。** `林口長庚 n=927 p=18.66%` —— 林口長庚醫院行政上屬**桃園市龜山區**，不是新北市林口區。資料抓到了這件事，而一般模型很可能答錯。
-它會出現在 validate 的第一批裡。**行為圖獨立地證實了同一件事**：`林口區 ↔ 龜山區` 的 Jaccard 是 0.1978、
-共同勾選 10,723 次，是全部跨縣市邊的第三強。
+</details>
 
 ### 步驟 2：L4 區級共同勾選圖 —— **已完成**
 
@@ -386,9 +415,12 @@ Jaccard 只有 0.0097；`L1/宜花東` 第 81 百分位，宜蘭花蓮台東不�
 3. **`shortcut` 邊無法用這份資料驗證。** 搜尋日誌是 2026-06-01~06-07，規劃書標的淡江大橋通車日是 2026-05-12，**整個資料窗都在通車後**，沒有 before/after 可比。
    實作上已處理：手填邊是備援不是覆寫，兩條 `shortcut` 都落在行為已涵蓋的區對上，
    所以時序過濾器可證明會動（三鶯線在 06-01 被排除、07-01 被接受），但不改變任何一條邊的權重。
-4. **LLM collocation 判斷未跑，本 workspace 的 Workshop Studio 憑證已過期。**
-   程式與測試就緒，換一組憑證即可執行。
-5. **本分支的 commit 都未推送。**
+4. **中間帶 2,558 筆 collocation 仍未解。** LLM 已試過並量測，分離度只有 0.087（見 §5 步驟 1）。
+   下一次嘗試要換特徵而不是換模型：給整段職缺文字或地址欄位，而不是 surface 後面一個漢字。
+5. **實測標註版的 occurrence 過濾預設未開啟。** 它是 +895 筆職缺的淨改善，
+   但開啟會改動 `reports/job-district-extraction.json` 以及多份文件引用的 255,119 / 26.53% / 86.71%。
+   要不要換成 256,014 / 26.62% / 86.75% 是發布決定，留給人決定。
+6. **本分支的 commit 都未推送。**
 
 已解決：
 - `.gitattributes` 缺失導致 `scripts/verify_release.py` 在 Windows 上 19/25 個 hash mismatch。已加入 `* text=auto eol=lf`，驗證器現在 89/89 全過。

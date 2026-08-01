@@ -151,6 +151,61 @@ def kept_error_rate(inside: int, appearances: int, expected: float) -> float:
     return _odds(outside_upper) * _odds(expected)
 
 
+def load_occurrence_judgements(
+    path: Path | None, prompt_version: str
+) -> dict[tuple[str, str], str]:
+    """`(surface, following) -> place | not_place`, from the judgement cache.
+
+    Two sources are merged and they are not equal in standing. A collocation
+    that already carries a `label` was labelled from its measured error rate
+    across the whole corpus, which is stronger evidence than any model output,
+    so the label wins wherever both exist. The model only fills the middle
+    band that no error-rate threshold could resolve.
+    """
+    if path is None or not path.is_file():
+        return {}
+    verdicts: dict[tuple[str, str], str] = {}
+    modelled: dict[tuple[str, str], str] = {}
+    with path.open(encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if row.get("prompt_version") != prompt_version:
+                continue
+            key = (row.get("surface"), row.get("following"))
+            if row.get("label"):
+                verdicts[key] = row["label"]
+            elif row.get("mode") == "apply" and row.get("verdict"):
+                modelled[key] = row["verdict"]
+    for key, verdict in modelled.items():
+        verdicts.setdefault(key, verdict)
+    return verdicts
+
+
+def occurrence_verdict(
+    judgements: dict[tuple[str, str], str], surface: str, keys: "frozenset[str] | tuple"
+) -> str | None:
+    """Verdict for a surface inside one posting, across all its occurrences.
+
+    One `place` occurrence is enough: a posting reading 中山區...中山路 does sit
+    in 中山區, and the road mention does not undo that. `not_place` is returned
+    only when every occurrence was judged and every one of them was negative,
+    so an unjudged occurrence leaves the decision with the surface-level gate.
+    """
+    seen = [judgements.get((surface, key)) for key in keys]
+    known = [verdict for verdict in seen if verdict]
+    if not known:
+        return None
+    if "place" in known:
+        return "place"
+    return "not_place" if len(known) == len(seen) else None
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA)
@@ -200,6 +255,19 @@ def main() -> None:
         help="a collocation needs this much support before it can be a label",
     )
     parser.add_argument(
+        "--collocation-judgements",
+        type=Path,
+        default=None,
+        help="occurrence-level verdicts from scripts/judge_district_collocations.py; "
+        "omitted means surface-level gating only, which is what the checked-in "
+        "report was produced with",
+    )
+    parser.add_argument(
+        "--judgement-prompt-version",
+        default="district-collocation-v2",
+        help="only verdicts from this prompt version are loaded",
+    )
+    parser.add_argument(
         "--review-collocations",
         type=int,
         default=30,
@@ -209,6 +277,15 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    occurrence_judgements = load_occurrence_judgements(
+        args.collocation_judgements, args.judgement_prompt_version
+    )
+    if args.collocation_judgements:
+        print(
+            f"occurrence judgements: {len(occurrence_judgements)} "
+            f"({args.judgement_prompt_version})",
+            flush=True,
+        )
     started = time.monotonic()
     counties, tables, collisions = load_districts(args.data_dir / "城市對照表.csv")
     full_table, stripped_table = tables["full"], tables["stripped"]
@@ -274,6 +351,11 @@ def main() -> None:
             title = normalize(row.get("職務名稱", ""))
             content = normalize(row.get("職務內容", ""))
             found: dict[str, str] = {}
+            # Which collocation keys each surface appeared with in this posting.
+            # The surface-level gate does not need this, but the occurrence-level
+            # one does: 中山路 and 中山區 are the same surface and must be able to
+            # reach different verdicts inside a single posting.
+            found_keys: dict[str, set[str]] = defaultdict(set)
             contexts: dict[tuple[str, str], str] = {}
             for field, text in (("title", title), ("content", content)):
                 if not text:
@@ -307,6 +389,7 @@ def main() -> None:
                     if surface not in found or field == "title":
                         found[surface] = field
                     key = following if HAN.match(following) else ""
+                    found_keys[surface].add(key)
                     contexts.setdefault((surface, key), text[start : end + 8].strip())
             if not found:
                 continue
@@ -318,7 +401,9 @@ def main() -> None:
                 entry[0] += 1
                 entry[1] += int(inside)
                 colloc_example.setdefault(key, snippet)
-            buffered.append((row["職缺編號"], county, found))
+            buffered.append(
+                (row["職缺編號"], county, found, {s: frozenset(k) for s, k in found_keys.items()})
+            )
 
     total_eligible = sum(base_rate.values()) or 1
     share = {name: count / total_eligible for name, count in base_rate.items()}
@@ -367,10 +452,20 @@ def main() -> None:
     rows_out = []
     layer_hits = Counter()
     field_hits = Counter()
-    for job_id, county, found in buffered:
+    for job_id, county, found, keys in buffered:
         resolved: dict[str, dict[str, str]] = {}
         for surface, field in found.items():
-            if surface not in accepted_surfaces:
+            occurrence = occurrence_verdict(occurrence_judgements, surface, keys.get(surface, ()))
+            if occurrence == "not_place":
+                # Every occurrence of this surface in this posting was judged
+                # not to locate it, so the surface-level accept does not apply.
+                stats["match_rejected_occurrence"] += 1
+                continue
+            if occurrence == "place" and surface not in accepted_surfaces:
+                # The other direction, and the reason this pass exists: 北區 is
+                # rejected wholesale at 62.9% error, but 北區和緯路 is 台南市北區.
+                stats["match_recovered_occurrence"] += 1
+            elif surface not in accepted_surfaces:
                 stats["match_rejected_surface"] += 1
                 continue
             district = candidates[surface].get(county)
@@ -417,6 +512,13 @@ def main() -> None:
             "label_place_max_error": args.label_place_max_error,
             "label_not_place_min_error": args.label_not_place_min_error,
             "label_min_postings": args.label_min_postings,
+            "occurrence_judgements": len(occurrence_judgements),
+            "occurrence_judgement_source": (
+                str(args.collocation_judgements) if args.collocation_judgements else None
+            ),
+            "occurrence_prompt_version": (
+                args.judgement_prompt_version if occurrence_judgements else None
+            ),
             "random_seed": 1111,
         },
         "stats": {

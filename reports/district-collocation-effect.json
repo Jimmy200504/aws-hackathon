@@ -1,0 +1,192 @@
+{
+  "metadata": {
+    "schema": "skillweave-district-collocation-effect-v1",
+    "prompt_version": "district-collocation-v2",
+    "extractor_model": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "held_out_accuracy": 0.8718,
+    "held_out_note": "measured on the labelled half that prompt wording never saw; see reports/district-collocation-judgement.json",
+    "precision_definition": "share of matched postings whose 工作城市 is consistent with the surface's candidate districts; the same proxy the extractor's own gate uses, not an independent ground truth"
+  },
+  "conclusion": {
+    "verdict": "model judgements not adopted",
+    "why": "the labelled bands are separable by construction, so 87.18% on them does not transfer; on the middle band the model's place/not_place split differs by 0.087 in weighted precision, and applying it costs coverage while leaving purity essentially unchanged",
+    "what_is_adopted": "the occurrence-level mechanism itself, driven by the 511 measured labels only, which is a coverage and purity gain with no model output",
+    "root_cause": "one following Han character is enough context for the easy cases and not for the ambiguous ones: 南區) at 0.6023 precision cannot be resolved from those four characters by any judge"
+  },
+  "collocation_diagnosis": {
+    "labelled_band": {
+      "collocations": 511,
+      "matches": 101266,
+      "place": {
+        "collocations": 365,
+        "matches": 62921,
+        "weighted_precision": 0.9511
+      },
+      "not_place": {
+        "collocations": 146,
+        "matches": 38345,
+        "weighted_precision": 0.1197
+      },
+      "separation": 0.8314
+    },
+    "middle_band": {
+      "collocations": 2558,
+      "matches": 126104,
+      "place": {
+        "collocations": 1755,
+        "matches": 90624,
+        "weighted_precision": 0.7792
+      },
+      "not_place": {
+        "collocations": 803,
+        "matches": 35480,
+        "weighted_precision": 0.692
+      },
+      "separation": 0.0872
+    },
+    "middle_band_false_rejections": {
+      "rule": "judged not_place while measured precision exceeds 0.60",
+      "collocations": 477,
+      "matches": 26811,
+      "examples": [
+        {
+          "surface": "南區",
+          "following": "",
+          "postings": 2987,
+          "precision": 0.6023,
+          "example": "南區)"
+        },
+        {
+          "surface": "中區",
+          "following": "",
+          "postings": 2266,
+          "precision": 0.7635,
+          "example": "中區)"
+        },
+        {
+          "surface": "東區",
+          "following": "",
+          "postings": 1996,
+          "precision": 0.8442,
+          "example": "東區)"
+        },
+        {
+          "surface": "信義",
+          "following": "",
+          "postings": 1308,
+          "precision": 0.8265,
+          "example": "信義)"
+        },
+        {
+          "surface": "桃園",
+          "following": "地",
+          "postings": 1175,
+          "precision": 0.794,
+          "example": "桃園地區)"
+        },
+        {
+          "surface": "桃園",
+          "following": "機",
+          "postings": 988,
+          "precision": 0.7733,
+          "example": "桃園機場)"
+        },
+        {
+          "surface": "信義",
+          "following": "店",
+          "postings": 900,
+          "precision": 0.8989,
+          "example": "信義店)外場正職人員"
+        },
+        {
+          "surface": "平鎮",
+          "following": "線",
+          "postings": 651,
+          "precision": 0.6528,
+          "example": "平鎮線 ✅夜班:板橋"
+        },
+        {
+          "surface": "中壢",
+          "following": "線",
+          "postings": 616,
+          "precision": 0.6396,
+          "example": "中壢線:(7:00)"
+        },
+        {
+          "surface": "大安",
+          "following": "",
+          "postings": 614,
+          "precision": 0.7736,
+          "example": "大安、萬華)+區域津"
+        },
+        {
+          "surface": "信義",
+          "following": "路",
+          "postings": 613,
+          "precision": 0.7537,
+          "example": "信義路四段65號6樓"
+        },
+        {
+          "surface": "三民",
+          "following": "",
+          "postings": 497,
+          "precision": 0.7465,
+          "example": "三民)"
+        },
+        {
+          "surface": "桃園",
+          "following": "全",
+          "postings": 432,
+          "precision": 0.6134,
+          "example": "桃園全區、新竹區、苗"
+        },
+        {
+          "surface": "東區",
+          "following": "中",
+          "postings": 401,
+          "precision": 0.813,
+          "example": "東區中華路二段318"
+        },
+        {
+          "surface": "桃園",
+          "following": "長",
+          "postings": 372,
+          "precision": 0.8387,
+          "example": "桃園長照機構]庶務司"
+        }
+      ]
+    }
+  },
+  "extraction_arms": {
+    "surface_only": {
+      "eligible": 961780,
+      "postings_with_district": 255119,
+      "coverage_of_eligible": 0.2653,
+      "single_district_postings": 221212,
+      "single_district_share": 0.8671,
+      "match_rejected_occurrence": 0,
+      "match_recovered_occurrence": 0,
+      "match_rejected_surface": 83674
+    },
+    "labels_only": {
+      "eligible": 961780,
+      "postings_with_district": 256014,
+      "coverage_of_eligible": 0.2662,
+      "single_district_postings": 222092,
+      "single_district_share": 0.8675,
+      "match_rejected_occurrence": 32691,
+      "match_recovered_occurrence": 1476,
+      "match_rejected_surface": 51999
+    },
+    "labels_plus_model": {
+      "eligible": 961780,
+      "postings_with_district": 254369,
+      "coverage_of_eligible": 0.2645,
+      "single_district_postings": 221302,
+      "single_district_share": 0.87,
+      "match_rejected_occurrence": 61946,
+      "match_recovered_occurrence": 12490,
+      "match_rejected_surface": 23997
+    }
+  }
+}

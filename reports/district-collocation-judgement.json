@@ -1,0 +1,353 @@
+{
+  "metadata": {
+    "schema": "skillweave-district-collocation-judgement-v1",
+    "mode": "validate",
+    "split": "holdout",
+    "source_queue": "artifacts/district-collocation-queue.json",
+    "extractor_model": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "prompt_version": "district-collocation-v2",
+    "prompt_sha256": "a66c007e344e3b03",
+    "batch_size": 25,
+    "temperature": 0,
+    "observed_rps": 0.3719,
+    "unanswered_items": 0
+  },
+  "counts": {
+    "items_in_mode": 273,
+    "judged": 273,
+    "place": 173,
+    "not_place": 100
+  },
+  "scores": {
+    "scored": 273,
+    "accuracy": 0.8718,
+    "place_precision": 0.9711,
+    "place_recall": 0.8485,
+    "not_place_precision": 0.7,
+    "not_place_recall": 0.9333,
+    "confusion": {
+      "place_place": 168,
+      "place_not_place": 30,
+      "not_place_place": 5,
+      "not_place_not_place": 70
+    },
+    "postings_weighted_accuracy": 0.9211
+  },
+  "disagreements": [
+    {
+      "surface": "中和",
+      "following": "環",
+      "example": "中和環球購物中心附近",
+      "postings": 807,
+      "precision": 0.948,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "板橋",
+      "following": "美",
+      "example": "板橋美商 門市服務人",
+      "postings": 364,
+      "precision": 1.0,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "桃園",
+      "following": "高",
+      "example": "桃園高鐵站30分鐘",
+      "postings": 313,
+      "precision": 0.9297,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "信義",
+      "following": "安",
+      "example": "信義安和、科技大樓站",
+      "postings": 280,
+      "precision": 0.95,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "大安",
+      "following": "店",
+      "example": "大安店)【有經驗者.",
+      "postings": 267,
+      "precision": 0.9738,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "八德",
+      "following": "線",
+      "example": "八德線➡️林口線➡️",
+      "postings": 244,
+      "precision": 0.9385,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "中壢",
+      "following": "平",
+      "example": "中壢平鎮店)",
+      "postings": 187,
+      "precision": 0.9091,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "永和",
+      "following": "中",
+      "example": "永和中山店)",
+      "postings": 174,
+      "precision": 0.9598,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "新莊",
+      "following": "三",
+      "example": "新莊三重區-日班機動",
+      "postings": 164,
+      "precision": 0.9939,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "三重",
+      "following": "重",
+      "example": "三重重新)",
+      "postings": 147,
+      "precision": 0.9864,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "中和",
+      "following": "建",
+      "example": "中和建一路站-計時服",
+      "postings": 145,
+      "precision": 0.9862,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "大雅",
+      "following": "街",
+      "example": "大雅街393號(北大",
+      "postings": 123,
+      "precision": 0.0,
+      "label": "not_place",
+      "verdict": "place"
+    },
+    {
+      "surface": "中壢",
+      "following": "龍",
+      "example": "中壢龍潭地區 )",
+      "postings": 119,
+      "precision": 0.9916,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "三重",
+      "following": "三",
+      "example": "三重三芝等鄰近地區者",
+      "postings": 101,
+      "precision": 0.9703,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "鶯歌",
+      "following": "八",
+      "example": "鶯歌八德/龍崗 大溪",
+      "postings": 94,
+      "precision": 0.0213,
+      "label": "not_place",
+      "verdict": "place"
+    },
+    {
+      "surface": "桃園",
+      "following": "華",
+      "example": "桃園華泰/大江/中壢",
+      "postings": 86,
+      "precision": 0.9302,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "桃園",
+      "following": "醫",
+      "example": "桃園醫院)",
+      "postings": 82,
+      "precision": 0.9878,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "三重",
+      "following": "分",
+      "example": "三重分校音樂、舞蹈團",
+      "postings": 79,
+      "precision": 0.9494,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "士林",
+      "following": "中",
+      "example": "士林中山北店【洋食芳",
+      "postings": 79,
+      "precision": 1.0,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "平鎮",
+      "following": "東",
+      "example": "平鎮東安國中 8.大",
+      "postings": 79,
+      "precision": 0.9367,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "桃園",
+      "following": "環",
+      "example": "桃園環球a19)月休",
+      "postings": 76,
+      "precision": 0.9605,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "內湖",
+      "following": "民",
+      "example": "內湖民權東路🆕早班p",
+      "postings": 74,
+      "precision": 0.9865,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "新店",
+      "following": "籌",
+      "example": "新店籌備中,熱烈歡迎",
+      "postings": 73,
+      "precision": 0.137,
+      "label": "not_place",
+      "verdict": "place"
+    },
+    {
+      "surface": "士林",
+      "following": "站",
+      "example": "士林站 ,公車站交通",
+      "postings": 72,
+      "precision": 0.9583,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "桃園",
+      "following": "一",
+      "example": "桃園一航店|b1美食",
+      "postings": 70,
+      "precision": 0.9857,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "信義",
+      "following": "企",
+      "example": "信義企業集團的各項產",
+      "postings": 67,
+      "precision": 0.9701,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "平鎮",
+      "following": "龍",
+      "example": "平鎮龍潭)",
+      "postings": 64,
+      "precision": 0.9531,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "板橋區",
+      "following": "三",
+      "example": "板橋區三民路一段175",
+      "postings": 64,
+      "precision": 0.9844,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "中壢",
+      "following": "北",
+      "example": "中壢北園路 日班:0",
+      "postings": 57,
+      "precision": 0.9298,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "鶯歌",
+      "following": "老",
+      "example": "鶯歌老街) 📌廠區面",
+      "postings": 56,
+      "precision": 0.2679,
+      "label": "not_place",
+      "verdict": "place"
+    },
+    {
+      "surface": "龜山",
+      "following": "南",
+      "example": "龜山南崁南上路】 上",
+      "postings": 45,
+      "precision": 1.0,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "桃園",
+      "following": "五",
+      "example": "桃園五處〈南崁-特展",
+      "postings": 44,
+      "precision": 0.9545,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "南區",
+      "following": "福",
+      "example": "南區福田五街10號(",
+      "postings": 39,
+      "precision": 1.0,
+      "label": "place",
+      "verdict": "not_place"
+    },
+    {
+      "surface": "北區",
+      "following": "華",
+      "example": "北區華信街10號 (",
+      "postings": 34,
+      "precision": 0.2059,
+      "label": "not_place",
+      "verdict": "place"
+    },
+    {
+      "surface": "桃園",
+      "following": "者",
+      "example": "桃園者可提出申請)",
+      "postings": 32,
+      "precision": 0.9688,
+      "label": "place",
+      "verdict": "not_place"
+    }
+  ]
+}

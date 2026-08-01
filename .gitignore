@@ -21,6 +21,7 @@ artifacts/temporal-eval.json
 # verdict live in reports/job-district-extraction.json, which is tracked.
 artifacts/job-districts.json
 artifacts/job-districts.jsonl
+artifacts/job-districts-llm.json
 artifacts/skill_ontology.seed_plus_llm.json
 artifacts/llm-exp-smoke/
 artifacts/llm-exp/

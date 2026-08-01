@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "schema": "skillweave-district-collocation-judgement-v1",
+    "mode": "apply",
+    "split": "all",
+    "source_queue": "artifacts/district-collocation-queue.json",
+    "extractor_model": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "prompt_version": "district-collocation-v2",
+    "prompt_sha256": "a66c007e344e3b03",
+    "batch_size": 25,
+    "temperature": 0,
+    "observed_rps": 0.4205,
+    "unanswered_items": 0
+  },
+  "counts": {
+    "items_in_mode": 2558,
+    "judged": 2558,
+    "place": 1755,
+    "not_place": 803
+  }
+}

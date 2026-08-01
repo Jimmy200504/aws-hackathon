@@ -144,8 +144,14 @@ class CacheTests(unittest.TestCase):
                 "\n".join(
                     json.dumps(row, ensure_ascii=False)
                     for row in (
-                        {"key": "北區\t業", "mode": "validate", "verdict": "not_place"},
-                        {"key": "北區\t和", "mode": "apply", "verdict": "place"},
+                        {
+                            "key": "北區\t業", "mode": "validate", "verdict": "not_place",
+                            "prompt_version": judge.PROMPT_VERSION,
+                        },
+                        {
+                            "key": "北區\t和", "mode": "apply", "verdict": "place",
+                            "prompt_version": judge.PROMPT_VERSION,
+                        },
                     )
                 ),
                 encoding="utf-8",
@@ -156,14 +162,44 @@ class CacheTests(unittest.TestCase):
     def test_corrupt_lines_are_skipped_not_fatal(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "cache.jsonl"
+            good = json.dumps(
+                {
+                    "key": "a", "mode": "apply", "verdict": "place",
+                    "prompt_version": judge.PROMPT_VERSION,
+                }
+            )
+            path.write_text(f"{good}\nnot json\n\n", encoding="utf-8")
+            self.assertEqual(list(judge.load_cache(path, "apply")), ["a"])
+
+    def test_a_reworded_prompt_does_not_inherit_the_previous_verdicts(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "cache.jsonl"
             path.write_text(
-                '{"key":"a","mode":"apply","verdict":"place"}\nnot json\n\n',
+                json.dumps(
+                    {
+                        "key": "a", "mode": "apply", "verdict": "place",
+                        "prompt_version": "district-collocation-v1",
+                    }
+                ),
                 encoding="utf-8",
             )
-            self.assertEqual(list(judge.load_cache(path, "apply")), ["a"])
+            self.assertEqual(judge.load_cache(path, "apply"), {})
 
     def test_absent_cache_is_empty(self) -> None:
         self.assertEqual(judge.load_cache(Path("no-such-cache.jsonl"), "apply"), {})
+
+
+class SplitTests(unittest.TestCase):
+    def test_split_is_deterministic(self) -> None:
+        self.assertEqual(judge.split_of("北區\t和"), judge.split_of("北區\t和"))
+
+    def test_split_covers_both_halves_and_only_those(self) -> None:
+        if not QUEUE.is_file():
+            self.skipTest("district-collocation-queue.json not present")
+        halves = [judge.split_of(item["key"]) for item in judge.load_items(QUEUE, "validate")]
+        self.assertEqual(set(halves), {"dev", "holdout"})
+        # Roughly balanced, so neither half is a trivial sample.
+        self.assertGreater(min(halves.count("dev"), halves.count("holdout")), 200)
 
 
 class ContractTests(unittest.TestCase):
@@ -178,6 +214,95 @@ class ContractTests(unittest.TestCase):
 
     def test_allowed_regions_match_the_event_rules(self) -> None:
         self.assertEqual(judge.ALLOWED_REGIONS, {"us-east-1", "us-west-2"})
+
+
+_ex_spec = importlib.util.spec_from_file_location(
+    "extract_job_districts", ROOT / "scripts" / "extract_job_districts.py"
+)
+extract = importlib.util.module_from_spec(_ex_spec)
+_ex_spec.loader.exec_module(extract)
+
+
+class OccurrenceVerdictTests(unittest.TestCase):
+    """The rule that turns per-collocation verdicts into a per-posting decision."""
+
+    JUDGEMENTS = {
+        ("中山", "路"): "not_place",
+        ("中山", "區"): "place",
+        ("北區", "業"): "not_place",
+    }
+
+    def verdict(self, surface: str, keys) -> str | None:
+        return extract.occurrence_verdict(self.JUDGEMENTS, surface, frozenset(keys))
+
+    def test_one_place_occurrence_carries_the_posting(self) -> None:
+        # 中山區...中山路 is in 中山區; the road mention does not undo the district.
+        self.assertEqual(self.verdict("中山", ["路", "區"]), "place")
+
+    def test_all_negative_occurrences_reject(self) -> None:
+        self.assertEqual(self.verdict("中山", ["路"]), "not_place")
+        self.assertEqual(self.verdict("北區", ["業"]), "not_place")
+
+    def test_an_unjudged_occurrence_defers_to_the_surface_gate(self) -> None:
+        # Returning not_place here would reject on the strength of one judged
+        # occurrence while another was never looked at.
+        self.assertIsNone(self.verdict("中山", ["路", "堂"]))
+
+    def test_no_judgement_at_all_defers(self) -> None:
+        self.assertIsNone(self.verdict("板橋", ["店"]))
+        self.assertIsNone(self.verdict("中山", []))
+
+
+class JudgementLoaderTests(unittest.TestCase):
+    def rows(self, *rows) -> Path:
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        path = Path(directory.name) / "cache.jsonl"
+        path.write_text(
+            "\n".join(json.dumps(row, ensure_ascii=False) for row in rows),
+            encoding="utf-8",
+        )
+        return path
+
+    def test_measured_label_outranks_the_model(self) -> None:
+        path = self.rows(
+            {
+                "surface": "北區", "following": "和", "label": "place",
+                "verdict": "not_place", "mode": "validate",
+                "prompt_version": "district-collocation-v2",
+            },
+        )
+        loaded = extract.load_occurrence_judgements(path, "district-collocation-v2")
+        self.assertEqual(loaded[("北區", "和")], "place")
+
+    def test_model_fills_only_the_unlabelled_middle(self) -> None:
+        path = self.rows(
+            {
+                "surface": "南區", "following": "_", "label": None,
+                "verdict": "not_place", "mode": "apply",
+                "prompt_version": "district-collocation-v2",
+            },
+        )
+        loaded = extract.load_occurrence_judgements(path, "district-collocation-v2")
+        self.assertEqual(loaded[("南區", "_")], "not_place")
+
+    def test_other_prompt_versions_are_ignored(self) -> None:
+        path = self.rows(
+            {
+                "surface": "北區", "following": "和", "label": None,
+                "verdict": "place", "mode": "apply",
+                "prompt_version": "district-collocation-v1",
+            },
+        )
+        self.assertEqual(
+            extract.load_occurrence_judgements(path, "district-collocation-v2"), {}
+        )
+
+    def test_absent_path_disables_the_feature(self) -> None:
+        self.assertEqual(extract.load_occurrence_judgements(None, "v2"), {})
+        self.assertEqual(
+            extract.load_occurrence_judgements(Path("no-such.jsonl"), "v2"), {}
+        )
 
 
 class QueueArtifactTests(unittest.TestCase):
