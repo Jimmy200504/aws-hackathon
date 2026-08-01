@@ -89,6 +89,11 @@ aws sts get-caller-identity --query Account --output text
 851558740348
 ```
 
+如果 workshop 憑證是存成具名 profile（`aws configure list-profiles` 可列出），請先
+`export AWS_PROFILE=<profile>` 再執行後續所有指令，並重跑一次
+`aws sts get-caller-identity` 確認落在 `851558740348`。少了這一步會沉默地用到
+`default` profile 的個人帳號：Bedrock 呼叫仍會成功，但用的是錯的帳號與配額。
+
 啟動本機 OpenSearch：
 
 ```bash
@@ -111,8 +116,21 @@ AWS_REGION=us-east-1 \
 BEDROCK_QUERY_MODEL_ID=global.anthropic.claude-haiku-4-5-20251001-v1:0 \
 OPENSEARCH_ENDPOINT=http://127.0.0.1:9200 \
 OPENSEARCH_INDEX=skillweave-jobs-v1 \
+OPENSEARCH_DOCUMENT_COUNT=1218635 \
 QUERY_PREWARM_LIMIT=2000 \
 .venv/bin/python -m app.server --port 8080
+```
+
+`OPENSEARCH_DOCUMENT_COUNT` 是**對外揭露的全量語料筆數**，`app/server.py` 與
+`app/lambda_handler.py` 共用同一份實作。它不是從 OpenSearch 查出來的，必須自己傳；
+未設定時預設 `0`，`/health` 的 `full_corpus_jobs` 與 `/api/v1/meta` 的
+`full_corpus_job_count` 會是 `null`，`search_corpus_job_count` 則退回內嵌的 12,000，
+對外看起來就像沒有在跑全量搜尋。它只影響這兩個 endpoint 的回報值，**不影響召回、
+排序或前端畫面**（前端 `web/app.js` 讀的是 `job_count`，恆為內嵌 demo index 的
+12,000）。值請以實際索引筆數為準：
+
+```bash
+curl -sS http://127.0.0.1:9200/skillweave-jobs-v1/_count
 ```
 
 Query 正規化相關環境變數：
@@ -187,8 +205,16 @@ curl -sS http://127.0.0.1:8080/api/v1/meta
 ```
 
 ```json
-{"search_scope":"full_corpus_opensearch"}
+{
+  "search_scope": "full_corpus_opensearch",
+  "embedded_job_count": 12000,
+  "full_corpus_job_count": 1218635,
+  "search_corpus_job_count": 1218635
+}
 ```
+
+後兩個欄位若為 `null` 或 `12000`，代表 `OPENSEARCH_DOCUMENT_COUNT` 沒帶到，
+不是召回真的退回子集；用 `GET /health` 的 `full_corpus_jobs` 可以同樣確認。
 
 搜尋回應中的 metadata 也必須符合：
 
