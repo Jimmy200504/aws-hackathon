@@ -17,6 +17,10 @@ def main() -> None:
     include = [
         *sorted((ROOT / "app").glob("*.py")),
         *sorted((ROOT / "web").glob("*")),
+        # Without these the query normalizer silently falls back to the legacy
+        # string contract: no closed vocabulary, no validation, no structure.
+        ROOT / "config" / "query-intent-vocab.json",
+        ROOT / "config" / "query-intent-prompt.txt",
         ROOT / "artifacts" / "demo-index.json",
         (
             ROOT
