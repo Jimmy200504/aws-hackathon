@@ -12,6 +12,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
+from app.geo_graph import GeoGraph
 from app.query_normalizer import BedrockQueryNormalizer
 from app.ranker import SkillWeaveRanker
 from app.region_graph import RegionGraph
@@ -30,6 +31,7 @@ class Handler(BaseHTTPRequestHandler):
     ranker: SkillWeaveRanker
     query_normalizer: BedrockQueryNormalizer
     region_graph: RegionGraph
+    geo_graph: GeoGraph
     server_version = "SkillWeave/0.1"
 
     def _json(self, body: dict, status: int = HTTPStatus.OK) -> None:
@@ -63,6 +65,7 @@ class Handler(BaseHTTPRequestHandler):
                     "full_corpus_retrieval": self.ranker.candidate_retriever is not None,
                     "bedrock_query_normalization": self.query_normalizer.enabled,
                     "region_graph": self.region_graph.enabled,
+                    "geo_graph": self.geo_graph.enabled,
                 }
             )
             return
@@ -145,6 +148,11 @@ class Handler(BaseHTTPRequestHandler):
             region_trace = self.region_graph.trace(location, self.ranker.locations)
             if region_trace is not None:
                 response["meta"]["region_trace"] = region_trace
+            # District level, same additive rule: omitted unless a searched code
+            # is a district code. County-only searches carry region_trace alone.
+            geo_trace = self.geo_graph.trace(location, self.ranker.locations)
+            if geo_trace is not None:
+                response["meta"]["geo_trace"] = geo_trace
             if path == "/api/v1/graph/trace":
                 response["trace"] = [
                     {"job_id": row["job_id"], "rank": row["rank"], "paths": row["graph_trace"]}
@@ -217,6 +225,7 @@ def main() -> None:
     )
     Handler.query_normalizer = BedrockQueryNormalizer.from_environment()
     Handler.region_graph = RegionGraph.from_environment()
+    Handler.geo_graph = GeoGraph.from_environment()
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     print(f"SkillWeave listening on http://{args.host}:{args.port}")
     print(f"Loaded {len(Handler.ranker.jobs):,} jobs from {args.artifact}")

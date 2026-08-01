@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import unquote
 
+from app.geo_graph import GeoGraph
 from app.query_normalizer import BedrockQueryNormalizer
 from app.ranker import SkillWeaveRanker
 from app.region_graph import RegionGraph
@@ -32,6 +33,7 @@ RANKER = SkillWeaveRanker(
 )
 QUERY_NORMALIZER = BedrockQueryNormalizer.from_environment()
 REGION_GRAPH = RegionGraph.from_environment()
+GEO_GRAPH = GeoGraph.from_environment()
 
 
 def response(
@@ -129,6 +131,9 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
     region_trace = REGION_GRAPH.trace(location, RANKER.locations)
     if region_trace is not None:
         payload["meta"]["region_trace"] = region_trace
+    geo_trace = GEO_GRAPH.trace(location, RANKER.locations)
+    if geo_trace is not None:
+        payload["meta"]["geo_trace"] = geo_trace
     if trace:
         payload["trace"] = [
             {"job_id": row["job_id"], "rank": row["rank"], "paths": row["graph_trace"]}
@@ -181,6 +186,7 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
                     "full_corpus_retrieval": RANKER.candidate_retriever is not None,
                     "bedrock_query_normalization": QUERY_NORMALIZER.enabled,
                     "region_graph": REGION_GRAPH.enabled,
+                    "geo_graph": GEO_GRAPH.enabled,
                 },
             )
         if method == "GET" and path == "/api/v1/meta":

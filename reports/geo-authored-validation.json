@@ -1,0 +1,1163 @@
+{
+  "metadata": {
+    "schema": "skillweave-geo-authored-validation-v1",
+    "authored_source": "config/geo-authored.json",
+    "district_graph": {
+      "schema": "skillweave-district-graph-v1",
+      "method": "behaviour-derived; no hand-assigned edge weight",
+      "dataset_version": "1111-2026-06-01_2026-06-07",
+      "graph_cutoff": "2026-06-05 23:59:59.999000",
+      "train_days": [
+        "2026-06-01",
+        "2026-06-02",
+        "2026-06-03",
+        "2026-06-04",
+        "2026-06-05"
+      ],
+      "leakage_policy": "district co-selection restricted to train days; anonymous talentNo dropped",
+      "domestic_only": true,
+      "provenance": "behaviour",
+      "min_co_selected": 30,
+      "max_districts_per_search": 10,
+      "commute_edges_excluded_reason": "application flow needs the job's district, and only 26.53% of jobs resolve to one; see reports/job-district-extraction.json",
+      "random_seed": 1111
+    },
+    "method": "cohesion = mean pairwise jaccard over the group, absent edge = 0; null = 2,000 random same-size groups drawn from the districts of the same counties; supported = cohesion above the null p95",
+    "samples": 20000,
+    "random_seed": 1111
+  },
+  "summary": {
+    "regions": {
+      "total": 7,
+      "supported": 4,
+      "not_supported": 3,
+      "not_testable": 0
+    },
+    "living_areas": {
+      "total": 7,
+      "supported": 6,
+      "not_supported": 1,
+      "not_testable": 0
+    },
+    "sites": {
+      "total": 14,
+      "supported": 3,
+      "not_supported": 4,
+      "not_testable": 7
+    },
+    "unknown_members": 0
+  },
+  "unknown_members": [],
+  "regions": [
+    {
+      "id": "L1/北北基桃",
+      "members": 4,
+      "pairs": 6,
+      "pairs_with_edge": 6,
+      "cohesion": 0.09804,
+      "pair_detail": [
+        {
+          "a": "台北市",
+          "b": "基隆市",
+          "jaccard": 0.04402
+        },
+        {
+          "a": "台北市",
+          "b": "新北市",
+          "jaccard": 0.36877
+        },
+        {
+          "a": "台北市",
+          "b": "桃園市",
+          "jaccard": 0.05004
+        },
+        {
+          "a": "基隆市",
+          "b": "桃園市",
+          "jaccard": 0.0121
+        },
+        {
+          "a": "新北市",
+          "b": "基隆市",
+          "jaccard": 0.03653
+        },
+        {
+          "a": "新北市",
+          "b": "桃園市",
+          "jaccard": 0.07676
+        }
+      ],
+      "group_share_of_pool": 0.182,
+      "null": {
+        "mode": "exact",
+        "pool": 22,
+        "draws": 7315,
+        "combinations": 7315,
+        "mean": 0.01639,
+        "p95": 0.07118,
+        "max": 0.14968
+      },
+      "percentile": 0.9956,
+      "lift_over_null_mean": 5.98,
+      "passed": true,
+      "verdict": "supported"
+    },
+    {
+      "id": "L1/竹竹苗",
+      "members": 3,
+      "pairs": 3,
+      "pairs_with_edge": 3,
+      "cohesion": 0.18063,
+      "pair_detail": [
+        {
+          "a": "新竹市",
+          "b": "新竹縣",
+          "jaccard": 0.39407
+        },
+        {
+          "a": "新竹市",
+          "b": "苗栗縣",
+          "jaccard": 0.08372
+        },
+        {
+          "a": "新竹縣",
+          "b": "苗栗縣",
+          "jaccard": 0.0641
+        }
+      ],
+      "group_share_of_pool": 0.136,
+      "null": {
+        "mode": "exact",
+        "pool": 22,
+        "draws": 1540,
+        "combinations": 1540,
+        "mean": 0.01639,
+        "p95": 0.06913,
+        "max": 0.21332
+      },
+      "percentile": 0.9981,
+      "lift_over_null_mean": 11.02,
+      "passed": true,
+      "verdict": "supported"
+    },
+    {
+      "id": "L1/中彰投",
+      "members": 3,
+      "pairs": 3,
+      "pairs_with_edge": 3,
+      "cohesion": 0.04921,
+      "pair_detail": [
+        {
+          "a": "台中市",
+          "b": "南投縣",
+          "jaccard": 0.02775
+        },
+        {
+          "a": "台中市",
+          "b": "彰化縣",
+          "jaccard": 0.04873
+        },
+        {
+          "a": "彰化縣",
+          "b": "南投縣",
+          "jaccard": 0.07114
+        }
+      ],
+      "group_share_of_pool": 0.136,
+      "null": {
+        "mode": "exact",
+        "pool": 22,
+        "draws": 1540,
+        "combinations": 1540,
+        "mean": 0.01639,
+        "p95": 0.06913,
+        "max": 0.21332
+      },
+      "percentile": 0.9208,
+      "lift_over_null_mean": 3.0,
+      "passed": false,
+      "verdict": "not_supported"
+    },
+    {
+      "id": "L1/雲嘉南",
+      "members": 4,
+      "pairs": 6,
+      "pairs_with_edge": 6,
+      "cohesion": 0.11819,
+      "pair_detail": [
+        {
+          "a": "嘉義市",
+          "b": "台南市",
+          "jaccard": 0.02895
+        },
+        {
+          "a": "嘉義市",
+          "b": "嘉義縣",
+          "jaccard": 0.47278
+        },
+        {
+          "a": "嘉義縣",
+          "b": "台南市",
+          "jaccard": 0.0302
+        },
+        {
+          "a": "雲林縣",
+          "b": "台南市",
+          "jaccard": 0.01002
+        },
+        {
+          "a": "雲林縣",
+          "b": "嘉義市",
+          "jaccard": 0.06716
+        },
+        {
+          "a": "雲林縣",
+          "b": "嘉義縣",
+          "jaccard": 0.10002
+        }
+      ],
+      "group_share_of_pool": 0.182,
+      "null": {
+        "mode": "exact",
+        "pool": 22,
+        "draws": 7315,
+        "combinations": 7315,
+        "mean": 0.01639,
+        "p95": 0.07118,
+        "max": 0.14968
+      },
+      "percentile": 0.9992,
+      "lift_over_null_mean": 7.21,
+      "passed": true,
+      "verdict": "supported"
+    },
+    {
+      "id": "L1/高屏",
+      "members": 2,
+      "pairs": 1,
+      "pairs_with_edge": 1,
+      "cohesion": 0.06417,
+      "pair_detail": [
+        {
+          "a": "高雄市",
+          "b": "屏東縣",
+          "jaccard": 0.06417
+        }
+      ],
+      "group_share_of_pool": 0.091,
+      "null": {
+        "mode": "exact",
+        "pool": 22,
+        "draws": 231,
+        "combinations": 231,
+        "mean": 0.01639,
+        "p95": 0.0641,
+        "max": 0.47278
+      },
+      "percentile": 0.9481,
+      "lift_over_null_mean": 3.91,
+      "passed": false,
+      "verdict": "not_supported"
+    },
+    {
+      "id": "L1/宜花東",
+      "members": 3,
+      "pairs": 3,
+      "pairs_with_edge": 3,
+      "cohesion": 0.02024,
+      "pair_detail": [
+        {
+          "a": "宜蘭縣",
+          "b": "台東縣",
+          "jaccard": 0.00739
+        },
+        {
+          "a": "宜蘭縣",
+          "b": "花蓮縣",
+          "jaccard": 0.01644
+        },
+        {
+          "a": "花蓮縣",
+          "b": "台東縣",
+          "jaccard": 0.03689
+        }
+      ],
+      "group_share_of_pool": 0.136,
+      "null": {
+        "mode": "exact",
+        "pool": 22,
+        "draws": 1540,
+        "combinations": 1540,
+        "mean": 0.01639,
+        "p95": 0.06913,
+        "max": 0.21332
+      },
+      "percentile": 0.811,
+      "lift_over_null_mean": 1.23,
+      "passed": false,
+      "verdict": "not_supported"
+    },
+    {
+      "id": "L1/離島",
+      "members": 3,
+      "pairs": 3,
+      "pairs_with_edge": 3,
+      "cohesion": 0.18673,
+      "pair_detail": [
+        {
+          "a": "澎湖縣",
+          "b": "連江縣",
+          "jaccard": 0.20655
+        },
+        {
+          "a": "澎湖縣",
+          "b": "金門縣",
+          "jaccard": 0.18009
+        },
+        {
+          "a": "金門縣",
+          "b": "連江縣",
+          "jaccard": 0.17354
+        }
+      ],
+      "group_share_of_pool": 0.136,
+      "null": {
+        "mode": "exact",
+        "pool": 22,
+        "draws": 1540,
+        "combinations": 1540,
+        "mean": 0.01639,
+        "p95": 0.06913,
+        "max": 0.21332
+      },
+      "percentile": 0.9987,
+      "lift_over_null_mean": 11.39,
+      "passed": true,
+      "verdict": "supported"
+    }
+  ],
+  "living_areas": [
+    {
+      "id": "L3/台中海線",
+      "pool_counties": [
+        "台中市"
+      ],
+      "members": 8,
+      "pairs": 28,
+      "pairs_with_edge": 28,
+      "cohesion": 0.22237,
+      "pair_detail": [
+        {
+          "a": "台中市/外埔區",
+          "b": "台中市/大安區",
+          "jaccard": 0.4874
+        },
+        {
+          "a": "台中市/外埔區",
+          "b": "台中市/大肚區",
+          "jaccard": 0.02992
+        },
+        {
+          "a": "台中市/外埔區",
+          "b": "台中市/梧棲區",
+          "jaccard": 0.04969
+        },
+        {
+          "a": "台中市/外埔區",
+          "b": "台中市/沙鹿區",
+          "jaccard": 0.05104
+        },
+        {
+          "a": "台中市/外埔區",
+          "b": "台中市/清水區",
+          "jaccard": 0.12075
+        },
+        {
+          "a": "台中市/外埔區",
+          "b": "台中市/龍井區",
+          "jaccard": 0.03089
+        },
+        {
+          "a": "台中市/大安區",
+          "b": "台中市/大肚區",
+          "jaccard": 0.0194
+        },
+        {
+          "a": "台中市/大安區",
+          "b": "台中市/梧棲區",
+          "jaccard": 0.04755
+        },
+        {
+          "a": "台中市/大安區",
+          "b": "台中市/沙鹿區",
+          "jaccard": 0.03854
+        },
+        {
+          "a": "台中市/大安區",
+          "b": "台中市/清水區",
+          "jaccard": 0.11419
+        },
+        {
+          "a": "台中市/大安區",
+          "b": "台中市/龍井區",
+          "jaccard": 0.03194
+        },
+        {
+          "a": "台中市/大甲區",
+          "b": "台中市/外埔區",
+          "jaccard": 0.43166
+        },
+        {
+          "a": "台中市/大甲區",
+          "b": "台中市/大安區",
+          "jaccard": 0.35043
+        },
+        {
+          "a": "台中市/大甲區",
+          "b": "台中市/大肚區",
+          "jaccard": 0.03409
+        },
+        {
+          "a": "台中市/大甲區",
+          "b": "台中市/梧棲區",
+          "jaccard": 0.10493
+        },
+        {
+          "a": "台中市/大甲區",
+          "b": "台中市/沙鹿區",
+          "jaccard": 0.09731
+        },
+        {
+          "a": "台中市/大甲區",
+          "b": "台中市/清水區",
+          "jaccard": 0.19059
+        },
+        {
+          "a": "台中市/大甲區",
+          "b": "台中市/龍井區",
+          "jaccard": 0.06776
+        },
+        {
+          "a": "台中市/梧棲區",
+          "b": "台中市/大肚區",
+          "jaccard": 0.18388
+        },
+        {
+          "a": "台中市/梧棲區",
+          "b": "台中市/龍井區",
+          "jaccard": 0.47538
+        },
+        {
+          "a": "台中市/沙鹿區",
+          "b": "台中市/大肚區",
+          "jaccard": 0.24727
+        },
+        {
+          "a": "台中市/沙鹿區",
+          "b": "台中市/梧棲區",
+          "jaccard": 0.58981
+        },
+        {
+          "a": "台中市/沙鹿區",
+          "b": "台中市/龍井區",
+          "jaccard": 0.53415
+        },
+        {
+          "a": "台中市/清水區",
+          "b": "台中市/大肚區",
+          "jaccard": 0.12362
+        },
+        {
+          "a": "台中市/清水區",
+          "b": "台中市/梧棲區",
+          "jaccard": 0.6033
+        },
+        {
+          "a": "台中市/清水區",
+          "b": "台中市/沙鹿區",
+          "jaccard": 0.49458
+        },
+        {
+          "a": "台中市/清水區",
+          "b": "台中市/龍井區",
+          "jaccard": 0.33243
+        },
+        {
+          "a": "台中市/龍井區",
+          "b": "台中市/大肚區",
+          "jaccard": 0.3438
+        }
+      ],
+      "group_share_of_pool": 0.276,
+      "null": {
+        "mode": "sampled",
+        "pool": 29,
+        "draws": 20000,
+        "combinations": 4292145,
+        "mean": 0.0802,
+        "p95": 0.12915,
+        "max": 0.27635
+      },
+      "percentile": 0.9994,
+      "lift_over_null_mean": 2.77,
+      "passed": true,
+      "verdict": "supported"
+    },
+    {
+      "id": "L3/基隆河谷走廊",
+      "pool_counties": [
+        "台北市",
+        "新北市"
+      ],
+      "members": 3,
+      "pairs": 3,
+      "pairs_with_edge": 3,
+      "cohesion": 0.28315,
+      "pair_detail": [
+        {
+          "a": "台北市/內湖區",
+          "b": "新北市/汐止區",
+          "jaccard": 0.16358
+        },
+        {
+          "a": "台北市/南港區",
+          "b": "台北市/內湖區",
+          "jaccard": 0.41577
+        },
+        {
+          "a": "台北市/南港區",
+          "b": "新北市/汐止區",
+          "jaccard": 0.27009
+        }
+      ],
+      "group_share_of_pool": 0.073,
+      "null": {
+        "mode": "exact",
+        "pool": 41,
+        "draws": 10660,
+        "combinations": 10660,
+        "mean": 0.04078,
+        "p95": 0.15303,
+        "max": 0.46911
+      },
+      "percentile": 0.9959,
+      "lift_over_null_mean": 6.94,
+      "passed": true,
+      "verdict": "supported"
+    },
+    {
+      "id": "L3/大新竹",
+      "pool_counties": [
+        "新竹市",
+        "新竹縣"
+      ],
+      "members": 6,
+      "pairs": 15,
+      "pairs_with_edge": 14,
+      "cohesion": 0.10488,
+      "pair_detail": [
+        {
+          "a": "新竹市/北區",
+          "b": "新竹市/香山區",
+          "jaccard": 0.10838
+        },
+        {
+          "a": "新竹市/北區",
+          "b": "新竹縣/寶山鄉",
+          "jaccard": 0.05571
+        },
+        {
+          "a": "新竹市/北區",
+          "b": "新竹縣/竹北市",
+          "jaccard": 0.09875
+        },
+        {
+          "a": "新竹市/北區",
+          "b": "新竹縣/竹東鎮",
+          "jaccard": 0.05183
+        },
+        {
+          "a": "新竹市/東區",
+          "b": "新竹市/北區",
+          "jaccard": 0.38129
+        },
+        {
+          "a": "新竹市/東區",
+          "b": "新竹市/香山區",
+          "jaccard": 0.05278
+        },
+        {
+          "a": "新竹市/東區",
+          "b": "新竹縣/寶山鄉",
+          "jaccard": 0.09554
+        },
+        {
+          "a": "新竹市/東區",
+          "b": "新竹縣/竹北市",
+          "jaccard": 0.1461
+        },
+        {
+          "a": "新竹市/東區",
+          "b": "新竹縣/竹東鎮",
+          "jaccard": 0.14387
+        },
+        {
+          "a": "新竹市/香山區",
+          "b": "新竹縣/寶山鄉",
+          "jaccard": 0.02643
+        },
+        {
+          "a": "新竹市/香山區",
+          "b": "新竹縣/竹北市",
+          "jaccard": 0.01113
+        },
+        {
+          "a": "新竹市/香山區",
+          "b": "新竹縣/竹東鎮",
+          "jaccard": null
+        },
+        {
+          "a": "新竹縣/竹北市",
+          "b": "新竹縣/寶山鄉",
+          "jaccard": 0.07927
+        },
+        {
+          "a": "新竹縣/竹北市",
+          "b": "新竹縣/竹東鎮",
+          "jaccard": 0.10471
+        },
+        {
+          "a": "新竹縣/竹東鎮",
+          "b": "新竹縣/寶山鄉",
+          "jaccard": 0.21736
+        }
+      ],
+      "group_share_of_pool": 0.375,
+      "null": {
+        "mode": "exact",
+        "pool": 16,
+        "draws": 8008,
+        "combinations": 8008,
+        "mean": 0.0604,
+        "p95": 0.10682,
+        "max": 0.15982
+      },
+      "percentile": 0.9424,
+      "lift_over_null_mean": 1.74,
+      "passed": false,
+      "verdict": "not_supported"
+    },
+    {
+      "id": "L3/南崁",
+      "pool_counties": [
+        "桃園市"
+      ],
+      "members": 3,
+      "pairs": 3,
+      "pairs_with_edge": 3,
+      "cohesion": 0.23175,
+      "pair_detail": [
+        {
+          "a": "桃園市/蘆竹區",
+          "b": "桃園市/桃園區",
+          "jaccard": 0.21492
+        },
+        {
+          "a": "桃園市/蘆竹區",
+          "b": "桃園市/龜山區",
+          "jaccard": 0.1805
+        },
+        {
+          "a": "桃園市/龜山區",
+          "b": "桃園市/桃園區",
+          "jaccard": 0.29984
+        }
+      ],
+      "group_share_of_pool": 0.231,
+      "null": {
+        "mode": "exact",
+        "pool": 13,
+        "draws": 286,
+        "combinations": 286,
+        "mean": 0.09566,
+        "p95": 0.20887,
+        "max": 0.32396
+      },
+      "percentile": 0.972,
+      "lift_over_null_mean": 2.42,
+      "passed": true,
+      "verdict": "supported"
+    },
+    {
+      "id": "L3/三鶯",
+      "pool_counties": [
+        "新北市"
+      ],
+      "members": 2,
+      "pairs": 1,
+      "pairs_with_edge": 1,
+      "cohesion": 0.38269,
+      "pair_detail": [
+        {
+          "a": "新北市/三峽區",
+          "b": "新北市/鶯歌區",
+          "jaccard": 0.38269
+        }
+      ],
+      "group_share_of_pool": 0.069,
+      "null": {
+        "mode": "exact",
+        "pool": 29,
+        "draws": 406,
+        "combinations": 406,
+        "mean": 0.03721,
+        "p95": 0.22818,
+        "max": 0.54389
+      },
+      "percentile": 0.9852,
+      "lift_over_null_mean": 10.28,
+      "passed": true,
+      "verdict": "supported"
+    },
+    {
+      "id": "L3/高雄臨港",
+      "pool_counties": [
+        "高雄市"
+      ],
+      "members": 3,
+      "pairs": 3,
+      "pairs_with_edge": 3,
+      "cohesion": 0.19388,
+      "pair_detail": [
+        {
+          "a": "高雄市/前鎮區",
+          "b": "高雄市/小港區",
+          "jaccard": 0.32977
+        },
+        {
+          "a": "高雄市/前鎮區",
+          "b": "高雄市/鼓山區",
+          "jaccard": 0.18164
+        },
+        {
+          "a": "高雄市/小港區",
+          "b": "高雄市/鼓山區",
+          "jaccard": 0.07022
+        }
+      ],
+      "group_share_of_pool": 0.079,
+      "null": {
+        "mode": "exact",
+        "pool": 38,
+        "draws": 8436,
+        "combinations": 8436,
+        "mean": 0.05747,
+        "p95": 0.19215,
+        "max": 0.63938
+      },
+      "percentile": 0.9553,
+      "lift_over_null_mean": 3.37,
+      "passed": true,
+      "verdict": "supported"
+    },
+    {
+      "id": "L3/台北北海岸",
+      "pool_counties": [
+        "新北市"
+      ],
+      "members": 5,
+      "pairs": 10,
+      "pairs_with_edge": 10,
+      "cohesion": 0.10165,
+      "pair_detail": [
+        {
+          "a": "新北市/三芝區",
+          "b": "新北市/石門區",
+          "jaccard": 0.29807
+        },
+        {
+          "a": "新北市/三芝區",
+          "b": "新北市/萬里區",
+          "jaccard": 0.03343
+        },
+        {
+          "a": "新北市/三芝區",
+          "b": "新北市/金山區",
+          "jaccard": 0.04708
+        },
+        {
+          "a": "新北市/淡水區",
+          "b": "新北市/三芝區",
+          "jaccard": 0.12172
+        },
+        {
+          "a": "新北市/淡水區",
+          "b": "新北市/石門區",
+          "jaccard": 0.03557
+        },
+        {
+          "a": "新北市/淡水區",
+          "b": "新北市/萬里區",
+          "jaccard": 0.00331
+        },
+        {
+          "a": "新北市/淡水區",
+          "b": "新北市/金山區",
+          "jaccard": 0.00474
+        },
+        {
+          "a": "新北市/石門區",
+          "b": "新北市/萬里區",
+          "jaccard": 0.03958
+        },
+        {
+          "a": "新北市/石門區",
+          "b": "新北市/金山區",
+          "jaccard": 0.06463
+        },
+        {
+          "a": "新北市/金山區",
+          "b": "新北市/萬里區",
+          "jaccard": 0.36839
+        }
+      ],
+      "group_share_of_pool": 0.172,
+      "null": {
+        "mode": "exact",
+        "pool": 29,
+        "draws": 118755,
+        "combinations": 118755,
+        "mean": 0.03721,
+        "p95": 0.09677,
+        "max": 0.31139
+      },
+      "percentile": 0.9584,
+      "lift_over_null_mean": 2.73,
+      "passed": true,
+      "verdict": "supported"
+    }
+  ],
+  "sites": [
+    {
+      "id": "L5/竹科",
+      "alias_gate_published": true,
+      "alias_concentration": 0.6092,
+      "members": 2,
+      "pairs": 1,
+      "pairs_with_edge": 1,
+      "cohesion": 0.09554,
+      "pair_detail": [
+        {
+          "a": "新竹市/東區",
+          "b": "新竹縣/寶山鄉",
+          "jaccard": 0.09554
+        }
+      ],
+      "group_share_of_pool": 0.125,
+      "null": {
+        "mode": "exact",
+        "pool": 16,
+        "draws": 120,
+        "combinations": 120,
+        "mean": 0.0604,
+        "p95": 0.24707,
+        "max": 0.60275
+      },
+      "percentile": 0.7917,
+      "lift_over_null_mean": 1.58,
+      "passed": false,
+      "verdict": "not_supported"
+    },
+    {
+      "id": "L5/南科",
+      "alias_gate_published": true,
+      "alias_concentration": 0.8112,
+      "members": 3,
+      "pairs": 3,
+      "pairs_with_edge": 3,
+      "cohesion": 0.32265,
+      "pair_detail": [
+        {
+          "a": "台南市/善化區",
+          "b": "台南市/安定區",
+          "jaccard": 0.26644
+        },
+        {
+          "a": "台南市/新市區",
+          "b": "台南市/善化區",
+          "jaccard": 0.4682
+        },
+        {
+          "a": "台南市/新市區",
+          "b": "台南市/安定區",
+          "jaccard": 0.2333
+        }
+      ],
+      "group_share_of_pool": 0.081,
+      "null": {
+        "mode": "exact",
+        "pool": 37,
+        "draws": 7770,
+        "combinations": 7770,
+        "mean": 0.05914,
+        "p95": 0.18384,
+        "max": 0.60751
+      },
+      "percentile": 0.9934,
+      "lift_over_null_mean": 5.46,
+      "passed": true,
+      "verdict": "supported"
+    },
+    {
+      "id": "L5/中科",
+      "alias_gate_published": true,
+      "alias_concentration": 0.7395,
+      "members": 3,
+      "pairs": 3,
+      "pairs_with_edge": 3,
+      "cohesion": 0.07984,
+      "pair_detail": [
+        {
+          "a": "台中市/大雅區",
+          "b": "台中市/后里區",
+          "jaccard": 0.09781
+        },
+        {
+          "a": "台中市/西屯區",
+          "b": "台中市/后里區",
+          "jaccard": 0.00972
+        },
+        {
+          "a": "台中市/西屯區",
+          "b": "台中市/大雅區",
+          "jaccard": 0.13198
+        }
+      ],
+      "group_share_of_pool": 0.103,
+      "null": {
+        "mode": "exact",
+        "pool": 29,
+        "draws": 3654,
+        "combinations": 3654,
+        "mean": 0.08042,
+        "p95": 0.21735,
+        "max": 0.56256
+      },
+      "percentile": 0.6117,
+      "lift_over_null_mean": 0.99,
+      "passed": false,
+      "verdict": "not_supported"
+    },
+    {
+      "id": "L5/樹谷",
+      "alias_gate_published": true,
+      "alias_concentration": 1.0,
+      "members": 2,
+      "pairs": 1,
+      "pairs_with_edge": 1,
+      "cohesion": 0.4682,
+      "pair_detail": [
+        {
+          "a": "台南市/新市區",
+          "b": "台南市/善化區",
+          "jaccard": 0.4682
+        }
+      ],
+      "group_share_of_pool": 0.054,
+      "null": {
+        "mode": "exact",
+        "pool": 37,
+        "draws": 666,
+        "combinations": 666,
+        "mean": 0.05914,
+        "p95": 0.3439,
+        "max": 0.68335
+      },
+      "percentile": 0.976,
+      "lift_over_null_mean": 7.92,
+      "passed": true,
+      "verdict": "supported"
+    },
+    {
+      "id": "L5/頂崁",
+      "alias_gate_published": true,
+      "alias_concentration": 1.0,
+      "members": 1,
+      "cohesion": null,
+      "passed": null,
+      "verdict": "single_district_not_testable"
+    },
+    {
+      "id": "L5/大發",
+      "alias_gate_published": true,
+      "alias_concentration": 1.0,
+      "members": 1,
+      "cohesion": null,
+      "passed": null,
+      "verdict": "single_district_not_testable"
+    },
+    {
+      "id": "L5/利澤",
+      "alias_gate_published": true,
+      "alias_concentration": 1.0,
+      "members": 2,
+      "pairs": 1,
+      "pairs_with_edge": 1,
+      "cohesion": 0.30116,
+      "pair_detail": [
+        {
+          "a": "宜蘭縣/五結鄉",
+          "b": "宜蘭縣/蘇澳鎮",
+          "jaccard": 0.30116
+        }
+      ],
+      "group_share_of_pool": 0.167,
+      "null": {
+        "mode": "exact",
+        "pool": 12,
+        "draws": 66,
+        "combinations": 66,
+        "mean": 0.14495,
+        "p95": 0.45078,
+        "max": 0.57222
+      },
+      "percentile": 0.8333,
+      "lift_over_null_mean": 2.08,
+      "passed": false,
+      "verdict": "not_supported"
+    },
+    {
+      "id": "L5/南勢角",
+      "alias_gate_published": true,
+      "alias_concentration": 1.0,
+      "members": 1,
+      "cohesion": null,
+      "passed": null,
+      "verdict": "single_district_not_testable"
+    },
+    {
+      "id": "L5/北車",
+      "alias_gate_published": true,
+      "alias_concentration": 0.8642,
+      "members": 2,
+      "pairs": 1,
+      "pairs_with_edge": 1,
+      "cohesion": 0.45442,
+      "pair_detail": [
+        {
+          "a": "台北市/中正區",
+          "b": "台北市/大同區",
+          "jaccard": 0.45442
+        }
+      ],
+      "group_share_of_pool": 0.167,
+      "null": {
+        "mode": "exact",
+        "pool": 12,
+        "draws": 66,
+        "combinations": 66,
+        "mean": 0.17157,
+        "p95": 0.42397,
+        "max": 0.49116
+      },
+      "percentile": 0.9394,
+      "lift_over_null_mean": 2.65,
+      "passed": false,
+      "verdict": "not_supported"
+    },
+    {
+      "id": "L5/文心",
+      "alias_gate_published": true,
+      "alias_concentration": 0.9179,
+      "members": 3,
+      "pairs": 3,
+      "pairs_with_edge": 3,
+      "cohesion": 0.32614,
+      "pair_detail": [
+        {
+          "a": "台中市/南屯區",
+          "b": "台中市/北屯區",
+          "jaccard": 0.21198
+        },
+        {
+          "a": "台中市/南屯區",
+          "b": "台中市/西屯區",
+          "jaccard": 0.43469
+        },
+        {
+          "a": "台中市/西屯區",
+          "b": "台中市/北屯區",
+          "jaccard": 0.33176
+        }
+      ],
+      "group_share_of_pool": 0.103,
+      "null": {
+        "mode": "exact",
+        "pool": 29,
+        "draws": 3654,
+        "combinations": 3654,
+        "mean": 0.08042,
+        "p95": 0.21735,
+        "max": 0.56256
+      },
+      "percentile": 0.9833,
+      "lift_over_null_mean": 4.06,
+      "passed": true,
+      "verdict": "supported"
+    },
+    {
+      "id": "L5/大墩",
+      "alias_gate_published": true,
+      "alias_concentration": 0.9787,
+      "members": 1,
+      "cohesion": null,
+      "passed": null,
+      "verdict": "single_district_not_testable"
+    },
+    {
+      "id": "L5/內科",
+      "alias_gate_published": false,
+      "alias_concentration": 0.2584,
+      "members": 1,
+      "cohesion": null,
+      "passed": null,
+      "verdict": "single_district_not_testable"
+    },
+    {
+      "id": "L5/公益",
+      "alias_gate_published": false,
+      "alias_concentration": 0.442,
+      "members": 1,
+      "cohesion": null,
+      "passed": null,
+      "verdict": "single_district_not_testable"
+    },
+    {
+      "id": "L5/嘉南",
+      "alias_gate_published": false,
+      "alias_concentration": 0.4647,
+      "members": 1,
+      "cohesion": null,
+      "passed": null,
+      "verdict": "single_district_not_testable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "a": "新北市/八里區",
+      "b": "新北市/淡水區",
+      "effective_date": "2026-05-12",
+      "provenance": "external",
+      "behaviour_jaccard": 0.23639,
+      "note": "an authored shortcut whose endpoints also carry a behaviour edge is corroborated, not proven; the dataset window has no before/after contrast for either opening"
+    },
+    {
+      "a": "新北市/三峽區",
+      "b": "新北市/鶯歌區",
+      "effective_date": "2026-06-30",
+      "provenance": "external",
+      "behaviour_jaccard": 0.38269,
+      "note": "an authored shortcut whose endpoints also carry a behaviour edge is corroborated, not proven; the dataset window has no before/after contrast for either opening"
+    }
+  ]
+}
