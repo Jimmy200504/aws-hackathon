@@ -5,6 +5,9 @@ __pycache__/
 .pytest_cache/
 .coverage
 
+# Local JavaScript dependencies.
+node_modules/
+
 # Organizer-provided data must not be published.
 data/dataset/*.csv
 docs/*.pdf
