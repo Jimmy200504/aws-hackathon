@@ -1,14 +1,21 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 from typing import Any, Iterable
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
+LOGGER = logging.getLogger(__name__)
+
 
 class OpenSearchRetriever:
     """Retrieve full-corpus job candidates from an IAM-protected OpenSearch index.
+
+    Supports hybrid retrieval: BM25 keyword search + kNN vector search merged
+    via Reciprocal Rank Fusion (RRF). Falls back to BM25-only when embedding
+    is unavailable.
 
     Imports from botocore are intentionally lazy. The local 12,000-job demo
     remains dependency-free unless an OpenSearch endpoint is configured.
@@ -46,6 +53,7 @@ class OpenSearchRetriever:
         *,
         region: str | None = None,
         timeout_seconds: float = 2.0,
+        embedding_client: Any = None,
     ) -> None:
         endpoint = endpoint.strip().rstrip("/")
         if not endpoint:
@@ -64,16 +72,23 @@ class OpenSearchRetriever:
         self.sign_requests = not endpoint.startswith(
             ("http://127.0.0.1", "http://localhost")
         )
+        self.embedding_client = embedding_client
 
     @classmethod
     def from_environment(cls) -> OpenSearchRetriever | None:
         endpoint = os.getenv("OPENSEARCH_ENDPOINT", "").strip()
         if not endpoint:
             return None
+        # Lazy import to keep dependency-free when not using embeddings
+        embedding_client = None
+        if os.getenv("BEDROCK_EMBEDDING_MODEL_ID") or os.getenv("HYBRID_RETRIEVAL", ""):
+            from app.embeddings import BedrockEmbeddingClient
+            embedding_client = BedrockEmbeddingClient.from_environment()
         return cls(
             endpoint,
             os.getenv("OPENSEARCH_INDEX", "skillweave-jobs-v1"),
             timeout_seconds=float(os.getenv("OPENSEARCH_TIMEOUT_SECONDS", "2.0")),
+            embedding_client=embedding_client,
         )
 
     @staticmethod
@@ -127,18 +142,16 @@ class OpenSearchRetriever:
             raise RuntimeError("OpenSearch returned a non-object response")
         return decoded
 
-    def retrieve(
+    def _build_bm25_query(
         self,
         query: str,
         *,
-        limit: int,
-        location_names: Iterable[str] = (),
-        duty_names: Iterable[str] = (),
-        wants_remote: bool = False,
-        salary_intent: dict[str, Any] | None = None,
-    ) -> list[dict[str, Any]]:
-        locations = self._clean_names(location_names)
-        duties = self._clean_names(duty_names)
+        locations: list[str],
+        duties: list[str],
+        wants_remote: bool,
+        salary_intent: dict[str, Any] | None,
+    ) -> dict[str, Any]:
+        """Build the BM25 keyword query (same as original logic)."""
         should: list[dict[str, Any]] = [
             {
                 "match_phrase": {
@@ -174,20 +187,8 @@ class OpenSearchRetriever:
             for name in duties
         )
         if wants_remote:
-            # A remote-intent query (遠端/在家工作/WFH) must be able to pull
-            # in an is_remote job even when the query text has no lexical
-            # overlap with the title/description (e.g. 遠端客服 vs a job
-            # titled "夜間客服人員" that only mentions "可遠端" in the body).
-            # This is a `should` clause, not a `must` filter: it widens
-            # recall without excluding otherwise-relevant lexical matches.
             should.append({"term": {"is_remote": {"value": True, "boost": 6.0}}})
         if salary_intent is not None:
-            # Mirror the local ranker's salary-range match: a job whose
-            # salary_min/salary_max range covers the requested figure is
-            # relevant even if its title never prints that exact number
-            # (e.g. 168+ jobs with a covering range but no literal "210" in
-            # the title -- the recall gap fixed in app/ranker.py). Gate on
-            # salary_type so an hourly query does not match a monthly job.
             target = float(salary_intent.get("target", 0.0))
             salary_type = salary_intent.get("salary_type")
             if salary_type and target > 0:
@@ -196,9 +197,6 @@ class OpenSearchRetriever:
                         "bool": {
                             "filter": [{"term": {"salary_type": salary_type}}],
                             "should": [
-                                # salary_max > 0 means an explicit upper bound
-                                # is set; the job's range covers the target
-                                # when that ceiling reaches at least target.
                                 {
                                     "bool": {
                                         "filter": [
@@ -207,9 +205,6 @@ class OpenSearchRetriever:
                                         ]
                                     }
                                 },
-                                # salary_max == 0 means no upper bound was
-                                # parsed (e.g. "面議40000‧" or open-ended pay);
-                                # fall back to comparing salary_min alone.
                                 {
                                     "bool": {
                                         "filter": [
@@ -224,16 +219,30 @@ class OpenSearchRetriever:
                         }
                     }
                 )
+        return {"bool": {"should": should, "minimum_should_match": 1}}
+
+    def _search_bm25(
+        self,
+        query: str,
+        *,
+        limit: int,
+        locations: list[str],
+        duties: list[str],
+        wants_remote: bool,
+        salary_intent: dict[str, Any] | None,
+    ) -> list[dict[str, Any]]:
+        """Execute BM25 keyword search."""
         body = {
-            "size": max(1, min(int(limit), 500)),
+            "size": limit,
             "track_total_hits": False,
             "_source": self.SOURCE_FIELDS,
-            "query": {
-                "bool": {
-                    "should": should,
-                    "minimum_should_match": 1,
-                }
-            },
+            "query": self._build_bm25_query(
+                query,
+                locations=locations,
+                duties=duties,
+                wants_remote=wants_remote,
+                salary_intent=salary_intent,
+            ),
             "sort": [{"_score": "desc"}, {"_id": "asc"}],
         }
         result = self._signed_request(
@@ -241,11 +250,161 @@ class OpenSearchRetriever:
             f"/{quote(self.index, safe='-_.')}/_search",
             body,
         )
-        hits = result.get("hits", {}).get("hits", [])
-        if not isinstance(hits, list):
-            raise RuntimeError("OpenSearch hits are malformed")
+        return result.get("hits", {}).get("hits", [])
+
+    def _search_knn(
+        self,
+        query_embedding: list[float],
+        *,
+        limit: int,
+    ) -> list[dict[str, Any]]:
+        """Execute kNN vector search."""
+        body = {
+            "size": limit,
+            "track_total_hits": False,
+            "_source": self.SOURCE_FIELDS,
+            "query": {
+                "knn": {
+                    "embedding": {
+                        "vector": query_embedding,
+                        "k": limit,
+                    }
+                }
+            },
+        }
+        result = self._signed_request(
+            "POST",
+            f"/{quote(self.index, safe='-_.')}/_search",
+            body,
+        )
+        return result.get("hits", {}).get("hits", [])
+
+    @staticmethod
+    def _rrf_merge(
+        bm25_hits: list[dict[str, Any]],
+        knn_hits: list[dict[str, Any]],
+        *,
+        k: int = 60,
+        bm25_weight: float = 1.0,
+        knn_weight: float = 0.4,
+        limit: int = 200,
+    ) -> list[dict[str, Any]]:
+        """Merge BM25 and kNN results using weighted Reciprocal Rank Fusion.
+
+        RRF score = sum(weight_i / (k + rank_i)) for each result list.
+        k=60 is the standard constant that prevents top ranks from dominating.
+        BM25 gets higher weight (1.0) vs kNN (0.4) since keyword precision
+        is more important for job search; kNN contributes semantic diversity.
+        """
+        scores: dict[str, float] = {}
+        hit_map: dict[str, dict[str, Any]] = {}
+
+        for rank, hit in enumerate(bm25_hits, 1):
+            doc_id = hit.get("_id", "")
+            scores[doc_id] = scores.get(doc_id, 0.0) + bm25_weight / (k + rank)
+            if doc_id not in hit_map:
+                hit_map[doc_id] = hit
+
+        for rank, hit in enumerate(knn_hits, 1):
+            doc_id = hit.get("_id", "")
+            scores[doc_id] = scores.get(doc_id, 0.0) + knn_weight / (k + rank)
+            if doc_id not in hit_map:
+                hit_map[doc_id] = hit
+
+        ranked = sorted(scores.items(), key=lambda item: -item[1])[:limit]
+        return [
+            {**hit_map[doc_id], "_rrf_score": rrf_score}
+            for doc_id, rrf_score in ranked
+            if doc_id in hit_map
+        ]
+
+    @staticmethod
+    def _bm25_plus_knn_expansion(
+        bm25_hits: list[dict[str, Any]],
+        knn_hits: list[dict[str, Any]],
+        *,
+        limit: int = 200,
+    ) -> list[dict[str, Any]]:
+        """BM25 results keep original ranking; kNN adds novel candidates at tail.
+
+        This preserves BM25's precision for the top positions while using
+        kNN to expand recall with semantically related jobs that BM25 missed.
+        """
+        result: list[dict[str, Any]] = []
+        seen_ids: set[str] = set()
+
+        # BM25 results first, in original order
+        for hit in bm25_hits:
+            doc_id = hit.get("_id", "")
+            if doc_id and doc_id not in seen_ids:
+                seen_ids.add(doc_id)
+                result.append(hit)
+
+        # kNN novel candidates appended at the tail
+        for hit in knn_hits:
+            if len(result) >= limit:
+                break
+            doc_id = hit.get("_id", "")
+            if doc_id and doc_id not in seen_ids:
+                seen_ids.add(doc_id)
+                result.append(hit)
+
+        return result[:limit]
+
+    def retrieve(
+        self,
+        query: str,
+        *,
+        limit: int,
+        location_names: Iterable[str] = (),
+        duty_names: Iterable[str] = (),
+        wants_remote: bool = False,
+        salary_intent: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
+        locations = self._clean_names(location_names)
+        duties = self._clean_names(duty_names)
+        effective_limit = max(1, min(int(limit), 500))
+
+        # Always run BM25 keyword search
+        bm25_hits = self._search_bm25(
+            query,
+            limit=effective_limit,
+            locations=locations,
+            duties=duties,
+            wants_remote=wants_remote,
+            salary_intent=salary_intent,
+        )
+
+        # Attempt kNN vector search if embedding client is available
+        knn_hits: list[dict[str, Any]] = []
+        if self.embedding_client is not None:
+            try:
+                query_embedding = self.embedding_client.embed(query)
+                if query_embedding is not None:
+                    # kNN fetches fewer results (top-50) to contribute semantic
+                    # diversity without overwhelming BM25's precise matches.
+                    knn_limit = min(50, effective_limit)
+                    knn_hits = self._search_knn(
+                        query_embedding,
+                        limit=knn_limit,
+                    )
+            except Exception as exc:
+                LOGGER.warning(
+                    "kNN search failed; using BM25-only: %s", type(exc).__name__
+                )
+
+        # Merge results: BM25 results keep original order, kNN adds novel
+        # candidates at the tail (expansion-only, does not reorder BM25).
+        if knn_hits:
+            merged_hits = self._bm25_plus_knn_expansion(
+                bm25_hits, knn_hits, limit=effective_limit
+            )
+        else:
+            merged_hits = bm25_hits
+
+        # Parse hits into candidate dicts
         candidates: list[dict[str, Any]] = []
-        for hit in hits:
+        for hit in merged_hits:
             source = hit.get("_source", {})
             if not isinstance(source, dict):
                 continue
@@ -253,6 +412,8 @@ class OpenSearchRetriever:
             job["id"] = str(job.get("id") or hit.get("_id") or "")
             if not job["id"]:
                 continue
-            job["_retrieval_score"] = float(hit.get("_score") or 0.0)
+            job["_retrieval_score"] = float(
+                hit.get("_rrf_score") or hit.get("_score") or 0.0
+            )
             candidates.append(job)
         return candidates

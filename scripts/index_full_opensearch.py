@@ -21,6 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from app.embeddings import BedrockEmbeddingClient, EMBEDDING_DIM, job_embedding_text
+from app.alias_matcher import AliasMatcher
 from app.job_fields import derive_job_fields
 
 DATA = ROOT / "data" / "dataset"
@@ -43,22 +45,14 @@ def parse_time(value: str) -> datetime:
 
 def compile_alias_matcher(
     skills: dict[str, dict[str, Any]],
-) -> tuple[re.Pattern[str], dict[str, list[str]]]:
+) -> tuple[AliasMatcher, dict[str, list[str]]]:
     alias_to_skills: dict[str, list[str]] = {}
     for skill_id, spec in skills.items():
         for value in [spec.get("label", ""), *spec.get("aliases", [])]:
             alias = norm(str(value))
-            if alias:
+            if alias and (alias.isascii() or len(alias) >= 2):
                 alias_to_skills.setdefault(alias, []).append(skill_id)
-    alternatives = "|".join(
-        (
-            rf"(?<![a-z0-9.+#]){re.escape(alias)}(?![a-z0-9.+#])"
-            if alias.isascii()
-            else re.escape(alias)
-        )
-        for alias in sorted(alias_to_skills, key=len, reverse=True)
-    )
-    return re.compile(alternatives, re.IGNORECASE), alias_to_skills
+    return AliasMatcher(alias_to_skills), alias_to_skills
 
 
 def mapping(
@@ -107,6 +101,19 @@ def mapping(
                 "freshness": {"type": "float"},
                 "view_count": {"type": "integer"},
                 "apply_count": {"type": "integer"},
+                "embedding": {
+                    "type": "knn_vector",
+                    "dimension": EMBEDDING_DIM,
+                    "method": {
+                        "name": "hnsw",
+                        "space_type": "cosinesimil",
+                        "engine": "lucene",
+                        "parameters": {
+                            "ef_construction": 256,
+                            "m": 16,
+                        },
+                    },
+                },
             },
         },
     }
@@ -118,6 +125,7 @@ def mapping(
                 "number_of_shards": 1 if local_single_node else 4,
                 "number_of_replicas": 0 if local_single_node else 1,
                 "refresh_interval": "30s",
+                "knn": True,
             }
         }
     return result
@@ -199,7 +207,7 @@ class SignedOpenSearchClient:
 
 def matched_skills(
     row: dict[str, str],
-    pattern: re.Pattern[str],
+    pattern: AliasMatcher,
     alias_to_skills: dict[str, list[str]],
 ) -> tuple[list[str], dict[str, str], dict[str, float]]:
     fields = [
@@ -242,8 +250,9 @@ def matched_skills(
 def job_document(
     row: dict[str, str],
     skills: dict[str, dict[str, Any]],
-    pattern: re.Pattern[str],
+    pattern: AliasMatcher,
     alias_to_skills: dict[str, list[str]],
+    embedding_client: BedrockEmbeddingClient | None = None,
 ) -> dict[str, Any]:
     modified = parse_time(row["職缺最後修改時間"])
     graph_eligible = modified <= TRAIN_CUTOFF
@@ -266,7 +275,7 @@ def job_document(
             / max(1.0, (TRAIN_CUTOFF - MIN_DATE).total_seconds()),
         ),
     )
-    return {
+    document = {
         "id": row["職缺編號"],
         "title": row["職務名稱"].strip(),
         "description": row["職務內容"].strip()[:420],
@@ -293,11 +302,15 @@ def job_document(
             for skill_id in skill_ids
         },
         "freshness": round(freshness, 4),
-        # Full train-only behavior aggregates can be published in a later
-        # version without changing the online feature contract.
         "view_count": 0,
         "apply_count": 0,
     }
+    # Generate embedding for hybrid retrieval
+    if embedding_client is not None:
+        embedding = embedding_client.embed(job_embedding_text(row))
+        if embedding is not None:
+            document["embedding"] = embedding
+    return document
 
 
 def bulk_payload(index: str, documents: Iterable[dict[str, Any]]) -> bytes:
@@ -346,6 +359,11 @@ def main() -> None:
         action="store_true",
         help="Parse and validate records without sending them",
     )
+    parser.add_argument(
+        "--embed",
+        action="store_true",
+        help="Generate embeddings via Bedrock for hybrid retrieval",
+    )
     args = parser.parse_args()
     if not args.dry_run and not args.endpoint:
         raise SystemExit("--endpoint or OPENSEARCH_ENDPOINT is required")
@@ -355,6 +373,12 @@ def main() -> None:
     demo = json.loads(args.demo_index.read_text(encoding="utf-8"))
     skills = demo["skills"]
     pattern, alias_to_skills = compile_alias_matcher(skills)
+    embedding_client = (
+        BedrockEmbeddingClient.from_environment() if args.embed else None
+    )
+    if embedding_client is not None and not embedding_client.enabled:
+        print("WARNING: --embed specified but BEDROCK_EMBEDDING_MODEL_ID not set; "
+              "using default amazon.titan-embed-text-v2:0")
     client = (
         None
         if args.dry_run
@@ -387,7 +411,7 @@ def main() -> None:
             if args.max_records > 0 and indexed >= args.max_records:
                 break
             document = job_document(
-                row, skills, pattern, alias_to_skills
+                row, skills, pattern, alias_to_skills, embedding_client
             )
             pending.append(document)
             graph_jobs += int(document["graph_eligible"])

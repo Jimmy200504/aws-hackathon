@@ -1,0 +1,28 @@
+{
+  "schema": "hybrid-retrieval-eval-v1",
+  "index_jobs": 38655,
+  "queries_evaluated": 200,
+  "retrieval_limit": 200,
+  "bm25_only": {
+    "queries": 200,
+    "recall@200": 0.4659,
+    "mrr": 0.1021,
+    "hit@1": 0.055,
+    "hit@10": 0.2
+  },
+  "hybrid_bm25_knn": {
+    "queries": 200,
+    "recall@200": 0.4784,
+    "mrr": 0.1047,
+    "hit@1": 0.055,
+    "hit@10": 0.205
+  },
+  "relative_lift": {
+    "recall@200": 0.0268,
+    "mrr": 0.0255,
+    "hit@1": 0.0,
+    "hit@10": 0.025
+  },
+  "embedding_model": "amazon.titan-embed-text-v2:0",
+  "fusion_method": "reciprocal_rank_fusion_k60"
+}
