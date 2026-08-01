@@ -14,6 +14,17 @@ FUNCTION_NAME="${SKILLWEAVE_FUNCTION_NAME:-}"
 AWS_REGION_NAME="${AWS_REGION:-us-east-1}"
 STACK_NAME="${SKILLWEAVE_STACK_NAME:-skillweave-demo}"
 BUNDLE="dist/skillweave-lambda.zip"
+EXPECTED_AWS_ACCOUNT_ID="${SKILLWEAVE_EXPECTED_AWS_ACCOUNT_ID:-851558740348}"
+
+if [[ "$AWS_REGION_NAME" != "us-east-1" ]]; then
+  echo "Refusing deployment outside us-east-1: $AWS_REGION_NAME" >&2
+  exit 1
+fi
+CURRENT_AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
+if [[ "$CURRENT_AWS_ACCOUNT_ID" != "$EXPECTED_AWS_ACCOUNT_ID" ]]; then
+  echo "Refusing deployment to AWS account $CURRENT_AWS_ACCOUNT_ID; expected $EXPECTED_AWS_ACCOUNT_ID" >&2
+  exit 1
+fi
 
 if [[ -z "$FUNCTION_NAME" ]]; then
   FUNCTION_NAME="$(aws cloudformation describe-stack-resources \
@@ -64,8 +75,10 @@ current.update(
         "BEDROCK_QUERY_MAX_BATCH": "10",
         # One invocation serves one request, so there is no sibling query to
         # coalesce with and waiting would only add latency.
-        "BEDROCK_QUERY_MAX_WAIT_SECONDS": "0",
-        "BEDROCK_QUERY_DEADLINE_SECONDS": "2.5",
+        "BEDROCK_QUERY_MAX_WAIT_SECONDS": "0.05",
+        # Measured complex queries can take 4.6 seconds; keep the documented
+        # six-second request budget instead of degrading them prematurely.
+        "BEDROCK_QUERY_DEADLINE_SECONDS": "6.0",
         "QUERY_VOCAB_PATH": "/var/task/config/query-intent-vocab.json",
         "QUERY_INTENTS_PATH": "/var/task/config/query-intents.json",
     }

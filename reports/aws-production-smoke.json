@@ -1,7 +1,7 @@
 {
   "metadata": {
     "schema": "skillweave-aws-production-smoke-v1",
-    "verified_at_utc": "2026-08-01T13:25:55Z",
+    "verified_at_utc": "2026-08-01T15:27:42Z",
     "base_url": "https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/",
     "index_version": "demo-2026.06.05-v1",
     "client": "stdlib urllib; public HTTPS; no AWS session",
@@ -49,11 +49,11 @@
     "graph_version": "deterministic-v1-rules-v2-evaluation-cutoff",
     "degraded_components": [],
     "graph_on_job_ids": [
+      "132446961",
       "132486869",
       "130249640",
       "130184426",
-      "132446961",
-      "130257219",
+      "132481149",
       "132469993",
       "130405380",
       "98836873",
@@ -62,15 +62,15 @@
     ],
     "graph_off_job_ids": [
       "132446961",
+      "132481149",
       "132469993",
       "132486869",
       "98836873",
       "130249640",
       "130184426",
-      "130257219",
       "130405380",
       "132096201",
-      "132168860"
+      "132446910"
     ],
     "graph_trace_path_count": 8,
     "bedrock_trace_path_count": 0,
@@ -87,21 +87,21 @@
     "matching_graph_backend": 15,
     "matching_graph_version": 15,
     "full_corpus_responses": 30,
-    "elapsed_ms": 9587.22,
-    "throughput_requests_per_second": 3.13,
+    "elapsed_ms": 7389.95,
+    "throughput_requests_per_second": 4.06,
     "latency_ms": {
-      "min": 945.51,
-      "p50": 1138.7,
-      "p95": 4722.65,
-      "p99": 4865.45,
-      "max": 4865.45
+      "min": 1099.64,
+      "p50": 1206.5,
+      "p95": 1295.3,
+      "p99": 1311.26,
+      "max": 1311.26
     },
     "service_latency_ms": {
-      "min": 140.85,
-      "p50": 203.35,
-      "p95": 302.69,
-      "p99": 333.97,
-      "max": 333.97
+      "min": 142.12,
+      "p50": 221.72,
+      "p95": 293.84,
+      "p99": 302.71,
+      "max": 302.71
     },
     "errors": []
   }

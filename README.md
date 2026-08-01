@@ -140,16 +140,22 @@ Query 正規化相關環境變數：
 | `BEDROCK_QUERY_MAX_BATCH` | `10` | 一次 Bedrock 請求最多帶幾筆查詢。Bedrock 的限制是每分鐘請求數，與單次帶幾筆無關 |
 | `BEDROCK_QUERY_MAX_WAIT_SECONDS` | 長駐 `1.0` / Lambda `0.05` | 批次視窗；湊滿 batch 或等滿這個秒數就送出。`app/server.py` 預設 `1.0`（可合併併發請求），Lambda 一次 invocation 只服務一個 request、無同批夥伴，故用 `0.05` |
 | `BEDROCK_QUERY_DEADLINE_SECONDS` | `6.0` | 單一 request 最多等多久；逾時回封閉字彙的 deterministic 解讀，批次仍會完成並暖 cache。實測單筆 Bedrock 呼叫約 2.1 秒，複雜查詢可達 4.6 秒 |
-| `QUERY_INTENTS_PATH` | `config/query-intents.json` | 離線算好的 intent 查表，載入後放在 LRU 之外，不受執行期 miss 淘汰 |
+| `QUERY_INTENTS_PATH` | `config/query-intents.json` | 離線算好的完整 intent 查表，載入後放在 LRU 之外，不受執行期 miss 淘汰；檔案不存在時仍會載入版控內的 `config/query-intents-release.json` |
 | `QUERY_PREWARM_LIMIT` | `0`（關閉） | 啟動時背景預熱 `config/top-queries.json` 的前 N 筆。2000 筆約 6 分鐘、涵蓋 61% 搜尋量。**僅適用長駐進程**；Lambda 請改用 `QUERY_INTENTS_PATH` |
 | `QUERY_PREWARM_RPM` | `45` | 預熱的請求速率上限（Bedrock quota 為 50 RPM） |
 
-預熱與快取狀態可在 `GET /health` 的 `query_intent_cache` 觀察。
+本機長駐的 `app.server` 可在 `GET /health` 的 `query_intent_cache` 觀察預熱與快取
+狀態。Lambda health endpoint 目前不輸出這個欄位；請從搜尋回應的
+`meta.query_normalization.source` 確認 `amazon_bedrock_cached`、`amazon_bedrock` 或
+`deterministic_fallback`。
 
 ### 重建衍生資料
 
-`config/query-intent-vocab.json`、`config/top-queries.json` 與
-`artifacts/job-behavior.json` 都是從主辦方資料衍生的建置產物，不入版控：
+`config/query-intent-vocab.json` 可從主辦方 taxonomy 重建，並隨 runtime 一起入版控。
+`config/top-queries.json`、`config/query-intents.json` 與
+`artifacts/job-behavior.json` 含主辦方資料衍生內容，不入版控。公開 release 只保留經
+審閱的小型 `config/query-intents-release.json`，Lambda 在完整 intent 檔不存在時會
+自動載入它：
 
 ```bash
 make query-artifacts        # vocab + top-queries + job-behavior
@@ -283,6 +289,37 @@ evidence paths。OpenSearch 職缺文件保留 `skills`、`skill_evidence`、
 - Metadata：<https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/api/v1/meta>
 - Search：<https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/api/v1/jobs/search>
 - Graph trace：<https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/api/v1/graph/trace>
+
+### 更新現有 judge deployment（目前建議流程）
+
+既有 `skillweave-demo` stack 含 provisioned OpenSearch、Neptune 與 alias index 設定；
+更新應只替換 Lambda code 並合併環境變數，不要直接執行 `sam deploy` 或
+`deploy_compact_aws.sh`，否則可能移除目前 template 未擁有的設定。
+
+```bash
+export AWS_REGION=us-east-1
+aws sts get-caller-identity --query Account --output text
+# 必須輸出 851558740348
+
+bash scripts/deploy_lambda_code.sh
+```
+
+腳本會拒絕非 `us-east-1` 或非 `851558740348` 的 deployment，並保留既有
+OpenSearch／Neptune wiring。部署後執行完整 production gate：
+
+```bash
+.venv/bin/python scripts/run_aws_production_smoke.py \
+  --requests 30 \
+  --concurrency 5 \
+  --require-full-corpus \
+  --require-neptune \
+  --expected-graph-version deterministic-v1-rules-v2-evaluation-cutoff \
+  --max-p95-ms 800
+
+.venv/bin/python scripts/verify_release.py
+```
+
+以下編號步驟是**從零建立或完整重建 stack** 的 runbook，不是一般 code update 流程。
 
 ### 1. 安裝工具並確認 AWS identity
 
@@ -857,6 +894,11 @@ API 同時相容原命題欄位 `ks`、`c0`、`d0`。完整契約見 [docs/opena
 | Hit@1 | 0.2793 | 0.3054 | **+9.35%** |
 
 第二個互斥 confirmation bucket 的 NDCG@10 仍提升 **5.07%**。這是離線相關性證據，不等於實際轉換率或營收。
+
+2026-08-01 的 query normalization／index-tooling pull 沒有重訓或替換這個 frozen
+LambdaMART model，因此以上數字仍是目前 authoritative release evidence，但不能解讀
+為該次 pull 新增的 NDCG／Hit 改善。該次更新主要改善 query coverage、structured
+retrieval 與 deployment reliability。
 
 完整報告見 [reports/README.md](reports/README.md)。
 
