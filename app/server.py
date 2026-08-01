@@ -12,6 +12,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
+from app.query_normalizer import BedrockQueryNormalizer
 from app.ranker import SkillWeaveRanker
 from app.retrieval import OpenSearchRetriever
 
@@ -26,6 +27,7 @@ DEFAULT_LTR_MODEL = (
 
 class Handler(BaseHTTPRequestHandler):
     ranker: SkillWeaveRanker
+    query_normalizer: BedrockQueryNormalizer
     server_version = "SkillWeave/0.1"
 
     def _json(self, body: dict, status: int = HTTPStatus.OK) -> None:
@@ -57,6 +59,7 @@ class Handler(BaseHTTPRequestHandler):
                     "index_version": self.ranker.metadata.get("index_version"),
                     "jobs": len(self.ranker.jobs),
                     "full_corpus_retrieval": self.ranker.candidate_retriever is not None,
+                    "bedrock_query_normalization": self.query_normalizer.enabled,
                 }
             )
             return
@@ -104,12 +107,14 @@ class Handler(BaseHTTPRequestHandler):
             include_graph = body.get("use_graph", True)
             if not isinstance(include_graph, bool):
                 raise ValueError("use_graph must be boolean")
+            normalization = self.query_normalizer.normalize(query)
             result = self.ranker.search(
                 query=query,
                 location_code=location,
                 duty_code=duty,
                 top_k=top_k,
                 include_graph=include_graph,
+                normalized_query=normalization.query,
             )
             request_id = "req_" + uuid.uuid4().hex[:16]
             elapsed_ms = round((time.perf_counter() - started) * 1000, 2)
@@ -125,7 +130,10 @@ class Handler(BaseHTTPRequestHandler):
                     "resolved_skills": list(result["intent"].skills),
                     "index_version": self.ranker.metadata.get("index_version"),
                     "candidate_source": result["candidate_source"],
-                    "degraded_components": result["degraded_components"],
+                    "degraded_components": normalization.merge_degraded_components(
+                        result["degraded_components"]
+                    ),
+                    "query_normalization": normalization.metadata(),
                 },
             }
             if path == "/api/v1/graph/trace":
@@ -198,6 +206,7 @@ def main() -> None:
         ltr_model_path=args.ltr_model,
         candidate_retriever=OpenSearchRetriever.from_environment(),
     )
+    Handler.query_normalizer = BedrockQueryNormalizer.from_environment()
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     print(f"SkillWeave listening on http://{args.host}:{args.port}")
     print(f"Loaded {len(Handler.ranker.jobs):,} jobs from {args.artifact}")

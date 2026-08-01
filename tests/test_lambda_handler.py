@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import json
 import unittest
+from unittest.mock import patch
 
+import app.lambda_handler as lambda_handler
 from app.lambda_handler import handler
+from app.query_normalizer import QueryNormalization
 
 
 def event(
@@ -37,6 +40,59 @@ class LambdaHandlerTests(unittest.TestCase):
         body = json.loads(result["body"])
         self.assertEqual(result["statusCode"], 200)
         self.assertEqual([row["rank"] for row in body["result"]], list(range(1, 11)))
+
+    def test_search_uses_bedrock_normalized_query(self) -> None:
+        class FakeNormalizer:
+            enabled = True
+
+            def normalize(self, query: str) -> QueryNormalization:
+                self.query = query
+                return QueryNormalization(
+                    "Node.js 後端工程師",
+                    "amazon_bedrock",
+                    "model-id",
+                )
+
+        normalizer = FakeNormalizer()
+        with patch.object(lambda_handler, "QUERY_NORMALIZER", normalizer):
+            result = handler(
+                event("POST", "/api/v1/jobs/search", {"query": "node js backend"}),
+                None,
+            )
+
+        body = json.loads(result["body"])
+        self.assertEqual(result["statusCode"], 200)
+        self.assertEqual(normalizer.query, "node js backend")
+        self.assertEqual(
+            body["meta"]["query_normalization"],
+            {
+                "source": "amazon_bedrock",
+                "model_id": "model-id",
+                "normalized_query": "Node.js 後端工程師",
+            },
+        )
+        self.assertIn("skill.nodejs", body["meta"]["resolved_skills"])
+
+    def test_bedrock_fallback_is_disclosed(self) -> None:
+        class FakeNormalizer:
+            enabled = True
+
+            def normalize(self, query: str) -> QueryNormalization:
+                return QueryNormalization(
+                    query,
+                    "deterministic_fallback",
+                    "model-id",
+                    degraded=True,
+                )
+
+        with patch.object(lambda_handler, "QUERY_NORMALIZER", FakeNormalizer()):
+            result = handler(
+                event("POST", "/api/v1/jobs/search", {"query": "行政助理"}),
+                None,
+            )
+
+        body = json.loads(result["body"])
+        self.assertIn("bedrock_query_normalizer", body["meta"]["degraded_components"])
 
     def test_invalid_query(self) -> None:
         result = handler(event("POST", "/api/v1/jobs/search", {"query": ""}), None)

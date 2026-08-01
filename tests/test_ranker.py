@@ -22,6 +22,15 @@ class RankerTests(unittest.TestCase):
         self.assertIn("skill.nodejs", intent.skills)
         self.assertNotIn("skill.javascript", intent.skills)
 
+    def test_explicit_normalized_query_preserves_raw_query_for_trace(self) -> None:
+        intent = self.ranker.parse_intent(
+            "node js backend",
+            normalized_query="Node.js 後端工程師",
+        )
+        self.assertEqual(intent.raw, "node js backend")
+        self.assertEqual(intent.normalized, "node.js 後端工程師")
+        self.assertIn("skill.nodejs", intent.skills)
+
     def test_rank_is_contiguous_and_job_ids_are_unique(self) -> None:
         rows = self.ranker.search("行政助理", top_k=20)["results"]
         self.assertGreaterEqual(len(rows), 10)

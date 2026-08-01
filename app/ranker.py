@@ -169,11 +169,14 @@ class SkillWeaveRanker:
         query: str,
         location_code: Any = None,
         duty_code: Any = None,
+        normalized_query: str | None = None,
     ) -> QueryIntent:
-        normalized_query = normalize(query)
-        units = lexical_units(normalized_query)
+        normalized_value = normalize(
+            query if normalized_query is None else normalized_query
+        )
+        units = lexical_units(normalized_value)
         resolved: list[tuple[int, str]] = []
-        for match in self._alias_pattern.finditer(normalized_query):
+        for match in self._alias_pattern.finditer(normalized_value):
             alias = normalize(match.group(0))
             for skill_id in self.alias_to_skills.get(alias, []):
                 resolved.append((len(alias), skill_id))
@@ -192,7 +195,7 @@ class SkillWeaveRanker:
         ][:8]
         return QueryIntent(
             raw=query,
-            normalized=normalized_query,
+            normalized=normalized_value,
             units=frozenset(units),
             # Keep independently capped feature families. A large deterministic
             # duty taxonomy must never evict reviewed skill nodes and silently
@@ -667,8 +670,14 @@ class SkillWeaveRanker:
         top_k: int = 20,
         include_graph: bool = True,
         candidate_ids: set[str] | None = None,
+        normalized_query: str | None = None,
     ) -> dict[str, Any]:
-        intent = self.parse_intent(query, location_code, duty_code)
+        intent = self.parse_intent(
+            query,
+            location_code,
+            duty_code,
+            normalized_query=normalized_query,
+        )
         if not intent.normalized:
             return {
                 "intent": intent,
@@ -682,7 +691,7 @@ class SkillWeaveRanker:
         if self.candidate_retriever is not None and candidate_ids is None:
             try:
                 external_candidates = self.candidate_retriever.retrieve(
-                    intent.raw,
+                    intent.normalized,
                     limit=max(200, limit),
                     location_names=self._filter_names(
                         intent.location_codes, self.locations

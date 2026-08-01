@@ -53,39 +53,63 @@ Query
 
 目前全量版本的 Skill Graph 特徵主要存在 OpenSearch 職缺文件與本機 artifact；Neptune、SageMaker 與 ECS 是完整 production 藍圖，不是本機全量搜尋的必要元件。
 
-## 目前狀態
+### 本機完整啟動（全量 OpenSearch + Bedrock + 前後端）
 
-- 全量 OpenSearch 索引流程已實作，可匯入全部 **1,218,635** 筆職缺。
-- OpenSearch 不可用時，API 會退回內建 **12,000** 筆 artifact，並在 response metadata 揭露降級。
-- LambdaMART 使用 37 個文字、條件、圖譜、行為與 retrieval 特徵。
-- Amazon Bedrock 已完成 200 筆 train-only JD pilot：180 筆通過、發布 1,598 個有原文證據的技能 mentions；尚未對全 corpus 執行 Bedrock 建圖。
-- 當 `BEDROCK_QUERY_MODEL_ID` 有設定時，線上 Query 由 Bedrock Converse 正規化；失敗時使用安全 fallback。
-- 已登錄的 public demo 目前仍是 compact deployment。正式全量評測必須確認 `search_scope=full_corpus_opensearch`。
+前端是 `web/` 內的靜態檔案，由 Python API 一起提供，因此不需要另外執行
+`npm install`、`npm build` 或啟動第二個 frontend process。Docker Desktop 建議配置
+至少 4 GB 記憶體，並預留足夠的索引空間。
 
-Public demo：<https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/>
-
-## 快速啟動
-
-需求：Python 3.11+。Compact demo 只使用 Python 標準函式庫。
-
-### Compact demo
+第一次執行先建立 Python 環境並安裝 AWS SDK：
 
 ```bash
-python3 scripts/build_demo_index.py
-python3 -m app.server --port 8080
+cd "/Users/jen/Desktop/Code/AWS Hackathon"
+python3 -m venv .venv
+.venv/bin/pip install -r requirements-production.lock
 ```
 
-開啟 <http://127.0.0.1:8080>。
+登入 AWS，並確認目前使用的是預期帳號：
 
-### 本機全量 OpenSearch
+```bash
+aws login
+aws sts get-caller-identity --query Account --output text
+```
 
-Docker Desktop 建議配置至少 4 GB 記憶體。
+預期 Account ID：
+
+```text
+851558740348
+```
+
+啟動本機 OpenSearch：
 
 ```bash
 make opensearch-local-up
-make full-index-local
-make full-demo-local
 ```
+
+只有全新的 Docker volume 尚未建立索引時，才執行一次全量匯入：
+
+```bash
+make full-index-local
+```
+
+索引保存在 Docker named volume；一般重啟不需要再次匯入。已有
+`skillweave-jobs-v1` 時不要重跑 `make full-index-local`。
+
+啟動整合式前端與後端，連接本機全量 OpenSearch，並使用 Bedrock 正規化 Query：
+
+```bash
+AWS_REGION=us-east-1 \
+BEDROCK_QUERY_MODEL_ID=us.anthropic.claude-sonnet-4-6 \
+OPENSEARCH_ENDPOINT=http://127.0.0.1:9200 \
+OPENSEARCH_INDEX=skillweave-jobs-v1 \
+.venv/bin/python -m app.server --port 8080
+```
+
+開啟前端：<http://127.0.0.1:8080>。後端 API 與前端使用同一個 port：
+
+- Health：`GET http://127.0.0.1:8080/health`
+- Metadata：`GET http://127.0.0.1:8080/api/v1/meta`
+- Search：`POST http://127.0.0.1:8080/api/v1/jobs/search`
 
 確認索引筆數：
 
@@ -116,6 +140,24 @@ curl -sS http://127.0.0.1:8080/api/v1/meta
   "candidate_source": "opensearch_full_corpus",
   "degraded_components": []
 }
+```
+
+Bedrock 成功時，搜尋回應還應包含：
+
+```json
+{
+  "query_normalization": {
+    "source": "amazon_bedrock",
+    "model_id": "us.anthropic.claude-sonnet-4-6"
+  },
+  "degraded_components": []
+}
+```
+
+停止後端請在執行中的 terminal 按 `Ctrl-C`。停止 OpenSearch 但保留全量索引：
+
+```bash
+make opensearch-local-down
 ```
 
 ## API
@@ -193,17 +235,6 @@ API 同時相容原命題欄位 `ks`、`c0`、`d0`。完整契約見 [docs/opena
 
 完整報告見 [reports/README.md](reports/README.md)。
 
-## 常用指令
-
-```bash
-make demo                 # Compact demo
-make test                 # 編譯檢查＋單元測試
-make full-demo-local      # 連接本機全量 OpenSearch
-make quality              # 重建 LTR 品質實驗
-make package              # 打包 Lambda
-make verify               # 驗證 release evidence
-```
-
 ## 專案目錄
 
 ```text
@@ -226,7 +257,3 @@ tests/      API、排序、防洩漏與 release 測試
 - [資料卡與時間切分](docs/data-card.md)
 - [Bedrock 安全與 evidence gate](docs/genai-safety.md)
 - [評估報告索引](reports/README.md)
-
-## Privacy
-
-原始競賽 CSV、`talentNo` 與可還原個人時序的資料不可發布。公開 artifact 只保留職缺資料、版本資訊與彙總行為訊號。

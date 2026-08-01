@@ -41,12 +41,13 @@ Target p95：`<800 ms`，timeout 2.5 s。
 
 | Stage | p95 budget | Fallback |
 |---|---:|---|
-| Validate / normalize | 15 ms | deterministic normalization |
+| Validate | 15 ms | reject malformed input |
+| Bedrock query normalize | 350 ms | deterministic Unicode/whitespace normalization |
 | OpenSearch Top 200 | 180 ms | BM25 only |
 | Neptune feature aggregation | 120 ms | cached / zero graph feature |
 | SageMaker rerank | 120 ms | versioned in-process linear fallback |
 | Assemble / trace | 30 ms | omit optional trace details |
-| Network reserve | 335 ms | — |
+| Network reserve | 100 ms | — |
 
 Graph 或 model service 超時不能讓 API contract 失效；服務必須回傳合法 fallback ranking 並在 `meta.degraded_components` 揭露。
 

@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import unquote
 
+from app.query_normalizer import BedrockQueryNormalizer
 from app.ranker import SkillWeaveRanker
 from app.retrieval import OpenSearchRetriever
 
@@ -28,6 +29,7 @@ RANKER = SkillWeaveRanker(
     ltr_model_path=LTR_MODEL_PATH,
     candidate_retriever=OpenSearchRetriever.from_environment(),
 )
+QUERY_NORMALIZER = BedrockQueryNormalizer.from_environment()
 
 
 def response(
@@ -88,12 +90,14 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
         return response(
             400, {"error": {"code": "invalid_request", "message": "use_graph must be boolean"}}
         )
+    normalization = QUERY_NORMALIZER.normalize(query)
     ranked = RANKER.search(
         query,
         location_code=location,
         duty_code=duty,
         top_k=body.get("top_k", 20),
         include_graph=include_graph,
+        normalized_query=normalization.query,
     )
     rows = ranked["results"]
     payload: dict[str, Any] = {
@@ -112,7 +116,10 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
                 else "heuristic_fallback"
             ),
             "candidate_source": ranked["candidate_source"],
-            "degraded_components": ranked["degraded_components"],
+            "degraded_components": normalization.merge_degraded_components(
+                ranked["degraded_components"]
+            ),
+            "query_normalization": normalization.metadata(),
         },
     }
     if trace:
@@ -165,6 +172,7 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
                     "index_version": RANKER.metadata.get("index_version"),
                     "jobs": len(RANKER.jobs),
                     "full_corpus_retrieval": RANKER.candidate_retriever is not None,
+                    "bedrock_query_normalization": QUERY_NORMALIZER.enabled,
                 },
             )
         if method == "GET" and path == "/api/v1/meta":

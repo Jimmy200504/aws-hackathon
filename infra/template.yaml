@@ -22,6 +22,10 @@ Parameters:
   OpenSearchIndex:
     Type: String
     Default: skillweave-jobs-v1
+  BedrockQueryModelId:
+    Type: String
+    Default: us.anthropic.claude-sonnet-4-6
+    Description: Bedrock model or inference profile used for online query normalization
 
 Rules:
   OpenSearchParametersTogether:
@@ -56,6 +60,8 @@ Globals:
         OPENSEARCH_ENDPOINT: !Ref OpenSearchEndpoint
         OPENSEARCH_INDEX: !Ref OpenSearchIndex
         OPENSEARCH_TIMEOUT_SECONDS: "2.0"
+        BEDROCK_QUERY_MODEL_ID: !Ref BedrockQueryModelId
+        BEDROCK_QUERY_MAX_TOKENS: "128"
 
 Resources:
   HttpApi:
@@ -89,6 +95,11 @@ Resources:
         - !Ref AWS::NoValue
       Policies:
         - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource: "*"
         - !If
           - UseFullCorpusOpenSearch
           - Statement:

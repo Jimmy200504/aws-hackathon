@@ -1,2 +1,2 @@
-# The local demo/API intentionally has no third-party Python dependencies.
-# Python 3.11+ standard library is sufficient.
+# The local demo/API has no mandatory third-party Python dependencies.
+# Online Bedrock normalization uses boto3 from the Lambda runtime when configured.
