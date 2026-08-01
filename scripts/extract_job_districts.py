@@ -199,6 +199,14 @@ def main() -> None:
         default=30,
         help="a collocation needs this much support before it can be a label",
     )
+    parser.add_argument(
+        "--review-collocations",
+        type=int,
+        default=30,
+        help="collocations kept per surface in the report; the default keeps the "
+        "checked-in report readable, and scripts/judge_district_collocations.py "
+        "needs all of them, so raise it and write to a separate --report path",
+    )
     args = parser.parse_args()
 
     started = time.monotonic()
@@ -498,7 +506,7 @@ def main() -> None:
                 "collocations_needing_judgement": sum(
                     1 for entry in entries if entry["needs_semantic_judgement"]
                 ),
-                "collocations": entries[:30],
+                "collocations": entries[: args.review_collocations],
             }
         )
 
