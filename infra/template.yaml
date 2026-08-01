@@ -74,7 +74,15 @@ Globals:
         OPENSEARCH_SERVICE: !Ref OpenSearchService
         OPENSEARCH_TIMEOUT_SECONDS: "4.0"
         BEDROCK_QUERY_MODEL_ID: !Ref BedrockQueryModelId
-        BEDROCK_QUERY_MAX_TOKENS: "128"
+        # One structured intent runs ~120 output tokens, so a full batch needs
+        # headroom that a single-answer budget never did.
+        BEDROCK_QUERY_MAX_TOKENS: "4000"
+        BEDROCK_QUERY_MAX_BATCH: "10"
+        # A Lambda invocation serves one request, so there is no sibling query
+        # to coalesce with; waiting would add latency and batch nothing. On a
+        # multi-request container (ECS Fargate) set this to 1.0.
+        BEDROCK_QUERY_MAX_WAIT_SECONDS: "0"
+        BEDROCK_QUERY_DEADLINE_SECONDS: "2.5"
 
 Resources:
   HttpApi:

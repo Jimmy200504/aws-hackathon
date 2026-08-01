@@ -397,6 +397,7 @@ class FakeFullCorpusRetriever:
         duty_names,
         wants_remote=False,
         salary_intent=None,
+        intent=None,
     ):
         if self.fail:
             raise RuntimeError("simulated OpenSearch outage")

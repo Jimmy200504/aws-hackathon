@@ -745,6 +745,7 @@ class SkillWeaveRanker:
         include_graph: bool = True,
         candidate_ids: set[str] | None = None,
         normalized_query: str | None = None,
+        structured_intent: Any = None,
     ) -> dict[str, Any]:
         intent = self.parse_intent(
             query,
@@ -760,6 +761,49 @@ class SkillWeaveRanker:
                 "degraded_components": [],
             }
         limit = max(1, min(int(top_k), 100))
+        stage_one, candidate_source, degraded_components = self._collect_stage_one(
+            intent,
+            structured_intent=structured_intent,
+            limit=limit,
+            include_graph=include_graph,
+            candidate_ids=candidate_ids,
+        )
+        # Attribute and brand queries (現領, 萊爾富) name nothing that occurs in
+        # job text, so the first pass comes back thin. Retry with the taxonomy
+        # expansion only in that case: a query that already retrieves well must
+        # not have five duty labels diluting its title-phrase evidence.
+        expansion = getattr(structured_intent, "recall_expansion", "") or ""
+        if expansion and len(stage_one) < limit:
+            rescue_intent = self.parse_intent(
+                query, location_code, duty_code, normalized_query=expansion
+            )
+            rescue, rescue_source, rescue_degraded = self._collect_stage_one(
+                rescue_intent,
+                structured_intent=structured_intent,
+                limit=limit,
+                include_graph=include_graph,
+                candidate_ids=candidate_ids,
+            )
+            seen = {item[1] for item in stage_one}
+            stage_one = stage_one + [item for item in rescue if item[1] not in seen]
+            candidate_source = f"{rescue_source}+taxonomy_expansion"
+            degraded_components = list(
+                dict.fromkeys(degraded_components + rescue_degraded)
+            )
+        ranked = self._rerank(stage_one, limit=limit, include_graph=include_graph)
+        return self._assemble(
+            intent, ranked, candidate_source, degraded_components
+        )
+
+    def _collect_stage_one(
+        self,
+        intent: QueryIntent,
+        *,
+        structured_intent: Any,
+        limit: int,
+        include_graph: bool,
+        candidate_ids: set[str] | None,
+    ) -> tuple[list[Any], str, list[str]]:
         degraded_components: list[str] = []
         external_candidates: list[dict[str, Any]] | None = None
         if self.candidate_retriever is not None and candidate_ids is None:
@@ -773,6 +817,7 @@ class SkillWeaveRanker:
                     duty_names=self._filter_names(intent.duty_codes, self.duties),
                     wants_remote=intent.wants_remote,
                     salary_intent=intent.salary_intent,
+                    intent=structured_intent,
                 )
             except Exception as exc:
                 # Keep the API contract alive if full-corpus retrieval is
@@ -853,9 +898,15 @@ class SkillWeaveRanker:
                     elif item[:2] > heap[0][:2]:
                         heapq.heapreplace(heap, item)
             stage_one = sorted(heap, key=lambda item: (-item[0], item[1]))
-        ranked = self._rerank(
-            stage_one, limit=limit, include_graph=include_graph
-        )
+        return stage_one, candidate_source, degraded_components
+
+    def _assemble(
+        self,
+        intent: QueryIntent,
+        ranked: list[Any],
+        candidate_source: str,
+        degraded_components: list[str],
+    ) -> dict[str, Any]:
         results: list[dict[str, Any]] = []
         for rank, (score, _, job, features, traces, direct) in enumerate(ranked, 1):
             matched_labels = [

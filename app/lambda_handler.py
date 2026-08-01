@@ -101,6 +101,7 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
         top_k=body.get("top_k", 20),
         include_graph=include_graph,
         normalized_query=normalization.query,
+        structured_intent=normalization.intent,
     )
     rows = ranked["results"]
     payload: dict[str, Any] = {

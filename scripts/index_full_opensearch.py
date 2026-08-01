@@ -25,6 +25,7 @@ from app.job_fields import derive_job_fields
 
 DATA = ROOT / "data" / "dataset"
 DEMO_INDEX = ROOT / "artifacts" / "demo-index.json"
+BEHAVIOR = ROOT / "artifacts" / "job-behavior.json"
 TRAIN_CUTOFF = datetime.fromisoformat("2026-06-05 23:59:59.999")
 MIN_DATE = datetime.fromisoformat("2024-01-01 00:00:00")
 
@@ -96,6 +97,10 @@ def mapping(
                 },
                 "industry": {"type": "text", "analyzer": "cjk"},
                 "company_id": {"type": "keyword"},
+                "employment_type": {"type": "keyword"},
+                "shifts": {"type": "keyword"},
+                "education": {"type": "keyword"},
+                "experience": {"type": "keyword"},
                 "modified_at": {"type": "keyword"},
                 "post_cutoff_jd": {"type": "boolean"},
                 "graph_eligible": {"type": "boolean"},
@@ -244,15 +249,16 @@ def job_document(
     skills: dict[str, dict[str, Any]],
     pattern: re.Pattern[str],
     alias_to_skills: dict[str, list[str]],
+    behavior: dict[str, list[int]] | None = None,
 ) -> dict[str, Any]:
     modified = parse_time(row["職缺最後修改時間"])
     graph_eligible = modified <= TRAIN_CUTOFF
-    if graph_eligible:
-        skill_ids, evidence, confidence = matched_skills(
-            row, pattern, alias_to_skills
-        )
-    else:
-        skill_ids, evidence, confidence = [], {}, {}
+    # The cutoff exists to keep the offline graph/no-graph ablation free of
+    # future information. The live index has no such leakage concern, and
+    # withholding skills from the 24% of postings modified after the cutoff
+    # only removes signal from a quarter of the corpus. Keep `graph_eligible`
+    # as the honest provenance flag; annotate every posting.
+    skill_ids, evidence, confidence = matched_skills(row, pattern, alias_to_skills)
     categories = [
         value
         for value in [row["職務大類"], row["職務中類"], row["職務小類"]]
@@ -266,6 +272,7 @@ def job_document(
             / max(1.0, (TRAIN_CUTOFF - MIN_DATE).total_seconds()),
         ),
     )
+    views, applies = (behavior or {}).get(row["職缺編號"], (0, 0))
     return {
         "id": row["職缺編號"],
         "title": row["職務名稱"].strip(),
@@ -277,6 +284,17 @@ def job_document(
         "categories": categories,
         "industry": row["產業中類"] or row["產業大類"],
         "company_id": row["廠商編號"],
+        # Attribute queries (現領/正職/兼職/工讀/晚班/暑期) are a double-digit
+        # share of the search log but occur in job free text far less often than
+        # they are searched for. Their answer is these structured columns.
+        "employment_type": row.get("職缺屬性", "").strip(),
+        "shifts": [
+            value.strip()
+            for value in row.get("工時", "").split(",")
+            if value.strip() and value.strip() != "NULL"
+        ],
+        "education": row.get("學歷需求", "").strip(),
+        "experience": row.get("工作經驗需求", "").strip(),
         "modified_at": row["職缺最後修改時間"],
         "post_cutoff_jd": not graph_eligible,
         "graph_eligible": graph_eligible,
@@ -293,10 +311,11 @@ def job_document(
             for skill_id in skill_ids
         },
         "freshness": round(freshness, 4),
-        # Full train-only behavior aggregates can be published in a later
-        # version without changing the online feature contract.
-        "view_count": 0,
-        "apply_count": 0,
+        # Train-window aggregates from scripts/build_job_behavior.py. Publishing
+        # zeroes here silently disabled the `behavior` ranking feature for the
+        # entire live corpus.
+        "view_count": views,
+        "apply_count": applies,
     }
 
 
@@ -342,6 +361,23 @@ def main() -> None:
         help="Index into an existing compatible index",
     )
     parser.add_argument(
+        "--behavior",
+        type=Path,
+        default=BEHAVIOR,
+        help="Aggregates from scripts/build_job_behavior.py; skipped if missing",
+    )
+    parser.add_argument(
+        "--update-mapping",
+        action="store_true",
+        help=(
+            "PUT the new field properties onto an existing index before "
+            "indexing. Adding fields is a non-breaking mapping update on a "
+            "provisioned domain, so an already-deployed index can be upgraded "
+            "in place: --update-mapping --skip-create re-bulks every document "
+            "by _id and no delete or alias swap is needed."
+        ),
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Parse and validate records without sending them",
@@ -355,6 +391,16 @@ def main() -> None:
     demo = json.loads(args.demo_index.read_text(encoding="utf-8"))
     skills = demo["skills"]
     pattern, alias_to_skills = compile_alias_matcher(skills)
+    behavior: dict[str, list[int]] = {}
+    if args.behavior and args.behavior.is_file():
+        behavior = json.loads(args.behavior.read_text(encoding="utf-8"))["counts"]
+        print(f"Loaded behavior for {len(behavior):,} jobs", flush=True)
+    else:
+        print(
+            "No behavior artifact; view_count/apply_count will be 0. "
+            "Run scripts/build_job_behavior.py first.",
+            flush=True,
+        )
     client = (
         None
         if args.dry_run
@@ -377,6 +423,18 @@ def main() -> None:
                 separators=(",", ":"),
             ).encode("utf-8"),
         )
+    if client is not None and args.update_mapping:
+        properties = mapping(serverless=client.service == "aoss")["mappings"][
+            "properties"
+        ]
+        client.request(
+            "PUT",
+            f"{index_path}/_mapping",
+            json.dumps({"properties": properties}, separators=(",", ":")).encode(
+                "utf-8"
+            ),
+        )
+        print(f"Updated mapping on {args.index} with {len(properties)} properties")
 
     indexed = graph_jobs = batches = 0
     started = time.monotonic()
@@ -387,7 +445,7 @@ def main() -> None:
             if args.max_records > 0 and indexed >= args.max_records:
                 break
             document = job_document(
-                row, skills, pattern, alias_to_skills
+                row, skills, pattern, alias_to_skills, behavior
             )
             pending.append(document)
             graph_jobs += int(document["graph_eligible"])

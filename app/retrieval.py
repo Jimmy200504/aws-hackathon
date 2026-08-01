@@ -27,6 +27,10 @@ class OpenSearchRetriever:
         "categories",
         "industry",
         "company_id",
+        "employment_type",
+        "shifts",
+        "education",
+        "experience",
         "modified_at",
         "post_cutoff_jd",
         "graph_eligible",
@@ -127,6 +131,38 @@ class OpenSearchRetriever:
             raise RuntimeError("OpenSearch returned a non-object response")
         return decoded
 
+    @staticmethod
+    def _intent_boosts(intent: Any) -> list[dict[str, Any]]:
+        """Turn a normalizer-inferred intent into recall-safe scoring clauses.
+
+        Attribute queries (現領/兼職/晚班) dominate the head of the search log but
+        barely occur in job free text; their answer lives in the structured
+        `employment_type` / `shifts` fields instead.
+        """
+        if intent is None:
+            return []
+        clauses: list[dict[str, Any]] = []
+        for name in getattr(intent, "duty_categories", ()) or ():
+            clauses.append(
+                {"match_phrase": {"categories": {"query": name, "boost": 6.0}}}
+            )
+        for name in getattr(intent, "employment_types", ()) or ():
+            clauses.append({"term": {"employment_type": {"value": name, "boost": 2.5}}})
+        for name in getattr(intent, "shifts", ()) or ():
+            clauses.append({"term": {"shifts": {"value": name, "boost": 2.0}}})
+        for name in getattr(intent, "locations", ()) or ():
+            clauses.append({"term": {"city.keyword": {"value": name, "boost": 3.0}}})
+        salary_type = getattr(intent, "salary_type", None)
+        if salary_type:
+            clauses.append({"term": {"salary_type": {"value": salary_type, "boost": 1.5}}})
+        company = getattr(intent, "company", None)
+        if company:
+            clauses.append(
+                {"match_phrase": {"description": {"query": company, "boost": 3.0}}}
+            )
+            clauses.append({"match_phrase": {"title": {"query": company, "boost": 4.0}}})
+        return clauses
+
     def retrieve(
         self,
         query: str,
@@ -136,7 +172,16 @@ class OpenSearchRetriever:
         duty_names: Iterable[str] = (),
         wants_remote: bool = False,
         salary_intent: dict[str, Any] | None = None,
+        intent: Any = None,
     ) -> list[dict[str, Any]]:
+        """Retrieve candidates for one query.
+
+        `location_names` / `duty_names` come from the caller's explicit `c0` /
+        `d0` codes and become filters, because the ranker penalises a mismatch
+        by -16 and would otherwise discard most of an unfiltered BM25 page.
+        Anything inferred by the query normalizer stays a boost: an inferred
+        constraint must never be able to empty the result set.
+        """
         locations = self._clean_names(location_names)
         duties = self._clean_names(duty_names)
         should: list[dict[str, Any]] = [
@@ -224,6 +269,8 @@ class OpenSearchRetriever:
                         }
                     }
                 )
+        should.extend(self._intent_boosts(intent))
+        filters = [{"terms": {"city.keyword": locations}}] if locations else []
         body = {
             "size": max(1, min(int(limit), 500)),
             "track_total_hits": False,
@@ -232,16 +279,21 @@ class OpenSearchRetriever:
                 "bool": {
                     "should": should,
                     "minimum_should_match": 1,
+                    **({"filter": filters} if filters else {}),
                 }
             },
             "sort": [{"_score": "desc"}, {"_id": "asc"}],
         }
-        result = self._signed_request(
-            "POST",
-            f"/{quote(self.index, safe='-_.')}/_search",
-            body,
-        )
+        path = f"/{quote(self.index, safe='-_.')}/_search"
+        result = self._signed_request("POST", path, body)
         hits = result.get("hits", {}).get("hits", [])
+        if filters and isinstance(hits, list) and not hits:
+            # A city filter that matches nothing usually means the caller's code
+            # table and the indexed city string disagree. Losing the constraint
+            # beats returning an empty page to the judge.
+            body["query"]["bool"].pop("filter")
+            result = self._signed_request("POST", path, body)
+            hits = result.get("hits", {}).get("hits", [])
         if not isinstance(hits, list):
             raise RuntimeError("OpenSearch hits are malformed")
         candidates: list[dict[str, Any]] = []

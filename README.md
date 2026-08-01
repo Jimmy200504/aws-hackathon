@@ -99,11 +99,24 @@ make full-index-local
 
 ```bash
 AWS_REGION=us-east-1 \
-BEDROCK_QUERY_MODEL_ID=us.anthropic.claude-sonnet-4-6 \
+BEDROCK_QUERY_MODEL_ID=global.anthropic.claude-haiku-4-5-20251001-v1:0 \
 OPENSEARCH_ENDPOINT=http://127.0.0.1:9200 \
 OPENSEARCH_INDEX=skillweave-jobs-v1 \
+QUERY_PREWARM_LIMIT=2000 \
 .venv/bin/python -m app.server --port 8080
 ```
+
+Query 正規化相關環境變數：
+
+| 變數 | 預設 | 說明 |
+|---|---|---|
+| `BEDROCK_QUERY_MAX_BATCH` | `10` | 一次 Bedrock 請求最多帶幾筆查詢 |
+| `BEDROCK_QUERY_MAX_WAIT_SECONDS` | `1.0` | 批次視窗；湊滿 batch 或等滿這個秒數就送出。Lambda 設 `0` |
+| `BEDROCK_QUERY_DEADLINE_SECONDS` | `2.5` | 單一 request 最多等多久；逾時回 deterministic 解讀，批次仍會完成並暖 cache |
+| `QUERY_PREWARM_LIMIT` | `0`（關閉） | 啟動時背景預熱 `config/top-queries.json` 的前 N 筆。2000 筆約 6 分鐘、涵蓋 61% 搜尋量 |
+| `QUERY_PREWARM_RPM` | `45` | 預熱的請求速率上限（Bedrock quota 為 50 RPM） |
+
+預熱進度可在 `GET /health` 的 `query_intent_cache` 觀察。
 
 開啟前端：<http://127.0.0.1:8080>。後端 API 與前端使用同一個 port：
 

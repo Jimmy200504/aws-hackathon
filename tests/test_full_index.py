@@ -41,17 +41,39 @@ class FullCorpusIndexTests(unittest.TestCase):
         }
         self.pattern, self.aliases = compile_alias_matcher(self.skills)
 
-    def test_every_job_becomes_a_document_even_after_graph_cutoff(self) -> None:
+    def test_post_cutoff_job_is_still_annotated_but_flagged(self) -> None:
+        """The cutoff is offline-ablation provenance, not a live-index gate.
+
+        Withholding skills here would leave a quarter of the corpus with no
+        graph signal for a leakage risk the live path does not have.
+        """
         document = job_document(
-            row(modified_at="2026-06-20 00:00:00"),
+            row(modified_at="2026-06-20 00:00:00", title="Python 工程師"),
             self.skills,
             self.pattern,
             self.aliases,
         )
         self.assertEqual(document["id"], "job-1")
         self.assertFalse(document["graph_eligible"])
-        self.assertEqual(document["skills"], [])
+        self.assertTrue(document["post_cutoff_jd"])
+        self.assertEqual(document["skills"], ["skill.python"])
         self.assertIn("Python", document["description_search"])
+
+    def test_structured_attribute_columns_are_indexed(self) -> None:
+        source = row(modified_at="2026-06-05 12:00:00")
+        source.update(
+            {
+                "職缺屬性": "兼職",
+                "工時": "晚班,假日班",
+                "學歷需求": "高中職",
+                "工作經驗需求": "不拘",
+            }
+        )
+        document = job_document(source, self.skills, self.pattern, self.aliases)
+        self.assertEqual(document["employment_type"], "兼職")
+        self.assertEqual(document["shifts"], ["晚班", "假日班"])
+        self.assertEqual(document["education"], "高中職")
+        self.assertEqual(document["experience"], "不拘")
 
     def test_cutoff_eligible_job_gets_grounded_skill(self) -> None:
         document = job_document(
