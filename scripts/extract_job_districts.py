@@ -47,6 +47,7 @@ DEFAULT_REPORT = ROOT / "reports" / "job-district-extraction.json"
 GRAPH_CUTOFF = datetime.fromisoformat("2026-06-05 23:59:59.999")
 DOMESTIC_TOP_REGION = "台灣"
 DISTRICT_SUFFIXES = "區市鎮鄉"
+HAN = re.compile(r"[\u4e00-\u9fff]")
 
 LAYER_FULL = "full_name"
 LAYER_STRIPPED = "suffix_dropped"
@@ -123,6 +124,14 @@ def _odds(proportion: float) -> float:
     return proportion / (1.0 - proportion) if proportion < 1.0 else math.inf
 
 
+def bounded_error(value: float, cap: float = 99.0) -> float | None:
+    """Report an error rate readably. A surface with zero correct matches has
+    unbounded odds, which is a verdict rather than a number worth printing."""
+    if not math.isfinite(value):
+        return None
+    return round(min(value, cap), 4)
+
+
 def kept_error_rate(inside: int, appearances: int, expected: float) -> float:
     """Upper bound on the share of kept matches that are not place references.
 
@@ -172,6 +181,24 @@ def main() -> None:
         default=0.93,
         help="accepted surfaces below this precision still carry occurrence-level error",
     )
+    parser.add_argument(
+        "--label-place-max-error",
+        type=float,
+        default=0.03,
+        help="a collocation this clean is a trustworthy positive label",
+    )
+    parser.add_argument(
+        "--label-not-place-min-error",
+        type=float,
+        default=0.50,
+        help="a collocation this dirty is a trustworthy negative label",
+    )
+    parser.add_argument(
+        "--label-min-postings",
+        type=int,
+        default=30,
+        help="a collocation needs this much support before it can be a label",
+    )
     args = parser.parse_args()
 
     started = time.monotonic()
@@ -188,15 +215,33 @@ def main() -> None:
         surface_layer.setdefault(name, LAYER_STRIPPED)
     candidates = {**{k: v for k, v in stripped_table.items()}, **full_table}
     pattern = build_pattern(list(surface_layer))
+    # Eight counties are named after their own seat, so the same two characters
+    # can qualify a county or name a district. 桃園大園 is 大園區 inside 桃園市,
+    # not 桃園區. Restricting the rule to these surfaces keeps 中和永和, which is
+    # two districts of 新北市 listed together, intact.
+    seat_surface = {
+        surface: county
+        for surface, per_county in candidates.items()
+        for county in per_county
+        if surface + "市" == county or surface + "縣" == county
+    }
+    print(f"county-seat surfaces: {sorted(seat_surface)}", flush=True)
 
     stats = Counter()
     base_rate: Counter[str] = Counter()
     surface_counties: dict[str, Counter[str]] = defaultdict(Counter)
     buffered: list[tuple[str, str, dict[str, str]]] = []
-    # (surface, following two characters) -> [appearances, appearances inside a
+    # (surface, next Han character) -> [appearances, appearances inside a
     # candidate county]. A surface-level verdict cannot separate 三重店 from
     # 三重防護; the collocation is the smallest unit that can.
+    #
+    # The key is one character, not a fixed-width window. A two-character window
+    # splits one street across 中正路1, 中正路7, 中正路二 and 中正路, which
+    # fragments the support the deterministic test needs. One character keeps
+    # 北區和緯 and 北區忠明 apart while collapsing the digit and punctuation
+    # variants of the same phrase.
     collocations: dict[tuple[str, str], list[int]] = defaultdict(lambda: [0, 0])
+    colloc_example: dict[tuple[str, str], str] = {}
 
     print("Scanning pre-cutoff postings…", flush=True)
     with (args.data_dir / "職缺.csv").open(encoding="utf-8-sig", newline="") as handle:
@@ -221,25 +266,50 @@ def main() -> None:
             title = normalize(row.get("職務名稱", ""))
             content = normalize(row.get("職務內容", ""))
             found: dict[str, str] = {}
-            contexts: set[tuple[str, str]] = set()
+            contexts: dict[tuple[str, str], str] = {}
             for field, text in (("title", title), ("content", content)):
                 if not text:
                     continue
-                for match in pattern.finditer(text):
-                    surface = match.group(0)
+                spans = [(m.start(), m.end(), m.group(0)) for m in pattern.finditer(text)]
+                qualifier = set()
+                for position in range(len(spans) - 1):
+                    _, a_end, a_surface = spans[position]
+                    b_start, _, b_surface = spans[position + 1]
+                    if a_end != b_start or seat_surface.get(a_surface) != county:
+                        continue
+                    if county in candidates[b_surface]:
+                        # 桃園 immediately before 大園 is qualifying the county.
+                        qualifier.add(position)
+                for position, (start, end, surface) in enumerate(spans):
+                    if position in qualifier:
+                        stats["match_rejected_county_qualifier"] += 1
+                        continue
+                    following = text[end : end + 1]
+                    if following and surface + following in counties:
+                        # 桃園市 names the county, not 桃園區, so a posting reading
+                        # 桃園市大園區 must not be tagged 桃園區. The county guard
+                        # cannot catch this, because 桃園市 does contain a 桃園區.
+                        # 彰化縣, 屏東縣, 苗栗縣, 南投縣, 台東縣, 花蓮縣 and 宜蘭縣
+                        # collide with their own seat the same way. The full-name
+                        # layer still matches 彰化市 directly, since the pattern
+                        # prefers the longer surface.
+                        stats["match_rejected_is_county_name"] += 1
+                        continue
                     # Title wins: it is the shorter, higher-signal field.
                     if surface not in found or field == "title":
                         found[surface] = field
-                    contexts.add((surface, text[match.end() : match.end() + 2]))
+                    key = following if HAN.match(following) else ""
+                    contexts.setdefault((surface, key), text[start : end + 8].strip())
             if not found:
                 continue
             for surface in found:
                 surface_counties[surface][county] += 1
-            for key in contexts:
+            for key, snippet in contexts.items():
                 inside = county in candidates[key[0]]
                 entry = collocations[key]
                 entry[0] += 1
                 entry[1] += int(inside)
+                colloc_example.setdefault(key, snippet)
             buffered.append((row["職缺編號"], county, found))
 
     total_eligible = sum(base_rate.values()) or 1
@@ -271,9 +341,7 @@ def main() -> None:
             "precision": round(precision, 4),
             "expected_share": round(expected, 4),
             "lift": round(lift, 3),
-            "kept_error_rate_upper_95": round(error_rate, 4)
-            if math.isfinite(error_rate)
-            else None,
+            "kept_error_rate_upper_95": bounded_error(error_rate),
             "accepted": accepted,
             # Mentions outside a candidate county are certainly not place
             # references, and a non-place word appears at roughly the same rate
@@ -337,6 +405,10 @@ def main() -> None:
             "that are not place references, applied to both layers",
             "max_error": args.max_error,
             "min_appearances": args.min_appearances,
+            "collocation_key": "the single Han character following the surface",
+            "label_place_max_error": args.label_place_max_error,
+            "label_not_place_min_error": args.label_not_place_min_error,
+            "label_min_postings": args.label_min_postings,
             "random_seed": 1111,
         },
         "stats": {
@@ -377,19 +449,27 @@ def main() -> None:
             if candidate_surface != surface or total < 5:
                 continue
             colloc_error = kept_error_rate(inside, total, expected)
+            # Only the two clean bands become labels. A collocation in between is
+            # exactly where the surface-level gate already fails: 北區和緯 lands
+            # at 12% error and is a real street in 台南市北區, so calling it a
+            # negative would penalise a model for answering correctly.
+            if total < args.label_min_postings:
+                verdict = None
+            elif colloc_error <= args.label_place_max_error:
+                verdict = "place"
+            elif colloc_error >= args.label_not_place_min_error:
+                verdict = "not_place"
+            else:
+                verdict = None
             entries.append(
                 {
                     "following": following,
+                    "example": colloc_example.get((surface, following), ""),
                     "postings": total,
                     "precision": round(inside / total, 4),
-                    "kept_error_rate_upper_95": round(colloc_error, 4)
-                    if math.isfinite(colloc_error)
-                    else None,
-                    "deterministic_verdict": (
-                        None
-                        if total < 30
-                        else ("place" if colloc_error <= args.max_error else "not_place")
-                    ),
+                    "kept_error_rate_upper_95": bounded_error(colloc_error),
+                    "label": verdict,
+                    "needs_semantic_judgement": verdict is None,
                 }
             )
         entries.sort(key=lambda entry: -entry["postings"])
@@ -409,10 +489,16 @@ def main() -> None:
                     )
                 },
                 "collocations_total": len(entries),
-                "collocations_labelled": sum(
-                    1 for entry in entries if entry["deterministic_verdict"] is not None
+                "collocations_labelled_place": sum(
+                    1 for entry in entries if entry["label"] == "place"
                 ),
-                "collocations": entries[:25],
+                "collocations_labelled_not_place": sum(
+                    1 for entry in entries if entry["label"] == "not_place"
+                ),
+                "collocations_needing_judgement": sum(
+                    1 for entry in entries if entry["needs_semantic_judgement"]
+                ),
+                "collocations": entries[:30],
             }
         )
 
@@ -438,6 +524,22 @@ def main() -> None:
         "suffix_dropped_rejected": [
             row for row in stripped_rows if not row["accepted"]
         ],
+        "occurrence_review_summary": {
+            "surfaces": len(review),
+            "estimated_wrong_keeps": sum(
+                row["estimated_false_keeps"] for row in review
+            ),
+            "collocations_total": sum(row["collocations_total"] for row in review),
+            "labelled_place": sum(row["collocations_labelled_place"] for row in review),
+            "labelled_not_place": sum(
+                row["collocations_labelled_not_place"] for row in review
+            ),
+            "needing_semantic_judgement": sum(
+                row["collocations_needing_judgement"] for row in review
+            ),
+            "note": "The labelled bands are a held-out set for measuring a model "
+            "before it is trusted on the rest. Nothing here has been sent to a model.",
+        },
         "full_name_rejected": sorted(
             (
                 row
