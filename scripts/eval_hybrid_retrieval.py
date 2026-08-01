@@ -321,7 +321,7 @@ def main() -> None:
             for metric in ["recall@200", "mrr", "hit@1", "hit@10"]
         },
         "embedding_model": "amazon.titan-embed-text-v2:0",
-        "fusion_method": "reciprocal_rank_fusion_k60",
+        "fusion_method": "bm25_first_knn_tail_expansion",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")

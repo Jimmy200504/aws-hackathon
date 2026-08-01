@@ -24,5 +24,5 @@
     "hit@10": 0.025
   },
   "embedding_model": "amazon.titan-embed-text-v2:0",
-  "fusion_method": "reciprocal_rank_fusion_k60"
+  "fusion_method": "bm25_first_knn_tail_expansion"
 }
