@@ -100,6 +100,10 @@ main { width: min(100%, 1540px); margin: auto; }
 .switch[aria-checked="true"] > em { color: var(--forest); }
 .switch:focus-visible { outline: 2px solid var(--forest); outline-offset: 2px; }
 .switch:disabled { cursor: not-allowed; opacity: .5; }
+/* A posting the geo graph substituted in from a neighbouring district. Marked so
+   an out-of-area result reads as deliberate rather than as a filter bug. */
+.job-card.geo-substituted { border-left: 2px solid var(--acid-dark); }
+.job-card.geo-substituted .job-subtitle { color: var(--forest); font-weight: 620; }
 .contract { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .contract code { font-size: 9px; color: var(--forest); background: var(--mint); border-radius: 7px; padding: 7px 9px; }
 .suggestions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 18px; }

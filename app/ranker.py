@@ -10,7 +10,7 @@ import threading
 import unicodedata
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping
 
 from app.job_fields import is_remote_job, parse_salary_intent
 from app.tree_ranker import PortableTreeRanker
@@ -24,6 +24,13 @@ _EN_TOKEN = re.compile(r"[a-z0-9][a-z0-9.+#/-]*")
 _SPACE = re.compile(r"\s+")
 _PUNCT = re.compile(r"[\s,，、/／|｜;；:：()（）\[\]【】{}「」『』·・_]+")
 LOGGER = logging.getLogger(__name__)
+
+# District annotations for the demo index, the join key `app/geo_graph.py` needs
+# to turn an expanded district back into postings. Built by
+# scripts/build_demo_job_districts.py; absent is a supported state.
+DEFAULT_JOB_DISTRICTS = (
+    Path(__file__).resolve().parents[1] / "artifacts" / "demo-job-districts.json"
+)
 
 # Same remote-work vocabulary used to derive `is_remote` at index time. A
 # query containing one of these terms expresses remote-work intent, mirrored
@@ -171,6 +178,7 @@ class SkillWeaveRanker:
         graph_novelty_threshold: float = 10.0,
         ltr_model_path: str | Path | None = None,
         candidate_retriever: Any = None,
+        job_districts_path: str | Path | None = None,
     ):
         self.artifact_path = Path(artifact_path)
         self.graph_novelty_threshold = max(0.1, float(graph_novelty_threshold))
@@ -179,6 +187,11 @@ class SkillWeaveRanker:
             PortableTreeRanker(ltr_model_path)
             if ltr_model_path is not None and Path(ltr_model_path).is_file()
             else None
+        )
+        self.job_districts_path = (
+            Path(job_districts_path)
+            if job_districts_path is not None
+            else DEFAULT_JOB_DISTRICTS
         )
         self._lock = threading.RLock()
         self._load()
@@ -191,6 +204,7 @@ class SkillWeaveRanker:
         self.locations: dict[str, list[str]] = artifact.get("locations", {})
         self.duties: dict[str, list[str]] = artifact.get("duties", {})
         self.skills: dict[str, dict[str, Any]] = artifact["skills"]
+        self._load_job_districts()
         self.behavior_graph: dict[str, Any] = artifact.get("behavior_graph", {})
         behavior_sources = [
             self.behavior_graph,
@@ -257,6 +271,55 @@ class SkillWeaveRanker:
             self._job_units.append(
                 lexical_units(" ".join([fields["title"], fields["category"], fields["industry"]]))
             )
+
+    def _load_job_districts(self) -> None:
+        """Job id -> district nodes, the join key the geo graph needs.
+
+        A job record carries `city`, which is a county, so an expanded district
+        had nothing to match against. `artifacts/demo-job-districts.json` supplies
+        the missing edge; see scripts/build_demo_job_districts.py for why it is a
+        side-car rather than a field on the index.
+
+        Absence is normal and not an error. Coverage is 4.8% of the demo index,
+        and a job without an annotation keeps exactly its previous behaviour, so
+        the expansion can only ever add candidates.
+        """
+        self.job_districts: dict[str, tuple[str, ...]] = {}
+        self.job_districts_metadata: dict[str, Any] = {}
+        try:
+            payload = json.loads(self.job_districts_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            LOGGER.warning(
+                "Job district side-car unavailable; geo expansion inert: %s",
+                type(exc).__name__,
+            )
+            return
+        index_version = payload.get("index_version")
+        if index_version and index_version != self.metadata.get("index_version"):
+            # Districts keyed by another index's job ids would silently annotate
+            # the wrong postings, which is worse than annotating none.
+            LOGGER.warning(
+                "Job district side-car built for index %s, loaded against %s; ignored",
+                index_version,
+                self.metadata.get("index_version"),
+            )
+            return
+        self.job_districts = {
+            str(job_id): tuple(nodes)
+            for job_id, nodes in (payload.get("jobs") or {}).items()
+            if nodes
+        }
+        self.job_districts_metadata = {
+            key: payload.get(key)
+            for key in (
+                "schema",
+                "dataset_version",
+                "graph_cutoff",
+                "index_version",
+                "schema_fingerprint",
+                "counts",
+            )
+        }
 
     def reload(self) -> None:
         with self._lock:
@@ -358,6 +421,26 @@ class SkillWeaveRanker:
             for name in lookup.get(code, []):
                 names.add(normalize(name))
         return names
+
+    def _geo_share(
+        self, job: dict[str, Any], geo_substitutability: Mapping[str, float] | None
+    ) -> float:
+        """Best substitutability among the districts this posting sits in.
+
+        A posting naming two districts takes the higher of the two: it is one
+        posting, and being reachable by a shorter route through either is what a
+        searcher experiences. 13% of annotated demo postings are in this case.
+        """
+        if not geo_substitutability:
+            return 0.0
+        nodes = self.job_districts.get(str(job.get("id", "")))
+        if not nodes:
+            return 0.0
+        return max((float(geo_substitutability.get(node, 0.0)) for node in nodes), default=0.0)
+
+    def job_district_nodes(self, job_id: str) -> tuple[str, ...]:
+        """Districts a posting sits in, for explaining an expanded candidate."""
+        return self.job_districts.get(str(job_id), ())
 
     def county_hints(self, intent: QueryIntent) -> tuple[str, ...]:
         """County names this request has already committed to.
@@ -576,6 +659,7 @@ class SkillWeaveRanker:
         include_graph: bool,
         behavior_snapshot_day: str | None = None,
         external_relations: dict[str, dict[str, dict[str, Any]]] | None = None,
+        geo_substitutability: Mapping[str, float] | None = None,
     ) -> tuple[float, dict[str, float], list[dict[str, Any]], list[str]]:
         job = self.jobs[index]
         fields = self._job_norm[index]
@@ -588,6 +672,7 @@ class SkillWeaveRanker:
             include_graph,
             behavior_snapshot_day,
             external_relations,
+            geo_substitutability=geo_substitutability,
         )
 
     def _score_job(
@@ -599,6 +684,7 @@ class SkillWeaveRanker:
         include_graph: bool,
         behavior_snapshot_day: str | None = None,
         external_relations: dict[str, dict[str, dict[str, Any]]] | None = None,
+        geo_substitutability: Mapping[str, float] | None = None,
     ) -> tuple[float, dict[str, float], list[dict[str, Any]], list[str]]:
         q = intent.normalized
 
@@ -628,13 +714,24 @@ class SkillWeaveRanker:
         wanted_locations = set(intent.inferred_locations) or self._filter_names(
             intent.location_codes, self.locations
         )
+        # How substitutable this posting's district is for the one searched, per
+        # `app/geo_graph.py`. 1.0 means the posting is in the searched district
+        # itself; 0.0 means the graph has nothing to say, which is the case for
+        # the 95% of demo postings with no district annotation.
+        geo_share = self._geo_share(job, geo_substitutability)
         location_match = 0.0
         if wanted_locations:
-            location_match = (
-                1.0
-                if any(name in fields["city"] for name in wanted_locations)
-                else -1.0
-            )
+            if any(name in fields["city"] for name in wanted_locations):
+                location_match = 1.0
+            elif geo_share > 0.0:
+                # A different county, but searchers demonstrably treat the two
+                # districts as interchangeable, so the out-of-area penalty is
+                # withheld. Neutral rather than positive: the penalty is what was
+                # keeping 龜山區 out of a 林口區 search, and lifting it is enough.
+                # Rewarding it instead would require a magnitude nothing measures.
+                location_match = 0.0
+            else:
+                location_match = -1.0
 
         wanted_duties = self._filter_names(intent.duty_codes, self.duties)
         duty_match = 0.0
@@ -813,6 +910,12 @@ class SkillWeaveRanker:
             ),
             "intent_location_inferred": float(bool(intent.inferred_locations)),
             "intent_confidence": round(intent.inferred_confidence, 4),
+            # Unweighted, for the same reason as the intent_* family above: the
+            # only thing the geo graph does to the score is withhold the
+            # out-of-area penalty, and pricing substitutability on top of that
+            # would be a guessed constant. Recorded so a future model can learn
+            # it and so every expanded candidate is auditable.
+            "geo_substitutability": round(geo_share, 5),
             "is_remote": float(job.get("is_remote", False)),
             "salary_min": float(job.get("salary_min", 0.0) or 0.0),
             "salary_max": float(job.get("salary_max", 0.0) or 0.0),
@@ -1030,7 +1133,16 @@ class SkillWeaveRanker:
         resolved_skill_ids: Iterable[str] | None = None,
         external_relations: dict[str, dict[str, dict[str, Any]]] | None = None,
         structured_intent: Any = None,
+        geo_substitutability: Mapping[str, float] | None = None,
     ) -> dict[str, Any]:
+        """Rank jobs for one query.
+
+        `geo_substitutability` maps a district node to how interchangeable it is
+        with the district the searcher named, from `app/geo_graph.py`. Supplying
+        it withholds the out-of-area penalty from those districts, which is what
+        lets a cross-county substitute survive candidate selection. Omitting it
+        reproduces the behaviour from before the geo graph was wired in.
+        """
         intent = self.parse_intent(
             query,
             location_code,
@@ -1057,6 +1169,7 @@ class SkillWeaveRanker:
             candidate_source,
             degraded_components,
             retrieval_mode,
+            geo_applied,
         ) = self._collect_stage_one(
             intent,
             structured_intent=structured_intent,
@@ -1064,6 +1177,7 @@ class SkillWeaveRanker:
             include_graph=include_graph,
             candidate_ids=candidate_ids,
             external_relations=external_relations,
+            geo_substitutability=geo_substitutability,
         )
         # Attribute and brand queries (現領, 萊爾富) name nothing that occurs in
         # job text, so the first pass comes back thin. Retry with the taxonomy
@@ -1078,16 +1192,22 @@ class SkillWeaveRanker:
                 normalized_query=expansion,
                 structured_intent=structured_intent,
             )
-            rescue, rescue_source, rescue_degraded, rescue_mode = (
-                self._collect_stage_one(
-                    rescue_intent,
-                    structured_intent=structured_intent,
-                    limit=limit,
-                    include_graph=include_graph,
-                    candidate_ids=candidate_ids,
-                    external_relations=external_relations,
-                )
+            (
+                rescue,
+                rescue_source,
+                rescue_degraded,
+                rescue_mode,
+                rescue_geo_applied,
+            ) = self._collect_stage_one(
+                rescue_intent,
+                structured_intent=structured_intent,
+                limit=limit,
+                include_graph=include_graph,
+                candidate_ids=candidate_ids,
+                external_relations=external_relations,
+                geo_substitutability=geo_substitutability,
             )
+            geo_applied = geo_applied or rescue_geo_applied
             seen = {item[1] for item in stage_one}
             stage_one = stage_one + [item for item in rescue if item[1] not in seen]
             candidate_source = f"{rescue_source}+taxonomy_expansion"
@@ -1100,7 +1220,12 @@ class SkillWeaveRanker:
                 retrieval_mode = "bm25_only"
         ranked = self._rerank(stage_one, limit=limit, include_graph=include_graph)
         return self._assemble(
-            intent, ranked, candidate_source, degraded_components, retrieval_mode
+            intent,
+            ranked,
+            candidate_source,
+            degraded_components,
+            retrieval_mode,
+            geo_applied=geo_applied,
         )
 
     def _collect_stage_one(
@@ -1112,7 +1237,8 @@ class SkillWeaveRanker:
         include_graph: bool,
         candidate_ids: set[str] | None,
         external_relations: dict[str, dict[str, dict[str, Any]]] | None,
-    ) -> tuple[list[Any], str, list[str], str]:
+        geo_substitutability: Mapping[str, float] | None = None,
+    ) -> tuple[list[Any], str, list[str], str, bool]:
         degraded_components: list[str] = []
         retrieval_mode = "embedded_index"
         external_candidates: list[dict[str, Any]] | None = None
@@ -1179,6 +1305,7 @@ class SkillWeaveRanker:
                 score, features, traces, direct = self._score_job(
                     job, fields, job_units, intent, include_graph,
                     external_relations=external_relations,
+                    geo_substitutability=geo_substitutability,
                 )
                 has_direct_candidate_evidence = bool(
                     set(intent.skills) & set(job.get("skills", []))
@@ -1216,6 +1343,7 @@ class SkillWeaveRanker:
                     score, features, traces, direct = self._score(
                         index, intent, include_graph,
                         external_relations=external_relations,
+                        geo_substitutability=geo_substitutability,
                     )
                     # A graph neighbor is a feature, not sufficient candidate evidence.
                     # Require lexical overlap, an exact canonical skill match, or a
@@ -1238,7 +1366,24 @@ class SkillWeaveRanker:
                     elif item[:2] > heap[0][:2]:
                         heapq.heapreplace(heap, item)
             stage_one = sorted(heap, key=lambda item: (-item[0], item[1]))
-        return stage_one, candidate_source, degraded_components, retrieval_mode
+        # Whether the expansion could act at all, which is not the same as having
+        # been supplied. District annotations cover the demo index only, so on the
+        # OpenSearch branch every posting looks unannotated and the expansion is
+        # inert. Reporting that lets `meta.geo_trace` avoid claiming an effect the
+        # deployed index cannot yet have; see docs/geo-graph.md for the mapping
+        # change and reindex that path needs.
+        geo_applied = (
+            bool(geo_substitutability)
+            and bool(self.job_districts)
+            and external_candidates is None
+        )
+        return (
+            stage_one,
+            candidate_source,
+            degraded_components,
+            retrieval_mode,
+            geo_applied,
+        )
 
     def _assemble(
         self,
@@ -1247,14 +1392,31 @@ class SkillWeaveRanker:
         candidate_source: str,
         degraded_components: list[str],
         retrieval_mode: str = "embedded_index",
+        geo_applied: bool = False,
     ) -> dict[str, Any]:
         results: list[dict[str, Any]] = []
+        geo_expanded = 0
         for rank, (score, _, job, features, traces, direct) in enumerate(ranked, 1):
             matched_labels = [
                 self.skills[skill_id].get("label", skill_id)
                 for skill_id in direct
                 if skill_id in self.skills
             ]
+            # A posting the searcher would not have seen without the expansion:
+            # the graph vouches for its district and the location feature is not
+            # a positive, i.e. it is outside the area the request asked for.
+            geo_share = features.get("geo_substitutability", 0.0)
+            substituted = geo_share > 0.0 and features["location"] <= 0.0
+            geo_expanded += int(substituted)
+            geo_row = (
+                {
+                    "districts": list(self.job_district_nodes(job["id"])),
+                    "substitutability": round(geo_share, 5),
+                    "substituted_for_searched_area": substituted,
+                }
+                if geo_share > 0.0
+                else None
+            )
             results.append(
                 {
                     "job_id": job["id"],
@@ -1270,10 +1432,13 @@ class SkillWeaveRanker:
                     "category": (job.get("categories") or [""])[-1],
                     "industry": job.get("industry", ""),
                     "matched_skills": matched_labels,
-                    "why": self._explanation(features, matched_labels, job),
+                    "why": self._explanation(
+                        features, matched_labels, job, geo=geo_row
+                    ),
                     "features": features,
                     "graph_trace": traces,
                     "graph_eligible": bool(job.get("graph_eligible", False)),
+                    **({"geo": geo_row} if geo_row is not None else {}),
                 }
             )
         return {
@@ -1282,11 +1447,16 @@ class SkillWeaveRanker:
             "candidate_source": candidate_source,
             "degraded_components": degraded_components,
             "retrieval_mode": retrieval_mode,
+            "geo_applied": geo_applied,
+            "geo_expanded_results": geo_expanded,
         }
 
     @staticmethod
     def _explanation(
-        features: dict[str, float], matched_skills: list[str], job: dict[str, Any]
+        features: dict[str, float],
+        matched_skills: list[str],
+        job: dict[str, Any],
+        geo: dict[str, Any] | None = None,
     ) -> str:
         evidence: list[str] = []
         if features["lexical"] >= 8:
@@ -1299,6 +1469,15 @@ class SkillWeaveRanker:
             evidence.append("技能圖譜一跳關聯命中")
         if features["location"] > 0:
             evidence.append("地區條件吻合")
+        elif geo is not None and geo["substituted_for_searched_area"]:
+            # Placed here rather than appended at the end because `evidence` is
+            # truncated to three items: the reason a posting outside the searched
+            # area is on the page at all must not be the line that gets cut.
+            district = (geo["districts"] or [""])[0].split("/")[-1]
+            evidence.append(
+                f"鄰近行政區{district}（求職者共同勾選的可替代度 "
+                f"{geo['substitutability']:.0%}）"
+            )
         if features["duty"] > 0:
             evidence.append("職務分類吻合")
         if features["remote"] > 0:

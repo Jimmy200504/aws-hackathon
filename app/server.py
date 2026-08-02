@@ -145,6 +145,27 @@ class Handler(BaseHTTPRequestHandler):
             if not isinstance(include_geo, bool):
                 raise ValueError("use_geo_graph must be boolean")
             normalization = self.query_normalizer.normalize(query)
+            # Same order as the Lambda path: read the geography before ranking so
+            # candidate selection can use it, and reuse that one reading for the
+            # trace rather than recomputing it.
+            geo = (
+                self.geo_graph.for_request(
+                    location,
+                    self.ranker.locations,
+                    query=query,
+                    counties=self.ranker.county_hints(
+                        self.ranker.parse_intent(
+                            query,
+                            location,
+                            duty,
+                            normalized_query=normalization.query,
+                            structured_intent=normalization.intent,
+                        )
+                    ),
+                )
+                if include_geo
+                else None
+            )
             result = self.ranker.search(
                 query=query,
                 location_code=location,
@@ -153,6 +174,7 @@ class Handler(BaseHTTPRequestHandler):
                 include_graph=include_graph,
                 normalized_query=normalization.query,
                 structured_intent=normalization.intent,
+                geo_substitutability=geo.substitutability if geo else None,
             )
             request_id = "req_" + uuid.uuid4().hex[:16]
             elapsed_ms = round((time.perf_counter() - started) * 1000, 2)
@@ -188,16 +210,16 @@ class Handler(BaseHTTPRequestHandler):
                 include_geo and self.geo_graph.enabled
             )
             geo_trace = (
-                self.geo_graph.trace(
-                    location,
-                    self.ranker.locations,
-                    query=query,
-                    counties=self.ranker.county_hints(result["intent"]),
+                self.geo_graph.trace_payload(
+                    geo, applied_to_ranking=result["geo_applied"]
                 )
-                if include_geo
+                if geo is not None
                 else None
             )
             if geo_trace is not None:
+                geo_trace["results_from_expanded_districts"] = result[
+                    "geo_expanded_results"
+                ]
                 response["meta"]["geo_trace"] = geo_trace
             if path == "/api/v1/graph/trace":
                 response["trace"] = [

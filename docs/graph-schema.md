@@ -534,7 +534,10 @@ L5 別名要進圖必須通過縣市集中度 ≥ 0.60（`reports/region-alias-c
          "implied_substitutability": 0.25, "behaviour_substitutability": 0.23639,
          "co_selected": 6210}
       ],
-      "applied_to_ranking": false
+      "applied_to_ranking": true,
+      "ranking_effect": "the out-of-area penalty is withheld from districts listed above; no positive weight is added, and substitutability is carried as an unweighted feature",
+      "offline_lift_measured": false,
+      "results_from_expanded_districts": 1
     }
   }
 }
@@ -611,20 +614,50 @@ hard|cross_county      0.00121        impassable             （無行為邊，�
 
 實際加入 83 條邊（4,857 → 4,940）。`include_authored=False` 回到 4,857，完全可消融。
 
+### 候選擴充：這個子圖與 Region 子圖在這裡分岔
+
+**`applied_to_ranking` 在區級不再恆為 `false`。** Region 子圖仍然只是證據；行政區層已接到候選選取。
+
+`GeoExpansion.substitutability`（節點 → 可替代度，被搜尋的區為 1.0）交給 `app/ranker.py`，
+對圖背書的行政區**免除跨區扣分**（`location` 由 `-16.0` 變為 `0.0`）。
+這改變候選集，所以 `meta.geo_trace.applied_to_ranking` 在排序器確實收到擴充時回報 `true`，
+並以 `ranking_effect` 明確描述做了什麼。
+
+**只免除扣分，不加分。** 同區職缺 `location = 2.8`，鄰區職缺 `location = 0.0`，無關區域 `-16.0`，
+因此同區永遠排在鄰區前面。可替代度本身以 `geo_substitutability` 記錄但**權重為零**，
+與 `intent_*` 家族同樣的理由：那個量級沒有任何東西量過。
+這樣做也讓 `location` 停留在 LambdaMART 訓練時見過的取值集合內，不需要重訓。
+
+**這是 recall 改動，沒有離線 lift 數字，也不會有。** 離線 benchmark 是重排評測，
+候選集已由現行系統按縣市預先過濾，84.3% 的 case 候選只落在 ≤1 個縣市
+（見上一節與 [`docs/evaluation-limits.md`](evaluation-limits.md)），表達不出跨區替代。
+`offline_lift_measured` 恆為 `false`，是為了讓這件事無法被讀成量過。
+
+效果只出現在 recall 原本就是瓶頸的地方。可示範的案例：搜「林口區 作業員」。
+林口區最近的替代區是**桃園市/龜山區**（可替代度 0.198），跨縣市，
+所以新北市的縣市過濾在結構上讓它永遠不可見 —— demo index 裡有 7 筆龜山區作業員職缺，
+其中一筆標題就是「【林口半導體廠】-作業員」。
+
 ### 已知限制
 
-**`applied_to_ranking` 恆為 `false`，理由與 Region 子圖完全相同，而且在區級更嚴重。**
-
-離線 benchmark 是重排評測，候選集已由現行系統按縣市預先過濾，84.3% 的 case 候選只落在 ≤1 個縣市
-（見上一節與 [`docs/evaluation-limits.md`](evaluation-limits.md)）。縣市內都沒有變異，區級只會更少。
-把區級距離做成 LTR 特徵，在候選組內取值恆定，決策樹無法用它分裂 —— 效果不是小，是數學上為零。
-
-另外職缺側只有 27.79% 解析得到行政區，其餘 72% 只能退到縣市。那個缺值不是隨機的：
-JD 寫地址的（門市、工廠、物流）與不寫的（辦公室、業務）系統性不同。
-這是不把區級距離送進 LTR 的第二個理由 —— 進去就必須先處理「缺值 ≠ 距離遠」的語意，
+**職缺側行政區覆蓋率是硬上限。** 全量 27.79%，demo index 只有 4.78%（574／12,000）。
+未標註的職缺 `geo_substitutability = 0`，行為與接線前完全相同，所以擴充只會加候選、不會減。
+那個缺值不是隨機的：JD 寫地址的（門市、工廠、物流）與不寫的（辦公室、業務）系統性不同。
+這也是可替代度不進 LTR 加權的第二個理由 —— 進去就必須先處理「缺值 ≠ 距離遠」的語意，
 而那個處理無法在這個 benchmark 上被驗證。
 
-因此這個子圖與 Region 子圖一樣不進 release gate，作用位置在檢索擴充與可解釋性展示。
+**OpenSearch 路徑目前接不上。** join key 來自 `artifacts/demo-job-districts.json`，只覆蓋 demo index。
+線上索引沒有 district 欄位（`scripts/index_full_opensearch.py` 的 `mapping()` 是 `"dynamic": False`，
+未宣告的欄位會被靜默丟棄），所以走 OpenSearch 時擴充是惰性的。
+排序器據此回報 `geo_applied: false`，`meta.geo_trace.applied_to_ranking` 也跟著是 `false` ——
+沒有 mapping 與重建索引之前，不會宣稱線上有這個效果。
+
+**同縣市但很遠的職缺仍然贏過鄰近的跨縣市職缺。** 新北市瑞芳區離林口區 60 公里，
+`location = 2.8`；桃園市龜山區緊鄰林口，`location = 0.0`。圖看得見這個矛盾，
+但修它需要對「同縣市但無可替代度」的職缺扣分，那會改動每一個沒指定行政區的查詢，
+而且需要 95% 的職缺都有行政區標註 —— 兩個條件目前都不成立。
+
+這個子圖仍然不進 release gate。
 
 ## Neptune query sketch
 

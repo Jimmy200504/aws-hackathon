@@ -16,6 +16,7 @@ from app.geo_graph import (
     get_expanded_locations,
 )
 from app.lambda_handler import handler
+from app.ranker import SkillWeaveRanker
 
 ROOT = Path(__file__).resolve().parents[1]
 ARTIFACT = ROOT / "artifacts" / "district-graph.json"
@@ -23,6 +24,7 @@ AUTHORED = ROOT / "config" / "geo-authored.json"
 L5_SOURCE = ROOT / "config" / "geo-l5-table.json"
 L5_PUBLISHED = ROOT / "config" / "geo-l5-published.json"
 L4_TABLE = ROOT / "config" / "geo-l4-districts.json"
+SIDE_CAR = ROOT / "artifacts" / "demo-job-districts.json"
 
 # 甲市 has a strong neighbour (乙區), a weak one (丙區), and one reachable only
 # by going through 乙區. 丁區 sits in another county so cross-county traversal
@@ -279,10 +281,29 @@ class ResolutionTests(unittest.TestCase):
         self.assertFalse(graph.enabled)
         self.assertIsNone(graph.trace(["100226"]))
 
-    def test_trace_never_claims_a_ranking_effect(self) -> None:
+    def test_a_bare_graph_call_claims_no_ranking_effect(self) -> None:
+        # The graph on its own cannot know whether a ranker was handed the
+        # expansion, so it must not assume one was. Only the caller that passed it
+        # to candidate selection may say so.
         trace = fixture_graph().trace(["900101"])
         self.assertIsNotNone(trace)
         self.assertIs(trace["applied_to_ranking"], False)
+        self.assertIn("evidence only", trace["ranking_effect"])
+
+    def test_a_ranking_effect_is_only_claimed_when_a_district_resolved(self) -> None:
+        graph = fixture_graph()
+        applied = graph.trace(["900101"], applied_to_ranking=True)
+        self.assertIs(applied["applied_to_ranking"], True)
+        self.assertIn("penalty is withheld", applied["ranking_effect"])
+        # A code that names no district expands nothing, so there is nothing for
+        # candidate selection to have applied.
+        self.assertIsNone(graph.trace(["999999"], applied_to_ranking=True))
+
+    def test_no_offline_lift_is_claimed_for_the_expansion(self) -> None:
+        # The benchmark reranks candidate sets that are already county-filtered,
+        # so it cannot measure a cross-district substitution either way.
+        trace = fixture_graph().trace(["900101"], applied_to_ranking=True)
+        self.assertIs(trace["offline_lift_measured"], False)
 
 
 class GeoArtifactTests(unittest.TestCase):
@@ -640,26 +661,35 @@ class GeoTraceContractTests(unittest.TestCase):
             {"query": "作業員", "location_code": ["100226"]}
         )["meta"]["geo_trace"]
         self.assertEqual(trace["searched_districts"], ["新北市/八里區"])
-        self.assertIs(trace["applied_to_ranking"], False)
         self.assertTrue(trace["expansions"])
         for expansion in trace["expansions"]:
             self.assertTrue(expansion["explanation"])
             self.assertTrue(set(expansion["provenance"]) <= {"behaviour", "authored", "external"})
 
-    def test_ranking_is_unchanged_by_the_geo_trace(self) -> None:
+    def test_the_served_trace_reports_that_candidate_selection_used_it(self) -> None:
         if not lambda_handler.GEO_GRAPH.enabled:
             self.skipTest("district graph artifact not available")
-        body = {"query": "作業員", "location_code": ["100226"], "top_k": 10}
-        with_graph = self.search(body)
-        self.assertIn("geo_trace", with_graph["meta"])
-        disabled = GeoGraph(ROOT / "artifacts" / "definitely-absent.json")
-        with patch.object(lambda_handler, "GEO_GRAPH", disabled):
-            without_graph = self.search(body)
-        self.assertNotIn("geo_trace", without_graph["meta"])
-        self.assertEqual(
-            [row["job_id"] for row in with_graph["result"]],
-            [row["job_id"] for row in without_graph["result"]],
-        )
+        if not lambda_handler.RANKER.job_districts:
+            self.skipTest("job district side-car not available")
+        trace = self.search({"query": "作業員", "location_code": ["100226"]})["meta"][
+            "geo_trace"
+        ]
+        self.assertIs(trace["applied_to_ranking"], True)
+        self.assertIn("results_from_expanded_districts", trace)
+
+    def test_the_trace_reports_no_effect_when_the_side_car_is_absent(self) -> None:
+        """Without the join key the expansion cannot act, and must not claim to.
+
+        This is the deployed OpenSearch path's situation as well: the live index
+        has no district field, so an expansion there is inert until it is
+        reindexed. Reporting it as applied would overstate what shipped.
+        """
+        if not lambda_handler.GEO_GRAPH.enabled:
+            self.skipTest("district graph artifact not available")
+        with patch.dict(lambda_handler.RANKER.job_districts, {}, clear=True):
+            body = self.search({"query": "作業員", "location_code": ["100226"]})
+        self.assertIs(body["meta"]["geo_trace"]["applied_to_ranking"], False)
+        self.assertEqual(body["meta"]["geo_trace"]["results_from_expanded_districts"], 0)
 
 
 class SpecInterfaceTests(unittest.TestCase):
@@ -856,6 +886,7 @@ class QueryTextArtifactTests(unittest.TestCase):
         self.assertEqual(trace["resolved_from"]["filter_codes"], [])
         nearest = trace["expansions"][0]
         self.assertEqual(nearest["district"], "新北市/淡水區")
+        # A direct graph call, so no ranker was involved to apply it.
         self.assertIs(trace["applied_to_ranking"], False)
 
 
@@ -886,19 +917,64 @@ class GeoSwitchContractTests(unittest.TestCase):
         self.assertIs(meta["geo_graph_enabled"], False)
         self.assertNotIn("geo_trace", meta)
 
-    def test_the_switch_does_not_move_the_ranking(self) -> None:
-        """The whole claim the switch demonstrates, pinned.
+    def test_the_switch_admits_a_cross_county_substitute(self) -> None:
+        """The demonstrable case, pinned end to end.
 
-        geo_trace is evidence, not a score, so the two states have to return the
-        same jobs in the same order. If this ever fails, `applied_to_ranking:
-        false` has become a false statement.
+        林口區's cheapest substitute is 龜山區, which is in 桃園市, so a 新北市
+        county filter excludes it by construction. The demo index holds 作業員
+        postings there, one of them titled 【林口半導體廠】. With the switch off
+        they are unreachable; with it on they are candidates.
+
+        This is the test that used to assert the opposite. It was correct while
+        the graph was evidence only, and keeping it would now be pinning a claim
+        the code no longer honours.
         """
         if not lambda_handler.GEO_GRAPH.enabled:
             self.skipTest("district graph artifact not available")
-        base = {"query": "八里區 銀行辦事員", "top_k": 10}
+        if not lambda_handler.RANKER.job_districts:
+            self.skipTest("job district side-car not available")
+        base = {"query": "林口區 作業員", "top_k": 10}
         on = self.search(base)
         off = self.search({**base, "use_geo_graph": False})
-        self.assertIn("geo_trace", on["meta"])
+        admitted = {row["job_id"] for row in on["result"]} - {
+            row["job_id"] for row in off["result"]
+        }
+        self.assertTrue(admitted, "expansion admitted no posting")
+        self.assertEqual(on["meta"]["geo_trace"]["results_from_expanded_districts"], len(admitted))
+        rows = {row["job_id"]: row for row in on["result"]}
+        for job_id in admitted:
+            row = rows[job_id]
+            # Admitted because the graph vouched for its district, and the
+            # response says so per row rather than leaving it to be inferred.
+            self.assertTrue(row["geo"]["substituted_for_searched_area"])
+            self.assertGreater(row["geo"]["substitutability"], 0.0)
+            self.assertNotEqual(row["city"], "新北市")
+            self.assertIn("鄰近行政區", row["why"])
+
+    def test_the_expansion_never_outranks_the_area_that_was_asked_for(self) -> None:
+        """A substitute is admitted, not promoted.
+
+        The location feature stays in the value set the ranking model was trained
+        on: positive for the requested area, neutral for a vouched substitute,
+        negative otherwise. Giving a substitute a positive weight would mean
+        inventing a magnitude and feeding the model a value it never saw.
+        """
+        if not lambda_handler.GEO_GRAPH.enabled or not lambda_handler.RANKER.job_districts:
+            self.skipTest("geo artifacts not available")
+        rows = self.search({"query": "林口區 作業員", "top_k": 10})["result"]
+        for row in rows:
+            geo = row.get("geo")
+            if geo and geo["substituted_for_searched_area"]:
+                self.assertEqual(row["features"]["location"], 0.0)
+            elif row["city"] == "新北市":
+                self.assertGreater(row["features"]["location"], 0.0)
+
+    def test_a_query_naming_no_district_is_untouched(self) -> None:
+        """No district resolved means no expansion, so nothing may change."""
+        base = {"query": "作業員", "top_k": 10}
+        on = self.search(base)
+        off = self.search({**base, "use_geo_graph": False})
+        self.assertNotIn("geo_trace", on["meta"])
         self.assertEqual(
             [(row["job_id"], row["rank"], row["score"]) for row in on["result"]],
             [(row["job_id"], row["rank"], row["score"]) for row in off["result"]],
@@ -946,7 +1022,10 @@ class QueryTextContractTests(unittest.TestCase):
         self.assertIn("empStr", body)
         trace = body["meta"]["geo_trace"]
         self.assertEqual(trace["resolved_from"]["query_text"], ["新北市/八里區"])
-        self.assertIs(trace["applied_to_ranking"], False)
+        # The official contract fields are untouched by the expansion; only the
+        # candidate set and this additive key change.
+        self.assertEqual([row["rank"] for row in body["result"]], [1, 2, 3, 4, 5])
+        self.assertIs(trace["offline_lift_measured"], False)
 
     def test_an_ambiguous_typed_name_expands_nothing_but_says_why(self) -> None:
         if not lambda_handler.GEO_GRAPH.enabled:
@@ -998,6 +1077,163 @@ class QueryTextContractTests(unittest.TestCase):
             [row["job_id"] for row in with_graph["result"]],
             [row["job_id"] for row in without_graph["result"]],
         )
+
+
+class GeoExpansionTests(unittest.TestCase):
+    """The object candidate selection and the trace both read."""
+
+    def test_a_named_district_scores_one_and_a_reached_one_scores_its_route(self) -> None:
+        expansion = fixture_graph().for_request(["900101"])
+        weights = expansion.substitutability
+        self.assertEqual(weights["甲市/一區"], 1.0)
+        reached = {r.district: r.substitutability for r in expansion.reaches}
+        self.assertTrue(reached)
+        for node, share in reached.items():
+            self.assertAlmostEqual(weights[node], share)
+            self.assertGreater(share, 0.0)
+            self.assertLessEqual(share, 1.0)
+
+    def test_only_vouched_districts_appear_so_it_cannot_read_as_a_county(self) -> None:
+        graph = fixture_graph()
+        expansion = graph.for_request(["900101"])
+        self.assertTrue(set(expansion.substitutability) <= set(graph.districts))
+        # 戊區 is reachable only through 乙區; whatever the budget admits, nothing
+        # outside the graph's own nodes may be listed as substitutable.
+        for node in expansion.substitutability:
+            self.assertIn("/", node)
+
+    def test_a_district_named_outright_is_not_downgraded_by_also_being_reachable(
+        self,
+    ) -> None:
+        expansion = fixture_graph().for_request(["900101", "900102"])
+        self.assertEqual(expansion.substitutability["甲市/乙區"], 1.0)
+
+    def test_counties_span_the_whole_expansion_so_a_filter_can_be_widened(self) -> None:
+        expansion = fixture_graph().for_request(["900101"])
+        self.assertIn("甲市", expansion.counties)
+        for county in expansion.counties:
+            self.assertNotIn("/", county)
+
+    def test_an_empty_expansion_is_falsey_and_renders_no_payload(self) -> None:
+        graph = fixture_graph()
+        empty = graph.for_request(["999999"])
+        self.assertFalse(empty)
+        self.assertEqual(empty.substitutability, {})
+        self.assertIsNone(graph.trace_payload(empty, applied_to_ranking=True))
+
+    def test_the_trace_describes_the_same_expansion_the_ranker_was_given(self) -> None:
+        # One computation, two consumers. If these could diverge the panel would
+        # be describing districts candidate selection never saw.
+        graph = fixture_graph()
+        expansion = graph.for_request(["900101"])
+        payload = graph.trace_payload(expansion)
+        self.assertEqual(
+            [item["district"] for item in payload["expansions"]],
+            [reach.district for reach in expansion.reaches],
+        )
+        self.assertEqual(payload["searched_districts"], list(expansion.searched))
+
+
+class JobDistrictSideCarTests(unittest.TestCase):
+    """artifacts/demo-job-districts.json, the join key from a district to a job."""
+
+    def setUp(self) -> None:
+        if not SIDE_CAR.is_file():
+            self.skipTest("demo job district side-car not present")
+        self.payload = json.loads(SIDE_CAR.read_text(encoding="utf-8"))
+
+    def test_the_artifact_records_its_provenance(self) -> None:
+        self.assertEqual(self.payload["schema"], "skillweave-demo-job-districts-v1")
+        for key in (
+            "dataset_version",
+            "graph_cutoff",
+            "index_version",
+            "schema_fingerprint",
+            "random_seed",
+        ):
+            self.assertIsNotNone(self.payload.get(key), key)
+
+    def test_it_is_keyed_to_the_demo_index_it_was_built_from(self) -> None:
+        # District annotations keyed by another index's job ids would annotate the
+        # wrong postings, which is worse than annotating none.
+        if not ARTIFACT.is_file():
+            self.skipTest("geo artifacts not present")
+        demo = json.loads(
+            (ROOT / "artifacts" / "demo-index.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(self.payload["index_version"], demo["metadata"]["index_version"])
+        demo_ids = {str(job["id"]) for job in demo["jobs"]}
+        self.assertTrue(set(self.payload["jobs"]) <= demo_ids)
+
+    def test_every_annotated_district_exists_in_the_graph(self) -> None:
+        if not ARTIFACT.is_file():
+            self.skipTest("geo artifacts not present")
+        graph = build_geo_graph(ARTIFACT, AUTHORED)
+        for job_id, nodes in self.payload["jobs"].items():
+            self.assertTrue(nodes, job_id)
+            for node in nodes:
+                # An annotation the graph cannot reach is dead weight that would
+                # silently never match an expansion.
+                self.assertIn(node, graph.districts, node)
+
+    def test_the_thin_demo_coverage_is_stated_next_to_the_full_corpus_figure(self) -> None:
+        counts = self.payload["counts"]
+        self.assertLess(counts["coverage"], 0.10)
+        # Recorded so 4.8% on the demo index is not mistaken for the extractor's
+        # 27.8% of the eligible corpus.
+        self.assertGreater(counts["source_coverage_of_eligible"], counts["coverage"])
+
+    def test_it_is_byte_identical_to_a_rebuild_from_its_inputs(self) -> None:
+        source = ROOT / "artifacts" / "job-districts.json"
+        if not source.is_file():
+            self.skipTest("artifacts/job-districts.json is gitignored and absent")
+        from scripts.build_demo_job_districts import build, serialise
+
+        rebuilt = serialise(build(ROOT / "artifacts" / "demo-index.json", source))
+        self.assertEqual(SIDE_CAR.read_text(encoding="utf-8"), rebuilt)
+
+
+class GeoShareTests(unittest.TestCase):
+    """How a posting's districts turn into one substitutability number."""
+
+    def setUp(self) -> None:
+        self.ranker = lambda_handler.RANKER
+        if not self.ranker.job_districts:
+            self.skipTest("job district side-car not available")
+
+    def test_a_posting_in_two_districts_takes_the_better_route(self) -> None:
+        multi = next(
+            (job_id for job_id, nodes in self.ranker.job_districts.items() if len(nodes) > 1),
+            None,
+        )
+        if multi is None:
+            self.skipTest("no multi-district posting in the side-car")
+        first, second = self.ranker.job_districts[multi][:2]
+        share = self.ranker._geo_share({"id": multi}, {first: 0.1, second: 0.9})
+        self.assertEqual(share, 0.9)
+
+    def test_an_unannotated_posting_scores_zero_and_keeps_its_old_behaviour(self) -> None:
+        share = self.ranker._geo_share(
+            {"id": "definitely-not-a-job-id"}, {"新北市/八里區": 1.0}
+        )
+        self.assertEqual(share, 0.0)
+
+    def test_no_expansion_means_no_lookup(self) -> None:
+        job_id = next(iter(self.ranker.job_districts))
+        self.assertEqual(self.ranker._geo_share({"id": job_id}, None), 0.0)
+        self.assertEqual(self.ranker._geo_share({"id": job_id}, {}), 0.0)
+
+    def test_a_side_car_built_for_another_index_is_refused(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "side-car.json"
+            path.write_text(
+                json.dumps({"index_version": "not-this-index", "jobs": {"1": ["甲市/一區"]}}),
+                encoding="utf-8",
+            )
+            ranker = SkillWeaveRanker(
+                self.ranker.artifact_path, job_districts_path=path
+            )
+            self.assertEqual(ranker.job_districts, {})
 
 
 if __name__ == "__main__":

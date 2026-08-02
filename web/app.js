@@ -448,6 +448,21 @@ function showGeoTrace(trace, enabled) {
   }
   regionPanel.append(heading);
 
+  // Whether the expansion reached the candidate set, and how many rows on this
+  // page came from it. Stated rather than implied, because the same panel used
+  // to be evidence-only and a reader may remember it that way.
+  const effect = document.createElement("small");
+  effect.className = "panel-empty";
+  if (trace.applied_to_ranking) {
+    const n = Number(trace.results_from_expanded_districts || 0);
+    effect.textContent = n
+      ? `已用於候選擴充：本頁有 ${n} 筆來自鄰近行政區（僅免除跨區扣分，未加分）`
+      : "已用於候選擴充：本頁沒有需要跨區補進的職缺";
+  } else {
+    effect.textContent = "僅為證據，本次未參與候選擴充（此索引缺少行政區欄位）";
+  }
+  regionPanel.append(effect);
+
   (trace.query_text_matches || [])
     .filter((note) => note.skipped)
     .forEach((note) => {
@@ -513,8 +528,17 @@ function renderRows(rows, query, graphEnabled) {
     card.style.animationDelay = `${Math.min(index * 45, 360)}ms`;
     card.querySelector(".rank").textContent = `#${String(row.rank).padStart(2, "0")}`;
     card.querySelector("h3").textContent = escapeText(row.title);
+    // A posting outside the area that was searched has to say so on the card.
+    // Finding it in the results without an explanation reads as a bug, not as
+    // the geo graph having substituted a district on purpose.
+    const substituted = row.geo?.substituted_for_searched_area
+      ? `${shortNode((row.geo.districts || [])[0])}（鄰近・可替代度 ${(
+          Number(row.geo.substitutability || 0) * 100
+        ).toFixed(1)}%）`
+      : "";
     card.querySelector(".job-subtitle").textContent =
-      [row.city, row.category, row.salary].filter(Boolean).join(" · ");
+      [substituted || row.city, row.category, row.salary].filter(Boolean).join(" · ");
+    if (substituted) card.classList.add("geo-substituted");
     card.querySelector(".fit-score").textContent =
       row.graph_eligible ? `SCORE ${row.score.toFixed(1)}` : "COLD START";
     const tags = card.querySelector(".job-tags");

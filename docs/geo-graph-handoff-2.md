@@ -23,10 +23,14 @@ Schema 與完整量測：[`docs/graph-schema.md`](graph-schema.md) 的「Geo gra
 | **四層地名表** | 完成 | 見第 2 節 |
 | **職缺端抽取** | 完成 | 267,306 筆（27.79%），key 是職缺編號 |
 | **圖的組裝與查詢** | 完成 | `app/geo_graph.py`，stdlib Dijkstra |
-| `meta.geo_trace` | **已上線** | 但 `applied_to_ranking: false` |
+| `meta.geo_trace` | **已上線** | 查詢文字解析 + 候選擴充，見第 3 節缺口 2／3 |
+| 職缺側 join key | 完成 | `artifacts/demo-job-districts.json`（側車，4.78% 覆蓋） |
+| 候選擴充 | 完成（embedded） | OpenSearch 路徑待 mapping + 重建索引 |
 | LLM 判斷 | 跑完兩次 | 一次不採用、一次採用，見第 4 節 |
 
-測試 197 個全過，`scripts/verify_release.py` 89/89。
+> 本文交接時是 197 個測試 / `verify_release` 89/89。之後的工作把兩者推到 368 / 94，
+> 第 3 節的缺口 2 與缺口 3 已經完成，內容已就地更新；第 5 節列的
+> `pipeline/bedrock_extract.py` 違規項因 main 刪除該檔而失效。
 
 ### 這張圖跟規劃書的差別
 
@@ -130,31 +134,42 @@ resolve_alias("南崁")   -> ('桃園市/蘆竹區', '龜山區', '桃園區')
 所以 query 端可以用全部 365 筆，職缺端只能用 346 筆。`scripts/extract_job_districts.py`
 已經照這個規則排除，不要在 query 端也跟著排除。
 
-### 缺口 2：職缺端的行政區從來沒進到 `app/`
+### 缺口 2：職缺端的行政區從來沒進到 `app/` —— **已補**
 
-`artifacts/job-districts.json` 有 267,306 筆 `職缺編號 → 行政區`，但：
+原本的狀況：`artifacts/job-districts.json` 有 267,306 筆 `職缺編號 → 行政區`，但 consumer
+全部在 `scripts/`，`artifacts/demo-index.json` 的職缺欄位只有 `city`（縣市級）沒有 district，
+所以圖說「八里 → 淡水」而排序器不知道哪些職缺在淡水。
 
-- consumer 全部是 `scripts/`，**一個都不在 `app/`**
-- `artifacts/demo-index.json` 的職缺欄位只有 `city`（縣市級），**沒有 district**
+補法**不是**加進 `scripts/build_demo_index.py`（本文原本的建議）。`artifacts/demo-index.json`
+被 `release-manifest.json` 的 `sha256` 釘住，改它的欄位會作廢一個已發布的 hash，
+並強迫每一項下游確認重跑。改用側車：
 
-所以圖說「八里 → 淡水」，排序器不知道哪些職缺在淡水。要讓
-「八里沒職缺 → 撈出淡水職缺」這個規劃書的核心情境成立，這個缺口必須補。
+- `scripts/build_demo_job_districts.py` → `artifacts/demo-job-districts.json`（37 KB，已 commit）
+- `app/ranker.py` 以 `job_districts` 載入，並比對 `index_version`，
+  側車若是為別的索引建的就整份忽略 —— 用錯 job id 去標註比不標註更糟
+- 覆蓋率：demo index 574／12,000 = **4.78%**（全量是 27.79%）。未標註的職缺行為完全不變
 
-做法是把 district 加進 `scripts/build_demo_index.py` 產生的職缺欄位。
-`artifacts/job-districts.json` 有 43 MB 且 gitignore，但它是 `extract_job_districts.py` 產的，
-75 秒可重建。
+### 缺口 3：真的用擴展去改候選集 —— **已做，但只在 embedded 路徑**
 
-### 缺口 3：真的用擴展去改候選集 —— **這個是刻意不做的，不是待辦**
+本文原本寫「這個是刻意不做的」，理由是離線 benchmark 量不到。**那個理由仍然成立，
+而且結論已經改成：做，但不宣稱 lift。** 兩件事是分開的。
 
-`meta.geo_trace` 的 `applied_to_ranking` 恆為 `false`。理由記在
-[`docs/evaluation-limits.md`](evaluation-limits.md)，不是偷懶：
+`GeoExpansion.substitutability` 交給 `app/ranker.py`，對圖背書的行政區免除跨區扣分
+（`location` 由 `-16.0` 變 `0.0`）。細節與已知限制見
+[`docs/graph-schema.md`](graph-schema.md) 的「候選擴充」一節。三個要點：
 
-- 離線 benchmark 是**重排**評測，候選集由舊系統按縣市預先過濾
-- **84.3% 的 case，所有候選職缺同屬一個縣市** → 地理特徵在候選組內變異數為零，決策樹無法分裂
-- 接進排序會動到 frozen model 與 release gate
+- **只免除扣分，不加分。** `location` 停在 LambdaMART 訓練時見過的取值集合內，**不需要重訓**。
+  可替代度以 `geo_substitutability` 記錄但權重為零。
+- **`applied_to_ranking` 現在會回報 `true`**，`offline_lift_measured` 恆為 `false`。
+  本文原本擔心的「不能寫成離線 NDCG 提升」已經在 payload 裡用欄位釘住，不是靠自律。
+- **OpenSearch 路徑仍然接不上**，因為線上索引沒有 district 欄位
+  （`mapping()` 是 `"dynamic": False`）。那條路徑上排序器回報 `geo_applied: false`。
+  本文說「必須在全量檢索路徑做」是對的，那仍然是待辦：需要 mapping 加欄位 + 重建索引 +
+  把側車擴到全量。
 
-**如果要做，必須是在全量檢索路徑（`app/retrieval.py` 的 OpenSearch）上做，不是在重排階段。**
-而且結果不能寫成「離線 NDCG 提升」，那是類別錯誤。
+可示範的案例：「林口區 作業員」。林口區最近的替代區是桃園市/龜山區（0.198），跨縣市，
+新北市的縣市過濾在結構上讓它不可見；擴充打開後 demo 第 8 筆就是龜山區的
+「【林口半導體廠】-作業員」。
 
 ---
 

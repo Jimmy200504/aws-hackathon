@@ -121,11 +121,30 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
         backend="embedded_artifact",
         version=str(embedded_graph_version),
     )
+    # Parsed once, before ranking, because the geo expansion has to be available
+    # to candidate selection and the county hint that disambiguates 東區 comes
+    # out of the same intent.
+    parsed_intent = RANKER.parse_intent(
+        query,
+        location,
+        duty,
+        normalized_query=normalization.query,
+        structured_intent=normalization.intent,
+    )
     if include_graph and GRAPH_PROVIDER is not None:
-        fallback_ids = RANKER.parse_intent(
-            query, location, duty, normalized_query=normalization.query
-        ).skills
-        graph = GRAPH_PROVIDER.expand(normalization.query, fallback_ids)
+        graph = GRAPH_PROVIDER.expand(normalization.query, parsed_intent.skills)
+    # One expansion, two consumers: the ranker and `meta.geo_trace`. Computing it
+    # twice would let the panel describe districts the ranker never saw.
+    geo = (
+        GEO_GRAPH.for_request(
+            location,
+            RANKER.locations,
+            query=query,
+            counties=RANKER.county_hints(parsed_intent),
+        )
+        if include_geo
+        else None
+    )
     ranked = RANKER.search(
         query,
         location_code=location,
@@ -138,6 +157,7 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
             graph.relations if GRAPH_PROVIDER is not None else None
         ),
         structured_intent=normalization.intent,
+        geo_substitutability=geo.substitutability if geo else None,
     )
     rows = ranked["results"]
     payload: dict[str, Any] = {
@@ -179,16 +199,14 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
     # district artifact is off whatever the request said.
     payload["meta"]["geo_graph_enabled"] = include_geo and GEO_GRAPH.enabled
     geo_trace = (
-        GEO_GRAPH.trace(
-            location,
-            RANKER.locations,
-            query=query,
-            counties=RANKER.county_hints(ranked["intent"]),
-        )
-        if include_geo
+        GEO_GRAPH.trace_payload(geo, applied_to_ranking=ranked["geo_applied"])
+        if geo is not None
         else None
     )
     if geo_trace is not None:
+        # Counted from the rows actually returned, so the claim that the expansion
+        # changed the page is checkable against the page.
+        geo_trace["results_from_expanded_districts"] = ranked["geo_expanded_results"]
         payload["meta"]["geo_trace"] = geo_trace
     if trace:
         payload["trace"] = [

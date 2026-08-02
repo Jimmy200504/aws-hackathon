@@ -197,12 +197,16 @@
                 選擇地區後，顯示求職者實際視為可替代的縣市，以及支持它的共同勾選與應徵流向數據。
               </p>
             </div>
+            <!-- The county layer and the district layer now differ on this, so
+                 the panel must not make one claim for both. -->
             <div class="provenance">
               <i></i>
               <p>
-                <strong>此面板不改動排序</strong>
-                地區圖的作用位置在檢索擴充階段；本次結果的排序未使用它。權重全部來自
-                2026-06-05 cutoff 前的搜尋與應徵行為，無人工填值。
+                <strong>縣市層不改動排序；行政區層只做候選擴充</strong>
+                縣市圖僅為證據。行政區圖會把「求職者實際視為可替代」的鄰近行政區職缺補進候選集，
+                作法是免除跨區扣分，不加分，因此同區職缺仍然排在前面。權重全部來自 2026-06-05
+                cutoff 前的搜尋與應徵行為，無人工填值。此擴充沒有離線 lift 數字：離線 benchmark
+                的候選集已按縣市過濾，84.3% 的 case 表達不出跨區替代。
               </p>
             </div>
           </div>

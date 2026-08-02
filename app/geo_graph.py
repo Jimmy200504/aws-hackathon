@@ -27,10 +27,23 @@ authored contribution can be switched off and measured separately. Authored
 edges never lower a behaviour weight; they can only raise it, so switching them
 off returns the graph to pure behaviour.
 
-As with `app/region_graph.py`, nothing here changes ranking. The offline
-benchmark is a re-ranking benchmark whose candidate sets are already
-county-filtered, so a geographic feature would have zero variance inside the
-candidate group. `docs/evaluation-limits.md` records that measurement.
+**This layer now acts on candidate selection**, unlike `app/region_graph.py`.
+`GeoExpansion.substitutability` is handed to `app/ranker.py`, which withholds the
+out-of-area penalty from a district the graph vouches for. That is a recall
+change and it does move results, so `meta.geo_trace.applied_to_ranking` reports
+`True` whenever the ranker was given the expansion.
+
+It adds no positive weight. A vouched district scores neutral on the location
+feature where an unrelated one scores negative, and the substitutability itself
+is carried as an unweighted feature for a future model to price. Inventing a
+magnitude here would be the one thing the cost model above refuses to do.
+
+No offline lift is claimed, because none can be measured: the benchmark reranks
+candidate sets that the current system already county-filtered, so 84.3% of its
+cases hold candidates from at most one county and cannot express a cross-district
+substitution. `docs/evaluation-limits.md` records that measurement. The effect is
+visible only where recall was the binding constraint - a search for 林口區 could
+not reach 龜山區, its cheapest substitute, because 龜山區 is in 桃園市.
 """
 from __future__ import annotations
 
@@ -203,6 +216,63 @@ class GeoReach:
 def _short(node: str) -> str:
     """'新北市/八里區' -> '八里區', for user-facing sentences."""
     return node.split("/", 1)[-1]
+
+
+@dataclass(frozen=True)
+class GeoExpansion:
+    """One request's geographic reading: what was named, and what substitutes.
+
+    Computed once per request and consumed twice, by candidate selection and by
+    `meta.geo_trace`. Two separate computations would let the panel describe an
+    expansion the ranker did not use, which is the failure mode this exists to
+    prevent.
+    """
+
+    from_codes: tuple[str, ...] = ()
+    from_text: tuple[str, ...] = ()
+    notes: tuple[dict[str, Any], ...] = ()
+    county_hint: tuple[str, ...] = ()
+    reaches: tuple[GeoReach, ...] = ()
+
+    @property
+    def searched(self) -> tuple[str, ...]:
+        """Districts the request actually named, filter codes first."""
+        return tuple(dict.fromkeys((*self.from_codes, *self.from_text)))
+
+    @property
+    def skipped(self) -> tuple[dict[str, Any], ...]:
+        return tuple(note for note in self.notes if note.get("skipped"))
+
+    def __bool__(self) -> bool:
+        return bool(self.searched or self.skipped)
+
+    @property
+    def substitutability(self) -> dict[str, float]:
+        """District node -> how substitutable it is for what was searched.
+
+        A named district scores 1.0; a reached one scores the product of the hop
+        weights along its route. Nothing else appears, so a caller cannot read
+        this as "anywhere in the county".
+        """
+        weights = {node: 1.0 for node in self.searched}
+        for reach in self.reaches:
+            # A district that was named outright is not downgraded by also being
+            # reachable from another named district.
+            weights.setdefault(reach.district, reach.substitutability)
+        return weights
+
+    @property
+    def counties(self) -> tuple[str, ...]:
+        """Counties holding any searched or reached district, in first-seen order.
+
+        The retrieval layer needs these to widen a county filter far enough to
+        reach a cross-county substitute: 林口區's cheapest neighbour is 龜山區,
+        which is in 桃園市, so a 新北市 filter excludes it by construction.
+        """
+        seen: dict[str, None] = {}
+        for node in (*self.searched, *(reach.district for reach in self.reaches)):
+            seen.setdefault(node.split("/", 1)[0], None)
+        return tuple(seen)
 
 
 class GeoGraph:
@@ -803,28 +873,23 @@ class GeoGraph:
         reached.sort(key=lambda reach: (round(reach.cost, 9), len(reach.hops), reach.district))
         return reached[:cap]
 
-    def trace(
+    def for_request(
         self,
         codes: Iterable[str] | None,
         locations: Mapping[str, Sequence[str]] | None = None,
         *,
         query: str = "",
         counties: Iterable[str] = (),
-    ) -> dict[str, Any] | None:
-        """Geo expansion payload for `meta.geo_trace`, or None when not applicable.
+    ) -> GeoExpansion:
+        """Read one request's geography, once.
 
         A district can arrive two ways. `codes` is the filter the caller sent,
         which only resolves when it is district-level. `query` is the text the
         searcher typed, which is how a place is usually named and which no code
         path can see.
-
-        A payload is also returned when nothing resolved but a skip was recorded,
-        because "東區 names four counties, so it was not expanded" is the answer
-        to a question the searcher just asked. Silence would read as the graph
-        having no opinion.
         """
         if not self.enabled:
-            return None
+            return GeoExpansion()
         # Callers hand over whatever the request knows about location, which
         # includes 台灣 and district names as well as counties. Only county names
         # can narrow a surface, and a field called county_hint should not report
@@ -835,10 +900,50 @@ class GeoGraph:
         from_codes = self.resolve(codes, locations)
         from_text, text_notes = self.resolve_text(query, hint)
         searched = tuple(dict.fromkeys((*from_codes, *from_text)))
-        skipped = [note for note in text_notes if note.get("skipped")]
-        if not searched and not skipped:
+        return GeoExpansion(
+            from_codes=from_codes,
+            from_text=from_text,
+            notes=tuple(text_notes),
+            county_hint=hint,
+            reaches=tuple(self.expand(searched)),
+        )
+
+    def trace(
+        self,
+        codes: Iterable[str] | None,
+        locations: Mapping[str, Sequence[str]] | None = None,
+        *,
+        query: str = "",
+        counties: Iterable[str] = (),
+        applied_to_ranking: bool = False,
+    ) -> dict[str, Any] | None:
+        """Convenience wrapper: read the request and render the payload."""
+        return self.trace_payload(
+            self.for_request(codes, locations, query=query, counties=counties),
+            applied_to_ranking=applied_to_ranking,
+        )
+
+    def trace_payload(
+        self, expansion: GeoExpansion, *, applied_to_ranking: bool = False
+    ) -> dict[str, Any] | None:
+        """`meta.geo_trace` for an expansion, or None when there is nothing to say.
+
+        A payload is also returned when nothing resolved but a skip was recorded,
+        because "東區 names four counties, so it was not expanded" is the answer
+        to a question the searcher just asked. Silence would read as the graph
+        having no opinion.
+
+        `applied_to_ranking` is supplied by the caller rather than assumed here,
+        because this object cannot know whether the expansion it describes was
+        handed to candidate selection. Reporting it as applied when it was not,
+        or the reverse, is the one error that would make the panel a lie.
+        """
+        if not self.enabled or not expansion:
             return None
-        expansions = self.expand(searched)
+        from_codes, from_text = expansion.from_codes, expansion.from_text
+        searched = expansion.searched
+        text_notes = list(expansion.notes)
+        expansions = list(expansion.reaches)
         return {
             "schema": "skillweave-geo-graph-v1",
             "resolved_from": {
@@ -848,7 +953,7 @@ class GeoGraph:
             "query_text_matches": text_notes,
             # Echoed so a hint-narrowed resolution can be checked against what
             # the request actually supplied, rather than taken on trust.
-            "county_hint": list(hint),
+            "county_hint": list(expansion.county_hint),
             "dataset_version": self.metadata.get("dataset_version"),
             "graph_cutoff": self.metadata.get("graph_cutoff"),
             "cutoff_date": self.cutoff_date,
@@ -865,9 +970,23 @@ class GeoGraph:
             # Authored shortcuts whose pair the search logs already connect. The
             # behaviour weight is what the graph uses; this records agreement.
             "authored_edges_corroborated": list(self.corroborated),
-            # The graph acts at retrieval expansion. This reports what the data
-            # supports; it does not reorder any result.
-            "applied_to_ranking": False,
+            # True when candidate selection was given this expansion. It changes
+            # the result set, so claiming otherwise would be false; it is also
+            # not a positive weight, so `ranking_effect` states exactly what it
+            # did rather than leaving a bare boolean to be over-read.
+            "applied_to_ranking": bool(applied_to_ranking and searched),
+            "ranking_effect": (
+                "the out-of-area penalty is withheld from districts listed above; "
+                "no positive weight is added, and substitutability is carried as "
+                "an unweighted feature"
+                if applied_to_ranking and searched
+                else "none; this payload is evidence only"
+            ),
+            # No offline number backs the expansion: the benchmark reranks
+            # candidate sets that are already county-filtered, so 84.3% of its
+            # cases cannot express a cross-district substitution at all. This is
+            # a recall change, reported as such and not as a measured lift.
+            "offline_lift_measured": False,
         }
 
 
