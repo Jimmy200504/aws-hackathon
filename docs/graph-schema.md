@@ -344,7 +344,7 @@ L1/L3/L5 不是節點，是容器：`members_of(group_id)` 回傳成員行政區
 | `SUBSTITUTABLE_WITH` | District ↔ District | 無向 | `jaccard` 0～1 | `behaviour` |
 | `shortcut` | District ↔ District | 無向 | `implied_substitutability` | `external`，帶 `effective_date` |
 
-沒有區級的 `COMMUTES_TO`。應徵流向需要知道職缺在哪一區，而職缺只有 26.53% 解析得到行政區
+沒有區級的 `COMMUTES_TO`。應徵流向需要知道職缺在哪一區，而職缺只有 27.79% 解析得到行政區
 （`reports/job-district-extraction.json`），那個缺值不是隨機的。縣市層的通勤邊留在 Region 子圖。
 
 建圖量測（`min_co_selected = 30`，train days only，匿名 `talentNo = 0` 排除）：
@@ -526,7 +526,7 @@ L5 別名要進圖必須通過縣市集中度 ≥ 0.60（`reports/region-alias-c
 （見上一節與 [`docs/evaluation-limits.md`](evaluation-limits.md)）。縣市內都沒有變異，區級只會更少。
 把區級距離做成 LTR 特徵，在候選組內取值恆定，決策樹無法用它分裂 —— 效果不是小，是數學上為零。
 
-另外職缺側只有 26.53% 解析得到行政區，其餘 73% 只能退到縣市。那個缺值不是隨機的：
+另外職缺側只有 27.79% 解析得到行政區，其餘 72% 只能退到縣市。那個缺值不是隨機的：
 JD 寫地址的（門市、工廠、物流）與不寫的（辦公室、業務）系統性不同。
 這是不把區級距離送進 LTR 的第二個理由 —— 進去就必須先處理「缺值 ≠ 距離遠」的語意，
 而那個處理無法在這個 benchmark 上被驗證。

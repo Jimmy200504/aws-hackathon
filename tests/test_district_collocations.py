@@ -275,7 +275,8 @@ class JudgementLoaderTests(unittest.TestCase):
         loaded = extract.load_occurrence_judgements(path, "district-collocation-v2")
         self.assertEqual(loaded[("北區", "和")], "place")
 
-    def test_model_fills_only_the_unlabelled_middle(self) -> None:
+    def test_model_verdicts_are_excluded_by_default(self) -> None:
+        # reports/district-collocation-effect.json measured and rejected them.
         path = self.rows(
             {
                 "surface": "南區", "following": "_", "label": None,
@@ -283,7 +284,21 @@ class JudgementLoaderTests(unittest.TestCase):
                 "prompt_version": "district-collocation-v2",
             },
         )
-        loaded = extract.load_occurrence_judgements(path, "district-collocation-v2")
+        self.assertEqual(
+            extract.load_occurrence_judgements(path, "district-collocation-v2"), {}
+        )
+
+    def test_model_fills_only_the_unlabelled_middle_when_asked(self) -> None:
+        path = self.rows(
+            {
+                "surface": "南區", "following": "_", "label": None,
+                "verdict": "not_place", "mode": "apply",
+                "prompt_version": "district-collocation-v2",
+            },
+        )
+        loaded = extract.load_occurrence_judgements(
+            path, "district-collocation-v2", source="all"
+        )
         self.assertEqual(loaded[("南區", "_")], "not_place")
 
     def test_other_prompt_versions_are_ignored(self) -> None:
@@ -371,16 +386,26 @@ class ArmReportTests(unittest.TestCase):
             self.skipTest("place-layer-arms.json not present")
         self.report = json.loads(self.REPORT.read_text(encoding="utf-8"))
 
-    def test_baseline_arm_matches_the_checked_in_extraction(self) -> None:
+    def test_l4_only_arm_reproduces_the_pre_place_layer_baseline(self) -> None:
         base = self.report["arms"]["l4_only"]
         self.assertEqual(base["postings_with_district"], 255119)
         self.assertEqual(base["coverage_of_eligible"], 0.2653)
         self.assertEqual(base["single_district_share"], 0.8671)
 
-    def test_adopted_arm_improves_both_metrics(self) -> None:
-        delta = self.report["arms"]["l5_unambiguous"]["delta_vs_l4_only"]
-        self.assertGreater(delta["coverage_of_eligible"], 0)
-        self.assertGreaterEqual(delta["single_district_share"], 0)
+    def test_shipped_arm_matches_the_checked_in_extraction(self) -> None:
+        report = ROOT / "reports" / "job-district-extraction.json"
+        if not report.is_file():
+            self.skipTest("job-district-extraction.json not present")
+        stats = json.loads(report.read_text(encoding="utf-8"))["stats"]
+        shipped = self.report["arms"]["l5_and_occurrence"]
+        for key in ("postings_with_district", "coverage_of_eligible", "single_district_share"):
+            self.assertEqual(stats[key], shipped[key], key)
+
+    def test_every_adopted_arm_improves_both_metrics(self) -> None:
+        for label in ("l5_unambiguous", "occurrence_only", "l5_and_occurrence"):
+            delta = self.report["arms"][label]["delta_vs_l4_only"]
+            self.assertGreater(delta["coverage_of_eligible"], 0, label)
+            self.assertGreaterEqual(delta["single_district_share"], 0, label)
 
     def test_rejected_arm_trades_purity_for_coverage(self) -> None:
         delta = self.report["arms"]["l5_l3_relaxed"]["delta_vs_l4_only"]

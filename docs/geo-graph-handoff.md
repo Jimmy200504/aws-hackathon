@@ -5,28 +5,30 @@
 規劃書：[`docs/geo-graph.md`](geo-graph.md)
 Schema 與量測結果：[`docs/graph-schema.md`](graph-schema.md) 的「Geo graph（行政區層）」一節
 
-**狀態：圖已建好並接上 API。** 本文件第 2～4 節是建圖前的量測，仍然有效，
-說明為什麼規劃書的部分設計做不到。第 5 節的四個步驟已完成三個，剩下 LLM collocation 判斷待跑
-（缺 AWS 憑證，程式已就緒）。
+**狀態：四個步驟全部完成。** 圖已建好、接上 API，L3/L4/L5 三張表都在 repo 裡，
+LLM 判斷跑了兩次（一次不採用、一次採用）。本文件第 2～4 節是建圖前的量測，仍然有效，
+說明為什麼規劃書的部分設計做不到。
+
+抽取器目前的預設值是 `--place-layers l5` + `--judgement-source labelled`，
+產出 **267,306 筆（27.79%）**、單一行政區 86.80%。五個 arm 的比較見
+[`reports/place-layer-arms.json`](../reports/place-layer-arms.json)。
 
 ---
 
 ## 1. 現況
 
-### 已 commit（本分支領先 `origin/main` 九個 commit，全部未推送）
+### 分層檔案（四層都可檢視）
 
-```
-e24e689  Prepare the occurrence-level district judgement for Bedrock
-bb4ba2a  Build the district geo graph from behaviour and audit its authored layers
-464337b  Pin the checkout to LF so the release audit passes on Windows
-f1525d7  Hand off the geo graph work with its measured constraints
-60fc880  Stop the district extractor from tagging the wrong district
-4422b75  Measure the geo graph's data support before building it
-ec25456  Surface region graph evidence in the search response and demo
-909deef  Add behaviour-derived region substitutability subgraph
-674e768  Make the generative-AI contribution separately measurable
-─────────  origin/main = 0933510
-```
+| 層 | 檔案 | 內容 | 驗證 |
+|---|---|---|---|
+| L1 大區 | `config/geo-authored.json` | 7 個 | cohesion（4 過） |
+| L3 生活圈 | `config/geo-authored.json` | 25 個 | cohesion（21 過）+ 文字集中度 |
+| L4 行政區 | `config/geo-l4-districts.json` | 368 區、705 surface | 誤留率閘門 |
+| L5 地標 | `config/geo-l5-table.json` → `geo-l5-published.json` | 666 → 365 | 集中度 + occurrence 過濾 |
+
+`config/geo-l4-districts.json` 是從 `城市對照表.csv` 生成後 commit 的，
+只含行政區劃（縣市名、區名、6 位代碼），不含任何職缺／求職者內容，
+兩個 loader 都優先讀它。
 
 ### 檔案
 
@@ -43,14 +45,19 @@ ec25456  Surface region graph evidence in the search response and demo
 | `scripts/validate_geo_authored.py` | 手填層對行為圖的稽核 | 是 |
 | `reports/geo-authored-validation.json` | 28 個分組的逐條判定 | 是 |
 | `app/geo_graph.py` | 組裝、Dijkstra、`meta.geo_trace` | 是 |
-| `tests/test_geo_graph.py` | 39 個測試 | 是 |
+| `tests/test_geo_graph.py` | geo graph 測試 | 是 |
 | **抽取器與待辦** | | |
 | `scripts/extract_job_districts.py` | L4 行政區抽取器 | 是 |
 | `reports/job-district-extraction.json` | 705 個 surface 的逐條判定 + 審查佇列 | 是 |
 | `artifacts/district-collocation-queue.json` | 完整 collocation 佇列（3,069 筆） | 是 |
-| `scripts/judge_district_collocations.py` | LLM occurrence 判斷（**未跑**） | 是 |
-| `tests/test_district_collocations.py` | 17 個測試 | 是 |
-| `artifacts/job-districts.json` | 255,119 筆職缺的行政區解析，43 MB | **否，gitignore** |
+| `scripts/judge_district_collocations.py` | L4 collocation LLM 判斷（跑完，**不採用模型判定**） | 是 |
+| `scripts/build_l4_table.py` / `config/geo-l4-districts.json` | L4 字表 | 是 |
+| `scripts/build_l5_table.py` / `config/geo-l5-table.json` | L5 手寫表 666 筆 | 是 |
+| `scripts/validate_l5_table.py` / `config/geo-l5-published.json` | 語料驗證後 365 筆 | 是 |
+| `scripts/judge_l5_occurrences.py` | L5 occurrence LLM 判斷（**採用**，lift +0.3185） | 是 |
+| `scripts/report_place_layer_arms.py` / `reports/place-layer-arms.json` | 五個 arm 比較 | 是 |
+| `tests/test_district_collocations.py` | 抽取與判斷測試 | 是 |
+| `artifacts/job-districts.json` | 267,306 筆職缺的行政區解析，43 MB | **否，gitignore** |
 | `scripts/measure_location_code_levels.py` | `c0` 層級分布 + 區級共同勾選 | 是 |
 | `reports/location-code-levels.json` | 含八里區的驗證結果 | 是 |
 | `scripts/mine_region_aliases.py` | L5 口語地名候選挖掘 | 是 |
@@ -66,7 +73,9 @@ ec25456  Surface region graph evidence in the search response and demo
 .\.venv\Scripts\python.exe scripts\extract_job_districts.py            # ~75s
 .\.venv\Scripts\python.exe scripts\measure_location_code_levels.py     # ~50s
 .\.venv\Scripts\python.exe scripts\mine_region_aliases.py              # ~70s
-.\.venv\Scripts\python.exe -m unittest discover -s tests               # 147 tests
+.\.venv\Scripts\python.exe scripts\build_l5_table.py                   # 即時
+.\.venv\Scripts\python.exe scripts\validate_l5_table.py                # ~90s
+.\.venv\Scripts\python.exe -m unittest discover -s tests               # 185 tests
 ```
 
 完整 collocation 佇列（LLM 步驟的輸入）要另外產，且**不要蓋掉** checked-in 報告：
@@ -88,7 +97,7 @@ ec25456  Surface region graph evidence in the search response and demo
 
 規劃書 §2 寫 L4 是「最常用的職缺綁定節點」——在這份資料集裡職缺綁不到 L4，只能綁 L2。L4 必須從 `職務名稱` + `職務內容` 抽取，而那有覆蓋率上限。
 
-### 2.2 L4 覆蓋率上限 26.53%
+### 2.2 L4 覆蓋率上限（當時 26.53%，現為 27.79%）
 
 `scripts/extract_job_districts.py` 實測：
 
@@ -99,6 +108,9 @@ ec25456  Surface region graph evidence in the search response and demo
 | 合格職缺 | 961,780 |
 | 抽到行政區 | **255,119（26.53%）** |
 | 其中單一行政區 | 221,212（86.71%） |
+
+這是只掃 L4 的數字。加上 L5 地標層與實測標註的 occurrence 過濾後為
+**267,306（27.79%）**、單一行政區 232,021（86.80%），見 `reports/place-layer-arms.json`。
 
 **因此規劃書 §5 的 LTR 距離特徵會在 73% 的候選職缺上缺值**，而且缺值不是隨機的：會在 JD 寫地址的職缺（門市、工廠、物流）與不寫的（辦公室、業務）系統性不同。要處理缺值語意（缺值 ≠ 距離遠）。
 
@@ -261,7 +273,8 @@ suffix_dropped  信義、板橋              167,758 筆命中
 - 套用到 2,558 筆中間帶才發現分數不能外推：標註帶的 place/not_place 加權精確度分離度 **0.8314**，
   中間帶只有 **0.0872**。標註帶是用誤留率切出來的，依定義可分；中間帶沒標註正是因為分不開
 - 模型把 `北區和緯`（實測 0.8050）判成 not_place —— **在 occurrence 層重現了 surface 層的錯誤答案**
-- **採用**：511 筆實測標註驅動的 occurrence 過濾（255,119 → **256,014** 筆、覆蓋率 26.53% → **26.62%**）
+- **採用**：511 筆實測標註驅動的 occurrence 過濾（單獨計 255,119 → **256,014** 筆、26.53% → **26.62%**；
+  與 L5 層合併後的最終值見 §1）
 - **不採用**：2,558 筆模型判定（加上去覆蓋率掉到 26.45%）
 
 根因不是提示詞：collocation 的 key 只有一個後續漢字，`南區)` 這四個字裡沒有可判定的資訊。
@@ -403,23 +416,23 @@ Jaccard 只有 0.0097；`L1/宜花東` 第 81 百分位，宜蘭花蓮台東不�
 **尚未做，且刻意不做：** 沒有接進排序路徑，也沒有做成 LTR 特徵。理由見
 [`docs/graph-schema.md`](graph-schema.md) 的「已知限制」——
 候選集 84.3% 只落在 ≤1 個縣市，區級特徵在候選組內變異數為零；
-加上職缺側只有 26.53% 有行政區，缺值語意無法在這個 benchmark 上驗證。
+加上職缺側只有 27.79% 有行政區，缺值語意無法在這個 benchmark 上驗證。
 
 ---
 
 ## 6. 已知未解問題
 
 1. **`桃園_`（後面非漢字）n=8,235、p=78.35% 仍在需判斷帶。** 這是 `桃園)`、`桃園|` 這類，量很大且未解。
-2. **L4 區級 `COMMUTES_TO` 沒做。** 應徵流向需要知道職缺在哪一區，而職缺只有 26.53% 解析得到，
+2. **L4 區級 `COMMUTES_TO` 沒做。** 應徵流向需要知道職缺在哪一區，而職缺只有 27.79% 解析得到，
    且缺值非隨機。這條要等步驟 1 的 LLM 判斷提高抽取品質之後才有意義 —— 那是這兩步唯一真正的依賴關係。
 3. **`shortcut` 邊無法用這份資料驗證。** 搜尋日誌是 2026-06-01~06-07，規劃書標的淡江大橋通車日是 2026-05-12，**整個資料窗都在通車後**，沒有 before/after 可比。
    實作上已處理：手填邊是備援不是覆寫，兩條 `shortcut` 都落在行為已涵蓋的區對上，
    所以時序過濾器可證明會動（三鶯線在 06-01 被排除、07-01 被接受），但不改變任何一條邊的權重。
 4. **中間帶 2,558 筆 collocation 仍未解。** LLM 已試過並量測，分離度只有 0.087（見 §5 步驟 1）。
    下一次嘗試要換特徵而不是換模型：給整段職缺文字或地址欄位，而不是 surface 後面一個漢字。
-5. **實測標註版的 occurrence 過濾預設未開啟。** 它是 +895 筆職缺的淨改善，
-   但開啟會改動 `reports/job-district-extraction.json` 以及多份文件引用的 255,119 / 26.53% / 86.71%。
-   要不要換成 256,014 / 26.62% / 86.75% 是發布決定，留給人決定。
+5. **已解決：** 實測標註版 occurrence 過濾與 L5 地標層都已設為預設，
+   最終為 267,306 / 27.79% / 86.80%（兩個指標都優於原本的 255,119 / 26.53% / 86.71%）。
+   模型判定的中間帶仍未採用，需要時用 `--judgement-source all` 開啟。
 6. **本分支的 commit 都未推送。**
 
 已解決：

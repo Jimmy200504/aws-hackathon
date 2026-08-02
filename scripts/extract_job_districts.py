@@ -226,7 +226,7 @@ def kept_error_rate(inside: int, appearances: int, expected: float) -> float:
 
 
 def load_occurrence_judgements(
-    path: Path | None, prompt_version: str
+    path: Path | None, prompt_version: str, source: str = "labelled"
 ) -> dict[tuple[str, str], str]:
     """`(surface, following) -> place | not_place`, from the judgement cache.
 
@@ -256,8 +256,12 @@ def load_occurrence_judgements(
                 verdicts[key] = row["label"]
             elif row.get("mode") == "apply" and row.get("verdict"):
                 modelled[key] = row["verdict"]
-    for key, verdict in modelled.items():
-        verdicts.setdefault(key, verdict)
+    if source == "all":
+        # Not the default, and reports/district-collocation-effect.json is why:
+        # the model separates the labelled bands by 0.8314 and the unlabelled
+        # middle band by 0.0872, and adding it costs coverage.
+        for key, verdict in modelled.items():
+            verdicts.setdefault(key, verdict)
     return verdicts
 
 
@@ -331,9 +335,10 @@ def main() -> None:
     parser.add_argument(
         "--place-layers",
         choices=("none", "l5", "l5+l3"),
-        default="none",
+        default="l5",
         help="scan L5 landmarks and L3 living areas alongside the district names; "
-        "the checked-in report was produced with none",
+        "l5 is the arm reports/place-layer-arms.json adopted, l5+l3 trades purity "
+        "for coverage and was rejected",
     )
     parser.add_argument(
         "--place-max-districts",
@@ -346,10 +351,17 @@ def main() -> None:
     parser.add_argument(
         "--collocation-judgements",
         type=Path,
-        default=None,
+        default=ROOT / "artifacts" / "district-collocations.jsonl",
         help="occurrence-level verdicts from scripts/judge_district_collocations.py; "
-        "omitted means surface-level gating only, which is what the checked-in "
-        "report was produced with",
+        "pass an absent path to fall back to surface-level gating only",
+    )
+    parser.add_argument(
+        "--judgement-source",
+        choices=("labelled", "all"),
+        default="labelled",
+        help="labelled uses only the 511 verdicts derived from measured error "
+        "rates; all adds the 2,558 model verdicts, which "
+        "reports/district-collocation-effect.json measured and rejected",
     )
     parser.add_argument(
         "--judgement-prompt-version",
@@ -367,12 +379,12 @@ def main() -> None:
     args = parser.parse_args()
 
     occurrence_judgements = load_occurrence_judgements(
-        args.collocation_judgements, args.judgement_prompt_version
+        args.collocation_judgements, args.judgement_prompt_version, args.judgement_source
     )
-    if args.collocation_judgements:
+    if occurrence_judgements:
         print(
             f"occurrence judgements: {len(occurrence_judgements)} "
-            f"({args.judgement_prompt_version})",
+            f"({args.judgement_source}, {args.judgement_prompt_version})",
             flush=True,
         )
     started = time.monotonic()
@@ -642,9 +654,7 @@ def main() -> None:
             "label_not_place_min_error": args.label_not_place_min_error,
             "label_min_postings": args.label_min_postings,
             "occurrence_judgements": len(occurrence_judgements),
-            "occurrence_judgement_source": (
-                str(args.collocation_judgements) if args.collocation_judgements else None
-            ),
+            "occurrence_judgement_source": args.judgement_source if occurrence_judgements else None,
             "occurrence_prompt_version": (
                 args.judgement_prompt_version if occurrence_judgements else None
             ),

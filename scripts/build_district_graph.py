@@ -28,7 +28,7 @@ behaviour it encodes is "anywhere", not substitutability — the same reason
 `build_region_graph.py` drops overseas co-selection.
 
 No `COMMUTES_TO` edge is emitted at this level. Application flow needs the job's
-district, and jobs resolve to a district for only 26.53% of the corpus
+district, and jobs resolve to a district for only 27.79% of the corpus
 (`reports/job-district-extraction.json`), which is both partial and
 systematically non-random. County-level commute edges stay in the region graph
 until that coverage is understood.
@@ -212,7 +212,7 @@ def main() -> None:
             "min_co_selected": args.min_co_selected,
             "max_districts_per_search": args.max_districts_per_search,
             "commute_edges_excluded_reason": (
-                "application flow needs the job's district, and only 26.53% of "
+                "application flow needs the job's district, and only 27.79% of "
                 "jobs resolve to one; see reports/job-district-extraction.json"
             ),
             "random_seed": 1111,

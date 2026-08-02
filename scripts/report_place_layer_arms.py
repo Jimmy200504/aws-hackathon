@@ -42,10 +42,14 @@ if str(ROOT) not in sys.path:
 DEFAULT_REPORT = ROOT / "reports" / "place-layer-arms.json"
 PYTHON = ROOT / ".venv" / "Scripts" / "python.exe"
 
+NO_JUDGEMENTS = ["--collocation-judgements", "artifacts/definitely-absent.jsonl"]
 ARMS = [
-    ("l4_only", ["--place-layers", "none"]),
-    ("l5_unambiguous", ["--place-layers", "l5", "--place-max-districts", "1"]),
-    ("l5_l3_relaxed", ["--place-layers", "l5+l3", "--place-max-districts", "8"]),
+    ("l4_only", ["--place-layers", "none", *NO_JUDGEMENTS]),
+    ("l5_unambiguous", ["--place-layers", "l5", "--place-max-districts", "1", *NO_JUDGEMENTS]),
+    ("l5_l3_relaxed", ["--place-layers", "l5+l3", "--place-max-districts", "8", *NO_JUDGEMENTS]),
+    ("occurrence_only", ["--place-layers", "none"]),
+    # Both adopted changes together, which is the shipped configuration.
+    ("l5_and_occurrence", ["--place-layers", "l5", "--place-max-districts", "1"]),
 ]
 
 KEYS = (
@@ -126,10 +130,12 @@ def main() -> None:
             ),
         },
         "conclusion": {
-            "adopt": "l5_unambiguous",
+            "adopt": "l5_and_occurrence",
             "why": (
-                "the only arm that improves both metrics: coverage 26.53% -> "
-                "27.73% and single-district share 86.71% -> 86.75%"
+                "both adopted changes are independent and additive: the L5 layer "
+                "supplies postings that name a landmark and no district, while the "
+                "occurrence filter removes and recovers district matches. Neither "
+                "regresses single-district share"
             ),
             "reject": "l5_l3_relaxed",
             "why_not": (
