@@ -48,6 +48,10 @@ LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DISTRICT_GRAPH = ROOT / "artifacts" / "district-graph.json"
 DEFAULT_AUTHORED = ROOT / "config" / "geo-authored.json"
+# Only the corpus-validated subset is loaded. The authored source table lives at
+# config/geo-l5-table.json and is deliberately not read here: entries reach the
+# graph by surviving scripts/validate_l5_table.py, not by being written down.
+DEFAULT_L5 = ROOT / "config" / "geo-l5-published.json"
 
 # The graph is built as of the first evaluation day, so an edge that only comes
 # into existence later must not be present. Passed to `build_geo_graph`.
@@ -171,6 +175,7 @@ class GeoGraph:
         self,
         district_graph_path: Path | None = None,
         authored_path: Path | None = None,
+        l5_path: Path | None = None,
         *,
         cutoff_date: str = DEFAULT_CUTOFF,
         max_cost: float = DEFAULT_MAX_COST,
@@ -179,6 +184,7 @@ class GeoGraph:
     ) -> None:
         self.district_graph_path = Path(district_graph_path or DEFAULT_DISTRICT_GRAPH)
         self.authored_path = Path(authored_path or DEFAULT_AUTHORED)
+        self.l5_path = Path(l5_path or DEFAULT_L5)
         self.cutoff_date = cutoff_date
         self.max_cost = float(max_cost)
         self.limit = max(0, int(limit))
@@ -193,6 +199,7 @@ class GeoGraph:
         self.aliases: dict[str, list[str]] = {}
         self.excluded_edges: list[dict[str, Any]] = []
         self.corroborated: list[dict[str, Any]] = []
+        self.l5_evidence: dict[str, dict[str, Any]] = {}
         self._adjacency: dict[str, dict[str, GeoEdge]] = {}
         self._load()
 
@@ -202,9 +209,11 @@ class GeoGraph:
     def from_environment(cls) -> GeoGraph:
         override = os.getenv("GEO_GRAPH_PATH")
         authored = os.getenv("GEO_AUTHORED_PATH")
+        l5 = os.getenv("GEO_L5_PATH")
         return cls(
             Path(override) if override else None,
             Path(authored) if authored else None,
+            Path(l5) if l5 else None,
             cutoff_date=os.getenv("GEO_GRAPH_CUTOFF", DEFAULT_CUTOFF),
             max_cost=float(os.getenv("GEO_GRAPH_MAX_COST", DEFAULT_MAX_COST)),
             limit=int(os.getenv("GEO_GRAPH_LIMIT", DEFAULT_LIMIT)),
@@ -244,6 +253,32 @@ class GeoGraph:
             )
         if self.include_authored:
             self._load_authored()
+            self._load_l5()
+
+    def _load_l5(self) -> None:
+        """Corpus-validated landmarks, stations, parks and arterial roads."""
+        try:
+            payload = json.loads(self.l5_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            LOGGER.warning("L5 table unavailable: %s", type(exc).__name__)
+            return
+        self.metadata["l5_gate"] = payload.get("gate")
+        for entry in payload.get("entries", []):
+            members = [d for d in entry.get("districts", []) if d in self.districts]
+            if not members:
+                continue
+            self._register_group(
+                entry["id"],
+                "L5",
+                members,
+                aliases=[entry["surface"]],
+            )
+            self.l5_evidence[entry["surface"]] = {
+                "kind": entry.get("kind"),
+                "appearances": entry.get("appearances"),
+                "concentration": entry.get("concentration"),
+                "district_agreement": entry.get("district_agreement"),
+            }
 
     def _load_authored(self) -> None:
         try:
@@ -518,6 +553,7 @@ def build_geo_graph(
     base_path: Path | str | None = None,
     special_path: Path | str | None = None,
     cutoff_date: str = DEFAULT_CUTOFF,
+    l5_path: Path | str | None = None,
     **kwargs: Any,
 ) -> GeoGraph:
     """The `docs/geo-graph.md` entry point, over this repo's artifacts.
@@ -531,6 +567,7 @@ def build_geo_graph(
     return GeoGraph(
         Path(base_path) if base_path else None,
         Path(special_path) if special_path else None,
+        Path(l5_path) if l5_path else None,
         cutoff_date=cutoff_date,
         **kwargs,
     )

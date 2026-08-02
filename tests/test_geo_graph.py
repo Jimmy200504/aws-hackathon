@@ -14,6 +14,8 @@ from app.lambda_handler import handler
 ROOT = Path(__file__).resolve().parents[1]
 ARTIFACT = ROOT / "artifacts" / "district-graph.json"
 AUTHORED = ROOT / "config" / "geo-authored.json"
+L5_SOURCE = ROOT / "config" / "geo-l5-table.json"
+L5_PUBLISHED = ROOT / "config" / "geo-l5-published.json"
 
 # 甲市 has a strong neighbour (乙區), a weak one (丙區), and one reachable only
 # by going through 乙區. 丁區 sits in another county so cross-county traversal
@@ -345,6 +347,62 @@ class GeoArtifactTests(unittest.TestCase):
         )
         # 內科 is 25.8% concentrated: in job text it is the medical department.
         self.assertEqual(self.graph.resolve_alias("內科"), ())
+
+
+class L5TableTests(unittest.TestCase):
+    """Only the corpus-validated subset of the authored table reaches the graph."""
+
+    def setUp(self) -> None:
+        if not ARTIFACT.is_file() or not L5_PUBLISHED.is_file():
+            self.skipTest("geo artifacts not present")
+        self.graph = build_geo_graph(ARTIFACT, AUTHORED)
+        self.published = json.loads(L5_PUBLISHED.read_text(encoding="utf-8"))
+        self.source = json.loads(L5_SOURCE.read_text(encoding="utf-8"))
+
+    def test_published_is_a_strict_subset_of_the_authored_table(self) -> None:
+        authored = {entry["surface"] for entry in self.source["entries"]}
+        published = {entry["surface"] for entry in self.published["entries"]}
+        self.assertTrue(published < authored)
+
+    def test_every_published_entry_carries_its_measured_evidence(self) -> None:
+        for entry in self.published["entries"]:
+            self.assertGreaterEqual(entry["appearances"], self.published["gate"]["min_appearances"])
+            self.assertGreaterEqual(
+                entry["concentration"], self.published["gate"]["min_concentration"]
+            )
+
+    def test_landmarks_resolve_to_their_districts(self) -> None:
+        self.assertEqual(set(self.graph.resolve_alias("中壢工業區")), {"桃園市/中壢區"})
+        self.assertEqual(set(self.graph.resolve_alias("南港軟體園區")), {"台北市/南港區"})
+        self.assertEqual(set(self.graph.resolve_alias("高鐵台中站")), {"台中市/烏日區"})
+
+    def test_an_arterial_road_resolves_to_every_district_it_runs_through(self) -> None:
+        # A road is not a point; claiming one district would be a false claim.
+        self.assertGreater(len(self.graph.resolve_alias("忠孝東路")), 1)
+
+    def test_common_words_that_are_also_station_names_are_not_published(self) -> None:
+        # 保安 is a security guard, 成功 is success, 幸福 is a benefit adjective.
+        # All three are real station names and all three fail the gate.
+        for surface in ("保安", "成功", "幸福"):
+            self.assertEqual(self.graph.resolve_alias(surface), ())
+
+    def test_the_source_table_is_never_loaded_directly(self) -> None:
+        rejected = {entry["surface"] for entry in self.source["entries"]} - {
+            entry["surface"] for entry in self.published["entries"]
+        }
+        # config/geo-authored.json carries its own small site list through a
+        # separate gate, so a surface it publishes is legitimately present even
+        # when the L5 table rejected it. 南科 is both.
+        separately_published = {
+            site["id"].split("/", 1)[1]
+            for site in json.loads(AUTHORED.read_text(encoding="utf-8"))["sites"]
+            if site.get("published", True)
+        }
+        rejected -= separately_published
+        self.assertTrue(rejected)
+        for surface in rejected:
+            self.assertNotIn(f"L5/{surface}", self.graph.aliases.get(surface, []))
+        self.assertNotIn("保安", self.graph.aliases)
 
 
 class GeoTraceContractTests(unittest.TestCase):

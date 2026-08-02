@@ -1,0 +1,4698 @@
+{
+  "schema": "skillweave-geo-l5-table-v1",
+  "provenance": "authored",
+  "status": "unvalidated source; scripts/validate_l5_table.py decides what is published",
+  "note": "Authored geography is confidently wrong more often than it is uncertain, so nothing here is trusted until the corpus supports it. The validator measures where each surface actually occurs in job text and publishes only what clears the county concentration gate.",
+  "kinds": [
+    "arterial_road",
+    "hsr_station",
+    "industrial_park",
+    "landmark",
+    "lrt_station",
+    "lrt_station+landmark",
+    "metro_station",
+    "tra_station",
+    "tra_station+industrial_park"
+  ],
+  "counts": {
+    "arterial_road": 29,
+    "hsr_station": 12,
+    "industrial_park": 54,
+    "landmark": 72,
+    "lrt_station": 12,
+    "lrt_station+landmark": 2,
+    "metro_station": 154,
+    "tra_station": 85,
+    "tra_station+industrial_park": 1
+  },
+  "total": 421,
+  "entries": [
+    {
+      "id": "L5/一中街",
+      "surface": "一中街",
+      "kind": "landmark",
+      "districts": [
+        "台中市/北區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/七堵",
+      "surface": "七堵",
+      "kind": "tra_station",
+      "districts": [
+        "基隆市/七堵區"
+      ],
+      "counties": [
+        "基隆市"
+      ]
+    },
+    {
+      "id": "L5/七張",
+      "surface": "七張",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新店區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/七星潭",
+      "surface": "七星潭",
+      "kind": "landmark",
+      "districts": [
+        "花蓮縣/新城鄉"
+      ],
+      "counties": [
+        "花蓮縣"
+      ]
+    },
+    {
+      "id": "L5/七期",
+      "surface": "七期",
+      "kind": "landmark",
+      "districts": [
+        "台中市/西屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/三和國中",
+      "surface": "三和國中",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/蘆洲區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/三多商圈",
+      "surface": "三多商圈",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/前鎮區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/三多路",
+      "surface": "三多路",
+      "kind": "arterial_road",
+      "districts": [
+        "高雄市/苓雅區",
+        "高雄市/前鎮區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/三義",
+      "surface": "三義",
+      "kind": "tra_station",
+      "districts": [
+        "苗栗縣/三義鄉"
+      ],
+      "counties": [
+        "苗栗縣"
+      ]
+    },
+    {
+      "id": "L5/三重國小",
+      "surface": "三重國小",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/三重區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/中原",
+      "surface": "中原",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/中和區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/中原大學",
+      "surface": "中原大學",
+      "kind": "landmark",
+      "districts": [
+        "桃園市/中壢區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/中友",
+      "surface": "中友",
+      "kind": "landmark",
+      "districts": [
+        "台中市/北區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/中國醫",
+      "surface": "中國醫",
+      "kind": "landmark",
+      "districts": [
+        "台中市/北區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/中壢工業區",
+      "surface": "中壢工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "桃園市/中壢區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/中央公園",
+      "surface": "中央公園",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/新興區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/中央大學",
+      "surface": "中央大學",
+      "kind": "landmark",
+      "districts": [
+        "桃園市/中壢區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/中山北路",
+      "surface": "中山北路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/中山區",
+        "台北市/士林區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/中山國中",
+      "surface": "中山國中",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/中山國小",
+      "surface": "中山國小",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/中山大學",
+      "surface": "中山大學",
+      "kind": "landmark",
+      "districts": [
+        "高雄市/鼓山區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/中正紀念堂",
+      "surface": "中正紀念堂",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/中清路",
+      "surface": "中清路",
+      "kind": "arterial_road",
+      "districts": [
+        "台中市/北區",
+        "台中市/西屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/中科",
+      "surface": "中科",
+      "kind": "industrial_park",
+      "districts": [
+        "台中市/西屯區",
+        "台中市/大雅區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/中科后里",
+      "surface": "中科后里",
+      "kind": "industrial_park",
+      "districts": [
+        "台中市/后里區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/中科大",
+      "surface": "中科大",
+      "kind": "landmark",
+      "districts": [
+        "台中市/北區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/中興新村",
+      "surface": "中興新村",
+      "kind": "landmark",
+      "districts": [
+        "南投縣/南投市"
+      ],
+      "counties": [
+        "南投縣"
+      ]
+    },
+    {
+      "id": "L5/中華五路",
+      "surface": "中華五路",
+      "kind": "arterial_road",
+      "districts": [
+        "高雄市/前鎮區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/中華北路",
+      "surface": "中華北路",
+      "kind": "arterial_road",
+      "districts": [
+        "台南市/北區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/中華東路",
+      "surface": "中華東路",
+      "kind": "arterial_road",
+      "districts": [
+        "台南市/東區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/中部科學園區",
+      "surface": "中部科學園區",
+      "kind": "industrial_park",
+      "districts": [
+        "台中市/西屯區",
+        "台中市/大雅區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/丹鳳",
+      "surface": "丹鳳",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新莊區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/九份",
+      "surface": "九份",
+      "kind": "landmark",
+      "districts": [
+        "新北市/瑞芳區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/二水",
+      "surface": "二水",
+      "kind": "tra_station",
+      "districts": [
+        "彰化縣/二水鄉"
+      ],
+      "counties": [
+        "彰化縣"
+      ]
+    },
+    {
+      "id": "L5/五堵",
+      "surface": "五堵",
+      "kind": "tra_station",
+      "districts": [
+        "新北市/汐止區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/五塊厝",
+      "surface": "五塊厝",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/苓雅區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/五權",
+      "surface": "五權",
+      "kind": "tra_station",
+      "districts": [
+        "台中市/中區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/五權路",
+      "surface": "五權路",
+      "kind": "arterial_road",
+      "districts": [
+        "台中市/西區",
+        "台中市/北區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/五股工業區",
+      "surface": "五股工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "新北市/五股區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/亞東醫院",
+      "surface": "亞東醫院",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/交大",
+      "surface": "交大",
+      "kind": "landmark",
+      "districts": [
+        "新竹市/東區"
+      ],
+      "counties": [
+        "新竹市"
+      ]
+    },
+    {
+      "id": "L5/仁武工業區",
+      "surface": "仁武工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/仁武區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/保安",
+      "surface": "保安",
+      "kind": "tra_station",
+      "districts": [
+        "台南市/仁德區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/信義商圈",
+      "surface": "信義商圈",
+      "kind": "landmark",
+      "districts": [
+        "台北市/信義區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/信義安和",
+      "surface": "信義安和",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/先嗇宮",
+      "surface": "先嗇宮",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/三重區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/光復",
+      "surface": "光復",
+      "kind": "tra_station",
+      "districts": [
+        "花蓮縣/光復鄉"
+      ],
+      "counties": [
+        "花蓮縣"
+      ]
+    },
+    {
+      "id": "L5/光復南路",
+      "surface": "光復南路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/大安區",
+        "台北市/信義區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/內壢",
+      "surface": "內壢",
+      "kind": "tra_station",
+      "districts": [
+        "桃園市/中壢區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/內湖科技園區",
+      "surface": "內湖科技園區",
+      "kind": "industrial_park",
+      "districts": [
+        "台北市/內湖區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/八堵",
+      "surface": "八堵",
+      "kind": "tra_station",
+      "districts": [
+        "基隆市/暖暖區"
+      ],
+      "counties": [
+        "基隆市"
+      ]
+    },
+    {
+      "id": "L5/八德路",
+      "surface": "八德路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/中正區",
+        "台北市/大安區",
+        "台北市/松山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/公益路",
+      "surface": "公益路",
+      "kind": "arterial_road",
+      "districts": [
+        "台中市/西區",
+        "台中市/南屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/公館",
+      "surface": "公館",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/六合夜市",
+      "surface": "六合夜市",
+      "kind": "landmark",
+      "districts": [
+        "高雄市/新興區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/六張犁",
+      "surface": "六張犁",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/六輕",
+      "surface": "六輕",
+      "kind": "industrial_park",
+      "districts": [
+        "雲林縣/麥寮鄉"
+      ],
+      "counties": [
+        "雲林縣"
+      ]
+    },
+    {
+      "id": "L5/冬山",
+      "surface": "冬山",
+      "kind": "tra_station",
+      "districts": [
+        "宜蘭縣/冬山鄉"
+      ],
+      "counties": [
+        "宜蘭縣"
+      ]
+    },
+    {
+      "id": "L5/凱旋",
+      "surface": "凱旋",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/前鎮區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/凱旋瑞田",
+      "surface": "凱旋瑞田",
+      "kind": "lrt_station",
+      "districts": [
+        "高雄市/前鎮區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/凹子底",
+      "surface": "凹子底",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/鼓山區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/利澤",
+      "surface": "利澤",
+      "kind": "industrial_park",
+      "districts": [
+        "宜蘭縣/五結鄉",
+        "宜蘭縣/蘇澳鎮"
+      ],
+      "counties": [
+        "宜蘭縣"
+      ]
+    },
+    {
+      "id": "L5/利澤工業區",
+      "surface": "利澤工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "宜蘭縣/五結鄉"
+      ],
+      "counties": [
+        "宜蘭縣"
+      ]
+    },
+    {
+      "id": "L5/劍南路",
+      "surface": "劍南路",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/劍湖山",
+      "surface": "劍湖山",
+      "kind": "landmark",
+      "districts": [
+        "雲林縣/古坑鄉"
+      ],
+      "counties": [
+        "雲林縣"
+      ]
+    },
+    {
+      "id": "L5/劍潭",
+      "surface": "劍潭",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/士林區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/動物園",
+      "surface": "動物園",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/文山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/北屯總站",
+      "surface": "北屯總站",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/北屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/北投士林科技園區",
+      "surface": "北投士林科技園區",
+      "kind": "industrial_park",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/北新竹",
+      "surface": "北新竹",
+      "kind": "tra_station",
+      "districts": [
+        "新竹市/東區"
+      ],
+      "counties": [
+        "新竹市"
+      ]
+    },
+    {
+      "id": "L5/北車",
+      "surface": "北車",
+      "kind": "landmark",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/北門",
+      "surface": "北門",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大同區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/十四張",
+      "surface": "十四張",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新店區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/南京三民",
+      "surface": "南京三民",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/松山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/南京復興",
+      "surface": "南京復興",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/松山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/南京東路",
+      "surface": "南京東路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/中山區",
+        "台北市/松山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/南勢角",
+      "surface": "南勢角",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/中和區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/南岡山",
+      "surface": "南岡山",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/岡山區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/南樹林",
+      "surface": "南樹林",
+      "kind": "tra_station",
+      "districts": [
+        "新北市/樹林區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/南港展覽",
+      "surface": "南港展覽",
+      "kind": "landmark",
+      "districts": [
+        "台北市/南港區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/南港展覽館",
+      "surface": "南港展覽館",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/南港區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/南港軟體園區",
+      "surface": "南港軟體園區",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/南港區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/南港軟體工業園區",
+      "surface": "南港軟體工業園區",
+      "kind": "industrial_park",
+      "districts": [
+        "台北市/南港區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/南澳",
+      "surface": "南澳",
+      "kind": "tra_station",
+      "districts": [
+        "宜蘭縣/南澳鄉"
+      ],
+      "counties": [
+        "宜蘭縣"
+      ]
+    },
+    {
+      "id": "L5/南科",
+      "surface": "南科",
+      "kind": "tra_station+industrial_park",
+      "districts": [
+        "台南市/善化區",
+        "台南市/安定區",
+        "台南市/新市區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/南部科學園區",
+      "surface": "南部科學園區",
+      "kind": "industrial_park",
+      "districts": [
+        "台南市/新市區",
+        "台南市/善化區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/南靖",
+      "surface": "南靖",
+      "kind": "tra_station",
+      "districts": [
+        "嘉義縣/水上鄉"
+      ],
+      "counties": [
+        "嘉義縣"
+      ]
+    },
+    {
+      "id": "L5/古亭",
+      "surface": "古亭",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/台中七期",
+      "surface": "台中七期",
+      "kind": "landmark",
+      "districts": [
+        "台中市/西屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/台中工業區",
+      "surface": "台中工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "台中市/南屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/台中榮總",
+      "surface": "台中榮總",
+      "kind": "landmark",
+      "districts": [
+        "台中市/西屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/台中歌劇院",
+      "surface": "台中歌劇院",
+      "kind": "landmark",
+      "districts": [
+        "台中市/西屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/台中港關連工業區",
+      "surface": "台中港關連工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "台中市/梧棲區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/台北101",
+      "surface": "台北101",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/信義區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/台北小巨蛋",
+      "surface": "台北小巨蛋",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/松山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/台北橋",
+      "surface": "台北橋",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/三重區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/台北車站",
+      "surface": "台北車站",
+      "kind": "landmark",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/台南林百貨",
+      "surface": "台南林百貨",
+      "kind": "landmark",
+      "districts": [
+        "台南市/中西區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/台南車站",
+      "surface": "台南車站",
+      "kind": "tra_station",
+      "districts": [
+        "台南市/東區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/台大",
+      "surface": "台大",
+      "kind": "landmark",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/台大醫院",
+      "surface": "台大醫院",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/台東大學",
+      "surface": "台東大學",
+      "kind": "landmark",
+      "districts": [
+        "台東縣/台東市"
+      ],
+      "counties": [
+        "台東縣"
+      ]
+    },
+    {
+      "id": "L5/台灣大道",
+      "surface": "台灣大道",
+      "kind": "arterial_road",
+      "districts": [
+        "台中市/中區",
+        "台中市/西區",
+        "台中市/西屯區",
+        "台中市/龍井區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/台電大樓",
+      "surface": "台電大樓",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/吉安",
+      "surface": "吉安",
+      "kind": "tra_station",
+      "districts": [
+        "花蓮縣/吉安鄉"
+      ],
+      "counties": [
+        "花蓮縣"
+      ]
+    },
+    {
+      "id": "L5/和平",
+      "surface": "和平",
+      "kind": "tra_station",
+      "districts": [
+        "花蓮縣/秀林鄉"
+      ],
+      "counties": [
+        "花蓮縣"
+      ]
+    },
+    {
+      "id": "L5/和緯路",
+      "surface": "和緯路",
+      "kind": "arterial_road",
+      "districts": [
+        "台南市/北區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/哈瑪星",
+      "surface": "哈瑪星",
+      "kind": "lrt_station",
+      "districts": [
+        "高雄市/鼓山區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/員林",
+      "surface": "員林",
+      "kind": "tra_station",
+      "districts": [
+        "彰化縣/員林市"
+      ],
+      "counties": [
+        "彰化縣"
+      ]
+    },
+    {
+      "id": "L5/唭哩岸",
+      "surface": "唭哩岸",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/善化",
+      "surface": "善化",
+      "kind": "tra_station",
+      "districts": [
+        "台南市/善化區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/善導寺",
+      "surface": "善導寺",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/嘉太工業區",
+      "surface": "嘉太工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "嘉義縣/太保市"
+      ],
+      "counties": [
+        "嘉義縣"
+      ]
+    },
+    {
+      "id": "L5/嘉義車站",
+      "surface": "嘉義車站",
+      "kind": "tra_station",
+      "districts": [
+        "嘉義市/西區"
+      ],
+      "counties": [
+        "嘉義市"
+      ]
+    },
+    {
+      "id": "L5/四城",
+      "surface": "四城",
+      "kind": "tra_station",
+      "districts": [
+        "宜蘭縣/礁溪鄉"
+      ],
+      "counties": [
+        "宜蘭縣"
+      ]
+    },
+    {
+      "id": "L5/四維國小",
+      "surface": "四維國小",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/北屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/四腳亭",
+      "surface": "四腳亭",
+      "kind": "tra_station",
+      "districts": [
+        "新北市/瑞芳區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/國父紀念館",
+      "surface": "國父紀念館",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/信義區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/圓山",
+      "surface": "圓山",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大同區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/圓山飯店",
+      "surface": "圓山飯店",
+      "kind": "landmark",
+      "districts": [
+        "台北市/中山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/土城工業區",
+      "surface": "土城工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "新北市/土城區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/坑口",
+      "surface": "坑口",
+      "kind": "metro_station",
+      "districts": [
+        "桃園市/蘆竹區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/埔心",
+      "surface": "埔心",
+      "kind": "tra_station",
+      "districts": [
+        "桃園市/楊梅區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/基隆路",
+      "surface": "基隆路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/信義區",
+        "台北市/大安區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/墾丁",
+      "surface": "墾丁",
+      "kind": "landmark",
+      "districts": [
+        "屏東縣/恆春鎮"
+      ],
+      "counties": [
+        "屏東縣"
+      ]
+    },
+    {
+      "id": "L5/士林夜市",
+      "surface": "士林夜市",
+      "kind": "landmark",
+      "districts": [
+        "台北市/士林區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/壽豐",
+      "surface": "壽豐",
+      "kind": "tra_station",
+      "districts": [
+        "花蓮縣/壽豐鄉"
+      ],
+      "counties": [
+        "花蓮縣"
+      ]
+    },
+    {
+      "id": "L5/夢時代",
+      "surface": "夢時代",
+      "kind": "lrt_station+landmark",
+      "districts": [
+        "高雄市/前鎮區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/大園工業區",
+      "surface": "大園工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "桃園市/大園區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/大坪林",
+      "surface": "大坪林",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新店區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/大墩",
+      "surface": "大墩",
+      "kind": "landmark",
+      "districts": [
+        "台中市/南屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/大安森林公園",
+      "surface": "大安森林公園",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/大寮",
+      "surface": "大寮",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/大寮區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/大慶",
+      "surface": "大慶",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/南區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/大慶車站",
+      "surface": "大慶車站",
+      "kind": "tra_station",
+      "districts": [
+        "台中市/南區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/大東",
+      "surface": "大東",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/鳳山區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/大林",
+      "surface": "大林",
+      "kind": "tra_station",
+      "districts": [
+        "嘉義縣/大林鎮"
+      ],
+      "counties": [
+        "嘉義縣"
+      ]
+    },
+    {
+      "id": "L5/大橋頭",
+      "surface": "大橋頭",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大同區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/大湖公園",
+      "surface": "大湖公園",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/內湖區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/大發",
+      "surface": "大發",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/大寮區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/大發工業區",
+      "surface": "大發工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/大寮區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/大直",
+      "surface": "大直",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/大里工業區",
+      "surface": "大里工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "台中市/大里區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/太原",
+      "surface": "太原",
+      "kind": "tra_station",
+      "districts": [
+        "台中市/北區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/太魯閣",
+      "surface": "太魯閣",
+      "kind": "landmark",
+      "districts": [
+        "花蓮縣/秀林鄉"
+      ],
+      "counties": [
+        "花蓮縣"
+      ]
+    },
+    {
+      "id": "L5/央北",
+      "surface": "央北",
+      "kind": "lrt_station",
+      "districts": [
+        "新北市/新店區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/奇岩",
+      "surface": "奇岩",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/奇美博物館",
+      "surface": "奇美博物館",
+      "kind": "landmark",
+      "districts": [
+        "台南市/仁德區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/安平",
+      "surface": "安平",
+      "kind": "landmark",
+      "districts": [
+        "台南市/安平區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/安平工業區",
+      "surface": "安平工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "台南市/安平區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/官田工業區",
+      "surface": "官田工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "台南市/官田區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/富岡",
+      "surface": "富岡",
+      "kind": "tra_station",
+      "districts": [
+        "桃園市/楊梅區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/小人國",
+      "surface": "小人國",
+      "kind": "landmark",
+      "districts": [
+        "桃園市/龍潭區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/小南門",
+      "surface": "小南門",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/小東路",
+      "surface": "小東路",
+      "kind": "arterial_road",
+      "districts": [
+        "台南市/東區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/小港",
+      "surface": "小港",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/小港區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/小琉球",
+      "surface": "小琉球",
+      "kind": "landmark",
+      "districts": [
+        "屏東縣/琉球鄉"
+      ],
+      "counties": [
+        "屏東縣"
+      ]
+    },
+    {
+      "id": "L5/小碧潭",
+      "surface": "小碧潭",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新店區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/屏東車站",
+      "surface": "屏東車站",
+      "kind": "tra_station",
+      "districts": [
+        "屏東縣/屏東市"
+      ],
+      "counties": [
+        "屏東縣"
+      ]
+    },
+    {
+      "id": "L5/山佳",
+      "surface": "山佳",
+      "kind": "tra_station",
+      "districts": [
+        "新北市/樹林區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/山鼻",
+      "surface": "山鼻",
+      "kind": "metro_station",
+      "districts": [
+        "桃園市/蘆竹區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/岡山",
+      "surface": "岡山",
+      "kind": "tra_station",
+      "districts": [
+        "高雄市/岡山區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/崁頂",
+      "surface": "崁頂",
+      "kind": "lrt_station",
+      "districts": [
+        "新北市/淡水區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/崇德路",
+      "surface": "崇德路",
+      "kind": "arterial_road",
+      "districts": [
+        "台中市/北區",
+        "台中市/北屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/崎頂",
+      "surface": "崎頂",
+      "kind": "tra_station",
+      "districts": [
+        "苗栗縣/竹南鎮"
+      ],
+      "counties": [
+        "苗栗縣"
+      ]
+    },
+    {
+      "id": "L5/巨城",
+      "surface": "巨城",
+      "kind": "landmark",
+      "districts": [
+        "新竹市/東區"
+      ],
+      "counties": [
+        "新竹市"
+      ]
+    },
+    {
+      "id": "L5/巨蛋",
+      "surface": "巨蛋",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/左營區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/市政府",
+      "surface": "市政府",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/信義區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/市議會",
+      "surface": "市議會",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/前金區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/師大",
+      "surface": "師大",
+      "kind": "landmark",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/平鎮工業區",
+      "surface": "平鎮工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "桃園市/平鎮區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/幸福",
+      "surface": "幸福",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新莊區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/幼獅工業區",
+      "surface": "幼獅工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "桃園市/楊梅區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/府中",
+      "surface": "府中",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/彰化workshop",
+      "surface": "彰化workshop",
+      "kind": "industrial_park",
+      "districts": [
+        "彰化縣/彰化市"
+      ],
+      "counties": [
+        "彰化縣"
+      ]
+    },
+    {
+      "id": "L5/彰化車站",
+      "surface": "彰化車站",
+      "kind": "tra_station",
+      "districts": [
+        "彰化縣/彰化市"
+      ],
+      "counties": [
+        "彰化縣"
+      ]
+    },
+    {
+      "id": "L5/彰濱工業區",
+      "surface": "彰濱工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "彰化縣/線西鄉",
+        "彰化縣/鹿港鎮"
+      ],
+      "counties": [
+        "彰化縣"
+      ]
+    },
+    {
+      "id": "L5/後勁",
+      "surface": "後勁",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/楠梓區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/後壁",
+      "surface": "後壁",
+      "kind": "tra_station",
+      "districts": [
+        "台南市/後壁區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/後山埤",
+      "surface": "後山埤",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/南港區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/後驛",
+      "surface": "後驛",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/三民區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/徐匯中學",
+      "surface": "徐匯中學",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/蘆洲區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/復興崗",
+      "surface": "復興崗",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/忠孝復興",
+      "surface": "忠孝復興",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/忠孝敦化",
+      "surface": "忠孝敦化",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/忠孝新生",
+      "surface": "忠孝新生",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/忠孝東路",
+      "surface": "忠孝東路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/中正區",
+        "台北市/大安區",
+        "台北市/信義區",
+        "台北市/南港區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/忠義",
+      "surface": "忠義",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/愛河之心",
+      "surface": "愛河之心",
+      "kind": "lrt_station",
+      "districts": [
+        "高雄市/三民區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/成功",
+      "surface": "成功",
+      "kind": "tra_station",
+      "districts": [
+        "台中市/烏日區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/成功大學",
+      "surface": "成功大學",
+      "kind": "landmark",
+      "districts": [
+        "台南市/東區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/成大",
+      "surface": "成大",
+      "kind": "landmark",
+      "districts": [
+        "台南市/東區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/承德路",
+      "surface": "承德路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/大同區",
+        "台北市/士林區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/技擊館",
+      "surface": "技擊館",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/苓雅區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/政大",
+      "surface": "政大",
+      "kind": "landmark",
+      "districts": [
+        "台北市/文山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/故宮南院",
+      "surface": "故宮南院",
+      "kind": "landmark",
+      "districts": [
+        "嘉義縣/太保市"
+      ],
+      "counties": [
+        "嘉義縣"
+      ]
+    },
+    {
+      "id": "L5/敦化北路",
+      "surface": "敦化北路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/松山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/敦化南路",
+      "surface": "敦化南路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/文化中心",
+      "surface": "文化中心",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/苓雅區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/文化路",
+      "surface": "文化路",
+      "kind": "arterial_road",
+      "districts": [
+        "新北市/板橋區",
+        "新北市/新莊區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/文德",
+      "surface": "文德",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/內湖區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/文心",
+      "surface": "文心",
+      "kind": "landmark",
+      "districts": [
+        "台中市/南屯區",
+        "台中市/西屯區",
+        "台中市/北屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/文心中清",
+      "surface": "文心中清",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/北屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/文心崇德",
+      "surface": "文心崇德",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/北屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/文心森林公園",
+      "surface": "文心森林公園",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/南屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/文心櫻花",
+      "surface": "文心櫻花",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/西屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/文心路",
+      "surface": "文心路",
+      "kind": "arterial_road",
+      "districts": [
+        "台中市/南屯區",
+        "台中市/西屯區",
+        "台中市/北屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/文華高中",
+      "surface": "文華高中",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/西屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/斗六",
+      "surface": "斗六",
+      "kind": "tra_station",
+      "districts": [
+        "雲林縣/斗六市"
+      ],
+      "counties": [
+        "雲林縣"
+      ]
+    },
+    {
+      "id": "L5/斗六工業區",
+      "surface": "斗六工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "雲林縣/斗六市"
+      ],
+      "counties": [
+        "雲林縣"
+      ]
+    },
+    {
+      "id": "L5/斗南",
+      "surface": "斗南",
+      "kind": "tra_station",
+      "districts": [
+        "雲林縣/斗南鎮"
+      ],
+      "counties": [
+        "雲林縣"
+      ]
+    },
+    {
+      "id": "L5/新北投",
+      "surface": "新北投",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/新北產業園區",
+      "surface": "新北產業園區",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新莊區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/新城",
+      "surface": "新城",
+      "kind": "tra_station",
+      "districts": [
+        "花蓮縣/新城鄉"
+      ],
+      "counties": [
+        "花蓮縣"
+      ]
+    },
+    {
+      "id": "L5/新埔",
+      "surface": "新埔",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/新埔民生",
+      "surface": "新埔民生",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/新左營",
+      "surface": "新左營",
+      "kind": "tra_station",
+      "districts": [
+        "高雄市/左營區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/新店區公所",
+      "surface": "新店區公所",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新店區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/新烏日",
+      "surface": "新烏日",
+      "kind": "tra_station",
+      "districts": [
+        "台中市/烏日區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/新營",
+      "surface": "新營",
+      "kind": "tra_station",
+      "districts": [
+        "台南市/新營區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/新竹工業區",
+      "surface": "新竹工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "新竹縣/湖口鄉"
+      ],
+      "counties": [
+        "新竹縣"
+      ]
+    },
+    {
+      "id": "L5/新竹巨城",
+      "surface": "新竹巨城",
+      "kind": "landmark",
+      "districts": [
+        "新竹市/東區"
+      ],
+      "counties": [
+        "新竹市"
+      ]
+    },
+    {
+      "id": "L5/新竹科學園區",
+      "surface": "新竹科學園區",
+      "kind": "industrial_park",
+      "districts": [
+        "新竹市/東區",
+        "新竹縣/寶山鄉"
+      ],
+      "counties": [
+        "新竹市",
+        "新竹縣"
+      ]
+    },
+    {
+      "id": "L5/新竹車站",
+      "surface": "新竹車站",
+      "kind": "tra_station",
+      "districts": [
+        "新竹市/東區"
+      ],
+      "counties": [
+        "新竹市"
+      ]
+    },
+    {
+      "id": "L5/新莊副都心",
+      "surface": "新莊副都心",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新莊區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/新豐",
+      "surface": "新豐",
+      "kind": "tra_station",
+      "districts": [
+        "新竹縣/新豐鄉"
+      ],
+      "counties": [
+        "新竹縣"
+      ]
+    },
+    {
+      "id": "L5/新馬",
+      "surface": "新馬",
+      "kind": "tra_station",
+      "districts": [
+        "宜蘭縣/蘇澳鎮"
+      ],
+      "counties": [
+        "宜蘭縣"
+      ]
+    },
+    {
+      "id": "L5/旅運中心",
+      "surface": "旅運中心",
+      "kind": "lrt_station",
+      "districts": [
+        "高雄市/苓雅區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/旗津",
+      "surface": "旗津",
+      "kind": "landmark",
+      "districts": [
+        "高雄市/旗津區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/日月潭",
+      "surface": "日月潭",
+      "kind": "landmark",
+      "districts": [
+        "南投縣/魚池鄉"
+      ],
+      "counties": [
+        "南投縣"
+      ]
+    },
+    {
+      "id": "L5/昆陽",
+      "surface": "昆陽",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/南港區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/明德",
+      "surface": "明德",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/景安",
+      "surface": "景安",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/中和區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/景平",
+      "surface": "景平",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/中和區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/景美",
+      "surface": "景美",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/文山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/木柵",
+      "surface": "木柵",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/文山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/東區商圈",
+      "surface": "東區商圈",
+      "kind": "landmark",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/東海大學",
+      "surface": "東海大學",
+      "kind": "landmark",
+      "districts": [
+        "台中市/龍井區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/東湖",
+      "surface": "東湖",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/內湖區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/東門",
+      "surface": "東門",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/松山文創",
+      "surface": "松山文創",
+      "kind": "landmark",
+      "districts": [
+        "台北市/信義區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/松山機場",
+      "surface": "松山機場",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/松山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/松江南京",
+      "surface": "松江南京",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/松竹",
+      "surface": "松竹",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/北屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/板新",
+      "surface": "板新",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/板新路",
+      "surface": "板新路",
+      "kind": "arterial_road",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/板橋車站",
+      "surface": "板橋車站",
+      "kind": "landmark",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/枋寮",
+      "surface": "枋寮",
+      "kind": "tra_station",
+      "districts": [
+        "屏東縣/枋寮鄉"
+      ],
+      "counties": [
+        "屏東縣"
+      ]
+    },
+    {
+      "id": "L5/林口三井",
+      "surface": "林口三井",
+      "kind": "landmark",
+      "districts": [
+        "新北市/林口區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/林口工三",
+      "surface": "林口工三",
+      "kind": "industrial_park",
+      "districts": [
+        "新北市/林口區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/林口長庚",
+      "surface": "林口長庚",
+      "kind": "landmark",
+      "districts": [
+        "桃園市/龜山區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/林園工業區",
+      "surface": "林園工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/林園區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/柳營",
+      "surface": "柳營",
+      "kind": "tra_station",
+      "districts": [
+        "台南市/柳營區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/桃園機場",
+      "surface": "桃園機場",
+      "kind": "landmark",
+      "districts": [
+        "桃園市/大園區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/桃園航空城",
+      "surface": "桃園航空城",
+      "kind": "industrial_park",
+      "districts": [
+        "桃園市/大園區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/桃園車站",
+      "surface": "桃園車站",
+      "kind": "tra_station",
+      "districts": [
+        "桃園市/桃園區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/桃園體育園區",
+      "surface": "桃園體育園區",
+      "kind": "metro_station",
+      "districts": [
+        "桃園市/中壢區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/楠梓",
+      "surface": "楠梓",
+      "kind": "tra_station",
+      "districts": [
+        "高雄市/楠梓區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/楠梓加工出口區",
+      "surface": "楠梓加工出口區",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/楠梓區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/楠梓加工區",
+      "surface": "楠梓加工區",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/楠梓區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/樹谷",
+      "surface": "樹谷",
+      "kind": "industrial_park",
+      "districts": [
+        "台南市/新市區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/樹谷園區",
+      "surface": "樹谷園區",
+      "kind": "industrial_park",
+      "districts": [
+        "台南市/新市區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/橋和",
+      "surface": "橋和",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/中和區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/橋頭糖廠",
+      "surface": "橋頭糖廠",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/橋頭區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/機場第一航廈",
+      "surface": "機場第一航廈",
+      "kind": "metro_station",
+      "districts": [
+        "桃園市/大園區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/機場第二航廈",
+      "surface": "機場第二航廈",
+      "kind": "metro_station",
+      "districts": [
+        "桃園市/大園區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/橫山",
+      "surface": "橫山",
+      "kind": "metro_station",
+      "districts": [
+        "桃園市/大園區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/民族路",
+      "surface": "民族路",
+      "kind": "arterial_road",
+      "districts": [
+        "高雄市/三民區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/民權西路",
+      "surface": "民權西路",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大同區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/民生東路",
+      "surface": "民生東路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/中山區",
+        "台北市/松山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/民雄",
+      "surface": "民雄",
+      "kind": "tra_station",
+      "districts": [
+        "嘉義縣/民雄鄉"
+      ],
+      "counties": [
+        "嘉義縣"
+      ]
+    },
+    {
+      "id": "L5/水上",
+      "surface": "水上",
+      "kind": "tra_station",
+      "districts": [
+        "嘉義縣/水上鄉"
+      ],
+      "counties": [
+        "嘉義縣"
+      ]
+    },
+    {
+      "id": "L5/水安宮",
+      "surface": "水安宮",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/南屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/永安工業區",
+      "surface": "永安工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/永安區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/永安市場",
+      "surface": "永安市場",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/中和區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/永寧",
+      "surface": "永寧",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/土城區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/永康",
+      "surface": "永康",
+      "kind": "tra_station",
+      "districts": [
+        "台南市/永康區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/永康工業區",
+      "surface": "永康工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "台南市/永康區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/永春",
+      "surface": "永春",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/信義區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/永靖",
+      "surface": "永靖",
+      "kind": "tra_station",
+      "districts": [
+        "彰化縣/永靖鄉"
+      ],
+      "counties": [
+        "彰化縣"
+      ]
+    },
+    {
+      "id": "L5/汐止科學園區",
+      "surface": "汐止科學園區",
+      "kind": "industrial_park",
+      "districts": [
+        "新北市/汐止區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/汐科",
+      "surface": "汐科",
+      "kind": "tra_station",
+      "districts": [
+        "新北市/汐止區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/江子翠",
+      "surface": "江子翠",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/池上",
+      "surface": "池上",
+      "kind": "tra_station",
+      "districts": [
+        "台東縣/池上鄉"
+      ],
+      "counties": [
+        "台東縣"
+      ]
+    },
+    {
+      "id": "L5/油廠國小",
+      "surface": "油廠國小",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/楠梓區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/泰安",
+      "surface": "泰安",
+      "kind": "tra_station",
+      "districts": [
+        "台中市/后里區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/泰山貴和",
+      "surface": "泰山貴和",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/泰山區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/浮洲",
+      "surface": "浮洲",
+      "kind": "tra_station",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/海山",
+      "surface": "海山",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/土城區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/淡水老街",
+      "surface": "淡水老街",
+      "kind": "landmark",
+      "districts": [
+        "新北市/淡水區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/淡江大學",
+      "surface": "淡江大學",
+      "kind": "lrt_station+landmark",
+      "districts": [
+        "新北市/淡水區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/淡金北新",
+      "surface": "淡金北新",
+      "kind": "lrt_station",
+      "districts": [
+        "新北市/淡水區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/清境",
+      "surface": "清境",
+      "kind": "landmark",
+      "districts": [
+        "南投縣/仁愛鄉"
+      ],
+      "counties": [
+        "南投縣"
+      ]
+    },
+    {
+      "id": "L5/清大",
+      "surface": "清大",
+      "kind": "landmark",
+      "districts": [
+        "新竹市/東區"
+      ],
+      "counties": [
+        "新竹市"
+      ]
+    },
+    {
+      "id": "L5/港墘",
+      "surface": "港墘",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/內湖區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/湖口",
+      "surface": "湖口",
+      "kind": "tra_station",
+      "districts": [
+        "新竹縣/湖口鄉"
+      ],
+      "counties": [
+        "新竹縣"
+      ]
+    },
+    {
+      "id": "L5/湖口工業區",
+      "surface": "湖口工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "新竹縣/湖口鄉"
+      ],
+      "counties": [
+        "新竹縣"
+      ]
+    },
+    {
+      "id": "L5/溪頭",
+      "surface": "溪頭",
+      "kind": "landmark",
+      "districts": [
+        "南投縣/鹿谷鄉"
+      ],
+      "counties": [
+        "南投縣"
+      ]
+    },
+    {
+      "id": "L5/漁人碼頭",
+      "surface": "漁人碼頭",
+      "kind": "lrt_station",
+      "districts": [
+        "新北市/淡水區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/潭子",
+      "surface": "潭子",
+      "kind": "tra_station",
+      "districts": [
+        "台中市/潭子區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/潮州",
+      "surface": "潮州",
+      "kind": "tra_station",
+      "districts": [
+        "屏東縣/潮州鎮"
+      ],
+      "counties": [
+        "屏東縣"
+      ]
+    },
+    {
+      "id": "L5/烏來",
+      "surface": "烏來",
+      "kind": "landmark",
+      "districts": [
+        "新北市/烏來區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/牡丹",
+      "surface": "牡丹",
+      "kind": "tra_station",
+      "districts": [
+        "新北市/雙溪區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/猴硐",
+      "surface": "猴硐",
+      "kind": "tra_station",
+      "districts": [
+        "新北市/瑞芳區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/獅甲",
+      "surface": "獅甲",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/前鎮區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/玉里",
+      "surface": "玉里",
+      "kind": "tra_station",
+      "districts": [
+        "花蓮縣/玉里鎮"
+      ],
+      "counties": [
+        "花蓮縣"
+      ]
+    },
+    {
+      "id": "L5/瑞穗",
+      "surface": "瑞穗",
+      "kind": "tra_station",
+      "districts": [
+        "花蓮縣/瑞穗鄉"
+      ],
+      "counties": [
+        "花蓮縣"
+      ]
+    },
+    {
+      "id": "L5/瑞芳工業區",
+      "surface": "瑞芳工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "新北市/瑞芳區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/瑞豐夜市",
+      "surface": "瑞豐夜市",
+      "kind": "landmark",
+      "districts": [
+        "高雄市/左營區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/環北",
+      "surface": "環北",
+      "kind": "metro_station",
+      "districts": [
+        "桃園市/中壢區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/環河南路",
+      "surface": "環河南路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/萬華區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/生態園區",
+      "surface": "生態園區",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/左營區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/田中",
+      "surface": "田中",
+      "kind": "tra_station",
+      "districts": [
+        "彰化縣/田中鎮"
+      ],
+      "counties": [
+        "彰化縣"
+      ]
+    },
+    {
+      "id": "L5/百福",
+      "surface": "百福",
+      "kind": "tra_station",
+      "districts": [
+        "基隆市/七堵區"
+      ],
+      "counties": [
+        "基隆市"
+      ]
+    },
+    {
+      "id": "L5/真愛碼頭",
+      "surface": "真愛碼頭",
+      "kind": "lrt_station",
+      "districts": [
+        "高雄市/鹽埕區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/知本",
+      "surface": "知本",
+      "kind": "landmark",
+      "districts": [
+        "台東縣/卑南鄉"
+      ],
+      "counties": [
+        "台東縣"
+      ]
+    },
+    {
+      "id": "L5/石牌",
+      "surface": "石牌",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/礁溪",
+      "surface": "礁溪",
+      "kind": "tra_station",
+      "districts": [
+        "宜蘭縣/礁溪鄉"
+      ],
+      "counties": [
+        "宜蘭縣"
+      ]
+    },
+    {
+      "id": "L5/福隆",
+      "surface": "福隆",
+      "kind": "tra_station",
+      "districts": [
+        "新北市/貢寮區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/秀朗橋",
+      "surface": "秀朗橋",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/永和區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/秋紅谷",
+      "surface": "秋紅谷",
+      "kind": "landmark",
+      "districts": [
+        "台中市/西屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/科技大樓",
+      "surface": "科技大樓",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/竹北",
+      "surface": "竹北",
+      "kind": "tra_station",
+      "districts": [
+        "新竹縣/竹北市"
+      ],
+      "counties": [
+        "新竹縣"
+      ]
+    },
+    {
+      "id": "L5/竹南",
+      "surface": "竹南",
+      "kind": "tra_station",
+      "districts": [
+        "苗栗縣/竹南鎮"
+      ],
+      "counties": [
+        "苗栗縣"
+      ]
+    },
+    {
+      "id": "L5/竹南科學園區",
+      "surface": "竹南科學園區",
+      "kind": "industrial_park",
+      "districts": [
+        "苗栗縣/竹南鎮"
+      ],
+      "counties": [
+        "苗栗縣"
+      ]
+    },
+    {
+      "id": "L5/竹圍",
+      "surface": "竹圍",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/淡水區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/竹科",
+      "surface": "竹科",
+      "kind": "industrial_park",
+      "districts": [
+        "新竹市/東區",
+        "新竹縣/寶山鄉"
+      ],
+      "counties": [
+        "新竹市",
+        "新竹縣"
+      ]
+    },
+    {
+      "id": "L5/竹科三期",
+      "surface": "竹科三期",
+      "kind": "industrial_park",
+      "districts": [
+        "新竹縣/寶山鄉"
+      ],
+      "counties": [
+        "新竹縣"
+      ]
+    },
+    {
+      "id": "L5/精武",
+      "surface": "精武",
+      "kind": "tra_station",
+      "districts": [
+        "台中市/東區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/紅樹林",
+      "surface": "紅樹林",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/淡水區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/羅斯福路",
+      "surface": "羅斯福路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/中正區",
+        "台北市/文山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/羅東",
+      "surface": "羅東",
+      "kind": "tra_station",
+      "districts": [
+        "宜蘭縣/羅東鎮"
+      ],
+      "counties": [
+        "宜蘭縣"
+      ]
+    },
+    {
+      "id": "L5/美術館",
+      "surface": "美術館",
+      "kind": "lrt_station",
+      "districts": [
+        "高雄市/鼓山區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/美麗島",
+      "surface": "美麗島",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/新興區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/義大世界",
+      "surface": "義大世界",
+      "kind": "landmark",
+      "districts": [
+        "高雄市/大樹區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/義大醫院",
+      "surface": "義大醫院",
+      "kind": "landmark",
+      "districts": [
+        "高雄市/燕巢區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/臨海工業區",
+      "surface": "臨海工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/小港區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/興南",
+      "surface": "興南",
+      "kind": "metro_station",
+      "districts": [
+        "桃園市/中壢區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/舊社",
+      "surface": "舊社",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/北屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/芝山",
+      "surface": "芝山",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/士林區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/花壇",
+      "surface": "花壇",
+      "kind": "tra_station",
+      "districts": [
+        "彰化縣/花壇鄉"
+      ],
+      "counties": [
+        "彰化縣"
+      ]
+    },
+    {
+      "id": "L5/草衙",
+      "surface": "草衙",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/前鎮區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/菜寮",
+      "surface": "菜寮",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/三重區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/華山",
+      "surface": "華山",
+      "kind": "landmark",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/萬芳社區",
+      "surface": "萬芳社區",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/文山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/萬芳醫院",
+      "surface": "萬芳醫院",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/文山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/萬華",
+      "surface": "萬華",
+      "kind": "tra_station",
+      "districts": [
+        "台北市/萬華區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/萬隆",
+      "surface": "萬隆",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/文山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/葫洲",
+      "surface": "葫洲",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/內湖區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/行天宮",
+      "surface": "行天宮",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/衛武營",
+      "surface": "衛武營",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/鳳山區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/西湖",
+      "surface": "西湖",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/內湖區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/西門",
+      "surface": "西門",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/萬華區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/西門町",
+      "surface": "西門町",
+      "kind": "landmark",
+      "districts": [
+        "台北市/萬華區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/觀音工業區",
+      "surface": "觀音工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "桃園市/觀音區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/豐原",
+      "surface": "豐原",
+      "kind": "tra_station",
+      "districts": [
+        "台中市/豐原區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/豐富",
+      "surface": "豐富",
+      "kind": "tra_station",
+      "districts": [
+        "苗栗縣/苗栗市"
+      ],
+      "counties": [
+        "苗栗縣"
+      ]
+    },
+    {
+      "id": "L5/豐樂公園",
+      "surface": "豐樂公園",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/南屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/象山",
+      "surface": "象山",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/信義區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/路竹",
+      "surface": "路竹",
+      "kind": "tra_station",
+      "districts": [
+        "高雄市/路竹區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/路竹科學園區",
+      "surface": "路竹科學園區",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/路竹區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/輔仁大學",
+      "surface": "輔仁大學",
+      "kind": "landmark",
+      "districts": [
+        "新北市/新莊區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/輔大",
+      "surface": "輔大",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新莊區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/辛亥",
+      "surface": "辛亥",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/文山區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/迴龍",
+      "surface": "迴龍",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新莊區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/追分",
+      "surface": "追分",
+      "kind": "tra_station",
+      "districts": [
+        "台中市/大肚區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/造橋",
+      "surface": "造橋",
+      "kind": "tra_station",
+      "districts": [
+        "苗栗縣/造橋鄉"
+      ],
+      "counties": [
+        "苗栗縣"
+      ]
+    },
+    {
+      "id": "L5/逢甲",
+      "surface": "逢甲",
+      "kind": "landmark",
+      "districts": [
+        "台中市/西屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/逢甲夜市",
+      "surface": "逢甲夜市",
+      "kind": "landmark",
+      "districts": [
+        "台中市/西屯區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/都會公園",
+      "surface": "都會公園",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/楠梓區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/重慶北路",
+      "surface": "重慶北路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/大同區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/銅鑼",
+      "surface": "銅鑼",
+      "kind": "tra_station",
+      "districts": [
+        "苗栗縣/銅鑼鄉"
+      ],
+      "counties": [
+        "苗栗縣"
+      ]
+    },
+    {
+      "id": "L5/銅鑼科學園區",
+      "surface": "銅鑼科學園區",
+      "kind": "industrial_park",
+      "districts": [
+        "苗栗縣/銅鑼鄉"
+      ],
+      "counties": [
+        "苗栗縣"
+      ]
+    },
+    {
+      "id": "L5/長庚大學",
+      "surface": "長庚大學",
+      "kind": "landmark",
+      "districts": [
+        "桃園市/龜山區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/長庚醫院",
+      "surface": "長庚醫院",
+      "kind": "metro_station",
+      "districts": [
+        "桃園市/龜山區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/關山",
+      "surface": "關山",
+      "kind": "tra_station",
+      "districts": [
+        "台東縣/關山鎮"
+      ],
+      "counties": [
+        "台東縣"
+      ]
+    },
+    {
+      "id": "L5/關渡",
+      "surface": "關渡",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/阿里山",
+      "surface": "阿里山",
+      "kind": "landmark",
+      "districts": [
+        "嘉義縣/阿里山鄉"
+      ],
+      "counties": [
+        "嘉義縣"
+      ]
+    },
+    {
+      "id": "L5/陽光運動公園",
+      "surface": "陽光運動公園",
+      "kind": "lrt_station",
+      "districts": [
+        "新北市/新店區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/陽明山",
+      "surface": "陽明山",
+      "kind": "landmark",
+      "districts": [
+        "台北市/士林區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/隆田",
+      "surface": "隆田",
+      "kind": "tra_station",
+      "districts": [
+        "台南市/官田區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/雙連",
+      "surface": "雙連",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大同區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/青埔",
+      "surface": "青埔",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/橋頭區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/青年路",
+      "surface": "青年路",
+      "kind": "arterial_road",
+      "districts": [
+        "高雄市/苓雅區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/頂埔",
+      "surface": "頂埔",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/土城區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/頂崁",
+      "surface": "頂崁",
+      "kind": "industrial_park",
+      "districts": [
+        "新北市/新莊區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/頂崁工業區",
+      "surface": "頂崁工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "新北市/新莊區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/頂溪",
+      "surface": "頂溪",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/永和區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/領航",
+      "surface": "領航",
+      "kind": "metro_station",
+      "districts": [
+        "桃園市/中壢區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/頭份工業區",
+      "surface": "頭份工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "苗栗縣/頭份市"
+      ],
+      "counties": [
+        "苗栗縣"
+      ]
+    },
+    {
+      "id": "L5/頭前庄",
+      "surface": "頭前庄",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新莊區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/頭城",
+      "surface": "頭城",
+      "kind": "tra_station",
+      "districts": [
+        "宜蘭縣/頭城鎮"
+      ],
+      "counties": [
+        "宜蘭縣"
+      ]
+    },
+    {
+      "id": "L5/香山",
+      "surface": "香山",
+      "kind": "tra_station",
+      "districts": [
+        "新竹市/香山區"
+      ],
+      "counties": [
+        "新竹市"
+      ]
+    },
+    {
+      "id": "L5/駁二",
+      "surface": "駁二",
+      "kind": "landmark",
+      "districts": [
+        "高雄市/鹽埕區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/駁二大義",
+      "surface": "駁二大義",
+      "kind": "lrt_station",
+      "districts": [
+        "高雄市/鹽埕區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/體育大學",
+      "surface": "體育大學",
+      "kind": "metro_station",
+      "districts": [
+        "桃園市/龜山區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/高醫",
+      "surface": "高醫",
+      "kind": "landmark",
+      "districts": [
+        "高雄市/三民區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/高鐵南港站",
+      "surface": "高鐵南港站",
+      "kind": "hsr_station",
+      "districts": [
+        "台北市/南港區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/高鐵台中站",
+      "surface": "高鐵台中站",
+      "kind": "hsr_station",
+      "districts": [
+        "台中市/烏日區"
+      ],
+      "counties": [
+        "台中市"
+      ]
+    },
+    {
+      "id": "L5/高鐵台北站",
+      "surface": "高鐵台北站",
+      "kind": "hsr_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/高鐵台南站",
+      "surface": "高鐵台南站",
+      "kind": "hsr_station",
+      "districts": [
+        "台南市/歸仁區"
+      ],
+      "counties": [
+        "台南市"
+      ]
+    },
+    {
+      "id": "L5/高鐵嘉義站",
+      "surface": "高鐵嘉義站",
+      "kind": "hsr_station",
+      "districts": [
+        "嘉義縣/太保市"
+      ],
+      "counties": [
+        "嘉義縣"
+      ]
+    },
+    {
+      "id": "L5/高鐵左營站",
+      "surface": "高鐵左營站",
+      "kind": "hsr_station",
+      "districts": [
+        "高雄市/左營區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/高鐵彰化站",
+      "surface": "高鐵彰化站",
+      "kind": "hsr_station",
+      "districts": [
+        "彰化縣/田中鎮"
+      ],
+      "counties": [
+        "彰化縣"
+      ]
+    },
+    {
+      "id": "L5/高鐵新竹站",
+      "surface": "高鐵新竹站",
+      "kind": "hsr_station",
+      "districts": [
+        "新竹縣/竹北市"
+      ],
+      "counties": [
+        "新竹縣"
+      ]
+    },
+    {
+      "id": "L5/高鐵板橋站",
+      "surface": "高鐵板橋站",
+      "kind": "hsr_station",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "counties": [
+        "新北市"
+      ]
+    },
+    {
+      "id": "L5/高鐵桃園站",
+      "surface": "高鐵桃園站",
+      "kind": "hsr_station",
+      "districts": [
+        "桃園市/中壢區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    },
+    {
+      "id": "L5/高鐵苗栗站",
+      "surface": "高鐵苗栗站",
+      "kind": "hsr_station",
+      "districts": [
+        "苗栗縣/後龍鎮"
+      ],
+      "counties": [
+        "苗栗縣"
+      ]
+    },
+    {
+      "id": "L5/高鐵雲林站",
+      "surface": "高鐵雲林站",
+      "kind": "hsr_station",
+      "districts": [
+        "雲林縣/虎尾鎮"
+      ],
+      "counties": [
+        "雲林縣"
+      ]
+    },
+    {
+      "id": "L5/高雄國際機場",
+      "surface": "高雄國際機場",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/小港區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/高雄長庚",
+      "surface": "高雄長庚",
+      "kind": "landmark",
+      "districts": [
+        "高雄市/鳥松區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/鳳山西站",
+      "surface": "鳳山西站",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/鳳山區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/鳳山車站",
+      "surface": "鳳山車站",
+      "kind": "tra_station",
+      "districts": [
+        "高雄市/鳳山區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/鹽埕埔",
+      "surface": "鹽埕埔",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/鹽埕區"
+      ],
+      "counties": [
+        "高雄市"
+      ]
+    },
+    {
+      "id": "L5/鹿港老街",
+      "surface": "鹿港老街",
+      "kind": "landmark",
+      "districts": [
+        "彰化縣/鹿港鎮"
+      ],
+      "counties": [
+        "彰化縣"
+      ]
+    },
+    {
+      "id": "L5/鹿野",
+      "surface": "鹿野",
+      "kind": "tra_station",
+      "districts": [
+        "台東縣/鹿野鄉"
+      ],
+      "counties": [
+        "台東縣"
+      ]
+    },
+    {
+      "id": "L5/麟光",
+      "surface": "麟光",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/麥寮六輕",
+      "surface": "麥寮六輕",
+      "kind": "industrial_park",
+      "districts": [
+        "雲林縣/麥寮鄉"
+      ],
+      "counties": [
+        "雲林縣"
+      ]
+    },
+    {
+      "id": "L5/龍山寺",
+      "surface": "龍山寺",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/萬華區"
+      ],
+      "counties": [
+        "台北市"
+      ]
+    },
+    {
+      "id": "L5/龍德工業區",
+      "surface": "龍德工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "宜蘭縣/蘇澳鎮"
+      ],
+      "counties": [
+        "宜蘭縣"
+      ]
+    },
+    {
+      "id": "L5/龜山工業區",
+      "surface": "龜山工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "桃園市/龜山區"
+      ],
+      "counties": [
+        "桃園市"
+      ]
+    }
+  ]
+}

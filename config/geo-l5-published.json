@@ -1,0 +1,2604 @@
+{
+  "schema": "skillweave-geo-l5-published-v1",
+  "provenance": "authored, corpus-validated",
+  "validation_report": "reports/l5-table-validation.json",
+  "gate": {
+    "min_appearances": 20,
+    "min_concentration": 0.6,
+    "min_district_agreement": 0.5
+  },
+  "entries": [
+    {
+      "id": "L5/竹北",
+      "surface": "竹北",
+      "kind": "tra_station",
+      "districts": [
+        "新竹縣/竹北市"
+      ],
+      "appearances": 5764,
+      "concentration": 0.7505,
+      "district_agreement": 0.8368
+    },
+    {
+      "id": "L5/永康",
+      "surface": "永康",
+      "kind": "tra_station",
+      "districts": [
+        "台南市/永康區"
+      ],
+      "appearances": 3582,
+      "concentration": 0.799,
+      "district_agreement": 0.8467
+    },
+    {
+      "id": "L5/湖口",
+      "surface": "湖口",
+      "kind": "tra_station",
+      "districts": [
+        "新竹縣/湖口鄉"
+      ],
+      "appearances": 3270,
+      "concentration": 0.7061,
+      "district_agreement": 0.7395
+    },
+    {
+      "id": "L5/楠梓",
+      "surface": "楠梓",
+      "kind": "tra_station",
+      "districts": [
+        "高雄市/楠梓區"
+      ],
+      "appearances": 2882,
+      "concentration": 0.957,
+      "district_agreement": 0.9766
+    },
+    {
+      "id": "L5/內壢",
+      "surface": "內壢",
+      "kind": "tra_station",
+      "districts": [
+        "桃園市/中壢區"
+      ],
+      "appearances": 2416,
+      "concentration": 0.8117,
+      "district_agreement": 0.5883
+    },
+    {
+      "id": "L5/竹南",
+      "surface": "竹南",
+      "kind": "tra_station",
+      "districts": [
+        "苗栗縣/竹南鎮"
+      ],
+      "appearances": 2357,
+      "concentration": 0.6678,
+      "district_agreement": 0.7314
+    },
+    {
+      "id": "L5/岡山",
+      "surface": "岡山",
+      "kind": "tra_station",
+      "districts": [
+        "高雄市/岡山區"
+      ],
+      "appearances": 2291,
+      "concentration": 0.9738,
+      "district_agreement": 0.9841
+    },
+    {
+      "id": "L5/萬華",
+      "surface": "萬華",
+      "kind": "tra_station",
+      "districts": [
+        "台北市/萬華區"
+      ],
+      "appearances": 2275,
+      "concentration": 0.8624,
+      "district_agreement": 0.8129
+    },
+    {
+      "id": "L5/小港",
+      "surface": "小港",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/小港區"
+      ],
+      "appearances": 2028,
+      "concentration": 0.9527,
+      "district_agreement": 0.9665
+    },
+    {
+      "id": "L5/大寮",
+      "surface": "大寮",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/大寮區"
+      ],
+      "appearances": 1842,
+      "concentration": 0.924,
+      "district_agreement": 0.944
+    },
+    {
+      "id": "L5/新豐",
+      "surface": "新豐",
+      "kind": "tra_station",
+      "districts": [
+        "新竹縣/新豐鄉"
+      ],
+      "appearances": 1765,
+      "concentration": 0.6572,
+      "district_agreement": 0.7039
+    },
+    {
+      "id": "L5/豐原",
+      "surface": "豐原",
+      "kind": "tra_station",
+      "districts": [
+        "台中市/豐原區"
+      ],
+      "appearances": 1709,
+      "concentration": 0.9655,
+      "district_agreement": 0.9752
+    },
+    {
+      "id": "L5/斗六",
+      "surface": "斗六",
+      "kind": "tra_station",
+      "districts": [
+        "雲林縣/斗六市"
+      ],
+      "appearances": 1645,
+      "concentration": 0.8748,
+      "district_agreement": 0.9033
+    },
+    {
+      "id": "L5/員林",
+      "surface": "員林",
+      "kind": "tra_station",
+      "districts": [
+        "彰化縣/員林市"
+      ],
+      "appearances": 1468,
+      "concentration": 0.7875,
+      "district_agreement": 0.8257
+    },
+    {
+      "id": "L5/路竹",
+      "surface": "路竹",
+      "kind": "tra_station",
+      "districts": [
+        "高雄市/路竹區"
+      ],
+      "appearances": 1379,
+      "concentration": 0.9304,
+      "district_agreement": 0.9448
+    },
+    {
+      "id": "L5/安平",
+      "surface": "安平",
+      "kind": "landmark",
+      "districts": [
+        "台南市/安平區"
+      ],
+      "appearances": 1260,
+      "concentration": 0.9286,
+      "district_agreement": 0.9535
+    },
+    {
+      "id": "L5/文心",
+      "surface": "文心",
+      "kind": "landmark",
+      "districts": [
+        "台中市/南屯區",
+        "台中市/西屯區",
+        "台中市/北屯區"
+      ],
+      "appearances": 1237,
+      "concentration": 0.9095,
+      "district_agreement": 0.8248
+    },
+    {
+      "id": "L5/中壢工業區",
+      "surface": "中壢工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "桃園市/中壢區"
+      ],
+      "appearances": 1190,
+      "concentration": 0.9874,
+      "district_agreement": 0.9975
+    },
+    {
+      "id": "L5/新營",
+      "surface": "新營",
+      "kind": "tra_station",
+      "districts": [
+        "台南市/新營區"
+      ],
+      "appearances": 1187,
+      "concentration": 0.8568,
+      "district_agreement": 0.9271
+    },
+    {
+      "id": "L5/龜山工業區",
+      "surface": "龜山工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "桃園市/龜山區"
+      ],
+      "appearances": 1187,
+      "concentration": 0.8332,
+      "district_agreement": 0.9611
+    },
+    {
+      "id": "L5/善化",
+      "surface": "善化",
+      "kind": "tra_station",
+      "districts": [
+        "台南市/善化區"
+      ],
+      "appearances": 1113,
+      "concentration": 0.9605,
+      "district_agreement": 0.9736
+    },
+    {
+      "id": "L5/忠孝東路",
+      "surface": "忠孝東路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/中正區",
+        "台北市/大安區",
+        "台北市/信義區",
+        "台北市/南港區"
+      ],
+      "appearances": 1014,
+      "concentration": 0.9152,
+      "district_agreement": 0.9129
+    },
+    {
+      "id": "L5/潭子",
+      "surface": "潭子",
+      "kind": "tra_station",
+      "districts": [
+        "台中市/潭子區"
+      ],
+      "appearances": 1006,
+      "concentration": 0.9821,
+      "district_agreement": 0.989
+    },
+    {
+      "id": "L5/羅東",
+      "surface": "羅東",
+      "kind": "tra_station",
+      "districts": [
+        "宜蘭縣/羅東鎮"
+      ],
+      "appearances": 942,
+      "concentration": 0.9533,
+      "district_agreement": 0.9868
+    },
+    {
+      "id": "L5/林口長庚",
+      "surface": "林口長庚",
+      "kind": "landmark",
+      "districts": [
+        "桃園市/龜山區"
+      ],
+      "appearances": 927,
+      "concentration": 0.8015,
+      "district_agreement": 0.6849
+    },
+    {
+      "id": "L5/大林",
+      "surface": "大林",
+      "kind": "tra_station",
+      "districts": [
+        "嘉義縣/大林鎮"
+      ],
+      "appearances": 767,
+      "concentration": 0.6714,
+      "district_agreement": 0.7529
+    },
+    {
+      "id": "L5/夢時代",
+      "surface": "夢時代",
+      "kind": "lrt_station+landmark",
+      "districts": [
+        "高雄市/前鎮區"
+      ],
+      "appearances": 766,
+      "concentration": 0.8721,
+      "district_agreement": 0.7812
+    },
+    {
+      "id": "L5/台北車站",
+      "surface": "台北車站",
+      "kind": "landmark",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "appearances": 726,
+      "concentration": 0.8829,
+      "district_agreement": 0.5705
+    },
+    {
+      "id": "L5/埔心",
+      "surface": "埔心",
+      "kind": "tra_station",
+      "districts": [
+        "桃園市/楊梅區"
+      ],
+      "appearances": 693,
+      "concentration": 0.8254,
+      "district_agreement": 0.679
+    },
+    {
+      "id": "L5/礁溪",
+      "surface": "礁溪",
+      "kind": "tra_station",
+      "districts": [
+        "宜蘭縣/礁溪鄉"
+      ],
+      "appearances": 669,
+      "concentration": 0.9656,
+      "district_agreement": 0.9818
+    },
+    {
+      "id": "L5/丹鳳",
+      "surface": "丹鳳",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新莊區"
+      ],
+      "appearances": 638,
+      "concentration": 0.7759,
+      "district_agreement": 0.679
+    },
+    {
+      "id": "L5/潮州",
+      "surface": "潮州",
+      "kind": "tra_station",
+      "districts": [
+        "屏東縣/潮州鎮"
+      ],
+      "appearances": 592,
+      "concentration": 0.8395,
+      "district_agreement": 0.8614
+    },
+    {
+      "id": "L5/逢甲",
+      "surface": "逢甲",
+      "kind": "landmark",
+      "districts": [
+        "台中市/西屯區"
+      ],
+      "appearances": 591,
+      "concentration": 0.8799,
+      "district_agreement": 0.538
+    },
+    {
+      "id": "L5/文心路",
+      "surface": "文心路",
+      "kind": "arterial_road",
+      "districts": [
+        "台中市/南屯區",
+        "台中市/西屯區",
+        "台中市/北屯區"
+      ],
+      "appearances": 582,
+      "concentration": 0.9192,
+      "district_agreement": 0.9244
+    },
+    {
+      "id": "L5/大墩",
+      "surface": "大墩",
+      "kind": "landmark",
+      "districts": [
+        "台中市/南屯區"
+      ],
+      "appearances": 564,
+      "concentration": 0.9787,
+      "district_agreement": 0.8661
+    },
+    {
+      "id": "L5/承德路",
+      "surface": "承德路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/大同區",
+        "台北市/士林區"
+      ],
+      "appearances": 563,
+      "concentration": 0.7762,
+      "district_agreement": 0.659
+    },
+    {
+      "id": "L5/南港展覽館",
+      "surface": "南港展覽館",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/南港區"
+      ],
+      "appearances": 545,
+      "concentration": 0.8257,
+      "district_agreement": 0.8539
+    },
+    {
+      "id": "L5/羅斯福路",
+      "surface": "羅斯福路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/中正區",
+        "台北市/文山區"
+      ],
+      "appearances": 531,
+      "concentration": 0.8682,
+      "district_agreement": 0.557
+    },
+    {
+      "id": "L5/北車",
+      "surface": "北車",
+      "kind": "landmark",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "appearances": 520,
+      "concentration": 0.9442,
+      "district_agreement": 0.6364
+    },
+    {
+      "id": "L5/先嗇宮",
+      "surface": "先嗇宮",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/三重區"
+      ],
+      "appearances": 510,
+      "concentration": 0.9,
+      "district_agreement": 0.8839
+    },
+    {
+      "id": "L5/西湖",
+      "surface": "西湖",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/內湖區"
+      ],
+      "appearances": 507,
+      "concentration": 0.7061,
+      "district_agreement": 0.6199
+    },
+    {
+      "id": "L5/頂埔",
+      "surface": "頂埔",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/土城區"
+      ],
+      "appearances": 507,
+      "concentration": 0.8994,
+      "district_agreement": 0.9206
+    },
+    {
+      "id": "L5/銅鑼",
+      "surface": "銅鑼",
+      "kind": "tra_station",
+      "districts": [
+        "苗栗縣/銅鑼鄉"
+      ],
+      "appearances": 484,
+      "concentration": 0.8678,
+      "district_agreement": 0.9313
+    },
+    {
+      "id": "L5/湖口工業區",
+      "surface": "湖口工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "新竹縣/湖口鄉"
+      ],
+      "appearances": 483,
+      "concentration": 0.7329,
+      "district_agreement": 0.7679
+    },
+    {
+      "id": "L5/南京東路",
+      "surface": "南京東路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/中山區",
+        "台北市/松山區"
+      ],
+      "appearances": 477,
+      "concentration": 0.9224,
+      "district_agreement": 0.8957
+    },
+    {
+      "id": "L5/民雄",
+      "surface": "民雄",
+      "kind": "tra_station",
+      "districts": [
+        "嘉義縣/民雄鄉"
+      ],
+      "appearances": 468,
+      "concentration": 0.8868,
+      "district_agreement": 0.9497
+    },
+    {
+      "id": "L5/中原大學",
+      "surface": "中原大學",
+      "kind": "landmark",
+      "districts": [
+        "桃園市/中壢區"
+      ],
+      "appearances": 450,
+      "concentration": 0.9956,
+      "district_agreement": 0.9711
+    },
+    {
+      "id": "L5/觀音工業區",
+      "surface": "觀音工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "桃園市/觀音區"
+      ],
+      "appearances": 448,
+      "concentration": 0.9107,
+      "district_agreement": 0.9903
+    },
+    {
+      "id": "L5/五股工業區",
+      "surface": "五股工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "新北市/五股區"
+      ],
+      "appearances": 446,
+      "concentration": 0.9821,
+      "district_agreement": 0.991
+    },
+    {
+      "id": "L5/石牌",
+      "surface": "石牌",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "appearances": 443,
+      "concentration": 0.9526,
+      "district_agreement": 0.8789
+    },
+    {
+      "id": "L5/橋和",
+      "surface": "橋和",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/中和區"
+      ],
+      "appearances": 432,
+      "concentration": 0.9653,
+      "district_agreement": 0.9387
+    },
+    {
+      "id": "L5/南京復興",
+      "surface": "南京復興",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/松山區"
+      ],
+      "appearances": 422,
+      "concentration": 0.9668,
+      "district_agreement": 0.633
+    },
+    {
+      "id": "L5/師大",
+      "surface": "師大",
+      "kind": "landmark",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "appearances": 416,
+      "concentration": 0.7163,
+      "district_agreement": 0.5611
+    },
+    {
+      "id": "L5/林口三井",
+      "surface": "林口三井",
+      "kind": "landmark",
+      "districts": [
+        "新北市/林口區"
+      ],
+      "appearances": 413,
+      "concentration": 0.9128,
+      "district_agreement": 0.6525
+    },
+    {
+      "id": "L5/斗南",
+      "surface": "斗南",
+      "kind": "tra_station",
+      "districts": [
+        "雲林縣/斗南鎮"
+      ],
+      "appearances": 401,
+      "concentration": 0.9576,
+      "district_agreement": 0.9697
+    },
+    {
+      "id": "L5/七堵",
+      "surface": "七堵",
+      "kind": "tra_station",
+      "districts": [
+        "基隆市/七堵區"
+      ],
+      "appearances": 399,
+      "concentration": 0.8371,
+      "district_agreement": 0.8721
+    },
+    {
+      "id": "L5/柳營",
+      "surface": "柳營",
+      "kind": "tra_station",
+      "districts": [
+        "台南市/柳營區"
+      ],
+      "appearances": 397,
+      "concentration": 0.9899,
+      "district_agreement": 0.9949
+    },
+    {
+      "id": "L5/永寧",
+      "surface": "永寧",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/土城區"
+      ],
+      "appearances": 395,
+      "concentration": 0.9241,
+      "district_agreement": 0.8789
+    },
+    {
+      "id": "L5/香山",
+      "surface": "香山",
+      "kind": "tra_station",
+      "districts": [
+        "新竹市/香山區"
+      ],
+      "appearances": 383,
+      "concentration": 0.658,
+      "district_agreement": 0.7304
+    },
+    {
+      "id": "L5/台大醫院",
+      "surface": "台大醫院",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "appearances": 369,
+      "concentration": 0.8428,
+      "district_agreement": 0.6176
+    },
+    {
+      "id": "L5/忠孝復興",
+      "surface": "忠孝復興",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "appearances": 367,
+      "concentration": 0.9619,
+      "district_agreement": 0.7669
+    },
+    {
+      "id": "L5/汐科",
+      "surface": "汐科",
+      "kind": "tra_station",
+      "districts": [
+        "新北市/汐止區"
+      ],
+      "appearances": 350,
+      "concentration": 0.9457,
+      "district_agreement": 0.9375
+    },
+    {
+      "id": "L5/景安",
+      "surface": "景安",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/中和區"
+      ],
+      "appearances": 343,
+      "concentration": 0.8746,
+      "district_agreement": 0.8889
+    },
+    {
+      "id": "L5/府中",
+      "surface": "府中",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "appearances": 337,
+      "concentration": 0.9614,
+      "district_agreement": 0.5071
+    },
+    {
+      "id": "L5/東湖",
+      "surface": "東湖",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/內湖區"
+      ],
+      "appearances": 337,
+      "concentration": 0.8665,
+      "district_agreement": 0.8176
+    },
+    {
+      "id": "L5/木柵",
+      "surface": "木柵",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/文山區"
+      ],
+      "appearances": 336,
+      "concentration": 0.8929,
+      "district_agreement": 0.6784
+    },
+    {
+      "id": "L5/敦化南路",
+      "surface": "敦化南路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "appearances": 331,
+      "concentration": 0.9637,
+      "district_agreement": 0.9169
+    },
+    {
+      "id": "L5/桃園車站",
+      "surface": "桃園車站",
+      "kind": "tra_station",
+      "districts": [
+        "桃園市/桃園區"
+      ],
+      "appearances": 325,
+      "concentration": 0.6769,
+      "district_agreement": 0.7358
+    },
+    {
+      "id": "L5/冬山",
+      "surface": "冬山",
+      "kind": "tra_station",
+      "districts": [
+        "宜蘭縣/冬山鄉"
+      ],
+      "appearances": 309,
+      "concentration": 0.9579,
+      "district_agreement": 0.99
+    },
+    {
+      "id": "L5/港墘",
+      "surface": "港墘",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/內湖區"
+      ],
+      "appearances": 308,
+      "concentration": 0.9416,
+      "district_agreement": 0.9195
+    },
+    {
+      "id": "L5/南京三民",
+      "surface": "南京三民",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/松山區"
+      ],
+      "appearances": 305,
+      "concentration": 0.9672,
+      "district_agreement": 0.9695
+    },
+    {
+      "id": "L5/美術館",
+      "surface": "美術館",
+      "kind": "lrt_station",
+      "districts": [
+        "高雄市/鼓山區"
+      ],
+      "appearances": 304,
+      "concentration": 0.602,
+      "district_agreement": 0.5976
+    },
+    {
+      "id": "L5/行天宮",
+      "surface": "行天宮",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中山區"
+      ],
+      "appearances": 299,
+      "concentration": 0.9298,
+      "district_agreement": 0.6994
+    },
+    {
+      "id": "L5/玉里",
+      "surface": "玉里",
+      "kind": "tra_station",
+      "districts": [
+        "花蓮縣/玉里鎮"
+      ],
+      "appearances": 287,
+      "concentration": 0.9024,
+      "district_agreement": 0.9152
+    },
+    {
+      "id": "L5/平鎮工業區",
+      "surface": "平鎮工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "桃園市/平鎮區"
+      ],
+      "appearances": 285,
+      "concentration": 0.9333,
+      "district_agreement": 0.9603
+    },
+    {
+      "id": "L5/小碧潭",
+      "surface": "小碧潭",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新店區"
+      ],
+      "appearances": 283,
+      "concentration": 0.9576,
+      "district_agreement": 0.9634
+    },
+    {
+      "id": "L5/大里工業區",
+      "surface": "大里工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "台中市/大里區"
+      ],
+      "appearances": 278,
+      "concentration": 0.9928,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/幼獅工業區",
+      "surface": "幼獅工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "桃園市/楊梅區"
+      ],
+      "appearances": 278,
+      "concentration": 0.8417,
+      "district_agreement": 0.7883
+    },
+    {
+      "id": "L5/江子翠",
+      "surface": "江子翠",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "appearances": 278,
+      "concentration": 0.9388,
+      "district_agreement": 0.9409
+    },
+    {
+      "id": "L5/中央大學",
+      "surface": "中央大學",
+      "kind": "landmark",
+      "districts": [
+        "桃園市/中壢區"
+      ],
+      "appearances": 276,
+      "concentration": 0.913,
+      "district_agreement": 0.685
+    },
+    {
+      "id": "L5/民生東路",
+      "surface": "民生東路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/中山區",
+        "台北市/松山區"
+      ],
+      "appearances": 265,
+      "concentration": 0.9585,
+      "district_agreement": 0.8478
+    },
+    {
+      "id": "L5/中華五路",
+      "surface": "中華五路",
+      "kind": "arterial_road",
+      "districts": [
+        "高雄市/前鎮區"
+      ],
+      "appearances": 264,
+      "concentration": 0.8485,
+      "district_agreement": 0.875
+    },
+    {
+      "id": "L5/古亭",
+      "surface": "古亭",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "appearances": 264,
+      "concentration": 0.9205,
+      "district_agreement": 0.5812
+    },
+    {
+      "id": "L5/楠梓加工區",
+      "surface": "楠梓加工區",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/楠梓區"
+      ],
+      "appearances": 262,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/花壇",
+      "surface": "花壇",
+      "kind": "tra_station",
+      "districts": [
+        "彰化縣/花壇鄉"
+      ],
+      "appearances": 257,
+      "concentration": 0.93,
+      "district_agreement": 0.9676
+    },
+    {
+      "id": "L5/松江南京",
+      "surface": "松江南京",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中山區"
+      ],
+      "appearances": 256,
+      "concentration": 0.9727,
+      "district_agreement": 0.8495
+    },
+    {
+      "id": "L5/崇德路",
+      "surface": "崇德路",
+      "kind": "arterial_road",
+      "districts": [
+        "台中市/北區",
+        "台中市/北屯區"
+      ],
+      "appearances": 252,
+      "concentration": 0.631,
+      "district_agreement": 0.6512
+    },
+    {
+      "id": "L5/西門町",
+      "surface": "西門町",
+      "kind": "landmark",
+      "districts": [
+        "台北市/萬華區"
+      ],
+      "appearances": 249,
+      "concentration": 0.9598,
+      "district_agreement": 0.5932
+    },
+    {
+      "id": "L5/土城工業區",
+      "surface": "土城工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "新北市/土城區"
+      ],
+      "appearances": 247,
+      "concentration": 0.9879,
+      "district_agreement": 0.9959
+    },
+    {
+      "id": "L5/景平",
+      "surface": "景平",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/中和區"
+      ],
+      "appearances": 247,
+      "concentration": 0.9474,
+      "district_agreement": 0.9388
+    },
+    {
+      "id": "L5/七張",
+      "surface": "七張",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新店區"
+      ],
+      "appearances": 242,
+      "concentration": 0.9339,
+      "district_agreement": 0.9421
+    },
+    {
+      "id": "L5/關渡",
+      "surface": "關渡",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "appearances": 241,
+      "concentration": 0.6017,
+      "district_agreement": 0.515
+    },
+    {
+      "id": "L5/松竹",
+      "surface": "松竹",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/北屯區"
+      ],
+      "appearances": 234,
+      "concentration": 0.9316,
+      "district_agreement": 0.872
+    },
+    {
+      "id": "L5/敦化北路",
+      "surface": "敦化北路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/松山區"
+      ],
+      "appearances": 233,
+      "concentration": 0.9485,
+      "district_agreement": 0.9434
+    },
+    {
+      "id": "L5/大坪林",
+      "surface": "大坪林",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新店區"
+      ],
+      "appearances": 224,
+      "concentration": 0.9286,
+      "district_agreement": 0.5829
+    },
+    {
+      "id": "L5/基隆路",
+      "surface": "基隆路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/信義區",
+        "台北市/大安區"
+      ],
+      "appearances": 222,
+      "concentration": 0.9189,
+      "district_agreement": 0.9198
+    },
+    {
+      "id": "L5/輔大",
+      "surface": "輔大",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新莊區"
+      ],
+      "appearances": 221,
+      "concentration": 0.9367,
+      "district_agreement": 0.9068
+    },
+    {
+      "id": "L5/忠孝敦化",
+      "surface": "忠孝敦化",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "appearances": 220,
+      "concentration": 0.9773,
+      "district_agreement": 0.7015
+    },
+    {
+      "id": "L5/草衙",
+      "surface": "草衙",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/前鎮區"
+      ],
+      "appearances": 218,
+      "concentration": 0.9954,
+      "district_agreement": 0.6139
+    },
+    {
+      "id": "L5/忠孝新生",
+      "surface": "忠孝新生",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "appearances": 213,
+      "concentration": 0.9671,
+      "district_agreement": 0.7025
+    },
+    {
+      "id": "L5/吉安",
+      "surface": "吉安",
+      "kind": "tra_station",
+      "districts": [
+        "花蓮縣/吉安鄉"
+      ],
+      "appearances": 210,
+      "concentration": 0.9333,
+      "district_agreement": 0.9751
+    },
+    {
+      "id": "L5/國父紀念館",
+      "surface": "國父紀念館",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/信義區"
+      ],
+      "appearances": 210,
+      "concentration": 0.9905,
+      "district_agreement": 0.7027
+    },
+    {
+      "id": "L5/淡江大學",
+      "surface": "淡江大學",
+      "kind": "lrt_station+landmark",
+      "districts": [
+        "新北市/淡水區"
+      ],
+      "appearances": 206,
+      "concentration": 0.9029,
+      "district_agreement": 0.9388
+    },
+    {
+      "id": "L5/田中",
+      "surface": "田中",
+      "kind": "tra_station",
+      "districts": [
+        "彰化縣/田中鎮"
+      ],
+      "appearances": 206,
+      "concentration": 0.8835,
+      "district_agreement": 0.9239
+    },
+    {
+      "id": "L5/大發工業區",
+      "surface": "大發工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/大寮區"
+      ],
+      "appearances": 191,
+      "concentration": 0.9948,
+      "district_agreement": 0.9664
+    },
+    {
+      "id": "L5/菜寮",
+      "surface": "菜寮",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/三重區"
+      ],
+      "appearances": 188,
+      "concentration": 0.9574,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/七期",
+      "surface": "七期",
+      "kind": "landmark",
+      "districts": [
+        "台中市/西屯區"
+      ],
+      "appearances": 186,
+      "concentration": 0.9946,
+      "district_agreement": 0.7059
+    },
+    {
+      "id": "L5/頭城",
+      "surface": "頭城",
+      "kind": "tra_station",
+      "districts": [
+        "宜蘭縣/頭城鎮"
+      ],
+      "appearances": 177,
+      "concentration": 0.9435,
+      "district_agreement": 0.9598
+    },
+    {
+      "id": "L5/光復南路",
+      "surface": "光復南路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/大安區",
+        "台北市/信義區"
+      ],
+      "appearances": 174,
+      "concentration": 0.9138,
+      "district_agreement": 0.8639
+    },
+    {
+      "id": "L5/新竹工業區",
+      "surface": "新竹工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "新竹縣/湖口鄉"
+      ],
+      "appearances": 173,
+      "concentration": 0.7225,
+      "district_agreement": 0.7296
+    },
+    {
+      "id": "L5/南勢角",
+      "surface": "南勢角",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/中和區"
+      ],
+      "appearances": 168,
+      "concentration": 0.9702,
+      "district_agreement": 0.9255
+    },
+    {
+      "id": "L5/板橋車站",
+      "surface": "板橋車站",
+      "kind": "landmark",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "appearances": 168,
+      "concentration": 0.9048,
+      "district_agreement": 0.962
+    },
+    {
+      "id": "L5/松山機場",
+      "surface": "松山機場",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/松山區"
+      ],
+      "appearances": 165,
+      "concentration": 0.8121,
+      "district_agreement": 0.8816
+    },
+    {
+      "id": "L5/旗津",
+      "surface": "旗津",
+      "kind": "landmark",
+      "districts": [
+        "高雄市/旗津區"
+      ],
+      "appearances": 161,
+      "concentration": 0.9814,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/科技大樓",
+      "surface": "科技大樓",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "appearances": 161,
+      "concentration": 0.8323,
+      "district_agreement": 0.7931
+    },
+    {
+      "id": "L5/昆陽",
+      "surface": "昆陽",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/南港區"
+      ],
+      "appearances": 158,
+      "concentration": 0.8987,
+      "district_agreement": 0.8125
+    },
+    {
+      "id": "L5/安平工業區",
+      "surface": "安平工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "台南市/安平區"
+      ],
+      "appearances": 157,
+      "concentration": 0.9299,
+      "district_agreement": 0.9481
+    },
+    {
+      "id": "L5/路竹科學園區",
+      "surface": "路竹科學園區",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/路竹區"
+      ],
+      "appearances": 155,
+      "concentration": 0.8903,
+      "district_agreement": 0.9517
+    },
+    {
+      "id": "L5/公益路",
+      "surface": "公益路",
+      "kind": "arterial_road",
+      "districts": [
+        "台中市/西區",
+        "台中市/南屯區"
+      ],
+      "appearances": 153,
+      "concentration": 0.9739,
+      "district_agreement": 0.9153
+    },
+    {
+      "id": "L5/彰濱工業區",
+      "surface": "彰濱工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "彰化縣/線西鄉",
+        "彰化縣/鹿港鎮"
+      ],
+      "appearances": 150,
+      "concentration": 0.8867,
+      "district_agreement": 0.8056
+    },
+    {
+      "id": "L5/後山埤",
+      "surface": "後山埤",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/南港區"
+      ],
+      "appearances": 150,
+      "concentration": 0.9467,
+      "district_agreement": 0.6458
+    },
+    {
+      "id": "L5/頂溪",
+      "surface": "頂溪",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/永和區"
+      ],
+      "appearances": 147,
+      "concentration": 0.932,
+      "district_agreement": 0.8922
+    },
+    {
+      "id": "L5/台北小巨蛋",
+      "surface": "台北小巨蛋",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/松山區"
+      ],
+      "appearances": 144,
+      "concentration": 0.9306,
+      "district_agreement": 0.8488
+    },
+    {
+      "id": "L5/壽豐",
+      "surface": "壽豐",
+      "kind": "tra_station",
+      "districts": [
+        "花蓮縣/壽豐鄉"
+      ],
+      "appearances": 143,
+      "concentration": 0.986,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/中正紀念堂",
+      "surface": "中正紀念堂",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "appearances": 138,
+      "concentration": 0.8116,
+      "district_agreement": 0.7912
+    },
+    {
+      "id": "L5/紅樹林",
+      "surface": "紅樹林",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/淡水區"
+      ],
+      "appearances": 138,
+      "concentration": 0.9203,
+      "district_agreement": 0.6691
+    },
+    {
+      "id": "L5/浮洲",
+      "surface": "浮洲",
+      "kind": "tra_station",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "appearances": 134,
+      "concentration": 0.9701,
+      "district_agreement": 0.8231
+    },
+    {
+      "id": "L5/桃園航空城",
+      "surface": "桃園航空城",
+      "kind": "industrial_park",
+      "districts": [
+        "桃園市/大園區"
+      ],
+      "appearances": 133,
+      "concentration": 0.9925,
+      "district_agreement": 0.8797
+    },
+    {
+      "id": "L5/六張犁",
+      "surface": "六張犁",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "appearances": 132,
+      "concentration": 0.947,
+      "district_agreement": 0.7556
+    },
+    {
+      "id": "L5/枋寮",
+      "surface": "枋寮",
+      "kind": "tra_station",
+      "districts": [
+        "屏東縣/枋寮鄉"
+      ],
+      "appearances": 132,
+      "concentration": 0.9242,
+      "district_agreement": 0.9313
+    },
+    {
+      "id": "L5/善導寺",
+      "surface": "善導寺",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "appearances": 129,
+      "concentration": 0.845,
+      "district_agreement": 0.8611
+    },
+    {
+      "id": "L5/大園工業區",
+      "surface": "大園工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "桃園市/大園區"
+      ],
+      "appearances": 127,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/辛亥",
+      "surface": "辛亥",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/文山區"
+      ],
+      "appearances": 126,
+      "concentration": 0.873,
+      "district_agreement": 0.7041
+    },
+    {
+      "id": "L5/後壁",
+      "surface": "後壁",
+      "kind": "tra_station",
+      "districts": [
+        "台南市/後壁區"
+      ],
+      "appearances": 125,
+      "concentration": 0.944,
+      "district_agreement": 0.9593
+    },
+    {
+      "id": "L5/芝山",
+      "surface": "芝山",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/士林區"
+      ],
+      "appearances": 125,
+      "concentration": 0.984,
+      "district_agreement": 0.9467
+    },
+    {
+      "id": "L5/樹谷園區",
+      "surface": "樹谷園區",
+      "kind": "industrial_park",
+      "districts": [
+        "台南市/新市區"
+      ],
+      "appearances": 122,
+      "concentration": 1.0,
+      "district_agreement": 0.9604
+    },
+    {
+      "id": "L5/新馬",
+      "surface": "新馬",
+      "kind": "tra_station",
+      "districts": [
+        "宜蘭縣/蘇澳鎮"
+      ],
+      "appearances": 116,
+      "concentration": 0.7672,
+      "district_agreement": 0.967
+    },
+    {
+      "id": "L5/造橋",
+      "surface": "造橋",
+      "kind": "tra_station",
+      "districts": [
+        "苗栗縣/造橋鄉"
+      ],
+      "appearances": 115,
+      "concentration": 0.8087,
+      "district_agreement": 0.8611
+    },
+    {
+      "id": "L5/南港軟體園區",
+      "surface": "南港軟體園區",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/南港區"
+      ],
+      "appearances": 112,
+      "concentration": 0.8125,
+      "district_agreement": 0.875
+    },
+    {
+      "id": "L5/亞東醫院",
+      "surface": "亞東醫院",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "appearances": 108,
+      "concentration": 0.9259,
+      "district_agreement": 0.9103
+    },
+    {
+      "id": "L5/成功大學",
+      "surface": "成功大學",
+      "kind": "landmark",
+      "districts": [
+        "台南市/東區"
+      ],
+      "appearances": 108,
+      "concentration": 0.75,
+      "district_agreement": 0.0
+    },
+    {
+      "id": "L5/劍潭",
+      "surface": "劍潭",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/士林區"
+      ],
+      "appearances": 104,
+      "concentration": 0.9519,
+      "district_agreement": 0.8868
+    },
+    {
+      "id": "L5/竹南科學園區",
+      "surface": "竹南科學園區",
+      "kind": "industrial_park",
+      "districts": [
+        "苗栗縣/竹南鎮"
+      ],
+      "appearances": 103,
+      "concentration": 0.8641,
+      "district_agreement": 0.9674
+    },
+    {
+      "id": "L5/山鼻",
+      "surface": "山鼻",
+      "kind": "metro_station",
+      "districts": [
+        "桃園市/蘆竹區"
+      ],
+      "appearances": 102,
+      "concentration": 0.9314,
+      "district_agreement": 0.7647
+    },
+    {
+      "id": "L5/奇岩",
+      "surface": "奇岩",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "appearances": 98,
+      "concentration": 0.898,
+      "district_agreement": 0.9692
+    },
+    {
+      "id": "L5/陽明山",
+      "surface": "陽明山",
+      "kind": "landmark",
+      "districts": [
+        "台北市/士林區"
+      ],
+      "appearances": 96,
+      "concentration": 0.9062,
+      "district_agreement": 0.6129
+    },
+    {
+      "id": "L5/象山",
+      "surface": "象山",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/信義區"
+      ],
+      "appearances": 92,
+      "concentration": 0.8804,
+      "district_agreement": 0.9306
+    },
+    {
+      "id": "L5/瑞穗",
+      "surface": "瑞穗",
+      "kind": "tra_station",
+      "districts": [
+        "花蓮縣/瑞穗鄉"
+      ],
+      "appearances": 88,
+      "concentration": 0.7273,
+      "district_agreement": 0.7711
+    },
+    {
+      "id": "L5/龍山寺",
+      "surface": "龍山寺",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/萬華區"
+      ],
+      "appearances": 87,
+      "concentration": 0.8621,
+      "district_agreement": 0.8167
+    },
+    {
+      "id": "L5/六輕",
+      "surface": "六輕",
+      "kind": "industrial_park",
+      "districts": [
+        "雲林縣/麥寮鄉"
+      ],
+      "appearances": 86,
+      "concentration": 0.9535,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/重慶北路",
+      "surface": "重慶北路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/大同區"
+      ],
+      "appearances": 84,
+      "concentration": 0.9643,
+      "district_agreement": 0.8611
+    },
+    {
+      "id": "L5/百福",
+      "surface": "百福",
+      "kind": "tra_station",
+      "districts": [
+        "基隆市/七堵區"
+      ],
+      "appearances": 82,
+      "concentration": 0.7439,
+      "district_agreement": 0.62
+    },
+    {
+      "id": "L5/葫洲",
+      "surface": "葫洲",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/內湖區"
+      ],
+      "appearances": 82,
+      "concentration": 0.939,
+      "district_agreement": 0.9298
+    },
+    {
+      "id": "L5/永靖",
+      "surface": "永靖",
+      "kind": "tra_station",
+      "districts": [
+        "彰化縣/永靖鄉"
+      ],
+      "appearances": 81,
+      "concentration": 0.963,
+      "district_agreement": 0.975
+    },
+    {
+      "id": "L5/阿里山",
+      "surface": "阿里山",
+      "kind": "landmark",
+      "districts": [
+        "嘉義縣/阿里山鄉"
+      ],
+      "appearances": 81,
+      "concentration": 0.7531,
+      "district_agreement": 0.9104
+    },
+    {
+      "id": "L5/南部科學園區",
+      "surface": "南部科學園區",
+      "kind": "industrial_park",
+      "districts": [
+        "台南市/新市區",
+        "台南市/善化區"
+      ],
+      "appearances": 80,
+      "concentration": 0.825,
+      "district_agreement": 0.7742
+    },
+    {
+      "id": "L5/富岡",
+      "surface": "富岡",
+      "kind": "tra_station",
+      "districts": [
+        "桃園市/楊梅區"
+      ],
+      "appearances": 77,
+      "concentration": 0.8182,
+      "district_agreement": 0.7727
+    },
+    {
+      "id": "L5/山佳",
+      "surface": "山佳",
+      "kind": "tra_station",
+      "districts": [
+        "新北市/樹林區"
+      ],
+      "appearances": 77,
+      "concentration": 0.8701,
+      "district_agreement": 0.8
+    },
+    {
+      "id": "L5/徐匯中學",
+      "surface": "徐匯中學",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/蘆洲區"
+      ],
+      "appearances": 77,
+      "concentration": 0.9221,
+      "district_agreement": 0.8462
+    },
+    {
+      "id": "L5/關山",
+      "surface": "關山",
+      "kind": "tra_station",
+      "districts": [
+        "台東縣/關山鎮"
+      ],
+      "appearances": 75,
+      "concentration": 0.8267,
+      "district_agreement": 0.9841
+    },
+    {
+      "id": "L5/高雄長庚",
+      "surface": "高雄長庚",
+      "kind": "landmark",
+      "districts": [
+        "高雄市/鳥松區"
+      ],
+      "appearances": 72,
+      "concentration": 0.9861,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/二水",
+      "surface": "二水",
+      "kind": "tra_station",
+      "districts": [
+        "彰化縣/二水鄉"
+      ],
+      "appearances": 71,
+      "concentration": 0.8732,
+      "district_agreement": 0.8857
+    },
+    {
+      "id": "L5/唭哩岸",
+      "surface": "唭哩岸",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "appearances": 70,
+      "concentration": 0.7143,
+      "district_agreement": 0.6935
+    },
+    {
+      "id": "L5/後驛",
+      "surface": "後驛",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/三民區"
+      ],
+      "appearances": 70,
+      "concentration": 0.9429,
+      "district_agreement": 0.9333
+    },
+    {
+      "id": "L5/松山文創",
+      "surface": "松山文創",
+      "kind": "landmark",
+      "districts": [
+        "台北市/信義區"
+      ],
+      "appearances": 69,
+      "concentration": 0.9855,
+      "district_agreement": 0.8261
+    },
+    {
+      "id": "L5/銅鑼科學園區",
+      "surface": "銅鑼科學園區",
+      "kind": "industrial_park",
+      "districts": [
+        "苗栗縣/銅鑼鄉"
+      ],
+      "appearances": 69,
+      "concentration": 0.9565,
+      "district_agreement": 0.9851
+    },
+    {
+      "id": "L5/駁二",
+      "surface": "駁二",
+      "kind": "landmark",
+      "districts": [
+        "高雄市/鹽埕區"
+      ],
+      "appearances": 68,
+      "concentration": 0.9853,
+      "district_agreement": 0.65
+    },
+    {
+      "id": "L5/文心崇德",
+      "surface": "文心崇德",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/北屯區"
+      ],
+      "appearances": 66,
+      "concentration": 0.9848,
+      "district_agreement": 0.9545
+    },
+    {
+      "id": "L5/三重國小",
+      "surface": "三重國小",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/三重區"
+      ],
+      "appearances": 65,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/台中七期",
+      "surface": "台中七期",
+      "kind": "landmark",
+      "districts": [
+        "台中市/西屯區"
+      ],
+      "appearances": 65,
+      "concentration": 1.0,
+      "district_agreement": 0.625
+    },
+    {
+      "id": "L5/麥寮六輕",
+      "surface": "麥寮六輕",
+      "kind": "industrial_park",
+      "districts": [
+        "雲林縣/麥寮鄉"
+      ],
+      "appearances": 65,
+      "concentration": 0.9385,
+      "district_agreement": 0.9683
+    },
+    {
+      "id": "L5/劍南路",
+      "surface": "劍南路",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中山區"
+      ],
+      "appearances": 64,
+      "concentration": 0.9844,
+      "district_agreement": 0.6744
+    },
+    {
+      "id": "L5/劍湖山",
+      "surface": "劍湖山",
+      "kind": "landmark",
+      "districts": [
+        "雲林縣/古坑鄉"
+      ],
+      "appearances": 64,
+      "concentration": 0.7188,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/萬芳醫院",
+      "surface": "萬芳醫院",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/文山區"
+      ],
+      "appearances": 64,
+      "concentration": 0.7812,
+      "district_agreement": 0.6429
+    },
+    {
+      "id": "L5/五堵",
+      "surface": "五堵",
+      "kind": "tra_station",
+      "districts": [
+        "新北市/汐止區"
+      ],
+      "appearances": 62,
+      "concentration": 0.7097,
+      "district_agreement": 0.641
+    },
+    {
+      "id": "L5/永安市場",
+      "surface": "永安市場",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/中和區"
+      ],
+      "appearances": 61,
+      "concentration": 0.8852,
+      "district_agreement": 0.5128
+    },
+    {
+      "id": "L5/高鐵桃園站",
+      "surface": "高鐵桃園站",
+      "kind": "hsr_station",
+      "districts": [
+        "桃園市/中壢區"
+      ],
+      "appearances": 61,
+      "concentration": 0.918,
+      "district_agreement": 0.5517
+    },
+    {
+      "id": "L5/南樹林",
+      "surface": "南樹林",
+      "kind": "tra_station",
+      "districts": [
+        "新北市/樹林區"
+      ],
+      "appearances": 60,
+      "concentration": 0.8667,
+      "district_agreement": 0.9811
+    },
+    {
+      "id": "L5/士林夜市",
+      "surface": "士林夜市",
+      "kind": "landmark",
+      "districts": [
+        "台北市/士林區"
+      ],
+      "appearances": 60,
+      "concentration": 0.9167,
+      "district_agreement": 0.9322
+    },
+    {
+      "id": "L5/大安森林公園",
+      "surface": "大安森林公園",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "appearances": 59,
+      "concentration": 0.9322,
+      "district_agreement": 0.5385
+    },
+    {
+      "id": "L5/新莊副都心",
+      "surface": "新莊副都心",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新莊區"
+      ],
+      "appearances": 59,
+      "concentration": 0.9661,
+      "district_agreement": 0.9661
+    },
+    {
+      "id": "L5/淡水老街",
+      "surface": "淡水老街",
+      "kind": "landmark",
+      "districts": [
+        "新北市/淡水區"
+      ],
+      "appearances": 57,
+      "concentration": 0.6316,
+      "district_agreement": 0.6429
+    },
+    {
+      "id": "L5/台北橋",
+      "surface": "台北橋",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/三重區"
+      ],
+      "appearances": 55,
+      "concentration": 0.8545,
+      "district_agreement": 0.931
+    },
+    {
+      "id": "L5/新北投",
+      "surface": "新北投",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "appearances": 55,
+      "concentration": 0.9818,
+      "district_agreement": 0.9818
+    },
+    {
+      "id": "L5/泰山貴和",
+      "surface": "泰山貴和",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/泰山區"
+      ],
+      "appearances": 55,
+      "concentration": 0.6545,
+      "district_agreement": 0.6667
+    },
+    {
+      "id": "L5/信義商圈",
+      "surface": "信義商圈",
+      "kind": "landmark",
+      "districts": [
+        "台北市/信義區"
+      ],
+      "appearances": 53,
+      "concentration": 0.9245,
+      "district_agreement": 0.9608
+    },
+    {
+      "id": "L5/中科大",
+      "surface": "中科大",
+      "kind": "landmark",
+      "districts": [
+        "台中市/北區"
+      ],
+      "appearances": 50,
+      "concentration": 1.0,
+      "district_agreement": 0.0
+    },
+    {
+      "id": "L5/頭前庄",
+      "surface": "頭前庄",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新莊區"
+      ],
+      "appearances": 50,
+      "concentration": 0.98,
+      "district_agreement": 0.973
+    },
+    {
+      "id": "L5/台中榮總",
+      "surface": "台中榮總",
+      "kind": "landmark",
+      "districts": [
+        "台中市/西屯區"
+      ],
+      "appearances": 49,
+      "concentration": 0.9592,
+      "district_agreement": 0.6
+    },
+    {
+      "id": "L5/新烏日",
+      "surface": "新烏日",
+      "kind": "tra_station",
+      "districts": [
+        "台中市/烏日區"
+      ],
+      "appearances": 45,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/樹谷",
+      "surface": "樹谷",
+      "kind": "industrial_park",
+      "districts": [
+        "台南市/新市區"
+      ],
+      "appearances": 45,
+      "concentration": 1.0,
+      "district_agreement": 0.9
+    },
+    {
+      "id": "L5/小人國",
+      "surface": "小人國",
+      "kind": "landmark",
+      "districts": [
+        "桃園市/龍潭區"
+      ],
+      "appearances": 44,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/舊社",
+      "surface": "舊社",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/北屯區"
+      ],
+      "appearances": 44,
+      "concentration": 0.7955,
+      "district_agreement": 0.8182
+    },
+    {
+      "id": "L5/中科后里",
+      "surface": "中科后里",
+      "kind": "industrial_park",
+      "districts": [
+        "台中市/后里區"
+      ],
+      "appearances": 43,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/楠梓加工出口區",
+      "surface": "楠梓加工出口區",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/楠梓區"
+      ],
+      "appearances": 43,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/大橋頭",
+      "surface": "大橋頭",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大同區"
+      ],
+      "appearances": 42,
+      "concentration": 0.9524,
+      "district_agreement": 0.9375
+    },
+    {
+      "id": "L5/高鐵台中站",
+      "surface": "高鐵台中站",
+      "kind": "hsr_station",
+      "districts": [
+        "台中市/烏日區"
+      ],
+      "appearances": 42,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/中山大學",
+      "surface": "中山大學",
+      "kind": "landmark",
+      "districts": [
+        "高雄市/鼓山區"
+      ],
+      "appearances": 40,
+      "concentration": 0.625,
+      "district_agreement": 0.3636
+    },
+    {
+      "id": "L5/內湖科技園區",
+      "surface": "內湖科技園區",
+      "kind": "industrial_park",
+      "districts": [
+        "台北市/內湖區"
+      ],
+      "appearances": 40,
+      "concentration": 0.975,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/後勁",
+      "surface": "後勁",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/楠梓區"
+      ],
+      "appearances": 40,
+      "concentration": 0.975,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/烏來",
+      "surface": "烏來",
+      "kind": "landmark",
+      "districts": [
+        "新北市/烏來區"
+      ],
+      "appearances": 40,
+      "concentration": 0.95,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/龍德工業區",
+      "surface": "龍德工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "宜蘭縣/蘇澳鎮"
+      ],
+      "appearances": 37,
+      "concentration": 0.973,
+      "district_agreement": 0.8919
+    },
+    {
+      "id": "L5/鹿野",
+      "surface": "鹿野",
+      "kind": "tra_station",
+      "districts": [
+        "台東縣/鹿野鄉"
+      ],
+      "appearances": 35,
+      "concentration": 0.9429,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/永安工業區",
+      "surface": "永安工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/永安區"
+      ],
+      "appearances": 34,
+      "concentration": 0.8529,
+      "district_agreement": 0.6111
+    },
+    {
+      "id": "L5/環河南路",
+      "surface": "環河南路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/萬華區"
+      ],
+      "appearances": 34,
+      "concentration": 0.6765,
+      "district_agreement": 0.5862
+    },
+    {
+      "id": "L5/美麗島",
+      "surface": "美麗島",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/新興區"
+      ],
+      "appearances": 34,
+      "concentration": 0.9412,
+      "district_agreement": 0.9375
+    },
+    {
+      "id": "L5/臨海工業區",
+      "surface": "臨海工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/小港區"
+      ],
+      "appearances": 33,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/永康工業區",
+      "surface": "永康工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "台南市/永康區"
+      ],
+      "appearances": 32,
+      "concentration": 0.9688,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/利澤",
+      "surface": "利澤",
+      "kind": "industrial_park",
+      "districts": [
+        "宜蘭縣/五結鄉",
+        "宜蘭縣/蘇澳鎮"
+      ],
+      "appearances": 31,
+      "concentration": 0.9677,
+      "district_agreement": 0.6875
+    },
+    {
+      "id": "L5/三多商圈",
+      "surface": "三多商圈",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/前鎮區"
+      ],
+      "appearances": 30,
+      "concentration": 1.0,
+      "district_agreement": 0.5833
+    },
+    {
+      "id": "L5/文心中清",
+      "surface": "文心中清",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/北屯區"
+      ],
+      "appearances": 30,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/新左營",
+      "surface": "新左營",
+      "kind": "tra_station",
+      "districts": [
+        "高雄市/左營區"
+      ],
+      "appearances": 29,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/凹子底",
+      "surface": "凹子底",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/鼓山區"
+      ],
+      "appearances": 28,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/水安宮",
+      "surface": "水安宮",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/南屯區"
+      ],
+      "appearances": 28,
+      "concentration": 1.0,
+      "district_agreement": 0.875
+    },
+    {
+      "id": "L5/獅甲",
+      "surface": "獅甲",
+      "kind": "metro_station",
+      "districts": [
+        "高雄市/前鎮區"
+      ],
+      "appearances": 28,
+      "concentration": 0.9286,
+      "district_agreement": 0.9231
+    },
+    {
+      "id": "L5/義大醫院",
+      "surface": "義大醫院",
+      "kind": "landmark",
+      "districts": [
+        "高雄市/燕巢區"
+      ],
+      "appearances": 28,
+      "concentration": 0.9643,
+      "district_agreement": 0.0769
+    },
+    {
+      "id": "L5/新竹車站",
+      "surface": "新竹車站",
+      "kind": "tra_station",
+      "districts": [
+        "新竹市/東區"
+      ],
+      "appearances": 27,
+      "concentration": 0.6667,
+      "district_agreement": 0.0
+    },
+    {
+      "id": "L5/一中街",
+      "surface": "一中街",
+      "kind": "landmark",
+      "districts": [
+        "台中市/北區"
+      ],
+      "appearances": 26,
+      "concentration": 1.0,
+      "district_agreement": 0.0
+    },
+    {
+      "id": "L5/新店區公所",
+      "surface": "新店區公所",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/新店區"
+      ],
+      "appearances": 26,
+      "concentration": 0.6538,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/溪頭",
+      "surface": "溪頭",
+      "kind": "landmark",
+      "districts": [
+        "南投縣/鹿谷鄉"
+      ],
+      "appearances": 26,
+      "concentration": 0.7308,
+      "district_agreement": 0.5
+    },
+    {
+      "id": "L5/長庚大學",
+      "surface": "長庚大學",
+      "kind": "landmark",
+      "districts": [
+        "桃園市/龜山區"
+      ],
+      "appearances": 26,
+      "concentration": 0.8077,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/秋紅谷",
+      "surface": "秋紅谷",
+      "kind": "landmark",
+      "districts": [
+        "台中市/西屯區"
+      ],
+      "appearances": 25,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/北屯總站",
+      "surface": "北屯總站",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/北屯區"
+      ],
+      "appearances": 24,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/南澳",
+      "surface": "南澳",
+      "kind": "tra_station",
+      "districts": [
+        "宜蘭縣/南澳鄉"
+      ],
+      "appearances": 24,
+      "concentration": 0.9167,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/文心森林公園",
+      "surface": "文心森林公園",
+      "kind": "metro_station",
+      "districts": [
+        "台中市/南屯區"
+      ],
+      "appearances": 24,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/復興崗",
+      "surface": "復興崗",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "appearances": 23,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/斗六工業區",
+      "surface": "斗六工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "雲林縣/斗六市"
+      ],
+      "appearances": 23,
+      "concentration": 0.9565,
+      "district_agreement": 1.0
+    },
+    {
+      "id": "L5/麟光",
+      "surface": "麟光",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/大安區"
+      ],
+      "appearances": 23,
+      "concentration": 1.0,
+      "district_agreement": 0.8182
+    },
+    {
+      "id": "L5/三和國中",
+      "surface": "三和國中",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/蘆洲區"
+      ],
+      "appearances": 22,
+      "concentration": 1.0,
+      "district_agreement": 0.0556
+    },
+    {
+      "id": "L5/中興新村",
+      "surface": "中興新村",
+      "kind": "landmark",
+      "districts": [
+        "南投縣/南投市"
+      ],
+      "appearances": 22,
+      "concentration": 0.7727,
+      "district_agreement": 0.7222
+    },
+    {
+      "id": "L5/八堵",
+      "surface": "八堵",
+      "kind": "tra_station",
+      "districts": [
+        "基隆市/暖暖區"
+      ],
+      "appearances": 21,
+      "concentration": 0.8095,
+      "district_agreement": 0.0
+    },
+    {
+      "id": "L5/小東路",
+      "surface": "小東路",
+      "kind": "arterial_road",
+      "districts": [
+        "台南市/東區"
+      ],
+      "appearances": 21,
+      "concentration": 1.0,
+      "district_agreement": 0.0
+    },
+    {
+      "id": "L5/瑞芳工業區",
+      "surface": "瑞芳工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "新北市/瑞芳區"
+      ],
+      "appearances": 21,
+      "concentration": 0.7619,
+      "district_agreement": 0.8
+    },
+    {
+      "id": "L5/林園工業區",
+      "surface": "林園工業區",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/林園區"
+      ],
+      "appearances": 20,
+      "concentration": 1.0,
+      "district_agreement": 1.0
+    }
+  ]
+}
