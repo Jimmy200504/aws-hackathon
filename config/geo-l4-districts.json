@@ -1,0 +1,4025 @@
+{
+  "schema": "skillweave-geo-l4-districts-v1",
+  "provenance": "public administrative geography",
+  "source": "data/dataset/城市對照表.csv, CodeType 2 = county and 3 = district",
+  "contains": "county and district names with their official location codes; no job, employer, applicant or search information",
+  "surface_layers": {
+    "full_name": "the official district name as written in the code table",
+    "suffix_dropped": "the name with its 區/鄉/鎮/市 suffix removed, which is the form job titles use; a short form under two characters is not emitted"
+  },
+  "collision_policy": "a short form naming two districts inside one county is dropped entirely, because the posting's 工作城市 cannot disambiguate it",
+  "counts": {
+    "counties": 22,
+    "districts": 368,
+    "full_name_surfaces": 357,
+    "suffix_dropped_surfaces": 348,
+    "dropped_collisions": 0
+  },
+  "counties": [
+    "南投縣",
+    "台中市",
+    "台北市",
+    "台南市",
+    "台東縣",
+    "嘉義市",
+    "嘉義縣",
+    "基隆市",
+    "宜蘭縣",
+    "屏東縣",
+    "彰化縣",
+    "新北市",
+    "新竹市",
+    "新竹縣",
+    "桃園市",
+    "澎湖縣",
+    "花蓮縣",
+    "苗栗縣",
+    "連江縣",
+    "金門縣",
+    "雲林縣",
+    "高雄市"
+  ],
+  "districts": [
+    {
+      "code": "100101",
+      "county": "台北市",
+      "district": "中正區"
+    },
+    {
+      "code": "100102",
+      "county": "台北市",
+      "district": "大同區"
+    },
+    {
+      "code": "100103",
+      "county": "台北市",
+      "district": "中山區"
+    },
+    {
+      "code": "100104",
+      "county": "台北市",
+      "district": "松山區"
+    },
+    {
+      "code": "100105",
+      "county": "台北市",
+      "district": "大安區"
+    },
+    {
+      "code": "100106",
+      "county": "台北市",
+      "district": "萬華區"
+    },
+    {
+      "code": "100107",
+      "county": "台北市",
+      "district": "信義區"
+    },
+    {
+      "code": "100108",
+      "county": "台北市",
+      "district": "士林區"
+    },
+    {
+      "code": "100109",
+      "county": "台北市",
+      "district": "北投區"
+    },
+    {
+      "code": "100110",
+      "county": "台北市",
+      "district": "內湖區"
+    },
+    {
+      "code": "100111",
+      "county": "台北市",
+      "district": "南港區"
+    },
+    {
+      "code": "100112",
+      "county": "台北市",
+      "district": "文山區"
+    },
+    {
+      "code": "100201",
+      "county": "新北市",
+      "district": "萬里區"
+    },
+    {
+      "code": "100202",
+      "county": "新北市",
+      "district": "金山區"
+    },
+    {
+      "code": "100203",
+      "county": "新北市",
+      "district": "板橋區"
+    },
+    {
+      "code": "100204",
+      "county": "新北市",
+      "district": "汐止區"
+    },
+    {
+      "code": "100205",
+      "county": "新北市",
+      "district": "深坑區"
+    },
+    {
+      "code": "100206",
+      "county": "新北市",
+      "district": "石碇區"
+    },
+    {
+      "code": "100207",
+      "county": "新北市",
+      "district": "瑞芳區"
+    },
+    {
+      "code": "100208",
+      "county": "新北市",
+      "district": "平溪區"
+    },
+    {
+      "code": "100209",
+      "county": "新北市",
+      "district": "雙溪區"
+    },
+    {
+      "code": "100210",
+      "county": "新北市",
+      "district": "貢寮區"
+    },
+    {
+      "code": "100211",
+      "county": "新北市",
+      "district": "新店區"
+    },
+    {
+      "code": "100212",
+      "county": "新北市",
+      "district": "坪林區"
+    },
+    {
+      "code": "100213",
+      "county": "新北市",
+      "district": "烏來區"
+    },
+    {
+      "code": "100214",
+      "county": "新北市",
+      "district": "永和區"
+    },
+    {
+      "code": "100215",
+      "county": "新北市",
+      "district": "中和區"
+    },
+    {
+      "code": "100216",
+      "county": "新北市",
+      "district": "土城區"
+    },
+    {
+      "code": "100217",
+      "county": "新北市",
+      "district": "三峽區"
+    },
+    {
+      "code": "100218",
+      "county": "新北市",
+      "district": "樹林區"
+    },
+    {
+      "code": "100219",
+      "county": "新北市",
+      "district": "鶯歌區"
+    },
+    {
+      "code": "100220",
+      "county": "新北市",
+      "district": "三重區"
+    },
+    {
+      "code": "100221",
+      "county": "新北市",
+      "district": "新莊區"
+    },
+    {
+      "code": "100222",
+      "county": "新北市",
+      "district": "泰山區"
+    },
+    {
+      "code": "100223",
+      "county": "新北市",
+      "district": "林口區"
+    },
+    {
+      "code": "100224",
+      "county": "新北市",
+      "district": "蘆洲區"
+    },
+    {
+      "code": "100225",
+      "county": "新北市",
+      "district": "五股區"
+    },
+    {
+      "code": "100226",
+      "county": "新北市",
+      "district": "八里區"
+    },
+    {
+      "code": "100227",
+      "county": "新北市",
+      "district": "淡水區"
+    },
+    {
+      "code": "100228",
+      "county": "新北市",
+      "district": "三芝區"
+    },
+    {
+      "code": "100229",
+      "county": "新北市",
+      "district": "石門區"
+    },
+    {
+      "code": "100301",
+      "county": "基隆市",
+      "district": "仁愛區"
+    },
+    {
+      "code": "100302",
+      "county": "基隆市",
+      "district": "信義區"
+    },
+    {
+      "code": "100303",
+      "county": "基隆市",
+      "district": "中正區"
+    },
+    {
+      "code": "100304",
+      "county": "基隆市",
+      "district": "中山區"
+    },
+    {
+      "code": "100305",
+      "county": "基隆市",
+      "district": "安樂區"
+    },
+    {
+      "code": "100306",
+      "county": "基隆市",
+      "district": "暖暖區"
+    },
+    {
+      "code": "100307",
+      "county": "基隆市",
+      "district": "七堵區"
+    },
+    {
+      "code": "100401",
+      "county": "宜蘭縣",
+      "district": "宜蘭市"
+    },
+    {
+      "code": "100402",
+      "county": "宜蘭縣",
+      "district": "頭城鎮"
+    },
+    {
+      "code": "100403",
+      "county": "宜蘭縣",
+      "district": "礁溪鄉"
+    },
+    {
+      "code": "100404",
+      "county": "宜蘭縣",
+      "district": "壯圍鄉"
+    },
+    {
+      "code": "100405",
+      "county": "宜蘭縣",
+      "district": "員山鄉"
+    },
+    {
+      "code": "100406",
+      "county": "宜蘭縣",
+      "district": "羅東鎮"
+    },
+    {
+      "code": "100407",
+      "county": "宜蘭縣",
+      "district": "三星鄉"
+    },
+    {
+      "code": "100408",
+      "county": "宜蘭縣",
+      "district": "大同鄉"
+    },
+    {
+      "code": "100409",
+      "county": "宜蘭縣",
+      "district": "五結鄉"
+    },
+    {
+      "code": "100410",
+      "county": "宜蘭縣",
+      "district": "冬山鄉"
+    },
+    {
+      "code": "100411",
+      "county": "宜蘭縣",
+      "district": "蘇澳鎮"
+    },
+    {
+      "code": "100412",
+      "county": "宜蘭縣",
+      "district": "南澳鄉"
+    },
+    {
+      "code": "100501",
+      "county": "桃園市",
+      "district": "中壢區"
+    },
+    {
+      "code": "100502",
+      "county": "桃園市",
+      "district": "平鎮區"
+    },
+    {
+      "code": "100503",
+      "county": "桃園市",
+      "district": "龍潭區"
+    },
+    {
+      "code": "100504",
+      "county": "桃園市",
+      "district": "楊梅區"
+    },
+    {
+      "code": "100505",
+      "county": "桃園市",
+      "district": "新屋區"
+    },
+    {
+      "code": "100506",
+      "county": "桃園市",
+      "district": "觀音區"
+    },
+    {
+      "code": "100507",
+      "county": "桃園市",
+      "district": "桃園區"
+    },
+    {
+      "code": "100508",
+      "county": "桃園市",
+      "district": "龜山區"
+    },
+    {
+      "code": "100509",
+      "county": "桃園市",
+      "district": "八德區"
+    },
+    {
+      "code": "100510",
+      "county": "桃園市",
+      "district": "大溪區"
+    },
+    {
+      "code": "100511",
+      "county": "桃園市",
+      "district": "復興區"
+    },
+    {
+      "code": "100512",
+      "county": "桃園市",
+      "district": "大園區"
+    },
+    {
+      "code": "100513",
+      "county": "桃園市",
+      "district": "蘆竹區"
+    },
+    {
+      "code": "100601",
+      "county": "新竹市",
+      "district": "東區"
+    },
+    {
+      "code": "100602",
+      "county": "新竹市",
+      "district": "北區"
+    },
+    {
+      "code": "100603",
+      "county": "新竹市",
+      "district": "香山區"
+    },
+    {
+      "code": "100701",
+      "county": "新竹縣",
+      "district": "竹北市"
+    },
+    {
+      "code": "100702",
+      "county": "新竹縣",
+      "district": "湖口鄉"
+    },
+    {
+      "code": "100703",
+      "county": "新竹縣",
+      "district": "新豐鄉"
+    },
+    {
+      "code": "100704",
+      "county": "新竹縣",
+      "district": "新埔鎮"
+    },
+    {
+      "code": "100705",
+      "county": "新竹縣",
+      "district": "關西鎮"
+    },
+    {
+      "code": "100706",
+      "county": "新竹縣",
+      "district": "芎林鄉"
+    },
+    {
+      "code": "100707",
+      "county": "新竹縣",
+      "district": "寶山鄉"
+    },
+    {
+      "code": "100708",
+      "county": "新竹縣",
+      "district": "竹東鎮"
+    },
+    {
+      "code": "100709",
+      "county": "新竹縣",
+      "district": "五峰鄉"
+    },
+    {
+      "code": "100710",
+      "county": "新竹縣",
+      "district": "橫山鄉"
+    },
+    {
+      "code": "100711",
+      "county": "新竹縣",
+      "district": "尖石鄉"
+    },
+    {
+      "code": "100712",
+      "county": "新竹縣",
+      "district": "北埔鄉"
+    },
+    {
+      "code": "100713",
+      "county": "新竹縣",
+      "district": "峨眉鄉"
+    },
+    {
+      "code": "100801",
+      "county": "苗栗縣",
+      "district": "竹南鎮"
+    },
+    {
+      "code": "100802",
+      "county": "苗栗縣",
+      "district": "頭份市"
+    },
+    {
+      "code": "100803",
+      "county": "苗栗縣",
+      "district": "三灣鄉"
+    },
+    {
+      "code": "100804",
+      "county": "苗栗縣",
+      "district": "南庄鄉"
+    },
+    {
+      "code": "100805",
+      "county": "苗栗縣",
+      "district": "獅潭鄉"
+    },
+    {
+      "code": "100806",
+      "county": "苗栗縣",
+      "district": "後龍鎮"
+    },
+    {
+      "code": "100807",
+      "county": "苗栗縣",
+      "district": "通霄鎮"
+    },
+    {
+      "code": "100808",
+      "county": "苗栗縣",
+      "district": "苑裡鎮"
+    },
+    {
+      "code": "100809",
+      "county": "苗栗縣",
+      "district": "苗栗市"
+    },
+    {
+      "code": "100810",
+      "county": "苗栗縣",
+      "district": "造橋鄉"
+    },
+    {
+      "code": "100811",
+      "county": "苗栗縣",
+      "district": "頭屋鄉"
+    },
+    {
+      "code": "100812",
+      "county": "苗栗縣",
+      "district": "公館鄉"
+    },
+    {
+      "code": "100813",
+      "county": "苗栗縣",
+      "district": "大湖鄉"
+    },
+    {
+      "code": "100814",
+      "county": "苗栗縣",
+      "district": "泰安鄉"
+    },
+    {
+      "code": "100815",
+      "county": "苗栗縣",
+      "district": "銅鑼鄉"
+    },
+    {
+      "code": "100816",
+      "county": "苗栗縣",
+      "district": "三義鄉"
+    },
+    {
+      "code": "100817",
+      "county": "苗栗縣",
+      "district": "西湖鄉"
+    },
+    {
+      "code": "100818",
+      "county": "苗栗縣",
+      "district": "卓蘭鎮"
+    },
+    {
+      "code": "100901",
+      "county": "台中市",
+      "district": "中區"
+    },
+    {
+      "code": "100902",
+      "county": "台中市",
+      "district": "東區"
+    },
+    {
+      "code": "100903",
+      "county": "台中市",
+      "district": "南區"
+    },
+    {
+      "code": "100904",
+      "county": "台中市",
+      "district": "西區"
+    },
+    {
+      "code": "100905",
+      "county": "台中市",
+      "district": "北區"
+    },
+    {
+      "code": "100906",
+      "county": "台中市",
+      "district": "北屯區"
+    },
+    {
+      "code": "100907",
+      "county": "台中市",
+      "district": "西屯區"
+    },
+    {
+      "code": "100908",
+      "county": "台中市",
+      "district": "南屯區"
+    },
+    {
+      "code": "100909",
+      "county": "台中市",
+      "district": "太平區"
+    },
+    {
+      "code": "100910",
+      "county": "台中市",
+      "district": "大里區"
+    },
+    {
+      "code": "100911",
+      "county": "台中市",
+      "district": "霧峰區"
+    },
+    {
+      "code": "100912",
+      "county": "台中市",
+      "district": "烏日區"
+    },
+    {
+      "code": "100913",
+      "county": "台中市",
+      "district": "豐原區"
+    },
+    {
+      "code": "100914",
+      "county": "台中市",
+      "district": "后里區"
+    },
+    {
+      "code": "100915",
+      "county": "台中市",
+      "district": "石岡區"
+    },
+    {
+      "code": "100916",
+      "county": "台中市",
+      "district": "東勢區"
+    },
+    {
+      "code": "100917",
+      "county": "台中市",
+      "district": "和平區"
+    },
+    {
+      "code": "100918",
+      "county": "台中市",
+      "district": "新社區"
+    },
+    {
+      "code": "100919",
+      "county": "台中市",
+      "district": "潭子區"
+    },
+    {
+      "code": "100920",
+      "county": "台中市",
+      "district": "大雅區"
+    },
+    {
+      "code": "100921",
+      "county": "台中市",
+      "district": "神岡區"
+    },
+    {
+      "code": "100922",
+      "county": "台中市",
+      "district": "大肚區"
+    },
+    {
+      "code": "100923",
+      "county": "台中市",
+      "district": "沙鹿區"
+    },
+    {
+      "code": "100924",
+      "county": "台中市",
+      "district": "龍井區"
+    },
+    {
+      "code": "100925",
+      "county": "台中市",
+      "district": "梧棲區"
+    },
+    {
+      "code": "100926",
+      "county": "台中市",
+      "district": "清水區"
+    },
+    {
+      "code": "100927",
+      "county": "台中市",
+      "district": "大甲區"
+    },
+    {
+      "code": "100928",
+      "county": "台中市",
+      "district": "外埔區"
+    },
+    {
+      "code": "100929",
+      "county": "台中市",
+      "district": "大安區"
+    },
+    {
+      "code": "101101",
+      "county": "南投縣",
+      "district": "南投市"
+    },
+    {
+      "code": "101102",
+      "county": "南投縣",
+      "district": "中寮鄉"
+    },
+    {
+      "code": "101103",
+      "county": "南投縣",
+      "district": "草屯鎮"
+    },
+    {
+      "code": "101104",
+      "county": "南投縣",
+      "district": "國姓鄉"
+    },
+    {
+      "code": "101105",
+      "county": "南投縣",
+      "district": "埔里鎮"
+    },
+    {
+      "code": "101106",
+      "county": "南投縣",
+      "district": "仁愛鄉"
+    },
+    {
+      "code": "101107",
+      "county": "南投縣",
+      "district": "名間鄉"
+    },
+    {
+      "code": "101108",
+      "county": "南投縣",
+      "district": "集集鎮"
+    },
+    {
+      "code": "101109",
+      "county": "南投縣",
+      "district": "水里鄉"
+    },
+    {
+      "code": "101110",
+      "county": "南投縣",
+      "district": "魚池鄉"
+    },
+    {
+      "code": "101111",
+      "county": "南投縣",
+      "district": "信義鄉"
+    },
+    {
+      "code": "101112",
+      "county": "南投縣",
+      "district": "竹山鎮"
+    },
+    {
+      "code": "101113",
+      "county": "南投縣",
+      "district": "鹿谷鄉"
+    },
+    {
+      "code": "101201",
+      "county": "彰化縣",
+      "district": "彰化市"
+    },
+    {
+      "code": "101202",
+      "county": "彰化縣",
+      "district": "芬園鄉"
+    },
+    {
+      "code": "101203",
+      "county": "彰化縣",
+      "district": "花壇鄉"
+    },
+    {
+      "code": "101204",
+      "county": "彰化縣",
+      "district": "秀水鄉"
+    },
+    {
+      "code": "101205",
+      "county": "彰化縣",
+      "district": "鹿港鎮"
+    },
+    {
+      "code": "101206",
+      "county": "彰化縣",
+      "district": "福興鄉"
+    },
+    {
+      "code": "101207",
+      "county": "彰化縣",
+      "district": "線西鄉"
+    },
+    {
+      "code": "101208",
+      "county": "彰化縣",
+      "district": "和美鎮"
+    },
+    {
+      "code": "101209",
+      "county": "彰化縣",
+      "district": "伸港鄉"
+    },
+    {
+      "code": "101210",
+      "county": "彰化縣",
+      "district": "員林市"
+    },
+    {
+      "code": "101211",
+      "county": "彰化縣",
+      "district": "社頭鄉"
+    },
+    {
+      "code": "101212",
+      "county": "彰化縣",
+      "district": "永靖鄉"
+    },
+    {
+      "code": "101213",
+      "county": "彰化縣",
+      "district": "埔心鄉"
+    },
+    {
+      "code": "101214",
+      "county": "彰化縣",
+      "district": "溪湖鎮"
+    },
+    {
+      "code": "101215",
+      "county": "彰化縣",
+      "district": "大村鄉"
+    },
+    {
+      "code": "101216",
+      "county": "彰化縣",
+      "district": "埔鹽鄉"
+    },
+    {
+      "code": "101217",
+      "county": "彰化縣",
+      "district": "田中鎮"
+    },
+    {
+      "code": "101218",
+      "county": "彰化縣",
+      "district": "北斗鎮"
+    },
+    {
+      "code": "101219",
+      "county": "彰化縣",
+      "district": "田尾鄉"
+    },
+    {
+      "code": "101220",
+      "county": "彰化縣",
+      "district": "埤頭鄉"
+    },
+    {
+      "code": "101221",
+      "county": "彰化縣",
+      "district": "溪州鄉"
+    },
+    {
+      "code": "101222",
+      "county": "彰化縣",
+      "district": "竹塘鄉"
+    },
+    {
+      "code": "101223",
+      "county": "彰化縣",
+      "district": "二林鎮"
+    },
+    {
+      "code": "101224",
+      "county": "彰化縣",
+      "district": "大城鄉"
+    },
+    {
+      "code": "101225",
+      "county": "彰化縣",
+      "district": "芳苑鄉"
+    },
+    {
+      "code": "101226",
+      "county": "彰化縣",
+      "district": "二水鄉"
+    },
+    {
+      "code": "101301",
+      "county": "雲林縣",
+      "district": "斗南鎮"
+    },
+    {
+      "code": "101302",
+      "county": "雲林縣",
+      "district": "大埤鄉"
+    },
+    {
+      "code": "101303",
+      "county": "雲林縣",
+      "district": "虎尾鎮"
+    },
+    {
+      "code": "101304",
+      "county": "雲林縣",
+      "district": "土庫鎮"
+    },
+    {
+      "code": "101305",
+      "county": "雲林縣",
+      "district": "褒忠鄉"
+    },
+    {
+      "code": "101306",
+      "county": "雲林縣",
+      "district": "東勢鄉"
+    },
+    {
+      "code": "101307",
+      "county": "雲林縣",
+      "district": "台西鄉"
+    },
+    {
+      "code": "101308",
+      "county": "雲林縣",
+      "district": "崙背鄉"
+    },
+    {
+      "code": "101309",
+      "county": "雲林縣",
+      "district": "麥寮鄉"
+    },
+    {
+      "code": "101310",
+      "county": "雲林縣",
+      "district": "斗六市"
+    },
+    {
+      "code": "101311",
+      "county": "雲林縣",
+      "district": "林內鄉"
+    },
+    {
+      "code": "101312",
+      "county": "雲林縣",
+      "district": "古坑鄉"
+    },
+    {
+      "code": "101313",
+      "county": "雲林縣",
+      "district": "莿桐鄉"
+    },
+    {
+      "code": "101314",
+      "county": "雲林縣",
+      "district": "西螺鎮"
+    },
+    {
+      "code": "101315",
+      "county": "雲林縣",
+      "district": "二崙鄉"
+    },
+    {
+      "code": "101316",
+      "county": "雲林縣",
+      "district": "北港鎮"
+    },
+    {
+      "code": "101317",
+      "county": "雲林縣",
+      "district": "水林鄉"
+    },
+    {
+      "code": "101318",
+      "county": "雲林縣",
+      "district": "口湖鄉"
+    },
+    {
+      "code": "101319",
+      "county": "雲林縣",
+      "district": "四湖鄉"
+    },
+    {
+      "code": "101320",
+      "county": "雲林縣",
+      "district": "元長鄉"
+    },
+    {
+      "code": "101401",
+      "county": "嘉義市",
+      "district": "東區"
+    },
+    {
+      "code": "101402",
+      "county": "嘉義市",
+      "district": "西區"
+    },
+    {
+      "code": "101501",
+      "county": "嘉義縣",
+      "district": "番路鄉"
+    },
+    {
+      "code": "101502",
+      "county": "嘉義縣",
+      "district": "梅山鄉"
+    },
+    {
+      "code": "101503",
+      "county": "嘉義縣",
+      "district": "竹崎鄉"
+    },
+    {
+      "code": "101504",
+      "county": "嘉義縣",
+      "district": "阿里山鄉"
+    },
+    {
+      "code": "101505",
+      "county": "嘉義縣",
+      "district": "中埔鄉"
+    },
+    {
+      "code": "101506",
+      "county": "嘉義縣",
+      "district": "大埔鄉"
+    },
+    {
+      "code": "101507",
+      "county": "嘉義縣",
+      "district": "水上鄉"
+    },
+    {
+      "code": "101508",
+      "county": "嘉義縣",
+      "district": "鹿草鄉"
+    },
+    {
+      "code": "101509",
+      "county": "嘉義縣",
+      "district": "太保市"
+    },
+    {
+      "code": "101510",
+      "county": "嘉義縣",
+      "district": "朴子市"
+    },
+    {
+      "code": "101511",
+      "county": "嘉義縣",
+      "district": "東石鄉"
+    },
+    {
+      "code": "101512",
+      "county": "嘉義縣",
+      "district": "六腳鄉"
+    },
+    {
+      "code": "101513",
+      "county": "嘉義縣",
+      "district": "新港鄉"
+    },
+    {
+      "code": "101514",
+      "county": "嘉義縣",
+      "district": "民雄鄉"
+    },
+    {
+      "code": "101515",
+      "county": "嘉義縣",
+      "district": "大林鎮"
+    },
+    {
+      "code": "101516",
+      "county": "嘉義縣",
+      "district": "溪口鄉"
+    },
+    {
+      "code": "101517",
+      "county": "嘉義縣",
+      "district": "義竹鄉"
+    },
+    {
+      "code": "101518",
+      "county": "嘉義縣",
+      "district": "布袋鎮"
+    },
+    {
+      "code": "101601",
+      "county": "台南市",
+      "district": "中西區"
+    },
+    {
+      "code": "101602",
+      "county": "台南市",
+      "district": "東區"
+    },
+    {
+      "code": "101603",
+      "county": "台南市",
+      "district": "南區"
+    },
+    {
+      "code": "101604",
+      "county": "台南市",
+      "district": "北區"
+    },
+    {
+      "code": "101605",
+      "county": "台南市",
+      "district": "安平區"
+    },
+    {
+      "code": "101606",
+      "county": "台南市",
+      "district": "安南區"
+    },
+    {
+      "code": "101607",
+      "county": "台南市",
+      "district": "永康區"
+    },
+    {
+      "code": "101608",
+      "county": "台南市",
+      "district": "歸仁區"
+    },
+    {
+      "code": "101609",
+      "county": "台南市",
+      "district": "新化區"
+    },
+    {
+      "code": "101610",
+      "county": "台南市",
+      "district": "左鎮區"
+    },
+    {
+      "code": "101611",
+      "county": "台南市",
+      "district": "玉井區"
+    },
+    {
+      "code": "101612",
+      "county": "台南市",
+      "district": "楠西區"
+    },
+    {
+      "code": "101613",
+      "county": "台南市",
+      "district": "南化區"
+    },
+    {
+      "code": "101614",
+      "county": "台南市",
+      "district": "仁德區"
+    },
+    {
+      "code": "101615",
+      "county": "台南市",
+      "district": "關廟區"
+    },
+    {
+      "code": "101616",
+      "county": "台南市",
+      "district": "龍崎區"
+    },
+    {
+      "code": "101617",
+      "county": "台南市",
+      "district": "官田區"
+    },
+    {
+      "code": "101618",
+      "county": "台南市",
+      "district": "麻豆區"
+    },
+    {
+      "code": "101619",
+      "county": "台南市",
+      "district": "佳里區"
+    },
+    {
+      "code": "101620",
+      "county": "台南市",
+      "district": "西港區"
+    },
+    {
+      "code": "101621",
+      "county": "台南市",
+      "district": "七股區"
+    },
+    {
+      "code": "101622",
+      "county": "台南市",
+      "district": "將軍區"
+    },
+    {
+      "code": "101623",
+      "county": "台南市",
+      "district": "學甲區"
+    },
+    {
+      "code": "101624",
+      "county": "台南市",
+      "district": "北門區"
+    },
+    {
+      "code": "101625",
+      "county": "台南市",
+      "district": "新營區"
+    },
+    {
+      "code": "101626",
+      "county": "台南市",
+      "district": "後壁區"
+    },
+    {
+      "code": "101627",
+      "county": "台南市",
+      "district": "白河區"
+    },
+    {
+      "code": "101628",
+      "county": "台南市",
+      "district": "東山區"
+    },
+    {
+      "code": "101629",
+      "county": "台南市",
+      "district": "六甲區"
+    },
+    {
+      "code": "101630",
+      "county": "台南市",
+      "district": "下營區"
+    },
+    {
+      "code": "101631",
+      "county": "台南市",
+      "district": "柳營區"
+    },
+    {
+      "code": "101632",
+      "county": "台南市",
+      "district": "鹽水區"
+    },
+    {
+      "code": "101633",
+      "county": "台南市",
+      "district": "善化區"
+    },
+    {
+      "code": "101634",
+      "county": "台南市",
+      "district": "大內區"
+    },
+    {
+      "code": "101635",
+      "county": "台南市",
+      "district": "山上區"
+    },
+    {
+      "code": "101636",
+      "county": "台南市",
+      "district": "新市區"
+    },
+    {
+      "code": "101637",
+      "county": "台南市",
+      "district": "安定區"
+    },
+    {
+      "code": "101801",
+      "county": "高雄市",
+      "district": "新興區"
+    },
+    {
+      "code": "101802",
+      "county": "高雄市",
+      "district": "前金區"
+    },
+    {
+      "code": "101803",
+      "county": "高雄市",
+      "district": "苓雅區"
+    },
+    {
+      "code": "101804",
+      "county": "高雄市",
+      "district": "鹽埕區"
+    },
+    {
+      "code": "101805",
+      "county": "高雄市",
+      "district": "鼓山區"
+    },
+    {
+      "code": "101806",
+      "county": "高雄市",
+      "district": "旗津區"
+    },
+    {
+      "code": "101807",
+      "county": "高雄市",
+      "district": "前鎮區"
+    },
+    {
+      "code": "101808",
+      "county": "高雄市",
+      "district": "三民區"
+    },
+    {
+      "code": "101809",
+      "county": "高雄市",
+      "district": "楠梓區"
+    },
+    {
+      "code": "101810",
+      "county": "高雄市",
+      "district": "小港區"
+    },
+    {
+      "code": "101811",
+      "county": "高雄市",
+      "district": "左營區"
+    },
+    {
+      "code": "101812",
+      "county": "高雄市",
+      "district": "仁武區"
+    },
+    {
+      "code": "101813",
+      "county": "高雄市",
+      "district": "大社區"
+    },
+    {
+      "code": "101814",
+      "county": "高雄市",
+      "district": "岡山區"
+    },
+    {
+      "code": "101815",
+      "county": "高雄市",
+      "district": "路竹區"
+    },
+    {
+      "code": "101816",
+      "county": "高雄市",
+      "district": "阿蓮區"
+    },
+    {
+      "code": "101817",
+      "county": "高雄市",
+      "district": "田寮區"
+    },
+    {
+      "code": "101818",
+      "county": "高雄市",
+      "district": "燕巢區"
+    },
+    {
+      "code": "101819",
+      "county": "高雄市",
+      "district": "橋頭區"
+    },
+    {
+      "code": "101820",
+      "county": "高雄市",
+      "district": "梓官區"
+    },
+    {
+      "code": "101821",
+      "county": "高雄市",
+      "district": "彌陀區"
+    },
+    {
+      "code": "101822",
+      "county": "高雄市",
+      "district": "永安區"
+    },
+    {
+      "code": "101823",
+      "county": "高雄市",
+      "district": "湖內區"
+    },
+    {
+      "code": "101824",
+      "county": "高雄市",
+      "district": "鳳山區"
+    },
+    {
+      "code": "101825",
+      "county": "高雄市",
+      "district": "大寮區"
+    },
+    {
+      "code": "101826",
+      "county": "高雄市",
+      "district": "林園區"
+    },
+    {
+      "code": "101827",
+      "county": "高雄市",
+      "district": "鳥松區"
+    },
+    {
+      "code": "101828",
+      "county": "高雄市",
+      "district": "大樹區"
+    },
+    {
+      "code": "101829",
+      "county": "高雄市",
+      "district": "旗山區"
+    },
+    {
+      "code": "101830",
+      "county": "高雄市",
+      "district": "美濃區"
+    },
+    {
+      "code": "101831",
+      "county": "高雄市",
+      "district": "六龜區"
+    },
+    {
+      "code": "101832",
+      "county": "高雄市",
+      "district": "內門區"
+    },
+    {
+      "code": "101833",
+      "county": "高雄市",
+      "district": "杉林區"
+    },
+    {
+      "code": "101834",
+      "county": "高雄市",
+      "district": "甲仙區"
+    },
+    {
+      "code": "101835",
+      "county": "高雄市",
+      "district": "桃源區"
+    },
+    {
+      "code": "101836",
+      "county": "高雄市",
+      "district": "那瑪夏區"
+    },
+    {
+      "code": "101837",
+      "county": "高雄市",
+      "district": "茂林區"
+    },
+    {
+      "code": "101838",
+      "county": "高雄市",
+      "district": "茄萣區"
+    },
+    {
+      "code": "102001",
+      "county": "屏東縣",
+      "district": "屏東市"
+    },
+    {
+      "code": "102002",
+      "county": "屏東縣",
+      "district": "三地門鄉"
+    },
+    {
+      "code": "102003",
+      "county": "屏東縣",
+      "district": "霧台鄉"
+    },
+    {
+      "code": "102004",
+      "county": "屏東縣",
+      "district": "瑪家鄉"
+    },
+    {
+      "code": "102005",
+      "county": "屏東縣",
+      "district": "九如鄉"
+    },
+    {
+      "code": "102006",
+      "county": "屏東縣",
+      "district": "里港鄉"
+    },
+    {
+      "code": "102007",
+      "county": "屏東縣",
+      "district": "高樹鄉"
+    },
+    {
+      "code": "102008",
+      "county": "屏東縣",
+      "district": "鹽埔鄉"
+    },
+    {
+      "code": "102009",
+      "county": "屏東縣",
+      "district": "長治鄉"
+    },
+    {
+      "code": "102010",
+      "county": "屏東縣",
+      "district": "麟洛鄉"
+    },
+    {
+      "code": "102011",
+      "county": "屏東縣",
+      "district": "竹田鄉"
+    },
+    {
+      "code": "102012",
+      "county": "屏東縣",
+      "district": "內埔鄉"
+    },
+    {
+      "code": "102013",
+      "county": "屏東縣",
+      "district": "萬丹鄉"
+    },
+    {
+      "code": "102014",
+      "county": "屏東縣",
+      "district": "潮州鎮"
+    },
+    {
+      "code": "102015",
+      "county": "屏東縣",
+      "district": "泰武鄉"
+    },
+    {
+      "code": "102016",
+      "county": "屏東縣",
+      "district": "來義鄉"
+    },
+    {
+      "code": "102017",
+      "county": "屏東縣",
+      "district": "萬巒鄉"
+    },
+    {
+      "code": "102018",
+      "county": "屏東縣",
+      "district": "崁頂鄉"
+    },
+    {
+      "code": "102019",
+      "county": "屏東縣",
+      "district": "新埤鄉"
+    },
+    {
+      "code": "102020",
+      "county": "屏東縣",
+      "district": "南州鄉"
+    },
+    {
+      "code": "102021",
+      "county": "屏東縣",
+      "district": "林邊鄉"
+    },
+    {
+      "code": "102022",
+      "county": "屏東縣",
+      "district": "東港鎮"
+    },
+    {
+      "code": "102023",
+      "county": "屏東縣",
+      "district": "琉球鄉"
+    },
+    {
+      "code": "102024",
+      "county": "屏東縣",
+      "district": "佳冬鄉"
+    },
+    {
+      "code": "102025",
+      "county": "屏東縣",
+      "district": "新園鄉"
+    },
+    {
+      "code": "102026",
+      "county": "屏東縣",
+      "district": "枋寮鄉"
+    },
+    {
+      "code": "102027",
+      "county": "屏東縣",
+      "district": "枋山鄉"
+    },
+    {
+      "code": "102028",
+      "county": "屏東縣",
+      "district": "春日鄉"
+    },
+    {
+      "code": "102029",
+      "county": "屏東縣",
+      "district": "獅子鄉"
+    },
+    {
+      "code": "102030",
+      "county": "屏東縣",
+      "district": "車城鄉"
+    },
+    {
+      "code": "102031",
+      "county": "屏東縣",
+      "district": "牡丹鄉"
+    },
+    {
+      "code": "102032",
+      "county": "屏東縣",
+      "district": "恆春鎮"
+    },
+    {
+      "code": "102033",
+      "county": "屏東縣",
+      "district": "滿州鄉"
+    },
+    {
+      "code": "102101",
+      "county": "花蓮縣",
+      "district": "花蓮市"
+    },
+    {
+      "code": "102102",
+      "county": "花蓮縣",
+      "district": "新城鄉"
+    },
+    {
+      "code": "102103",
+      "county": "花蓮縣",
+      "district": "秀林鄉"
+    },
+    {
+      "code": "102104",
+      "county": "花蓮縣",
+      "district": "吉安鄉"
+    },
+    {
+      "code": "102105",
+      "county": "花蓮縣",
+      "district": "壽豐鄉"
+    },
+    {
+      "code": "102106",
+      "county": "花蓮縣",
+      "district": "鳳林鎮"
+    },
+    {
+      "code": "102107",
+      "county": "花蓮縣",
+      "district": "光復鄉"
+    },
+    {
+      "code": "102108",
+      "county": "花蓮縣",
+      "district": "豐濱鄉"
+    },
+    {
+      "code": "102109",
+      "county": "花蓮縣",
+      "district": "瑞穗鄉"
+    },
+    {
+      "code": "102110",
+      "county": "花蓮縣",
+      "district": "萬榮鄉"
+    },
+    {
+      "code": "102111",
+      "county": "花蓮縣",
+      "district": "玉里鎮"
+    },
+    {
+      "code": "102112",
+      "county": "花蓮縣",
+      "district": "卓溪鄉"
+    },
+    {
+      "code": "102113",
+      "county": "花蓮縣",
+      "district": "富里鄉"
+    },
+    {
+      "code": "102201",
+      "county": "台東縣",
+      "district": "台東市"
+    },
+    {
+      "code": "102202",
+      "county": "台東縣",
+      "district": "綠島鄉"
+    },
+    {
+      "code": "102203",
+      "county": "台東縣",
+      "district": "蘭嶼鄉"
+    },
+    {
+      "code": "102204",
+      "county": "台東縣",
+      "district": "延平鄉"
+    },
+    {
+      "code": "102205",
+      "county": "台東縣",
+      "district": "卑南鄉"
+    },
+    {
+      "code": "102206",
+      "county": "台東縣",
+      "district": "鹿野鄉"
+    },
+    {
+      "code": "102207",
+      "county": "台東縣",
+      "district": "關山鎮"
+    },
+    {
+      "code": "102208",
+      "county": "台東縣",
+      "district": "海端鄉"
+    },
+    {
+      "code": "102209",
+      "county": "台東縣",
+      "district": "池上鄉"
+    },
+    {
+      "code": "102210",
+      "county": "台東縣",
+      "district": "東河鄉"
+    },
+    {
+      "code": "102211",
+      "county": "台東縣",
+      "district": "成功鎮"
+    },
+    {
+      "code": "102212",
+      "county": "台東縣",
+      "district": "長濱鄉"
+    },
+    {
+      "code": "102213",
+      "county": "台東縣",
+      "district": "太麻里鄉"
+    },
+    {
+      "code": "102214",
+      "county": "台東縣",
+      "district": "金峰鄉"
+    },
+    {
+      "code": "102215",
+      "county": "台東縣",
+      "district": "大武鄉"
+    },
+    {
+      "code": "102216",
+      "county": "台東縣",
+      "district": "達仁鄉"
+    },
+    {
+      "code": "102301",
+      "county": "澎湖縣",
+      "district": "馬公市"
+    },
+    {
+      "code": "102302",
+      "county": "澎湖縣",
+      "district": "西嶼鄉"
+    },
+    {
+      "code": "102303",
+      "county": "澎湖縣",
+      "district": "望安鄉"
+    },
+    {
+      "code": "102304",
+      "county": "澎湖縣",
+      "district": "七美鄉"
+    },
+    {
+      "code": "102305",
+      "county": "澎湖縣",
+      "district": "白沙鄉"
+    },
+    {
+      "code": "102306",
+      "county": "澎湖縣",
+      "district": "湖西鄉"
+    },
+    {
+      "code": "102401",
+      "county": "金門縣",
+      "district": "金沙鎮"
+    },
+    {
+      "code": "102402",
+      "county": "金門縣",
+      "district": "金湖鎮"
+    },
+    {
+      "code": "102403",
+      "county": "金門縣",
+      "district": "金寧鄉"
+    },
+    {
+      "code": "102404",
+      "county": "金門縣",
+      "district": "金城鎮"
+    },
+    {
+      "code": "102405",
+      "county": "金門縣",
+      "district": "烈嶼鄉"
+    },
+    {
+      "code": "102406",
+      "county": "金門縣",
+      "district": "烏坵鄉"
+    },
+    {
+      "code": "102501",
+      "county": "連江縣",
+      "district": "南竿鄉"
+    },
+    {
+      "code": "102502",
+      "county": "連江縣",
+      "district": "北竿鄉"
+    },
+    {
+      "code": "102503",
+      "county": "連江縣",
+      "district": "莒光鄉"
+    },
+    {
+      "code": "102504",
+      "county": "連江縣",
+      "district": "東引鄉"
+    }
+  ],
+  "surfaces": {
+    "full_name": {
+      "七堵區": {
+        "基隆市": "七堵區"
+      },
+      "七美鄉": {
+        "澎湖縣": "七美鄉"
+      },
+      "七股區": {
+        "台南市": "七股區"
+      },
+      "三地門鄉": {
+        "屏東縣": "三地門鄉"
+      },
+      "三峽區": {
+        "新北市": "三峽區"
+      },
+      "三星鄉": {
+        "宜蘭縣": "三星鄉"
+      },
+      "三民區": {
+        "高雄市": "三民區"
+      },
+      "三灣鄉": {
+        "苗栗縣": "三灣鄉"
+      },
+      "三義鄉": {
+        "苗栗縣": "三義鄉"
+      },
+      "三芝區": {
+        "新北市": "三芝區"
+      },
+      "三重區": {
+        "新北市": "三重區"
+      },
+      "下營區": {
+        "台南市": "下營區"
+      },
+      "中區": {
+        "台中市": "中區"
+      },
+      "中和區": {
+        "新北市": "中和區"
+      },
+      "中埔鄉": {
+        "嘉義縣": "中埔鄉"
+      },
+      "中壢區": {
+        "桃園市": "中壢區"
+      },
+      "中寮鄉": {
+        "南投縣": "中寮鄉"
+      },
+      "中山區": {
+        "台北市": "中山區",
+        "基隆市": "中山區"
+      },
+      "中正區": {
+        "台北市": "中正區",
+        "基隆市": "中正區"
+      },
+      "中西區": {
+        "台南市": "中西區"
+      },
+      "九如鄉": {
+        "屏東縣": "九如鄉"
+      },
+      "二崙鄉": {
+        "雲林縣": "二崙鄉"
+      },
+      "二林鎮": {
+        "彰化縣": "二林鎮"
+      },
+      "二水鄉": {
+        "彰化縣": "二水鄉"
+      },
+      "五峰鄉": {
+        "新竹縣": "五峰鄉"
+      },
+      "五結鄉": {
+        "宜蘭縣": "五結鄉"
+      },
+      "五股區": {
+        "新北市": "五股區"
+      },
+      "仁德區": {
+        "台南市": "仁德區"
+      },
+      "仁愛區": {
+        "基隆市": "仁愛區"
+      },
+      "仁愛鄉": {
+        "南投縣": "仁愛鄉"
+      },
+      "仁武區": {
+        "高雄市": "仁武區"
+      },
+      "伸港鄉": {
+        "彰化縣": "伸港鄉"
+      },
+      "佳冬鄉": {
+        "屏東縣": "佳冬鄉"
+      },
+      "佳里區": {
+        "台南市": "佳里區"
+      },
+      "來義鄉": {
+        "屏東縣": "來義鄉"
+      },
+      "信義區": {
+        "台北市": "信義區",
+        "基隆市": "信義區"
+      },
+      "信義鄉": {
+        "南投縣": "信義鄉"
+      },
+      "元長鄉": {
+        "雲林縣": "元長鄉"
+      },
+      "光復鄉": {
+        "花蓮縣": "光復鄉"
+      },
+      "內埔鄉": {
+        "屏東縣": "內埔鄉"
+      },
+      "內湖區": {
+        "台北市": "內湖區"
+      },
+      "內門區": {
+        "高雄市": "內門區"
+      },
+      "八德區": {
+        "桃園市": "八德區"
+      },
+      "八里區": {
+        "新北市": "八里區"
+      },
+      "公館鄉": {
+        "苗栗縣": "公館鄉"
+      },
+      "六甲區": {
+        "台南市": "六甲區"
+      },
+      "六腳鄉": {
+        "嘉義縣": "六腳鄉"
+      },
+      "六龜區": {
+        "高雄市": "六龜區"
+      },
+      "冬山鄉": {
+        "宜蘭縣": "冬山鄉"
+      },
+      "前金區": {
+        "高雄市": "前金區"
+      },
+      "前鎮區": {
+        "高雄市": "前鎮區"
+      },
+      "北區": {
+        "台中市": "北區",
+        "台南市": "北區",
+        "新竹市": "北區"
+      },
+      "北埔鄉": {
+        "新竹縣": "北埔鄉"
+      },
+      "北屯區": {
+        "台中市": "北屯區"
+      },
+      "北投區": {
+        "台北市": "北投區"
+      },
+      "北斗鎮": {
+        "彰化縣": "北斗鎮"
+      },
+      "北港鎮": {
+        "雲林縣": "北港鎮"
+      },
+      "北竿鄉": {
+        "連江縣": "北竿鄉"
+      },
+      "北門區": {
+        "台南市": "北門區"
+      },
+      "卑南鄉": {
+        "台東縣": "卑南鄉"
+      },
+      "卓溪鄉": {
+        "花蓮縣": "卓溪鄉"
+      },
+      "卓蘭鎮": {
+        "苗栗縣": "卓蘭鎮"
+      },
+      "南化區": {
+        "台南市": "南化區"
+      },
+      "南區": {
+        "台中市": "南區",
+        "台南市": "南區"
+      },
+      "南屯區": {
+        "台中市": "南屯區"
+      },
+      "南州鄉": {
+        "屏東縣": "南州鄉"
+      },
+      "南庄鄉": {
+        "苗栗縣": "南庄鄉"
+      },
+      "南投市": {
+        "南投縣": "南投市"
+      },
+      "南港區": {
+        "台北市": "南港區"
+      },
+      "南澳鄉": {
+        "宜蘭縣": "南澳鄉"
+      },
+      "南竿鄉": {
+        "連江縣": "南竿鄉"
+      },
+      "口湖鄉": {
+        "雲林縣": "口湖鄉"
+      },
+      "古坑鄉": {
+        "雲林縣": "古坑鄉"
+      },
+      "台東市": {
+        "台東縣": "台東市"
+      },
+      "台西鄉": {
+        "雲林縣": "台西鄉"
+      },
+      "吉安鄉": {
+        "花蓮縣": "吉安鄉"
+      },
+      "名間鄉": {
+        "南投縣": "名間鄉"
+      },
+      "后里區": {
+        "台中市": "后里區"
+      },
+      "和平區": {
+        "台中市": "和平區"
+      },
+      "和美鎮": {
+        "彰化縣": "和美鎮"
+      },
+      "員山鄉": {
+        "宜蘭縣": "員山鄉"
+      },
+      "員林市": {
+        "彰化縣": "員林市"
+      },
+      "善化區": {
+        "台南市": "善化區"
+      },
+      "四湖鄉": {
+        "雲林縣": "四湖鄉"
+      },
+      "國姓鄉": {
+        "南投縣": "國姓鄉"
+      },
+      "土城區": {
+        "新北市": "土城區"
+      },
+      "土庫鎮": {
+        "雲林縣": "土庫鎮"
+      },
+      "坪林區": {
+        "新北市": "坪林區"
+      },
+      "埔心鄉": {
+        "彰化縣": "埔心鄉"
+      },
+      "埔里鎮": {
+        "南投縣": "埔里鎮"
+      },
+      "埔鹽鄉": {
+        "彰化縣": "埔鹽鄉"
+      },
+      "埤頭鄉": {
+        "彰化縣": "埤頭鄉"
+      },
+      "士林區": {
+        "台北市": "士林區"
+      },
+      "壯圍鄉": {
+        "宜蘭縣": "壯圍鄉"
+      },
+      "壽豐鄉": {
+        "花蓮縣": "壽豐鄉"
+      },
+      "外埔區": {
+        "台中市": "外埔區"
+      },
+      "大內區": {
+        "台南市": "大內區"
+      },
+      "大同區": {
+        "台北市": "大同區"
+      },
+      "大同鄉": {
+        "宜蘭縣": "大同鄉"
+      },
+      "大園區": {
+        "桃園市": "大園區"
+      },
+      "大城鄉": {
+        "彰化縣": "大城鄉"
+      },
+      "大埔鄉": {
+        "嘉義縣": "大埔鄉"
+      },
+      "大埤鄉": {
+        "雲林縣": "大埤鄉"
+      },
+      "大安區": {
+        "台中市": "大安區",
+        "台北市": "大安區"
+      },
+      "大寮區": {
+        "高雄市": "大寮區"
+      },
+      "大村鄉": {
+        "彰化縣": "大村鄉"
+      },
+      "大林鎮": {
+        "嘉義縣": "大林鎮"
+      },
+      "大樹區": {
+        "高雄市": "大樹區"
+      },
+      "大武鄉": {
+        "台東縣": "大武鄉"
+      },
+      "大湖鄉": {
+        "苗栗縣": "大湖鄉"
+      },
+      "大溪區": {
+        "桃園市": "大溪區"
+      },
+      "大甲區": {
+        "台中市": "大甲區"
+      },
+      "大社區": {
+        "高雄市": "大社區"
+      },
+      "大肚區": {
+        "台中市": "大肚區"
+      },
+      "大里區": {
+        "台中市": "大里區"
+      },
+      "大雅區": {
+        "台中市": "大雅區"
+      },
+      "太保市": {
+        "嘉義縣": "太保市"
+      },
+      "太平區": {
+        "台中市": "太平區"
+      },
+      "太麻里鄉": {
+        "台東縣": "太麻里鄉"
+      },
+      "學甲區": {
+        "台南市": "學甲區"
+      },
+      "安南區": {
+        "台南市": "安南區"
+      },
+      "安定區": {
+        "台南市": "安定區"
+      },
+      "安平區": {
+        "台南市": "安平區"
+      },
+      "安樂區": {
+        "基隆市": "安樂區"
+      },
+      "官田區": {
+        "台南市": "官田區"
+      },
+      "宜蘭市": {
+        "宜蘭縣": "宜蘭市"
+      },
+      "富里鄉": {
+        "花蓮縣": "富里鄉"
+      },
+      "寶山鄉": {
+        "新竹縣": "寶山鄉"
+      },
+      "將軍區": {
+        "台南市": "將軍區"
+      },
+      "小港區": {
+        "高雄市": "小港區"
+      },
+      "尖石鄉": {
+        "新竹縣": "尖石鄉"
+      },
+      "屏東市": {
+        "屏東縣": "屏東市"
+      },
+      "山上區": {
+        "台南市": "山上區"
+      },
+      "岡山區": {
+        "高雄市": "岡山區"
+      },
+      "峨眉鄉": {
+        "新竹縣": "峨眉鄉"
+      },
+      "崁頂鄉": {
+        "屏東縣": "崁頂鄉"
+      },
+      "崙背鄉": {
+        "雲林縣": "崙背鄉"
+      },
+      "左營區": {
+        "高雄市": "左營區"
+      },
+      "左鎮區": {
+        "台南市": "左鎮區"
+      },
+      "布袋鎮": {
+        "嘉義縣": "布袋鎮"
+      },
+      "平溪區": {
+        "新北市": "平溪區"
+      },
+      "平鎮區": {
+        "桃園市": "平鎮區"
+      },
+      "延平鄉": {
+        "台東縣": "延平鄉"
+      },
+      "彌陀區": {
+        "高雄市": "彌陀區"
+      },
+      "彰化市": {
+        "彰化縣": "彰化市"
+      },
+      "後壁區": {
+        "台南市": "後壁區"
+      },
+      "後龍鎮": {
+        "苗栗縣": "後龍鎮"
+      },
+      "復興區": {
+        "桃園市": "復興區"
+      },
+      "恆春鎮": {
+        "屏東縣": "恆春鎮"
+      },
+      "成功鎮": {
+        "台東縣": "成功鎮"
+      },
+      "文山區": {
+        "台北市": "文山區"
+      },
+      "斗六市": {
+        "雲林縣": "斗六市"
+      },
+      "斗南鎮": {
+        "雲林縣": "斗南鎮"
+      },
+      "新化區": {
+        "台南市": "新化區"
+      },
+      "新園鄉": {
+        "屏東縣": "新園鄉"
+      },
+      "新城鄉": {
+        "花蓮縣": "新城鄉"
+      },
+      "新埔鎮": {
+        "新竹縣": "新埔鎮"
+      },
+      "新埤鄉": {
+        "屏東縣": "新埤鄉"
+      },
+      "新屋區": {
+        "桃園市": "新屋區"
+      },
+      "新市區": {
+        "台南市": "新市區"
+      },
+      "新店區": {
+        "新北市": "新店區"
+      },
+      "新港鄉": {
+        "嘉義縣": "新港鄉"
+      },
+      "新營區": {
+        "台南市": "新營區"
+      },
+      "新社區": {
+        "台中市": "新社區"
+      },
+      "新興區": {
+        "高雄市": "新興區"
+      },
+      "新莊區": {
+        "新北市": "新莊區"
+      },
+      "新豐鄉": {
+        "新竹縣": "新豐鄉"
+      },
+      "旗山區": {
+        "高雄市": "旗山區"
+      },
+      "旗津區": {
+        "高雄市": "旗津區"
+      },
+      "春日鄉": {
+        "屏東縣": "春日鄉"
+      },
+      "暖暖區": {
+        "基隆市": "暖暖區"
+      },
+      "望安鄉": {
+        "澎湖縣": "望安鄉"
+      },
+      "朴子市": {
+        "嘉義縣": "朴子市"
+      },
+      "杉林區": {
+        "高雄市": "杉林區"
+      },
+      "東勢區": {
+        "台中市": "東勢區"
+      },
+      "東勢鄉": {
+        "雲林縣": "東勢鄉"
+      },
+      "東區": {
+        "台中市": "東區",
+        "台南市": "東區",
+        "嘉義市": "東區",
+        "新竹市": "東區"
+      },
+      "東山區": {
+        "台南市": "東山區"
+      },
+      "東引鄉": {
+        "連江縣": "東引鄉"
+      },
+      "東河鄉": {
+        "台東縣": "東河鄉"
+      },
+      "東港鎮": {
+        "屏東縣": "東港鎮"
+      },
+      "東石鄉": {
+        "嘉義縣": "東石鄉"
+      },
+      "松山區": {
+        "台北市": "松山區"
+      },
+      "板橋區": {
+        "新北市": "板橋區"
+      },
+      "枋寮鄉": {
+        "屏東縣": "枋寮鄉"
+      },
+      "枋山鄉": {
+        "屏東縣": "枋山鄉"
+      },
+      "林內鄉": {
+        "雲林縣": "林內鄉"
+      },
+      "林口區": {
+        "新北市": "林口區"
+      },
+      "林園區": {
+        "高雄市": "林園區"
+      },
+      "林邊鄉": {
+        "屏東縣": "林邊鄉"
+      },
+      "柳營區": {
+        "台南市": "柳營區"
+      },
+      "桃園區": {
+        "桃園市": "桃園區"
+      },
+      "桃源區": {
+        "高雄市": "桃源區"
+      },
+      "梅山鄉": {
+        "嘉義縣": "梅山鄉"
+      },
+      "梓官區": {
+        "高雄市": "梓官區"
+      },
+      "梧棲區": {
+        "台中市": "梧棲區"
+      },
+      "楊梅區": {
+        "桃園市": "楊梅區"
+      },
+      "楠梓區": {
+        "高雄市": "楠梓區"
+      },
+      "楠西區": {
+        "台南市": "楠西區"
+      },
+      "樹林區": {
+        "新北市": "樹林區"
+      },
+      "橋頭區": {
+        "高雄市": "橋頭區"
+      },
+      "橫山鄉": {
+        "新竹縣": "橫山鄉"
+      },
+      "歸仁區": {
+        "台南市": "歸仁區"
+      },
+      "民雄鄉": {
+        "嘉義縣": "民雄鄉"
+      },
+      "水上鄉": {
+        "嘉義縣": "水上鄉"
+      },
+      "水林鄉": {
+        "雲林縣": "水林鄉"
+      },
+      "水里鄉": {
+        "南投縣": "水里鄉"
+      },
+      "永和區": {
+        "新北市": "永和區"
+      },
+      "永安區": {
+        "高雄市": "永安區"
+      },
+      "永康區": {
+        "台南市": "永康區"
+      },
+      "永靖鄉": {
+        "彰化縣": "永靖鄉"
+      },
+      "汐止區": {
+        "新北市": "汐止區"
+      },
+      "池上鄉": {
+        "台東縣": "池上鄉"
+      },
+      "沙鹿區": {
+        "台中市": "沙鹿區"
+      },
+      "泰安鄉": {
+        "苗栗縣": "泰安鄉"
+      },
+      "泰山區": {
+        "新北市": "泰山區"
+      },
+      "泰武鄉": {
+        "屏東縣": "泰武鄉"
+      },
+      "海端鄉": {
+        "台東縣": "海端鄉"
+      },
+      "淡水區": {
+        "新北市": "淡水區"
+      },
+      "深坑區": {
+        "新北市": "深坑區"
+      },
+      "清水區": {
+        "台中市": "清水區"
+      },
+      "湖內區": {
+        "高雄市": "湖內區"
+      },
+      "湖口鄉": {
+        "新竹縣": "湖口鄉"
+      },
+      "湖西鄉": {
+        "澎湖縣": "湖西鄉"
+      },
+      "溪口鄉": {
+        "嘉義縣": "溪口鄉"
+      },
+      "溪州鄉": {
+        "彰化縣": "溪州鄉"
+      },
+      "溪湖鎮": {
+        "彰化縣": "溪湖鎮"
+      },
+      "滿州鄉": {
+        "屏東縣": "滿州鄉"
+      },
+      "潭子區": {
+        "台中市": "潭子區"
+      },
+      "潮州鎮": {
+        "屏東縣": "潮州鎮"
+      },
+      "烈嶼鄉": {
+        "金門縣": "烈嶼鄉"
+      },
+      "烏來區": {
+        "新北市": "烏來區"
+      },
+      "烏坵鄉": {
+        "金門縣": "烏坵鄉"
+      },
+      "烏日區": {
+        "台中市": "烏日區"
+      },
+      "燕巢區": {
+        "高雄市": "燕巢區"
+      },
+      "牡丹鄉": {
+        "屏東縣": "牡丹鄉"
+      },
+      "獅子鄉": {
+        "屏東縣": "獅子鄉"
+      },
+      "獅潭鄉": {
+        "苗栗縣": "獅潭鄉"
+      },
+      "玉井區": {
+        "台南市": "玉井區"
+      },
+      "玉里鎮": {
+        "花蓮縣": "玉里鎮"
+      },
+      "琉球鄉": {
+        "屏東縣": "琉球鄉"
+      },
+      "瑞穗鄉": {
+        "花蓮縣": "瑞穗鄉"
+      },
+      "瑞芳區": {
+        "新北市": "瑞芳區"
+      },
+      "瑪家鄉": {
+        "屏東縣": "瑪家鄉"
+      },
+      "田中鎮": {
+        "彰化縣": "田中鎮"
+      },
+      "田寮區": {
+        "高雄市": "田寮區"
+      },
+      "田尾鄉": {
+        "彰化縣": "田尾鄉"
+      },
+      "甲仙區": {
+        "高雄市": "甲仙區"
+      },
+      "番路鄉": {
+        "嘉義縣": "番路鄉"
+      },
+      "白沙鄉": {
+        "澎湖縣": "白沙鄉"
+      },
+      "白河區": {
+        "台南市": "白河區"
+      },
+      "石岡區": {
+        "台中市": "石岡區"
+      },
+      "石碇區": {
+        "新北市": "石碇區"
+      },
+      "石門區": {
+        "新北市": "石門區"
+      },
+      "礁溪鄉": {
+        "宜蘭縣": "礁溪鄉"
+      },
+      "社頭鄉": {
+        "彰化縣": "社頭鄉"
+      },
+      "神岡區": {
+        "台中市": "神岡區"
+      },
+      "福興鄉": {
+        "彰化縣": "福興鄉"
+      },
+      "秀林鄉": {
+        "花蓮縣": "秀林鄉"
+      },
+      "秀水鄉": {
+        "彰化縣": "秀水鄉"
+      },
+      "竹北市": {
+        "新竹縣": "竹北市"
+      },
+      "竹南鎮": {
+        "苗栗縣": "竹南鎮"
+      },
+      "竹塘鄉": {
+        "彰化縣": "竹塘鄉"
+      },
+      "竹山鎮": {
+        "南投縣": "竹山鎮"
+      },
+      "竹崎鄉": {
+        "嘉義縣": "竹崎鄉"
+      },
+      "竹東鎮": {
+        "新竹縣": "竹東鎮"
+      },
+      "竹田鄉": {
+        "屏東縣": "竹田鄉"
+      },
+      "綠島鄉": {
+        "台東縣": "綠島鄉"
+      },
+      "線西鄉": {
+        "彰化縣": "線西鄉"
+      },
+      "羅東鎮": {
+        "宜蘭縣": "羅東鎮"
+      },
+      "美濃區": {
+        "高雄市": "美濃區"
+      },
+      "義竹鄉": {
+        "嘉義縣": "義竹鄉"
+      },
+      "芎林鄉": {
+        "新竹縣": "芎林鄉"
+      },
+      "芬園鄉": {
+        "彰化縣": "芬園鄉"
+      },
+      "花壇鄉": {
+        "彰化縣": "花壇鄉"
+      },
+      "花蓮市": {
+        "花蓮縣": "花蓮市"
+      },
+      "芳苑鄉": {
+        "彰化縣": "芳苑鄉"
+      },
+      "苑裡鎮": {
+        "苗栗縣": "苑裡鎮"
+      },
+      "苓雅區": {
+        "高雄市": "苓雅區"
+      },
+      "苗栗市": {
+        "苗栗縣": "苗栗市"
+      },
+      "茂林區": {
+        "高雄市": "茂林區"
+      },
+      "茄萣區": {
+        "高雄市": "茄萣區"
+      },
+      "草屯鎮": {
+        "南投縣": "草屯鎮"
+      },
+      "莒光鄉": {
+        "連江縣": "莒光鄉"
+      },
+      "莿桐鄉": {
+        "雲林縣": "莿桐鄉"
+      },
+      "萬丹鄉": {
+        "屏東縣": "萬丹鄉"
+      },
+      "萬巒鄉": {
+        "屏東縣": "萬巒鄉"
+      },
+      "萬榮鄉": {
+        "花蓮縣": "萬榮鄉"
+      },
+      "萬華區": {
+        "台北市": "萬華區"
+      },
+      "萬里區": {
+        "新北市": "萬里區"
+      },
+      "蘆洲區": {
+        "新北市": "蘆洲區"
+      },
+      "蘆竹區": {
+        "桃園市": "蘆竹區"
+      },
+      "蘇澳鎮": {
+        "宜蘭縣": "蘇澳鎮"
+      },
+      "蘭嶼鄉": {
+        "台東縣": "蘭嶼鄉"
+      },
+      "虎尾鎮": {
+        "雲林縣": "虎尾鎮"
+      },
+      "褒忠鄉": {
+        "雲林縣": "褒忠鄉"
+      },
+      "西區": {
+        "台中市": "西區",
+        "嘉義市": "西區"
+      },
+      "西屯區": {
+        "台中市": "西屯區"
+      },
+      "西嶼鄉": {
+        "澎湖縣": "西嶼鄉"
+      },
+      "西港區": {
+        "台南市": "西港區"
+      },
+      "西湖鄉": {
+        "苗栗縣": "西湖鄉"
+      },
+      "西螺鎮": {
+        "雲林縣": "西螺鎮"
+      },
+      "觀音區": {
+        "桃園市": "觀音區"
+      },
+      "豐原區": {
+        "台中市": "豐原區"
+      },
+      "豐濱鄉": {
+        "花蓮縣": "豐濱鄉"
+      },
+      "貢寮區": {
+        "新北市": "貢寮區"
+      },
+      "路竹區": {
+        "高雄市": "路竹區"
+      },
+      "車城鄉": {
+        "屏東縣": "車城鄉"
+      },
+      "通霄鎮": {
+        "苗栗縣": "通霄鎮"
+      },
+      "造橋鄉": {
+        "苗栗縣": "造橋鄉"
+      },
+      "達仁鄉": {
+        "台東縣": "達仁鄉"
+      },
+      "那瑪夏區": {
+        "高雄市": "那瑪夏區"
+      },
+      "里港鄉": {
+        "屏東縣": "里港鄉"
+      },
+      "金城鎮": {
+        "金門縣": "金城鎮"
+      },
+      "金寧鄉": {
+        "金門縣": "金寧鄉"
+      },
+      "金山區": {
+        "新北市": "金山區"
+      },
+      "金峰鄉": {
+        "台東縣": "金峰鄉"
+      },
+      "金沙鎮": {
+        "金門縣": "金沙鎮"
+      },
+      "金湖鎮": {
+        "金門縣": "金湖鎮"
+      },
+      "銅鑼鄉": {
+        "苗栗縣": "銅鑼鄉"
+      },
+      "長治鄉": {
+        "屏東縣": "長治鄉"
+      },
+      "長濱鄉": {
+        "台東縣": "長濱鄉"
+      },
+      "關山鎮": {
+        "台東縣": "關山鎮"
+      },
+      "關廟區": {
+        "台南市": "關廟區"
+      },
+      "關西鎮": {
+        "新竹縣": "關西鎮"
+      },
+      "阿蓮區": {
+        "高雄市": "阿蓮區"
+      },
+      "阿里山鄉": {
+        "嘉義縣": "阿里山鄉"
+      },
+      "集集鎮": {
+        "南投縣": "集集鎮"
+      },
+      "雙溪區": {
+        "新北市": "雙溪區"
+      },
+      "霧台鄉": {
+        "屏東縣": "霧台鄉"
+      },
+      "霧峰區": {
+        "台中市": "霧峰區"
+      },
+      "頭份市": {
+        "苗栗縣": "頭份市"
+      },
+      "頭城鎮": {
+        "宜蘭縣": "頭城鎮"
+      },
+      "頭屋鄉": {
+        "苗栗縣": "頭屋鄉"
+      },
+      "香山區": {
+        "新竹市": "香山區"
+      },
+      "馬公市": {
+        "澎湖縣": "馬公市"
+      },
+      "高樹鄉": {
+        "屏東縣": "高樹鄉"
+      },
+      "魚池鄉": {
+        "南投縣": "魚池鄉"
+      },
+      "鳥松區": {
+        "高雄市": "鳥松區"
+      },
+      "鳳山區": {
+        "高雄市": "鳳山區"
+      },
+      "鳳林鎮": {
+        "花蓮縣": "鳳林鎮"
+      },
+      "鶯歌區": {
+        "新北市": "鶯歌區"
+      },
+      "鹽埔鄉": {
+        "屏東縣": "鹽埔鄉"
+      },
+      "鹽埕區": {
+        "高雄市": "鹽埕區"
+      },
+      "鹽水區": {
+        "台南市": "鹽水區"
+      },
+      "鹿港鎮": {
+        "彰化縣": "鹿港鎮"
+      },
+      "鹿草鄉": {
+        "嘉義縣": "鹿草鄉"
+      },
+      "鹿谷鄉": {
+        "南投縣": "鹿谷鄉"
+      },
+      "鹿野鄉": {
+        "台東縣": "鹿野鄉"
+      },
+      "麟洛鄉": {
+        "屏東縣": "麟洛鄉"
+      },
+      "麥寮鄉": {
+        "雲林縣": "麥寮鄉"
+      },
+      "麻豆區": {
+        "台南市": "麻豆區"
+      },
+      "鼓山區": {
+        "高雄市": "鼓山區"
+      },
+      "龍井區": {
+        "台中市": "龍井區"
+      },
+      "龍崎區": {
+        "台南市": "龍崎區"
+      },
+      "龍潭區": {
+        "桃園市": "龍潭區"
+      },
+      "龜山區": {
+        "桃園市": "龜山區"
+      }
+    },
+    "suffix_dropped": {
+      "七堵": {
+        "基隆市": "七堵區"
+      },
+      "七美": {
+        "澎湖縣": "七美鄉"
+      },
+      "七股": {
+        "台南市": "七股區"
+      },
+      "三地門": {
+        "屏東縣": "三地門鄉"
+      },
+      "三峽": {
+        "新北市": "三峽區"
+      },
+      "三星": {
+        "宜蘭縣": "三星鄉"
+      },
+      "三民": {
+        "高雄市": "三民區"
+      },
+      "三灣": {
+        "苗栗縣": "三灣鄉"
+      },
+      "三義": {
+        "苗栗縣": "三義鄉"
+      },
+      "三芝": {
+        "新北市": "三芝區"
+      },
+      "三重": {
+        "新北市": "三重區"
+      },
+      "下營": {
+        "台南市": "下營區"
+      },
+      "中和": {
+        "新北市": "中和區"
+      },
+      "中埔": {
+        "嘉義縣": "中埔鄉"
+      },
+      "中壢": {
+        "桃園市": "中壢區"
+      },
+      "中寮": {
+        "南投縣": "中寮鄉"
+      },
+      "中山": {
+        "台北市": "中山區",
+        "基隆市": "中山區"
+      },
+      "中正": {
+        "台北市": "中正區",
+        "基隆市": "中正區"
+      },
+      "中西": {
+        "台南市": "中西區"
+      },
+      "九如": {
+        "屏東縣": "九如鄉"
+      },
+      "二崙": {
+        "雲林縣": "二崙鄉"
+      },
+      "二林": {
+        "彰化縣": "二林鎮"
+      },
+      "二水": {
+        "彰化縣": "二水鄉"
+      },
+      "五峰": {
+        "新竹縣": "五峰鄉"
+      },
+      "五結": {
+        "宜蘭縣": "五結鄉"
+      },
+      "五股": {
+        "新北市": "五股區"
+      },
+      "仁德": {
+        "台南市": "仁德區"
+      },
+      "仁愛": {
+        "南投縣": "仁愛鄉",
+        "基隆市": "仁愛區"
+      },
+      "仁武": {
+        "高雄市": "仁武區"
+      },
+      "伸港": {
+        "彰化縣": "伸港鄉"
+      },
+      "佳冬": {
+        "屏東縣": "佳冬鄉"
+      },
+      "佳里": {
+        "台南市": "佳里區"
+      },
+      "來義": {
+        "屏東縣": "來義鄉"
+      },
+      "信義": {
+        "南投縣": "信義鄉",
+        "台北市": "信義區",
+        "基隆市": "信義區"
+      },
+      "元長": {
+        "雲林縣": "元長鄉"
+      },
+      "光復": {
+        "花蓮縣": "光復鄉"
+      },
+      "內埔": {
+        "屏東縣": "內埔鄉"
+      },
+      "內湖": {
+        "台北市": "內湖區"
+      },
+      "內門": {
+        "高雄市": "內門區"
+      },
+      "八德": {
+        "桃園市": "八德區"
+      },
+      "八里": {
+        "新北市": "八里區"
+      },
+      "公館": {
+        "苗栗縣": "公館鄉"
+      },
+      "六甲": {
+        "台南市": "六甲區"
+      },
+      "六腳": {
+        "嘉義縣": "六腳鄉"
+      },
+      "六龜": {
+        "高雄市": "六龜區"
+      },
+      "冬山": {
+        "宜蘭縣": "冬山鄉"
+      },
+      "前金": {
+        "高雄市": "前金區"
+      },
+      "前鎮": {
+        "高雄市": "前鎮區"
+      },
+      "北埔": {
+        "新竹縣": "北埔鄉"
+      },
+      "北屯": {
+        "台中市": "北屯區"
+      },
+      "北投": {
+        "台北市": "北投區"
+      },
+      "北斗": {
+        "彰化縣": "北斗鎮"
+      },
+      "北港": {
+        "雲林縣": "北港鎮"
+      },
+      "北竿": {
+        "連江縣": "北竿鄉"
+      },
+      "北門": {
+        "台南市": "北門區"
+      },
+      "卑南": {
+        "台東縣": "卑南鄉"
+      },
+      "卓溪": {
+        "花蓮縣": "卓溪鄉"
+      },
+      "卓蘭": {
+        "苗栗縣": "卓蘭鎮"
+      },
+      "南化": {
+        "台南市": "南化區"
+      },
+      "南屯": {
+        "台中市": "南屯區"
+      },
+      "南州": {
+        "屏東縣": "南州鄉"
+      },
+      "南庄": {
+        "苗栗縣": "南庄鄉"
+      },
+      "南投": {
+        "南投縣": "南投市"
+      },
+      "南港": {
+        "台北市": "南港區"
+      },
+      "南澳": {
+        "宜蘭縣": "南澳鄉"
+      },
+      "南竿": {
+        "連江縣": "南竿鄉"
+      },
+      "口湖": {
+        "雲林縣": "口湖鄉"
+      },
+      "古坑": {
+        "雲林縣": "古坑鄉"
+      },
+      "台東": {
+        "台東縣": "台東市"
+      },
+      "台西": {
+        "雲林縣": "台西鄉"
+      },
+      "吉安": {
+        "花蓮縣": "吉安鄉"
+      },
+      "名間": {
+        "南投縣": "名間鄉"
+      },
+      "后里": {
+        "台中市": "后里區"
+      },
+      "和平": {
+        "台中市": "和平區"
+      },
+      "和美": {
+        "彰化縣": "和美鎮"
+      },
+      "員山": {
+        "宜蘭縣": "員山鄉"
+      },
+      "員林": {
+        "彰化縣": "員林市"
+      },
+      "善化": {
+        "台南市": "善化區"
+      },
+      "四湖": {
+        "雲林縣": "四湖鄉"
+      },
+      "國姓": {
+        "南投縣": "國姓鄉"
+      },
+      "土城": {
+        "新北市": "土城區"
+      },
+      "土庫": {
+        "雲林縣": "土庫鎮"
+      },
+      "坪林": {
+        "新北市": "坪林區"
+      },
+      "埔心": {
+        "彰化縣": "埔心鄉"
+      },
+      "埔里": {
+        "南投縣": "埔里鎮"
+      },
+      "埔鹽": {
+        "彰化縣": "埔鹽鄉"
+      },
+      "埤頭": {
+        "彰化縣": "埤頭鄉"
+      },
+      "士林": {
+        "台北市": "士林區"
+      },
+      "壯圍": {
+        "宜蘭縣": "壯圍鄉"
+      },
+      "壽豐": {
+        "花蓮縣": "壽豐鄉"
+      },
+      "外埔": {
+        "台中市": "外埔區"
+      },
+      "大內": {
+        "台南市": "大內區"
+      },
+      "大同": {
+        "台北市": "大同區",
+        "宜蘭縣": "大同鄉"
+      },
+      "大園": {
+        "桃園市": "大園區"
+      },
+      "大城": {
+        "彰化縣": "大城鄉"
+      },
+      "大埔": {
+        "嘉義縣": "大埔鄉"
+      },
+      "大埤": {
+        "雲林縣": "大埤鄉"
+      },
+      "大安": {
+        "台中市": "大安區",
+        "台北市": "大安區"
+      },
+      "大寮": {
+        "高雄市": "大寮區"
+      },
+      "大村": {
+        "彰化縣": "大村鄉"
+      },
+      "大林": {
+        "嘉義縣": "大林鎮"
+      },
+      "大樹": {
+        "高雄市": "大樹區"
+      },
+      "大武": {
+        "台東縣": "大武鄉"
+      },
+      "大湖": {
+        "苗栗縣": "大湖鄉"
+      },
+      "大溪": {
+        "桃園市": "大溪區"
+      },
+      "大甲": {
+        "台中市": "大甲區"
+      },
+      "大社": {
+        "高雄市": "大社區"
+      },
+      "大肚": {
+        "台中市": "大肚區"
+      },
+      "大里": {
+        "台中市": "大里區"
+      },
+      "大雅": {
+        "台中市": "大雅區"
+      },
+      "太保": {
+        "嘉義縣": "太保市"
+      },
+      "太平": {
+        "台中市": "太平區"
+      },
+      "太麻里": {
+        "台東縣": "太麻里鄉"
+      },
+      "學甲": {
+        "台南市": "學甲區"
+      },
+      "安南": {
+        "台南市": "安南區"
+      },
+      "安定": {
+        "台南市": "安定區"
+      },
+      "安平": {
+        "台南市": "安平區"
+      },
+      "安樂": {
+        "基隆市": "安樂區"
+      },
+      "官田": {
+        "台南市": "官田區"
+      },
+      "宜蘭": {
+        "宜蘭縣": "宜蘭市"
+      },
+      "富里": {
+        "花蓮縣": "富里鄉"
+      },
+      "寶山": {
+        "新竹縣": "寶山鄉"
+      },
+      "將軍": {
+        "台南市": "將軍區"
+      },
+      "小港": {
+        "高雄市": "小港區"
+      },
+      "尖石": {
+        "新竹縣": "尖石鄉"
+      },
+      "屏東": {
+        "屏東縣": "屏東市"
+      },
+      "山上": {
+        "台南市": "山上區"
+      },
+      "岡山": {
+        "高雄市": "岡山區"
+      },
+      "峨眉": {
+        "新竹縣": "峨眉鄉"
+      },
+      "崁頂": {
+        "屏東縣": "崁頂鄉"
+      },
+      "崙背": {
+        "雲林縣": "崙背鄉"
+      },
+      "左營": {
+        "高雄市": "左營區"
+      },
+      "左鎮": {
+        "台南市": "左鎮區"
+      },
+      "布袋": {
+        "嘉義縣": "布袋鎮"
+      },
+      "平溪": {
+        "新北市": "平溪區"
+      },
+      "平鎮": {
+        "桃園市": "平鎮區"
+      },
+      "延平": {
+        "台東縣": "延平鄉"
+      },
+      "彌陀": {
+        "高雄市": "彌陀區"
+      },
+      "彰化": {
+        "彰化縣": "彰化市"
+      },
+      "後壁": {
+        "台南市": "後壁區"
+      },
+      "後龍": {
+        "苗栗縣": "後龍鎮"
+      },
+      "復興": {
+        "桃園市": "復興區"
+      },
+      "恆春": {
+        "屏東縣": "恆春鎮"
+      },
+      "成功": {
+        "台東縣": "成功鎮"
+      },
+      "文山": {
+        "台北市": "文山區"
+      },
+      "斗六": {
+        "雲林縣": "斗六市"
+      },
+      "斗南": {
+        "雲林縣": "斗南鎮"
+      },
+      "新化": {
+        "台南市": "新化區"
+      },
+      "新園": {
+        "屏東縣": "新園鄉"
+      },
+      "新城": {
+        "花蓮縣": "新城鄉"
+      },
+      "新埔": {
+        "新竹縣": "新埔鎮"
+      },
+      "新埤": {
+        "屏東縣": "新埤鄉"
+      },
+      "新屋": {
+        "桃園市": "新屋區"
+      },
+      "新市": {
+        "台南市": "新市區"
+      },
+      "新店": {
+        "新北市": "新店區"
+      },
+      "新港": {
+        "嘉義縣": "新港鄉"
+      },
+      "新營": {
+        "台南市": "新營區"
+      },
+      "新社": {
+        "台中市": "新社區"
+      },
+      "新興": {
+        "高雄市": "新興區"
+      },
+      "新莊": {
+        "新北市": "新莊區"
+      },
+      "新豐": {
+        "新竹縣": "新豐鄉"
+      },
+      "旗山": {
+        "高雄市": "旗山區"
+      },
+      "旗津": {
+        "高雄市": "旗津區"
+      },
+      "春日": {
+        "屏東縣": "春日鄉"
+      },
+      "暖暖": {
+        "基隆市": "暖暖區"
+      },
+      "望安": {
+        "澎湖縣": "望安鄉"
+      },
+      "朴子": {
+        "嘉義縣": "朴子市"
+      },
+      "杉林": {
+        "高雄市": "杉林區"
+      },
+      "東勢": {
+        "台中市": "東勢區",
+        "雲林縣": "東勢鄉"
+      },
+      "東山": {
+        "台南市": "東山區"
+      },
+      "東引": {
+        "連江縣": "東引鄉"
+      },
+      "東河": {
+        "台東縣": "東河鄉"
+      },
+      "東港": {
+        "屏東縣": "東港鎮"
+      },
+      "東石": {
+        "嘉義縣": "東石鄉"
+      },
+      "松山": {
+        "台北市": "松山區"
+      },
+      "板橋": {
+        "新北市": "板橋區"
+      },
+      "枋寮": {
+        "屏東縣": "枋寮鄉"
+      },
+      "枋山": {
+        "屏東縣": "枋山鄉"
+      },
+      "林內": {
+        "雲林縣": "林內鄉"
+      },
+      "林口": {
+        "新北市": "林口區"
+      },
+      "林園": {
+        "高雄市": "林園區"
+      },
+      "林邊": {
+        "屏東縣": "林邊鄉"
+      },
+      "柳營": {
+        "台南市": "柳營區"
+      },
+      "桃園": {
+        "桃園市": "桃園區"
+      },
+      "桃源": {
+        "高雄市": "桃源區"
+      },
+      "梅山": {
+        "嘉義縣": "梅山鄉"
+      },
+      "梓官": {
+        "高雄市": "梓官區"
+      },
+      "梧棲": {
+        "台中市": "梧棲區"
+      },
+      "楊梅": {
+        "桃園市": "楊梅區"
+      },
+      "楠梓": {
+        "高雄市": "楠梓區"
+      },
+      "楠西": {
+        "台南市": "楠西區"
+      },
+      "樹林": {
+        "新北市": "樹林區"
+      },
+      "橋頭": {
+        "高雄市": "橋頭區"
+      },
+      "橫山": {
+        "新竹縣": "橫山鄉"
+      },
+      "歸仁": {
+        "台南市": "歸仁區"
+      },
+      "民雄": {
+        "嘉義縣": "民雄鄉"
+      },
+      "水上": {
+        "嘉義縣": "水上鄉"
+      },
+      "水林": {
+        "雲林縣": "水林鄉"
+      },
+      "水里": {
+        "南投縣": "水里鄉"
+      },
+      "永和": {
+        "新北市": "永和區"
+      },
+      "永安": {
+        "高雄市": "永安區"
+      },
+      "永康": {
+        "台南市": "永康區"
+      },
+      "永靖": {
+        "彰化縣": "永靖鄉"
+      },
+      "汐止": {
+        "新北市": "汐止區"
+      },
+      "池上": {
+        "台東縣": "池上鄉"
+      },
+      "沙鹿": {
+        "台中市": "沙鹿區"
+      },
+      "泰安": {
+        "苗栗縣": "泰安鄉"
+      },
+      "泰山": {
+        "新北市": "泰山區"
+      },
+      "泰武": {
+        "屏東縣": "泰武鄉"
+      },
+      "海端": {
+        "台東縣": "海端鄉"
+      },
+      "淡水": {
+        "新北市": "淡水區"
+      },
+      "深坑": {
+        "新北市": "深坑區"
+      },
+      "清水": {
+        "台中市": "清水區"
+      },
+      "湖內": {
+        "高雄市": "湖內區"
+      },
+      "湖口": {
+        "新竹縣": "湖口鄉"
+      },
+      "湖西": {
+        "澎湖縣": "湖西鄉"
+      },
+      "溪口": {
+        "嘉義縣": "溪口鄉"
+      },
+      "溪州": {
+        "彰化縣": "溪州鄉"
+      },
+      "溪湖": {
+        "彰化縣": "溪湖鎮"
+      },
+      "滿州": {
+        "屏東縣": "滿州鄉"
+      },
+      "潭子": {
+        "台中市": "潭子區"
+      },
+      "潮州": {
+        "屏東縣": "潮州鎮"
+      },
+      "烈嶼": {
+        "金門縣": "烈嶼鄉"
+      },
+      "烏來": {
+        "新北市": "烏來區"
+      },
+      "烏坵": {
+        "金門縣": "烏坵鄉"
+      },
+      "烏日": {
+        "台中市": "烏日區"
+      },
+      "燕巢": {
+        "高雄市": "燕巢區"
+      },
+      "牡丹": {
+        "屏東縣": "牡丹鄉"
+      },
+      "獅子": {
+        "屏東縣": "獅子鄉"
+      },
+      "獅潭": {
+        "苗栗縣": "獅潭鄉"
+      },
+      "玉井": {
+        "台南市": "玉井區"
+      },
+      "玉里": {
+        "花蓮縣": "玉里鎮"
+      },
+      "琉球": {
+        "屏東縣": "琉球鄉"
+      },
+      "瑞穗": {
+        "花蓮縣": "瑞穗鄉"
+      },
+      "瑞芳": {
+        "新北市": "瑞芳區"
+      },
+      "瑪家": {
+        "屏東縣": "瑪家鄉"
+      },
+      "田中": {
+        "彰化縣": "田中鎮"
+      },
+      "田寮": {
+        "高雄市": "田寮區"
+      },
+      "田尾": {
+        "彰化縣": "田尾鄉"
+      },
+      "甲仙": {
+        "高雄市": "甲仙區"
+      },
+      "番路": {
+        "嘉義縣": "番路鄉"
+      },
+      "白沙": {
+        "澎湖縣": "白沙鄉"
+      },
+      "白河": {
+        "台南市": "白河區"
+      },
+      "石岡": {
+        "台中市": "石岡區"
+      },
+      "石碇": {
+        "新北市": "石碇區"
+      },
+      "石門": {
+        "新北市": "石門區"
+      },
+      "礁溪": {
+        "宜蘭縣": "礁溪鄉"
+      },
+      "社頭": {
+        "彰化縣": "社頭鄉"
+      },
+      "神岡": {
+        "台中市": "神岡區"
+      },
+      "福興": {
+        "彰化縣": "福興鄉"
+      },
+      "秀林": {
+        "花蓮縣": "秀林鄉"
+      },
+      "秀水": {
+        "彰化縣": "秀水鄉"
+      },
+      "竹北": {
+        "新竹縣": "竹北市"
+      },
+      "竹南": {
+        "苗栗縣": "竹南鎮"
+      },
+      "竹塘": {
+        "彰化縣": "竹塘鄉"
+      },
+      "竹山": {
+        "南投縣": "竹山鎮"
+      },
+      "竹崎": {
+        "嘉義縣": "竹崎鄉"
+      },
+      "竹東": {
+        "新竹縣": "竹東鎮"
+      },
+      "竹田": {
+        "屏東縣": "竹田鄉"
+      },
+      "綠島": {
+        "台東縣": "綠島鄉"
+      },
+      "線西": {
+        "彰化縣": "線西鄉"
+      },
+      "羅東": {
+        "宜蘭縣": "羅東鎮"
+      },
+      "美濃": {
+        "高雄市": "美濃區"
+      },
+      "義竹": {
+        "嘉義縣": "義竹鄉"
+      },
+      "芎林": {
+        "新竹縣": "芎林鄉"
+      },
+      "芬園": {
+        "彰化縣": "芬園鄉"
+      },
+      "花壇": {
+        "彰化縣": "花壇鄉"
+      },
+      "花蓮": {
+        "花蓮縣": "花蓮市"
+      },
+      "芳苑": {
+        "彰化縣": "芳苑鄉"
+      },
+      "苑裡": {
+        "苗栗縣": "苑裡鎮"
+      },
+      "苓雅": {
+        "高雄市": "苓雅區"
+      },
+      "苗栗": {
+        "苗栗縣": "苗栗市"
+      },
+      "茂林": {
+        "高雄市": "茂林區"
+      },
+      "茄萣": {
+        "高雄市": "茄萣區"
+      },
+      "草屯": {
+        "南投縣": "草屯鎮"
+      },
+      "莒光": {
+        "連江縣": "莒光鄉"
+      },
+      "莿桐": {
+        "雲林縣": "莿桐鄉"
+      },
+      "萬丹": {
+        "屏東縣": "萬丹鄉"
+      },
+      "萬巒": {
+        "屏東縣": "萬巒鄉"
+      },
+      "萬榮": {
+        "花蓮縣": "萬榮鄉"
+      },
+      "萬華": {
+        "台北市": "萬華區"
+      },
+      "萬里": {
+        "新北市": "萬里區"
+      },
+      "蘆洲": {
+        "新北市": "蘆洲區"
+      },
+      "蘆竹": {
+        "桃園市": "蘆竹區"
+      },
+      "蘇澳": {
+        "宜蘭縣": "蘇澳鎮"
+      },
+      "蘭嶼": {
+        "台東縣": "蘭嶼鄉"
+      },
+      "虎尾": {
+        "雲林縣": "虎尾鎮"
+      },
+      "褒忠": {
+        "雲林縣": "褒忠鄉"
+      },
+      "西屯": {
+        "台中市": "西屯區"
+      },
+      "西嶼": {
+        "澎湖縣": "西嶼鄉"
+      },
+      "西港": {
+        "台南市": "西港區"
+      },
+      "西湖": {
+        "苗栗縣": "西湖鄉"
+      },
+      "西螺": {
+        "雲林縣": "西螺鎮"
+      },
+      "觀音": {
+        "桃園市": "觀音區"
+      },
+      "豐原": {
+        "台中市": "豐原區"
+      },
+      "豐濱": {
+        "花蓮縣": "豐濱鄉"
+      },
+      "貢寮": {
+        "新北市": "貢寮區"
+      },
+      "路竹": {
+        "高雄市": "路竹區"
+      },
+      "車城": {
+        "屏東縣": "車城鄉"
+      },
+      "通霄": {
+        "苗栗縣": "通霄鎮"
+      },
+      "造橋": {
+        "苗栗縣": "造橋鄉"
+      },
+      "達仁": {
+        "台東縣": "達仁鄉"
+      },
+      "那瑪夏": {
+        "高雄市": "那瑪夏區"
+      },
+      "里港": {
+        "屏東縣": "里港鄉"
+      },
+      "金城": {
+        "金門縣": "金城鎮"
+      },
+      "金寧": {
+        "金門縣": "金寧鄉"
+      },
+      "金山": {
+        "新北市": "金山區"
+      },
+      "金峰": {
+        "台東縣": "金峰鄉"
+      },
+      "金沙": {
+        "金門縣": "金沙鎮"
+      },
+      "金湖": {
+        "金門縣": "金湖鎮"
+      },
+      "銅鑼": {
+        "苗栗縣": "銅鑼鄉"
+      },
+      "長治": {
+        "屏東縣": "長治鄉"
+      },
+      "長濱": {
+        "台東縣": "長濱鄉"
+      },
+      "關山": {
+        "台東縣": "關山鎮"
+      },
+      "關廟": {
+        "台南市": "關廟區"
+      },
+      "關西": {
+        "新竹縣": "關西鎮"
+      },
+      "阿蓮": {
+        "高雄市": "阿蓮區"
+      },
+      "阿里山": {
+        "嘉義縣": "阿里山鄉"
+      },
+      "集集": {
+        "南投縣": "集集鎮"
+      },
+      "雙溪": {
+        "新北市": "雙溪區"
+      },
+      "霧台": {
+        "屏東縣": "霧台鄉"
+      },
+      "霧峰": {
+        "台中市": "霧峰區"
+      },
+      "頭份": {
+        "苗栗縣": "頭份市"
+      },
+      "頭城": {
+        "宜蘭縣": "頭城鎮"
+      },
+      "頭屋": {
+        "苗栗縣": "頭屋鄉"
+      },
+      "香山": {
+        "新竹市": "香山區"
+      },
+      "馬公": {
+        "澎湖縣": "馬公市"
+      },
+      "高樹": {
+        "屏東縣": "高樹鄉"
+      },
+      "魚池": {
+        "南投縣": "魚池鄉"
+      },
+      "鳥松": {
+        "高雄市": "鳥松區"
+      },
+      "鳳山": {
+        "高雄市": "鳳山區"
+      },
+      "鳳林": {
+        "花蓮縣": "鳳林鎮"
+      },
+      "鶯歌": {
+        "新北市": "鶯歌區"
+      },
+      "鹽埔": {
+        "屏東縣": "鹽埔鄉"
+      },
+      "鹽埕": {
+        "高雄市": "鹽埕區"
+      },
+      "鹽水": {
+        "台南市": "鹽水區"
+      },
+      "鹿港": {
+        "彰化縣": "鹿港鎮"
+      },
+      "鹿草": {
+        "嘉義縣": "鹿草鄉"
+      },
+      "鹿谷": {
+        "南投縣": "鹿谷鄉"
+      },
+      "鹿野": {
+        "台東縣": "鹿野鄉"
+      },
+      "麟洛": {
+        "屏東縣": "麟洛鄉"
+      },
+      "麥寮": {
+        "雲林縣": "麥寮鄉"
+      },
+      "麻豆": {
+        "台南市": "麻豆區"
+      },
+      "鼓山": {
+        "高雄市": "鼓山區"
+      },
+      "龍井": {
+        "台中市": "龍井區"
+      },
+      "龍崎": {
+        "台南市": "龍崎區"
+      },
+      "龍潭": {
+        "桃園市": "龍潭區"
+      },
+      "龜山": {
+        "桃園市": "龜山區"
+      }
+    }
+  },
+  "intra_county_collisions": {}
+}

@@ -16,6 +16,7 @@ ARTIFACT = ROOT / "artifacts" / "district-graph.json"
 AUTHORED = ROOT / "config" / "geo-authored.json"
 L5_SOURCE = ROOT / "config" / "geo-l5-table.json"
 L5_PUBLISHED = ROOT / "config" / "geo-l5-published.json"
+L4_TABLE = ROOT / "config" / "geo-l4-districts.json"
 
 # 甲市 has a strong neighbour (乙區), a weak one (丙區), and one reachable only
 # by going through 乙區. 丁區 sits in another county so cross-county traversal
@@ -443,6 +444,66 @@ class L5TableTests(unittest.TestCase):
         for surface in rejected:
             self.assertNotIn(f"L5/{surface}", self.graph.aliases.get(surface, []))
         self.assertNotIn("保安", self.graph.aliases)
+
+
+class L4TableTests(unittest.TestCase):
+    """The checked-in district table is the one the extractor actually runs on."""
+
+    def setUp(self) -> None:
+        if not L4_TABLE.is_file():
+            self.skipTest("geo-l4-districts.json not present")
+        self.table = json.loads(L4_TABLE.read_text(encoding="utf-8"))
+
+    def test_covers_every_domestic_district(self) -> None:
+        self.assertEqual(self.table["counts"]["counties"], 22)
+        self.assertEqual(self.table["counts"]["districts"], 368)
+
+    def test_agrees_with_the_behaviour_graph_node_set(self) -> None:
+        if not ARTIFACT.is_file():
+            self.skipTest("district-graph.json not present")
+        graph = json.loads(ARTIFACT.read_text(encoding="utf-8"))
+        self.assertEqual(
+            {f"{row['county']}/{row['district']}" for row in self.table["districts"]},
+            {node["id"] for node in graph["nodes"]},
+        )
+        self.assertEqual(
+            {row["code"] for row in self.table["districts"]},
+            {code for node in graph["nodes"] for code in node["codes"]},
+        )
+
+    def test_carries_no_dataset_content(self) -> None:
+        # Public administrative geography only. If a future edit pulls anything
+        # from the organizer corpus into this file, that is a publication. Only
+        # the data sections are checked; the prose fields legitimately name the
+        # dataset columns they were derived from.
+        data = {
+            key: self.table[key]
+            for key in ("counties", "districts", "surfaces", "intra_county_collisions")
+        }
+        blob = json.dumps(data, ensure_ascii=False)
+        for field in ("職缺", "empNo", "talentNo", "職務名稱", "職務內容", "薪資"):
+            self.assertNotIn(field, blob)
+
+    def test_data_sections_hold_only_place_names_and_codes(self) -> None:
+        for row in self.table["districts"]:
+            self.assertEqual(set(row), {"code", "county", "district"})
+            self.assertTrue(row["code"].isdigit())
+            self.assertEqual(len(row["code"]), 6)
+
+    def test_short_forms_stay_resolvable(self) -> None:
+        stripped = self.table["surfaces"]["suffix_dropped"]
+        # 八里區 -> 八里 keeps its county mapping, and no surface is one char.
+        self.assertEqual(stripped["八里"], {"新北市": "八里區"})
+        for surface in stripped:
+            self.assertGreaterEqual(len(surface), 2)
+
+    def test_ambiguous_short_forms_map_per_county(self) -> None:
+        # 大安 is a district in both 台北市 and 台中市; the table keeps both, and
+        # the posting's own 工作城市 is what picks between them.
+        self.assertEqual(
+            self.table["surfaces"]["suffix_dropped"]["大安"],
+            {"台中市": "大安區", "台北市": "大安區"},
+        )
 
 
 class GeoTraceContractTests(unittest.TestCase):

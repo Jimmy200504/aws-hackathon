@@ -65,6 +65,14 @@ def load_district_codes(path: Path) -> dict[str, tuple[str, str]]:
     that filters on 新北市 says nothing about which districts inside it the
     searcher would accept.
     """
+    table = ROOT / "config" / "geo-l4-districts.json"
+    if table.is_file():
+        # Same reason as scripts/extract_job_districts.py: the checked-in table
+        # is the one a reader can inspect, so it is the one that runs.
+        payload = json.loads(table.read_text(encoding="utf-8"))
+        return {
+            row["code"]: (row["county"], row["district"]) for row in payload["districts"]
+        }
     districts: dict[str, tuple[str, str]] = {}
     with path.open(encoding="utf-8-sig", newline="") as handle:
         for row in csv.DictReader(handle):

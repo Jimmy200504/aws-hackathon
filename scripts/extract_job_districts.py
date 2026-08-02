@@ -53,8 +53,30 @@ LAYER_FULL = "full_name"
 LAYER_STRIPPED = "suffix_dropped"
 
 
+L4_TABLE = ROOT / "config" / "geo-l4-districts.json"
+
+
 def load_districts(path: Path) -> tuple[set[str], dict[str, dict[str, str]], dict[str, set[str]]]:
-    """Counties, plus surface -> {county: district} for both surface layers."""
+    """Counties, plus surface -> {county: district} for both surface layers.
+
+    The checked-in table wins when present so the file a reader can inspect is
+    the one under test. `scripts/build_l4_table.py` regenerates it from the code
+    table; the fallback keeps the script working in a checkout that has the
+    dataset but not the config.
+    """
+    if L4_TABLE.is_file():
+        payload = json.loads(L4_TABLE.read_text(encoding="utf-8"))
+        return (
+            set(payload["counties"]),
+            {
+                "full": payload["surfaces"]["full_name"],
+                "stripped": payload["surfaces"]["suffix_dropped"],
+            },
+            {
+                short: set(per_county)
+                for short, per_county in payload.get("intra_county_collisions", {}).items()
+            },
+        )
     counties: set[str] = set()
     full: dict[str, dict[str, str]] = defaultdict(dict)
     stripped_raw: dict[str, dict[str, set[str]]] = defaultdict(lambda: defaultdict(set))
