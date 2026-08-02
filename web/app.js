@@ -2,6 +2,7 @@ const form = document.querySelector("#search-form");
 const queryInput = document.querySelector("#query");
 const locationSelect = document.querySelector("#location");
 const graphMode = document.querySelector("#graph-mode");
+const geoSwitch = document.querySelector("#geo-mode");
 const results = document.querySelector("#results");
 const loading = document.querySelector("#loading");
 const errorBox = document.querySelector("#error");
@@ -396,10 +397,42 @@ function showRegionTrace(trace) {
   });
 }
 
+// aria-checked is the single source of truth for the switch, so the request
+// flag and the styling both read it and cannot disagree.
+const geoGraphOn = () => geoSwitch.getAttribute("aria-checked") !== "false";
+
+function setGeoGraphOn(on) {
+  geoSwitch.setAttribute("aria-checked", String(on));
+  geoSwitch.querySelector("em").textContent = on ? "已啟用" : "已停用";
+}
+
+// A response reporting the layer off while the request asked for it on can only
+// mean the artifact is not in this deployment. Retire the switch rather than let
+// it claim 已啟用 over a panel that says otherwise.
+function retireGeoSwitch() {
+  geoSwitch.disabled = true;
+  setGeoGraphOn(false);
+  geoSwitch.querySelector("em").textContent = "無圖資";
+}
+
 // Renders meta.geo_trace, the district-level layer. Appended below the county
 // expansions rather than replacing them: the two answer different questions,
 // and a county-only search carries region_trace alone.
-function showGeoTrace(trace) {
+//
+// `enabled` is meta.geo_graph_enabled. Without it, a switched-off layer and a
+// query that named no district would both render as nothing at all, which are
+// very different facts.
+function showGeoTrace(trace, enabled) {
+  if (enabled === false) {
+    if (geoGraphOn()) retireGeoSwitch();
+    const off = document.createElement("small");
+    off.className = "panel-empty";
+    off.textContent = geoSwitch.disabled
+      ? "行政區層：此部署未載入行政區圖資。"
+      : "行政區層：已停用。排序不受影響，兩種狀態的結果順序相同。";
+    regionPanel.append(off);
+    return;
+  }
   if (!trace) return;
   const heading = document.createElement("small");
   heading.className = "panel-empty";
@@ -520,6 +553,7 @@ async function search(event) {
       top_k: 20,
       use_graph: graphEnabled,
     };
+    if (!geoGraphOn()) payload.use_geo_graph = false;
     if (locationSelect.value) payload.location_code = [locationSelect.value];
     const response = await fetch("api/v1/jobs/search", {
       method: "POST",
@@ -531,7 +565,7 @@ async function search(event) {
     renderNormalization(body.meta?.query_normalization, query);
     renderRows(body.result, query, graphEnabled);
     showRegionTrace(body.meta?.region_trace);
-    showGeoTrace(body.meta?.geo_trace);
+    showGeoTrace(body.meta?.geo_trace, body.meta?.geo_graph_enabled);
     resultMeta.textContent =
       `${body.result.length} RESULTS · ${body.meta.latency_ms} MS · ${graphEnabled ? "GRAPH" : "BASELINE"}`;
   } catch (error) {
@@ -558,6 +592,13 @@ document.querySelectorAll("[data-query]").forEach((button) => {
   });
 });
 graphMode.addEventListener("change", () => {
+  if (queryInput.value.trim()) search();
+});
+// Re-runs on toggle, same as 排序模式, so the two states can be compared without
+// a second click. The point of the comparison is that the ranking does not move.
+geoSwitch.addEventListener("click", () => {
+  if (geoSwitch.disabled) return;
+  setGeoGraphOn(!geoGraphOn());
   if (queryInput.value.trim()) search();
 });
 window.addEventListener("resize", () => requestAnimationFrame(redrawGraphLines), { passive: true });

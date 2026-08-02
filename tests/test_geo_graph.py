@@ -859,6 +859,79 @@ class QueryTextArtifactTests(unittest.TestCase):
         self.assertIs(trace["applied_to_ranking"], False)
 
 
+class GeoSwitchContractTests(unittest.TestCase):
+    """`use_geo_graph` turns the district layer off at the server.
+
+    The demo switch has to remove the layer rather than hide it, otherwise the
+    off state proves nothing about what the response contained.
+    """
+
+    def call(self, body: dict) -> dict:
+        return handler(event("POST", "/api/v1/jobs/search", body), None)
+
+    def search(self, body: dict) -> dict:
+        result = self.call(body)
+        self.assertEqual(result["statusCode"], 200)
+        return json.loads(result["body"])
+
+    def test_the_flag_defaults_to_on_so_older_callers_are_unaffected(self) -> None:
+        if not lambda_handler.GEO_GRAPH.enabled:
+            self.skipTest("district graph artifact not available")
+        meta = self.search({"query": "八里區 銀行辦事員"})["meta"]
+        self.assertIs(meta["geo_graph_enabled"], True)
+        self.assertIn("geo_trace", meta)
+
+    def test_switching_off_removes_the_trace_from_the_response(self) -> None:
+        meta = self.search({"query": "八里區 銀行辦事員", "use_geo_graph": False})["meta"]
+        self.assertIs(meta["geo_graph_enabled"], False)
+        self.assertNotIn("geo_trace", meta)
+
+    def test_the_switch_does_not_move_the_ranking(self) -> None:
+        """The whole claim the switch demonstrates, pinned.
+
+        geo_trace is evidence, not a score, so the two states have to return the
+        same jobs in the same order. If this ever fails, `applied_to_ranking:
+        false` has become a false statement.
+        """
+        if not lambda_handler.GEO_GRAPH.enabled:
+            self.skipTest("district graph artifact not available")
+        base = {"query": "八里區 銀行辦事員", "top_k": 10}
+        on = self.search(base)
+        off = self.search({**base, "use_geo_graph": False})
+        self.assertIn("geo_trace", on["meta"])
+        self.assertEqual(
+            [(row["job_id"], row["rank"], row["score"]) for row in on["result"]],
+            [(row["job_id"], row["rank"], row["score"]) for row in off["result"]],
+        )
+        self.assertEqual(on["empStr"], off["empStr"])
+
+    def test_the_switch_leaves_the_county_layer_alone(self) -> None:
+        """Two switches, two layers. Turning the district layer off must not
+        take region_trace with it, or the demo would misattribute the loss."""
+        if not lambda_handler.REGION_GRAPH.enabled:
+            self.skipTest("region graph artifact not available")
+        meta = self.search(
+            {"query": "作業員", "location_code": ["100200"], "use_geo_graph": False}
+        )["meta"]
+        self.assertIn("region_trace", meta)
+        self.assertNotIn("geo_trace", meta)
+
+    def test_a_non_boolean_flag_is_rejected(self) -> None:
+        result = self.call({"query": "作業員", "use_geo_graph": "false"})
+        self.assertEqual(result["statusCode"], 400)
+        body = json.loads(result["body"])
+        self.assertEqual(body["error"]["code"], "invalid_request")
+        self.assertIn("use_geo_graph", body["error"]["message"])
+
+    def test_reported_state_follows_the_artifact_not_the_request(self) -> None:
+        """A deployment without the artifact is off however the request asked."""
+        disabled = GeoGraph(ROOT / "artifacts" / "definitely-absent.json")
+        with patch.object(lambda_handler, "GEO_GRAPH", disabled):
+            meta = self.search({"query": "八里區 銀行辦事員", "use_geo_graph": True})["meta"]
+        self.assertIs(meta["geo_graph_enabled"], False)
+        self.assertNotIn("geo_trace", meta)
+
+
 class QueryTextContractTests(unittest.TestCase):
     def search(self, body: dict) -> dict:
         result = handler(event("POST", "/api/v1/jobs/search", body), None)

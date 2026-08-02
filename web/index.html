@@ -91,6 +91,23 @@
                 <option value="false">無圖譜 Baseline</option>
               </select>
             </label>
+            <!-- Switches meta.geo_trace off at the server, not in CSS, so the
+                 off state is the real absence of the layer. Separate from
+                 排序模式 because the geo graph never scores anything. -->
+            <div class="field">
+              <span id="geo-mode-label">行政區圖</span>
+              <button
+                id="geo-mode"
+                class="switch"
+                type="button"
+                role="switch"
+                aria-checked="true"
+                aria-labelledby="geo-mode-label"
+              >
+                <i aria-hidden="true"></i>
+                <em>已啟用</em>
+              </button>
+            </div>
             <div class="contract">
               <span>API CONTRACT</span>
               <code>POST /api/v1/jobs/search</code>

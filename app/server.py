@@ -139,6 +139,11 @@ class Handler(BaseHTTPRequestHandler):
             include_graph = body.get("use_graph", True)
             if not isinstance(include_graph, bool):
                 raise ValueError("use_graph must be boolean")
+            # Separate switch from use_graph, same default: the district layer is
+            # evidence rather than scoring, and omitting the field keeps it on.
+            include_geo = body.get("use_geo_graph", True)
+            if not isinstance(include_geo, bool):
+                raise ValueError("use_geo_graph must be boolean")
             normalization = self.query_normalizer.normalize(query)
             result = self.ranker.search(
                 query=query,
@@ -179,11 +184,18 @@ class Handler(BaseHTTPRequestHandler):
             # District level, same additive rule. A district can arrive either as
             # a district filter code or as text the searcher typed, so both are
             # offered; the county hint disambiguates surfaces such as 東區.
-            geo_trace = self.geo_graph.trace(
-                location,
-                self.ranker.locations,
-                query=query,
-                counties=self.ranker.county_hints(result["intent"]),
+            response["meta"]["geo_graph_enabled"] = (
+                include_geo and self.geo_graph.enabled
+            )
+            geo_trace = (
+                self.geo_graph.trace(
+                    location,
+                    self.ranker.locations,
+                    query=query,
+                    counties=self.ranker.county_hints(result["intent"]),
+                )
+                if include_geo
+                else None
             )
             if geo_trace is not None:
                 response["meta"]["geo_trace"] = geo_trace

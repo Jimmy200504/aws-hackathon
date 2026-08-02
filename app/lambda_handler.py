@@ -99,6 +99,20 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
         return response(
             400, {"error": {"code": "invalid_request", "message": "use_graph must be boolean"}}
         )
+    # The district layer switches separately from the skill graph, because it
+    # answers a different question and is evidence rather than scoring. Absent
+    # means on, so a caller written against the earlier contract is unaffected.
+    include_geo = body.get("use_geo_graph", True)
+    if not isinstance(include_geo, bool):
+        return response(
+            400,
+            {
+                "error": {
+                    "code": "invalid_request",
+                    "message": "use_geo_graph must be boolean",
+                }
+            },
+        )
     normalization = QUERY_NORMALIZER.normalize(query)
     embedded_graph_version = RANKER.metadata.get(
         "graph_version", RANKER.metadata.get("index_version", "")
@@ -161,11 +175,18 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
     # county hint lets an ambiguous surface resolve: 東區 names a district in
     # four counties, and 台南市 in the filter or the normalizer's reading is
     # what decides which one was meant.
-    geo_trace = GEO_GRAPH.trace(
-        location,
-        RANKER.locations,
-        query=query,
-        counties=RANKER.county_hints(ranked["intent"]),
+    # Reports what happened, not what was asked for: a deployment without the
+    # district artifact is off whatever the request said.
+    payload["meta"]["geo_graph_enabled"] = include_geo and GEO_GRAPH.enabled
+    geo_trace = (
+        GEO_GRAPH.trace(
+            location,
+            RANKER.locations,
+            query=query,
+            counties=RANKER.county_hints(ranked["intent"]),
+        )
+        if include_geo
+        else None
     )
     if geo_trace is not None:
         payload["meta"]["geo_trace"] = geo_trace
