@@ -60,21 +60,29 @@ python3 scripts/run_sam_local_smoke.py
 
 ## Validate and deploy
 
-完整 release gate 與一鍵部署：
+更新目前已連接 full-corpus OpenSearch 與 Neptune 的共用 judge stack，使用 code-only
+deployment；它會保留既有環境設定，並驗證線上前端資產與後端 contract：
+
+```bash
+export AWS_REGION=us-east-1
+bash scripts/deploy_lambda_code.sh
+```
+
+只有建立新的 compact stack 時才使用完整 release gate 與 SAM deployment：
 
 ```bash
 ./scripts/release_gate.sh
 ./scripts/deploy_compact_aws.sh
 ```
 
-第二個指令會 package、驗證、部署、讀取 CloudFormation `DemoUrl`、執行
+`deploy_compact_aws.sh` 會 package、驗證、部署、讀取 CloudFormation `DemoUrl`、執行
 external health/search smoke，最後把真實 AWS URL 寫入 `release-manifest.json`。
 可用 `SKILLWEAVE_STACK_NAME`、`AWS_REGION`、`SKILLWEAVE_STAGE_NAME` 與
 `SKILLWEAVE_RESERVED_CONCURRENCY` 覆寫預設值。Reserved concurrency 預設
 為 `0`（不建立 function-level reservation，使用帳號共用 concurrency），以支援
 新帳號的最低 quota；提高 account quota 後可設為 `10` 或更高。
 
-等價的逐步指令：
+新建 compact stack 的等價逐步指令：
 
 ```bash
 sam validate --lint --template-file infra/template.yaml
@@ -99,7 +107,7 @@ aws cloudformation describe-stacks \
 
 目前已驗證的 public judge URL：
 
-`https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/`
+`https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/`
 
 GitHub 與影片完成後只接受 public HTTPS URL：
 

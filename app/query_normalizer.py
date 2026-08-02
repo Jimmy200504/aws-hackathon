@@ -662,6 +662,24 @@ class BedrockQueryNormalizer:
             "prewarm_requests": self.prewarm_requests,
         }
 
+    def verify_connection(self) -> QueryNormalization:
+        """Make one live inference to prove Bedrock normalization is usable.
+
+        This deliberately bypasses shipped and in-memory intent caches. It is
+        intended for strict local-demo startup checks, where merely having a
+        model ID configured is not enough evidence that credentials, region,
+        model access, and the structured-output contract all work together.
+        """
+        if not self.enabled:
+            raise RuntimeError(
+                "BEDROCK_QUERY_MODEL_ID and the query-intent vocabulary are required"
+            )
+        probe = "SkillWeave Bedrock query normalization connectivity check"
+        intent = self._normalize_batch([probe]).get(probe)
+        if intent is None:
+            raise RuntimeError("Amazon Bedrock returned no result for the startup probe")
+        return self._result(probe, intent, "amazon_bedrock")
+
     def _get_client(self) -> Any:
         if self._client is not None:
             return self._client

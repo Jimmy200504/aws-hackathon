@@ -72,6 +72,14 @@ curl --fail --silent --show-error \
   --request POST "${DEMO_URL%/}/api/v1/jobs/search" \
   --header "content-type: application/json" \
   --data '{"query":"後端工程師 Node.js","location_code":["100100"],"top_k":10}'
+VERIFY_ARGS=(--url "$DEMO_URL")
+if [[ -n "$OPENSEARCH_ENDPOINT_VALUE" ]]; then
+  VERIFY_ARGS+=(--require-full-corpus)
+fi
+if [[ -n "$NEPTUNE_GRAPH_ID_VALUE" ]]; then
+  VERIFY_ARGS+=(--require-neptune --expected-graph-version "$GRAPH_VERSION_VALUE")
+fi
+.venv/bin/python scripts/verify_app_deployment.py "${VERIFY_ARGS[@]}"
 python3 scripts/update_release_urls.py --aws-url "$DEMO_URL"
 python3 scripts/verify_release.py
 

@@ -220,6 +220,14 @@ def main() -> None:
         type=Path,
         default=Path(os.getenv("LTR_MODEL_PATH", DEFAULT_LTR_MODEL)),
     )
+    parser.add_argument(
+        "--require-bedrock-query-normalization",
+        action="store_true",
+        help=(
+            "perform a live Amazon Bedrock normalization probe before opening "
+            "the local server, and fail startup if it cannot connect"
+        ),
+    )
     args = parser.parse_args()
     if not args.artifact.is_file():
         raise SystemExit(
@@ -237,6 +245,18 @@ def main() -> None:
     # request. An explicit environment value still wins.
     os.environ.setdefault("BEDROCK_QUERY_MAX_WAIT_SECONDS", "1.0")
     Handler.query_normalizer = BedrockQueryNormalizer.from_environment()
+    if args.require_bedrock_query_normalization:
+        model_id = Handler.query_normalizer.model_id or "not configured"
+        print(f"Checking Amazon Bedrock query normalization ({model_id})...")
+        try:
+            Handler.query_normalizer.verify_connection()
+        except Exception as exc:
+            raise SystemExit(
+                "Amazon Bedrock query normalization is required but the live "
+                f"startup probe failed ({type(exc).__name__}: {exc}). "
+                "Run `aws login`, verify AWS_REGION/model access, and retry."
+            ) from exc
+        print("Amazon Bedrock query normalization connected (live inference passed)")
     # Warming the head of the query distribution turns most traffic into a
     # microsecond cache hit. Backgrounded so the port opens immediately; only
     # done here, not in the Lambda handler, because Lambda freezes the container

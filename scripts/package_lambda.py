@@ -28,11 +28,21 @@ def main() -> None:
         ROOT / "config" / "query-intents.json",
         ROOT / "config" / "query-intents-release.json",
     ]
+    required_web = [
+        ROOT / "web" / "index.html",
+        ROOT / "web" / "app.js",
+        ROOT / "web" / "styles.css",
+    ]
     include = [
         *sorted((ROOT / "app").glob("*.py")),
         *required_config,
         *(path for path in optional_config if path.is_file()),
-        *sorted((ROOT / "web").glob("*")),
+        *required_web,
+        *(
+            path
+            for path in sorted((ROOT / "web").glob("*"))
+            if path not in required_web
+        ),
         ROOT / "artifacts" / "demo-index.json",
         (
             ROOT

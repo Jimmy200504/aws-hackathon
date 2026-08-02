@@ -149,6 +149,23 @@ class BatchCoalescingTests(unittest.TestCase):
 
 
 class StructuredOutputTests(unittest.TestCase):
+    def test_live_connection_probe_bypasses_cache_and_uses_bedrock(self) -> None:
+        client = FakeBedrock()
+        subject = normalizer(client)
+
+        result = subject.verify_connection()
+        repeated = subject.verify_connection()
+
+        self.assertEqual(result.source, "amazon_bedrock")
+        self.assertEqual(repeated.source, "amazon_bedrock")
+        self.assertEqual(client.batch_sizes, [1, 1])
+
+    def test_live_connection_probe_requires_bedrock_configuration(self) -> None:
+        subject = BedrockQueryNormalizer(None, vocabulary=VOCAB)
+
+        with self.assertRaisesRegex(RuntimeError, "BEDROCK_QUERY_MODEL_ID"):
+            subject.verify_connection()
+
     def test_uses_bedrock_structured_output_and_expands_the_query(self) -> None:
         client = FakeBedrock(
             duty_categories=["行政助理"],

@@ -39,12 +39,17 @@ fi
 
 echo "Packaging..."
 .venv/bin/python scripts/package_lambda.py
-for required in config/query-intent-vocab.json config/query-intent-prompt.txt; do
+for required in \
+  config/query-intent-vocab.json \
+  config/query-intent-prompt.txt \
+  web/index.html \
+  web/app.js \
+  web/styles.css; do
   .venv/bin/python - "$required" <<'PY'
 import sys, zipfile
 name = sys.argv[1]
 if name not in zipfile.ZipFile("dist/skillweave-lambda.zip").namelist():
-    raise SystemExit(f"{name} missing from the bundle; normalization would silently regress")
+    raise SystemExit(f"{name} missing from the bundle; deployment is incomplete")
 PY
 done
 
@@ -93,7 +98,27 @@ aws lambda update-function-configuration \
 aws lambda wait function-updated \
   --function-name "$FUNCTION_NAME" --region "$AWS_REGION_NAME"
 
-echo "Deployed. Verify with:"
-echo "  curl -sS \"\$(aws cloudformation describe-stacks --stack-name $STACK_NAME \\"
-echo "    --region $AWS_REGION_NAME --query 'Stacks[0].Outputs[?OutputKey==\`DemoUrl\`].OutputValue|[0]' \\"
-echo "    --output text)health\" | python3 -m json.tool"
+DEMO_URL="$(aws cloudformation describe-stacks \
+  --stack-name "$STACK_NAME" --region "$AWS_REGION_NAME" \
+  --query "Stacks[0].Outputs[?OutputKey=='DemoUrl'].OutputValue | [0]" \
+  --output text)"
+if [[ "$DEMO_URL" != https://* ]]; then
+  echo "Deployment completed but DemoUrl was not an HTTPS URL: $DEMO_URL" >&2
+  exit 1
+fi
+
+VERIFY_ARGS=(--url "$DEMO_URL")
+if [[ "${SKILLWEAVE_REQUIRE_FULL_CORPUS:-yes}" == "yes" ]]; then
+  VERIFY_ARGS+=(--require-full-corpus)
+fi
+if [[ "${SKILLWEAVE_REQUIRE_NEPTUNE:-yes}" == "yes" ]]; then
+  VERIFY_ARGS+=(--require-neptune)
+fi
+EXPECTED_GRAPH_VERSION="${SKILLWEAVE_EXPECTED_GRAPH_VERSION-deterministic-v1-rules-v2-evaluation-cutoff}"
+if [[ -n "$EXPECTED_GRAPH_VERSION" ]]; then
+  VERIFY_ARGS+=(--expected-graph-version "$EXPECTED_GRAPH_VERSION")
+fi
+
+echo "Verifying exact frontend assets and backend contract on $DEMO_URL..."
+.venv/bin/python scripts/verify_app_deployment.py "${VERIFY_ARGS[@]}"
+echo "SkillWeave frontend and backend deployed: $DEMO_URL"
