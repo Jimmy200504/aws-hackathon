@@ -14,6 +14,24 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from app.ranker import SkillWeaveRanker
+from app.query_normalizer import BedrockQueryNormalizer, QueryIntentVocabulary
+
+
+def build_offline_normalizer() -> tuple[BedrockQueryNormalizer | None, int]:
+    """Return a cache-only normalizer, or None when no intents are available.
+
+    Training features must match what the API computes, and the API runs every
+    query through the normalizer. This deliberately passes `model_id=None` so
+    the run stays offline and reproducible: a cached intent is used when one
+    exists and the deterministic reading is used otherwise, but no training run
+    can silently depend on a live Bedrock call.
+    """
+    try:
+        vocabulary = QueryIntentVocabulary.load()
+    except Exception:
+        return None, 0
+    normalizer = BedrockQueryNormalizer(None, vocabulary=vocabulary)
+    return normalizer, normalizer.load_intents()
 
 
 INDEX = ROOT / "artifacts" / "benchmark-index.json"
@@ -36,11 +54,23 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, default=OUTPUT)
     args = parser.parse_args()
     ranker = SkillWeaveRanker(args.index, graph_novelty_threshold=1.0)
+    normalizer, preloaded_intents = build_offline_normalizer()
+    print(
+        f"Query normalization: {preloaded_intents:,} precomputed intents"
+        if normalizer is not None
+        else "Query normalization: unavailable, features match the pre-normalizer contract"
+    )
     evaluation = json.loads(args.qrels.read_text(encoding="utf-8"))
     job_to_index = {job["id"]: index for index, job in enumerate(ranker.jobs)}
     args.output_dir.mkdir(parents=True, exist_ok=True)
     manifest = {
         "schema": "skillweave-ltr-pairs-v1",
+        # Recorded so a model can never be compared against pairs built under a
+        # different normalization contract without it being visible.
+        "query_normalization": {
+            "applied": normalizer is not None,
+            "precomputed_intents": preloaded_intents,
+        },
         "index_version": ranker.metadata["index_version"],
         "index_sha256": sha256_file(args.index),
         "qrels_schema": evaluation["metadata"]["schema"],
@@ -63,8 +93,21 @@ def main() -> None:
                     continue
                 if max((case["qrels"].get(job_id, 0) for job_id in available), default=0) <= 0:
                     continue
+                normalization = (
+                    normalizer.normalize(case["query"])
+                    if normalizer is not None
+                    else None
+                )
                 intent = ranker.parse_intent(
-                    case["query"], case["location_code"], case["duty_code"]
+                    case["query"],
+                    case["location_code"],
+                    case["duty_code"],
+                    normalized_query=(
+                        normalization.query if normalization is not None else None
+                    ),
+                    structured_intent=(
+                        normalization.intent if normalization is not None else None
+                    ),
                 )
                 group_rows = []
                 for exposure_rank, job_id in enumerate(available, 1):

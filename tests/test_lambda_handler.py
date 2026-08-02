@@ -47,10 +47,15 @@ class LambdaHandlerTests(unittest.TestCase):
         self.assertEqual(body["search_scope"], "full_corpus_opensearch")
 
     def test_search_contract(self) -> None:
-        result = handler(
-            event("POST", "/api/v1/jobs/search", {"query": "行政助理", "top_k": 10}),
-            None,
-        )
+        # GRAPH_PROVIDER is built from the environment at import time, so without
+        # this patch the assertion below depends on whether NEPTUNE_GRAPH_ID
+        # happens to be exported -- which it always is when following the AWS
+        # runbook, making the documented deploy command fail its own gate.
+        with patch.object(lambda_handler, "GRAPH_PROVIDER", None):
+            result = handler(
+                event("POST", "/api/v1/jobs/search", {"query": "行政助理", "top_k": 10}),
+                None,
+            )
         body = json.loads(result["body"])
         self.assertEqual(result["statusCode"], 200)
         self.assertEqual([row["rank"] for row in body["result"]], list(range(1, 11)))

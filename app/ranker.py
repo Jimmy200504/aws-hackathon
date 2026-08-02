@@ -8,7 +8,7 @@ import math
 import re
 import threading
 import unicodedata
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -96,6 +96,34 @@ def _as_codes(value: Any) -> list[str]:
     return [str(value)]
 
 
+def _as_strings(value: Any) -> list[str]:
+    """Read a normalizer-supplied name list defensively.
+
+    The structured intent crosses a process boundary as JSON, so a malformed or
+    partially-parsed payload must degrade to "no inferred names" rather than
+    raise inside ranking.
+    """
+    if not value or isinstance(value, (str, bytes, dict)):
+        return []
+    try:
+        return [str(item).strip() for item in value if str(item).strip()]
+    except TypeError:
+        return []
+
+
+def _as_name(value: Any) -> str:
+    if not value or isinstance(value, (list, tuple, set, dict)):
+        return ""
+    return normalize(str(value))
+
+
+def _as_confidence(value: Any) -> float:
+    try:
+        return min(1.0, max(0.0, float(value)))
+    except (TypeError, ValueError):
+        return 0.0
+
+
 @dataclass(frozen=True)
 class QueryIntent:
     raw: str
@@ -106,6 +134,17 @@ class QueryIntent:
     duty_codes: tuple[str, ...]
     wants_remote: bool = False
     salary_intent: dict[str, Any] | None = None
+    # Read from the query text by the normalizer, as opposed to the codes the
+    # caller supplied. Empty when normalization did not run, which keeps every
+    # offline path that builds an intent without a normalizer unchanged.
+    inferred_locations: tuple[str, ...] = ()
+    inferred_duty_categories: tuple[str, ...] = ()
+    inferred_company: str = ""
+    # Carried as a feature rather than used as a cut-off. The override below is
+    # unconditional because a location the user typed outranks a filter code,
+    # but the ranker still sees how sure the normalizer was and can learn to
+    # discount a low-confidence reading instead of obeying a fixed threshold.
+    inferred_confidence: float = 0.0
 
 
 class SkillWeaveRanker:
@@ -219,6 +258,7 @@ class SkillWeaveRanker:
         location_code: Any = None,
         duty_code: Any = None,
         normalized_query: str | None = None,
+        structured_intent: Any = None,
     ) -> QueryIntent:
         normalized_value = normalize(
             query if normalized_query is None else normalized_query
@@ -259,6 +299,20 @@ class SkillWeaveRanker:
             duty_codes=tuple(_as_codes(duty_code)),
             wants_remote=wants_remote(normalized_value),
             salary_intent=wants_salary(normalized_value),
+            inferred_locations=tuple(
+                normalize(name)
+                for name in _as_strings(getattr(structured_intent, "locations", ()))
+            ),
+            inferred_duty_categories=tuple(
+                normalize(name)
+                for name in _as_strings(
+                    getattr(structured_intent, "duty_categories", ())
+                )
+            ),
+            inferred_company=_as_name(getattr(structured_intent, "company", "")),
+            inferred_confidence=_as_confidence(
+                getattr(structured_intent, "confidence", 0.0)
+            ),
         )
 
     def _filter_names(self, codes: Iterable[str], lookup: dict[str, list[str]]) -> set[str]:
@@ -455,7 +509,14 @@ class SkillWeaveRanker:
             + 3.5 * overlap
         )
 
-        wanted_locations = self._filter_names(intent.location_codes, self.locations)
+        # A location the user typed into the query outranks a filter code: the
+        # code is often a leftover from a previous search or a default the user
+        # never chose, while the text is a deliberate statement of intent. The
+        # inferred names are already city names, so they bypass the code->name
+        # lookup that `location_codes` needs.
+        wanted_locations = set(intent.inferred_locations) or self._filter_names(
+            intent.location_codes, self.locations
+        )
         location_match = 0.0
         if wanted_locations:
             location_match = (
@@ -613,6 +674,26 @@ class SkillWeaveRanker:
             "duty": signed_match_score(duty_match, 2.4, -10.0),
             "remote": signed_match_score(remote_match, 2.4, -1.4),
             "salary": signed_match_score(salary_match, 2.4, -1.4),
+            # Normalizer-derived evidence, exposed as plain 0/1 signals with no
+            # hand-set magnitude. Until a model is trained on them these carry
+            # no weight, which is deliberate: the retrieval-side boosts already
+            # in production must not be double-counted by a guessed constant.
+            "intent_duty_match": float(
+                bool(intent.inferred_duty_categories)
+                and any(
+                    name in fields["category"] or name in fields["title"]
+                    for name in intent.inferred_duty_categories
+                )
+            ),
+            "intent_company_match": float(
+                bool(intent.inferred_company)
+                and (
+                    intent.inferred_company in fields["title"]
+                    or intent.inferred_company in fields["description"]
+                )
+            ),
+            "intent_location_inferred": float(bool(intent.inferred_locations)),
+            "intent_confidence": round(intent.inferred_confidence, 4),
             "is_remote": float(job.get("is_remote", False)),
             "salary_min": float(job.get("salary_min", 0.0) or 0.0),
             "salary_max": float(job.get("salary_max", 0.0) or 0.0),
@@ -824,14 +905,13 @@ class SkillWeaveRanker:
             location_code,
             duty_code,
             normalized_query=normalized_query,
+            structured_intent=structured_intent,
         )
         if resolved_skill_ids is not None:
             combined = tuple(dict.fromkeys((*resolved_skill_ids, *intent.skills)))[:16]
-            intent = QueryIntent(
-                intent.raw, intent.normalized, intent.units, combined,
-                intent.location_codes, intent.duty_codes,
-                intent.wants_remote, intent.salary_intent,
-            )
+            # `replace` rather than a positional rebuild: the latter silently
+            # dropped any field added to QueryIntent after it was written.
+            intent = replace(intent, skills=combined)
         if not intent.normalized:
             return {
                 "intent": intent,
@@ -855,7 +935,11 @@ class SkillWeaveRanker:
         expansion = getattr(structured_intent, "recall_expansion", "") or ""
         if expansion and len(stage_one) < limit:
             rescue_intent = self.parse_intent(
-                query, location_code, duty_code, normalized_query=expansion
+                query,
+                location_code,
+                duty_code,
+                normalized_query=expansion,
+                structured_intent=structured_intent,
             )
             rescue, rescue_source, rescue_degraded = self._collect_stage_one(
                 rescue_intent,

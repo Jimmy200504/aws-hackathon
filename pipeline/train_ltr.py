@@ -88,6 +88,20 @@ QUALITY_MINIMAL_FEATURES = [
     *BEHAVIOR_GRAPH_FEATURES,
     "retrieval_reciprocal_rank",
 ]
+# What the Bedrock query normalizer reads out of the query text. Kept as a
+# separate list appended to a new feature set rather than folded into
+# BASE_FEATURES, so every previously published ablation stays reproducible
+# against the exact column order it was trained on.
+INTENT_FEATURES = [
+    "intent_duty_match",
+    "intent_company_match",
+    "intent_location_inferred",
+    "intent_confidence",
+]
+QUALITY_MINIMAL_INTENT_FEATURES = [
+    *QUALITY_MINIMAL_FEATURES,
+    *INTENT_FEATURES,
+]
 QUALITY_COMPANY_FEATURES = [
     *[
         name
@@ -144,6 +158,7 @@ def main() -> None:
             "behavior_graph",
             "quality",
             "quality_minimal",
+            "quality_minimal_intent",
             "quality_company",
         ],
         required=True,
@@ -168,6 +183,7 @@ def main() -> None:
         "behavior_graph": BEHAVIOR_GRAPH_FEATURES,
         "quality": QUALITY_FEATURES,
         "quality_minimal": QUALITY_MINIMAL_FEATURES,
+        "quality_minimal_intent": QUALITY_MINIMAL_INTENT_FEATURES,
         "quality_company": QUALITY_COMPANY_FEATURES,
     }[args.feature_set]
     train_parts = [

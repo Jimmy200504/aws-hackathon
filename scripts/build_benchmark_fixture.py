@@ -9,6 +9,7 @@ import json
 import re
 import sys
 from collections import Counter, defaultdict
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -380,12 +381,49 @@ def load_train_title_snapshots(
     return snapshots
 
 
+def serving_query_key() -> Callable[[str], str]:
+    """Build the exact query key the ranker will use at lookup time.
+
+    Falls back to `norm` when the normalizer cannot be constructed, which keeps
+    a data-only checkout working; the returned keys then match the historical
+    pre-normalizer contract rather than silently producing keys nothing reads.
+    """
+    from app.ranker import normalize as ranker_normalize
+
+    try:
+        from app.query_normalizer import (
+            BedrockQueryNormalizer,
+            QueryIntentVocabulary,
+        )
+
+        normalizer = BedrockQueryNormalizer(
+            None, vocabulary=QueryIntentVocabulary.load()
+        )
+        normalizer.load_intents()
+    except Exception:
+        return norm
+
+    def key(query: str) -> str:
+        return ranker_normalize(normalizer.normalize(query).query)
+
+    return key
+
+
 def build_train_behavior_graph(
     cases: dict[str, list[dict]],
     jobs: list[dict],
     train_days: set[str],
+    query_key: Callable[[str], str] = norm,
 ) -> dict[str, dict]:
-    """Build rolling exposure-normalized Query→Skill/Job train-only edges."""
+    """Build rolling exposure-normalized Query→Skill/Job train-only edges.
+
+    `query_key` must produce the exact string the ranker will later look these
+    edges up with. The ranker keys on `app.ranker.normalize` applied to the
+    normalized query, which is not the same as `norm` on the raw query: the two
+    disagree on ASCII canonicalization, and normalization appends keep_terms.
+    Any disagreement is silent -- the lookup simply misses and every
+    `behavior_query_*` feature reads zero.
+    """
     jobs_by_id = {job["id"]: job for job in jobs}
     query_job: dict[str, dict[str, list[int]]] = defaultdict(dict)
     query_skill: dict[str, dict[str, list[int]]] = defaultdict(dict)
@@ -417,7 +455,7 @@ def build_train_behavior_graph(
         # A row on this day can only see graph edges from earlier days.
         snapshots[day] = snapshot()
         for case in cases.get(day, []):
-            query = norm(case["query"])
+            query = query_key(case["query"])
             if not query:
                 continue
             for job_id in case["candidates"]:
@@ -529,7 +567,9 @@ def write_fixture(
         for case in split_cases:
             case["candidates"] = [job for job in case["candidates"] if job in found]
             case["qrels"] = {job: grade for job, grade in case["qrels"].items() if job in found}
-    behavior_graph = build_train_behavior_graph(cases, jobs, train_days)
+    behavior_graph = build_train_behavior_graph(
+        cases, jobs, train_days, query_key=serving_query_key()
+    )
     qrels = {
         "metadata": {
             "schema": "skillweave-temporal-qrels-v2",

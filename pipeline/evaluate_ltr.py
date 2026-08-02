@@ -14,10 +14,20 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.train_ltr import BASE_FEATURES, RETRIEVAL_FEATURES, load_groups
+from pipeline.train_ltr import (
+    BASE_FEATURES,
+    INTENT_FEATURES,
+    RETRIEVAL_FEATURES,
+    load_groups,
+)
 from scripts.benchmark import aggregate, metrics
 
-ABLATION_BASE_FEATURES = set([*BASE_FEATURES, *RETRIEVAL_FEATURES])
+# The graph-off arm must see everything the graph-on arm sees except the graph
+# itself. Query-intent features are not graph features, so withholding them
+# here would book their contribution as skill-graph lift.
+ABLATION_BASE_FEATURES = set(
+    [*BASE_FEATURES, *RETRIEVAL_FEATURES, *INTENT_FEATURES]
+)
 
 
 def sha256_file(path: Path) -> str:

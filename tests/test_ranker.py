@@ -449,5 +449,113 @@ class FullCorpusRankerTests(unittest.TestCase):
         self.assertEqual(len(result["results"]), 5)
 
 
+@unittest.skipUnless(
+    (ROOT / "artifacts" / "demo-index.json").is_file(), "demo index missing"
+)
+class InferredIntentFeatureTests(unittest.TestCase):
+    """A location the user typed outranks the caller's filter code.
+
+    The filter is often a leftover from an earlier search; the query text is a
+    deliberate statement. These tests pin the precedence in both directions so
+    the override cannot silently regress into "inferred is ignored" (the bug
+    this replaced) or "inferred is required" (which would break every caller
+    that sends codes without running normalization).
+    """
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.ranker = SkillWeaveRanker(ROOT / "artifacts" / "demo-index.json")
+
+    @staticmethod
+    def _intent(locations, *, confidence: float = 0.9, duties=(), company=None):
+        from app.query_normalizer import StructuredQueryIntent
+
+        return StructuredQueryIntent.from_dict(
+            {
+                "intent_type": "mixed",
+                "duty_categories": list(duties),
+                "locations": list(locations),
+                "employment_types": [],
+                "shifts": [],
+                "salary_type": None,
+                "company": company,
+                "keep_terms": [],
+                "confidence": confidence,
+            }
+        )
+
+    @staticmethod
+    def _cities(result) -> list[str]:
+        return [row.get("city", "") for row in result["results"]]
+
+    def test_inferred_location_overrides_caller_filter_code(self) -> None:
+        # 100100 is 台北市; the query text says 台中市 and must win.
+        overridden = self.ranker.search(
+            "作業員",
+            location_code=["100100"],
+            top_k=10,
+            structured_intent=self._intent(["台中市"]),
+        )
+        inferred_only = self.ranker.search(
+            "作業員", top_k=10, structured_intent=self._intent(["台中市"])
+        )
+        self.assertEqual(self._cities(overridden), self._cities(inferred_only))
+        self.assertIn("台中市", self._cities(overridden))
+
+    def test_absent_inferred_location_leaves_filter_code_behaviour_unchanged(
+        self,
+    ) -> None:
+        baseline = self.ranker.search("作業員", location_code=["100100"], top_k=10)
+        with_empty_intent = self.ranker.search(
+            "作業員",
+            location_code=["100100"],
+            top_k=10,
+            structured_intent=self._intent([]),
+        )
+        self.assertEqual(
+            self._cities(baseline), self._cities(with_empty_intent)
+        )
+
+    def test_intent_features_are_emitted_for_training(self) -> None:
+        result = self.ranker.search(
+            "作業員",
+            top_k=5,
+            structured_intent=self._intent(
+                ["台中市"], confidence=0.42, duties=["包裝員／作業員"]
+            ),
+        )
+        features = result["results"][0]["features"]
+        for name in (
+            "intent_duty_match",
+            "intent_company_match",
+            "intent_location_inferred",
+            "intent_confidence",
+        ):
+            self.assertIn(name, features)
+        self.assertEqual(features["intent_location_inferred"], 1.0)
+        self.assertAlmostEqual(features["intent_confidence"], 0.42)
+
+    def test_missing_structured_intent_yields_inert_features(self) -> None:
+        result = self.ranker.search("作業員", top_k=5)
+        features = result["results"][0]["features"]
+        self.assertEqual(features["intent_location_inferred"], 0.0)
+        self.assertEqual(features["intent_duty_match"], 0.0)
+        self.assertEqual(features["intent_company_match"], 0.0)
+        self.assertEqual(features["intent_confidence"], 0.0)
+
+    def test_malformed_structured_intent_degrades_instead_of_raising(self) -> None:
+        class Broken:
+            locations = {"not": "a list"}
+            duty_categories = None
+            company = 12345
+            confidence = "high"
+
+        result = self.ranker.search("作業員", top_k=5, structured_intent=Broken())
+        self.assertEqual(len(result["results"]), 5)
+        self.assertEqual(
+            result["results"][0]["features"]["intent_confidence"], 0.0
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
