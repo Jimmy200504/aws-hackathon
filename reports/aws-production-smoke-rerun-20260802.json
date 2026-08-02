@@ -1,7 +1,7 @@
 {
   "metadata": {
     "schema": "skillweave-aws-production-smoke-v1",
-    "verified_at_utc": "2026-08-02T05:34:01Z",
+    "verified_at_utc": "2026-08-02T05:04:57Z",
     "base_url": "https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/",
     "index_version": "demo-2026.06.07-full-v1",
     "client": "stdlib urllib; public HTTPS; no AWS session",
@@ -11,7 +11,7 @@
     "max_p95_ms": 10000.0,
     "p95_gate_basis": "response.meta.latency_ms (service-side)"
   },
-  "passed": true,
+  "passed": false,
   "checks": {
     "public_ui": true,
     "relative_css_asset": true,
@@ -21,7 +21,7 @@
     "full_corpus_scope_when_required": true,
     "full_corpus_count_when_required": true,
     "full_corpus_candidate_source_when_required": true,
-    "quality_ltr_deployed": true,
+    "quality_ltr_deployed": false,
     "latest_graph_metadata_deployed": true,
     "graph_on_contract": true,
     "graph_off_contract": true,
@@ -33,7 +33,7 @@
     "load_all_http_200": true,
     "load_all_top_10": true,
     "load_index_version": true,
-    "load_quality_ltr_model": true,
+    "load_quality_ltr_model": false,
     "load_full_corpus_when_required": true,
     "load_neptune_when_required": true,
     "load_graph_version_when_required": true,
@@ -50,27 +50,27 @@
     "degraded_components": [],
     "graph_on_job_ids": [
       "132446961",
-      "132469993",
-      "132481149",
       "132486869",
-      "98836873",
-      "130184426",
+      "132481149",
       "130249640",
+      "130184426",
+      "132469993",
+      "98836873",
       "132096201",
       "130405380",
-      "132168860"
+      "132446910"
     ],
     "graph_off_job_ids": [
       "132446961",
-      "132469993",
       "132481149",
+      "132469993",
       "132486869",
       "98836873",
       "130249640",
       "130184426",
-      "132096201",
       "130405380",
-      "132510224"
+      "132096201",
+      "132446910"
     ],
     "graph_trace_path_count": 10,
     "bedrock_trace_path_count": 0,
@@ -83,25 +83,25 @@
     "http_200": 30,
     "top_10_responses": 30,
     "matching_index_version": 30,
-    "matching_ranking_model": 30,
+    "matching_ranking_model": 0,
     "matching_graph_backend": 15,
     "matching_graph_version": 15,
     "full_corpus_responses": 30,
-    "elapsed_ms": 11060.06,
-    "throughput_requests_per_second": 2.71,
+    "elapsed_ms": 9744.33,
+    "throughput_requests_per_second": 3.08,
     "latency_ms": {
-      "min": 1187.34,
-      "p50": 1330.9,
-      "p95": 4450.16,
-      "p99": 4450.6,
-      "max": 4450.6
+      "min": 1107.71,
+      "p50": 1221.89,
+      "p95": 3884.84,
+      "p99": 4326.81,
+      "max": 4326.81
     },
     "service_latency_ms": {
-      "min": 136.48,
-      "p50": 205.33,
-      "p95": 351.26,
-      "p99": 416.01,
-      "max": 416.01
+      "min": 155.66,
+      "p50": 222.09,
+      "p95": 308.3,
+      "p99": 326.14,
+      "max": 326.14
     },
     "errors": []
   }
