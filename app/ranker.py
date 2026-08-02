@@ -294,6 +294,21 @@ class SkillWeaveRanker:
             label = self.skills.get(skill_id, {}).get("label")
             return str(label or fallback or skill_id)
 
+        def node_kind(skill_id: str) -> str:
+            configured_type = str(self.skills.get(skill_id, {}).get("type", ""))
+            if configured_type.lower() == "occupation" or skill_id.startswith(
+                ("occupation.", "duty.")
+            ):
+                return "Occupation"
+            return "Skill"
+
+        def node_ref(skill_id: str, fallback: Any = "", *, display: bool) -> str:
+            value = display_label(skill_id, fallback) if display else skill_id
+            return f"{node_kind(skill_id)}:{value}"
+
+        def job_relation(skill_id: str) -> str:
+            return "INSTANCE_OF" if node_kind(skill_id) == "Occupation" else "REQUIRES"
+
         job_skills = set(job.get("skills", []))
         direct_score = 0.0
         best_related = 0.0
@@ -314,15 +329,16 @@ class SkillWeaveRanker:
                     {
                         "path": [
                             f"Query:{intent.raw}",
-                            f"Skill:{query_skill}",
+                            node_ref(query_skill, display=False),
                             f"Job:{job['id']}",
                         ],
                         "display_path": [
                             f"Query:{intent.raw}",
-                            f"Skill:{display_label(query_skill)}",
+                            node_ref(query_skill, display=True),
                             f"Job:{job['id']}",
                         ],
-                        "edges": ["RESOLVES_TO", "REQUIRES"],
+                        "edges": ["RESOLVES_TO", job_relation(query_skill)],
+                        "edge_directions": ["forward", "reverse"],
                         "weight": round(confidence, 3),
                         "evidence": job.get("skill_evidence", {}).get(
                             query_skill, "structured field"
@@ -363,21 +379,30 @@ class SkillWeaveRanker:
                     best_related_trace = {
                         "path": [
                             f"Query:{intent.raw}",
-                            f"Skill:{query_skill}",
-                            f"Skill:{candidate_skill}",
+                            node_ref(query_skill, display=False),
+                            node_ref(candidate_skill, display=False),
                             f"Job:{job['id']}",
                         ],
                         "display_path": [
                             f"Query:{intent.raw}",
-                            f"Skill:{display_label(query_skill, relation_meta.get('source_label'))}",
-                            f"Skill:{display_label(candidate_skill, relation_meta.get('target_label'))}",
+                            node_ref(
+                                query_skill,
+                                relation_meta.get("source_label"),
+                                display=True,
+                            ),
+                            node_ref(
+                                candidate_skill,
+                                relation_meta.get("target_label"),
+                                display=True,
+                            ),
                             f"Job:{job['id']}",
                         ],
                         "edges": [
                             "RESOLVES_TO",
                             relation_meta.get("relation_type", "RELATED_TO"),
-                            "REQUIRES",
+                            job_relation(candidate_skill),
                         ],
+                        "edge_directions": ["forward", "undirected", "reverse"],
                         "weight": round(weight, 3),
                         "edge_id": relation_meta.get("edge_id"),
                         "relation_confidence": relation_meta.get("confidence"),

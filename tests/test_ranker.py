@@ -96,7 +96,13 @@ class GraphIsolationTests(unittest.TestCase):
                 "label": "Python",
                 "aliases": ["python"],
                 "related": {},
-            }
+            },
+            "occupation.software": {
+                "type": "Occupation",
+                "label": "軟體工程師",
+                "aliases": ["software engineer", "軟體工程師"],
+                "related": {},
+            },
         }
         for index in range(12):
             skills[f"duty.{index}"] = {
@@ -135,9 +141,15 @@ class GraphIsolationTests(unittest.TestCase):
                     "industry": "",
                     "company_id": "company-1",
                     "graph_eligible": True,
-                    "skills": ["skill.python"],
-                    "skill_confidence": {"skill.python": 0.9},
-                    "skill_evidence": {"skill.python": "Python engineer"},
+                    "skills": ["skill.python", "occupation.software"],
+                    "skill_confidence": {
+                        "skill.python": 0.9,
+                        "occupation.software": 1.0,
+                    },
+                    "skill_evidence": {
+                        "skill.python": "Python engineer",
+                        "occupation.software": "software engineer",
+                    },
                     "view_count": 0,
                     "apply_count": 0,
                     "freshness": 0,
@@ -184,6 +196,21 @@ class GraphIsolationTests(unittest.TestCase):
         )
         self.assertIn("Skill:skill.python", trace["path"])
         self.assertIn("Skill:Python", trace["display_path"])
+        self.assertEqual(trace["edge_directions"], ["forward", "reverse"])
+
+    def test_occupation_trace_has_typed_node_and_job_to_occupation_direction(self) -> None:
+        row = self.ranker.search("software engineer", top_k=1)["results"][0]
+        trace = next(
+            item
+            for item in row["graph_trace"]
+            if "Occupation:occupation.software" in item["path"]
+        )
+        self.assertEqual(
+            trace["display_path"],
+            ["Query:software engineer", "Occupation:軟體工程師", "Job:job-1"],
+        )
+        self.assertEqual(trace["edges"], ["RESOLVES_TO", "INSTANCE_OF"])
+        self.assertEqual(trace["edge_directions"], ["forward", "reverse"])
 
 
 class RemoteWorkFeatureTests(unittest.TestCase):
