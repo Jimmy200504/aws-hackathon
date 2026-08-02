@@ -146,13 +146,36 @@ async function loadMeta() {
 function nodeType(label, index, length) {
   if (index === 0 || label.startsWith("Query:")) return "query";
   if (index === length - 1 || label.startsWith("Job:")) return "job";
+  if (label.startsWith("Occupation:") || /^Skill:(occupation|duty)\./.test(label)) return "occupation";
   return "skill";
 }
 
 function nodeLabel(label, type) {
   if (type === "query") return label.replace(/^Query:/, "");
   if (type === "skill") return label.replace(/^Skill:/, "").replace(/^skill\./, "");
+  if (type === "occupation") {
+    return label.replace(/^(Occupation|Skill):/, "").replace(/^(occupation|duty)\./, "");
+  }
   return label.replace(/^Job:/, "#");
+}
+
+function relationDirection(relation, explicitDirection) {
+  if (["forward", "reverse", "undirected"].includes(explicitDirection)) return explicitDirection;
+  if (relation.includes("RELATED")) return "undirected";
+  if (["REQUIRES", "INSTANCE_OF"].includes(relation)) return "reverse";
+  return "forward";
+}
+
+function relationSummary(trace) {
+  const nodes = trace.path.map((label, index) =>
+    nodeType(label, index, trace.path.length).toUpperCase());
+  return trace.edges.reduce((summary, relation, index) => {
+    const direction = relationDirection(relation, trace.edge_directions?.[index]);
+    const target = nodes[index + 1] || "NODE";
+    if (direction === "reverse") return `${summary} ←${relation}— ${target}`;
+    if (direction === "undirected") return `${summary} —${relation}— ${target}`;
+    return `${summary} —${relation}→ ${target}`;
+  }, nodes[0] || "QUERY");
 }
 
 function renderTraceGraph(traces) {
@@ -160,7 +183,7 @@ function renderTraceGraph(traces) {
   const visual = document.createElement("div");
   visual.className = "trace-visual";
   visual.setAttribute("role", "img");
-  visual.setAttribute("aria-label", "查詢、技能與職缺之間的圖譜推論連線圖");
+  visual.setAttribute("aria-label", "查詢、技能、職業與職缺之間的圖譜關係圖；箭頭依關係實際方向顯示");
 
   const canvas = document.createElement("div");
   canvas.className = "graph-canvas";
@@ -169,10 +192,10 @@ function renderTraceGraph(traces) {
   svg.setAttribute("aria-hidden", "true");
   svg.innerHTML = `
     <defs>
-      <marker id="trace-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <marker id="trace-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto-start-reverse">
         <path d="M0,0 L7,3.5 L0,7 Z"></path>
       </marker>
-      <marker id="trace-arrow-related" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <marker id="trace-arrow-related" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto-start-reverse">
         <path d="M0,0 L7,3.5 L0,7 Z"></path>
       </marker>
     </defs>`;
@@ -196,6 +219,9 @@ function renderTraceGraph(traces) {
   });
 
   visibleTraces.forEach((trace) => {
+    const displayPath = Array.isArray(trace.display_path) && trace.display_path.length === trace.path.length
+      ? trace.display_path
+      : trace.path;
     const keys = trace.path.map((label, index) => {
       const type = nodeType(label, index, trace.path.length);
       const columnIndex = type === "query" ? 0 : type === "job" ? 3 : relatedTargets.has(label) ? 2 : 1;
@@ -203,11 +229,14 @@ function renderTraceGraph(traces) {
       if (!nodeElements.has(key)) {
         const node = document.createElement("div");
         node.className = `graph-node ${type}`;
-        node.title = label;
+        const displayLabel = displayPath[index] || label;
+        node.title = displayLabel === label
+          ? label
+          : `${nodeLabel(displayLabel, type)} · ${label}`;
         const kind = document.createElement("span");
         kind.textContent = type.toUpperCase();
         const name = document.createElement("strong");
-        name.textContent = nodeLabel(label, type);
+        name.textContent = nodeLabel(displayLabel, type);
         node.append(kind, name);
         columns[columnIndex].append(node);
         nodeElements.set(key, node);
@@ -215,10 +244,12 @@ function renderTraceGraph(traces) {
       return key;
     });
     keys.slice(0, -1).forEach((source, index) => {
+      const relation = trace.edges?.[index] || "LINKS_TO";
       edges.push({
         source,
         target: keys[index + 1],
-        relation: trace.edges?.[index] || "LINKS_TO",
+        relation,
+        direction: relationDirection(relation, trace.edge_directions?.[index]),
       });
     });
   });
@@ -228,8 +259,8 @@ function renderTraceGraph(traces) {
   legend.className = "graph-legend";
   legend.innerHTML = `
     <span><i class="solid"></i>直接命中</span>
-    <span><i class="related"></i>技能關聯</span>
-    <span class="graph-direction">由上至下推論 <b>↓</b></span>`;
+    <span><i class="related"></i>關聯（無向）</span>
+    <span class="graph-direction">箭頭＝關係方向 <b>↕</b></span>`;
   visual.append(legend);
   graphPanel.append(visual);
 
@@ -242,7 +273,7 @@ function renderTraceGraph(traces) {
     number.textContent = `PATH ${String(index + 1).padStart(2, "0")}`;
     const copy = document.createElement("div");
     const relation = document.createElement("strong");
-    relation.textContent = trace.edges.join(" → ");
+    relation.textContent = relationSummary(trace);
     const detail = document.createElement("small");
     detail.textContent = `weight ${trace.weight} · ${trace.evidence}`;
     copy.append(relation, detail);
@@ -256,7 +287,7 @@ function renderTraceGraph(traces) {
     const canvasBounds = canvas.getBoundingClientRect();
     if (!canvasBounds.width || !canvasBounds.height) return;
     svg.setAttribute("viewBox", `0 0 ${canvasBounds.width} ${canvasBounds.height}`);
-    edges.forEach(({ source, target, relation }) => {
+    edges.forEach(({ source, target, relation, direction }) => {
       const sourceBounds = nodeElements.get(source).getBoundingClientRect();
       const targetBounds = nodeElements.get(target).getBoundingClientRect();
       const x1 = sourceBounds.left + sourceBounds.width / 2 - canvasBounds.left;
@@ -274,7 +305,8 @@ function renderTraceGraph(traces) {
       } else {
         edge.setAttribute("d", `M ${x1} ${y1} C ${x1} ${y1 + bend}, ${x2} ${y2 - bend}, ${x2} ${y2}`);
       }
-      edge.setAttribute("marker-end", relation.includes("RELATED") ? "url(#trace-arrow-related)" : "url(#trace-arrow)");
+      if (direction === "forward") edge.setAttribute("marker-end", "url(#trace-arrow)");
+      if (direction === "reverse") edge.setAttribute("marker-start", "url(#trace-arrow)");
       edge.classList.add("graph-edge");
       if (relation.includes("RELATED")) edge.classList.add("related");
       svg.append(edge);

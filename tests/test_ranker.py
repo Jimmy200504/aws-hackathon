@@ -96,7 +96,13 @@ class GraphIsolationTests(unittest.TestCase):
                 "label": "Python",
                 "aliases": ["python"],
                 "related": {},
-            }
+            },
+            "occupation.software": {
+                "type": "Occupation",
+                "label": "軟體工程師",
+                "aliases": ["software engineer", "軟體工程師"],
+                "related": {},
+            },
         }
         for index in range(12):
             skills[f"duty.{index}"] = {
@@ -135,9 +141,15 @@ class GraphIsolationTests(unittest.TestCase):
                     "industry": "",
                     "company_id": "company-1",
                     "graph_eligible": True,
-                    "skills": ["skill.python"],
-                    "skill_confidence": {"skill.python": 0.9},
-                    "skill_evidence": {"skill.python": "Python engineer"},
+                    "skills": ["skill.python", "occupation.software"],
+                    "skill_confidence": {
+                        "skill.python": 0.9,
+                        "occupation.software": 1.0,
+                    },
+                    "skill_evidence": {
+                        "skill.python": "Python engineer",
+                        "occupation.software": "software engineer",
+                    },
                     "view_count": 0,
                     "apply_count": 0,
                     "freshness": 0,
@@ -174,6 +186,31 @@ class GraphIsolationTests(unittest.TestCase):
         self.assertEqual(full["behavior_company_global_seen"], 1.0)
         self.assertEqual(day_one["behavior_job_global_seen"], 0.0)
         self.assertEqual(day_one["behavior_company_global_seen"], 0.0)
+
+    def test_graph_trace_keeps_canonical_ids_and_adds_display_names(self) -> None:
+        row = self.ranker.search("python", top_k=1)["results"][0]
+        trace = next(
+            item
+            for item in row["graph_trace"]
+            if "Skill:skill.python" in item["path"]
+        )
+        self.assertIn("Skill:skill.python", trace["path"])
+        self.assertIn("Skill:Python", trace["display_path"])
+        self.assertEqual(trace["edge_directions"], ["forward", "reverse"])
+
+    def test_occupation_trace_has_typed_node_and_job_to_occupation_direction(self) -> None:
+        row = self.ranker.search("software engineer", top_k=1)["results"][0]
+        trace = next(
+            item
+            for item in row["graph_trace"]
+            if "Occupation:occupation.software" in item["path"]
+        )
+        self.assertEqual(
+            trace["display_path"],
+            ["Query:software engineer", "Occupation:軟體工程師", "Job:job-1"],
+        )
+        self.assertEqual(trace["edges"], ["RESOLVES_TO", "INSTANCE_OF"])
+        self.assertEqual(trace["edge_directions"], ["forward", "reverse"])
 
 
 class RemoteWorkFeatureTests(unittest.TestCase):
@@ -385,8 +422,12 @@ class SalaryRangeFeatureTests(unittest.TestCase):
 
 
 class FakeFullCorpusRetriever:
-    def __init__(self, *, fail: bool = False) -> None:
+    def __init__(self, *, fail: bool = False, telemetry: dict | None = None) -> None:
         self.fail = fail
+        self._telemetry = telemetry
+
+    def last_retrieval_telemetry(self) -> dict:
+        return dict(self._telemetry or {})
 
     def retrieve(
         self,
@@ -446,7 +487,32 @@ class FullCorpusRankerTests(unittest.TestCase):
         result = ranker.search("行政助理", top_k=5)
         self.assertEqual(result["candidate_source"], "embedded_12000_fallback")
         self.assertEqual(result["degraded_components"], ["opensearch"])
+        self.assertEqual(result["retrieval_mode"], "embedded_index")
         self.assertEqual(len(result["results"]), 5)
+
+    def test_hybrid_retrieval_mode_is_reported(self) -> None:
+        ranker = SkillWeaveRanker(
+            ROOT / "artifacts" / "demo-index.json",
+            candidate_retriever=FakeFullCorpusRetriever(
+                telemetry={"mode": "hybrid_bm25_knn", "knn_degraded": False}
+            ),
+        )
+        result = ranker.search("Python 資料工程師", top_k=10)
+        self.assertEqual(result["retrieval_mode"], "hybrid_bm25_knn")
+        self.assertEqual(result["degraded_components"], [])
+
+    def test_failed_vector_leg_is_disclosed_as_degraded(self) -> None:
+        ranker = SkillWeaveRanker(
+            ROOT / "artifacts" / "demo-index.json",
+            candidate_retriever=FakeFullCorpusRetriever(
+                telemetry={"mode": "bm25_only", "knn_degraded": True}
+            ),
+        )
+        result = ranker.search("Python 資料工程師", top_k=10)
+        self.assertEqual(result["retrieval_mode"], "bm25_only")
+        self.assertIn("opensearch_knn", result["degraded_components"])
+        # Losing the vector leg must not lose the candidate itself.
+        self.assertEqual(result["candidate_source"], "opensearch_full_corpus")
 
 
 @unittest.skipUnless(

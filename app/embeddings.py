@@ -10,6 +10,7 @@ import json
 import logging
 import os
 import threading
+from collections import OrderedDict
 from typing import Any
 
 LOGGER = logging.getLogger(__name__)
@@ -17,6 +18,10 @@ LOGGER = logging.getLogger(__name__)
 # Amazon Titan Text Embeddings V2 produces 1024-dimensional vectors.
 EMBEDDING_DIM = 1024
 DEFAULT_MODEL_ID = "amazon.titan-embed-text-v2:0"
+# A measured Bedrock embedding round trip costs roughly 430 ms, so repeat
+# queries must not pay it twice. Head traffic is highly repetitive, which makes
+# a small bounded cache the difference between a 470 ms and a 50 ms search.
+DEFAULT_CACHE_SIZE = 4096
 
 
 class BedrockEmbeddingClient:
@@ -32,21 +37,53 @@ class BedrockEmbeddingClient:
         *,
         region: str | None = None,
         client: Any = None,
+        cache_size: int = DEFAULT_CACHE_SIZE,
     ) -> None:
         self.model_id = (model_id or "").strip() or None
         self.region = region or os.getenv("AWS_REGION", "us-east-1")
         self._client = client
         self._client_lock = threading.Lock()
+        # Index-time backfill sees 1.2M distinct texts, so the cache must be
+        # bounded rather than unbounded memoization.
+        self.cache_size = max(0, int(cache_size))
+        self._cache: OrderedDict[str, list[float]] = OrderedDict()
+        self._cache_lock = threading.Lock()
+        self.cache_hits = 0
+        self.cache_misses = 0
 
     @classmethod
     def from_environment(cls) -> BedrockEmbeddingClient:
         return cls(
             os.getenv("BEDROCK_EMBEDDING_MODEL_ID", DEFAULT_MODEL_ID),
+            cache_size=int(
+                os.getenv("EMBEDDING_CACHE_SIZE", str(DEFAULT_CACHE_SIZE))
+            ),
         )
 
     @property
     def enabled(self) -> bool:
         return self.model_id is not None
+
+    def _cache_get(self, text: str) -> list[float] | None:
+        if self.cache_size <= 0:
+            return None
+        with self._cache_lock:
+            vector = self._cache.get(text)
+            if vector is None:
+                self.cache_misses += 1
+                return None
+            self._cache.move_to_end(text)
+            self.cache_hits += 1
+            return vector
+
+    def _cache_put(self, text: str, vector: list[float]) -> None:
+        if self.cache_size <= 0:
+            return
+        with self._cache_lock:
+            self._cache[text] = vector
+            self._cache.move_to_end(text)
+            while len(self._cache) > self.cache_size:
+                self._cache.popitem(last=False)
 
     def _get_client(self) -> Any:
         if self._client is not None:
@@ -78,6 +115,9 @@ class BedrockEmbeddingClient:
             return None
         # Titan V2 accepts up to 8192 tokens; truncate input text as safety.
         truncated = text[:2048]
+        cached = self._cache_get(truncated)
+        if cached is not None:
+            return cached
         try:
             response = self._get_client().invoke_model(
                 modelId=self.model_id,
@@ -94,6 +134,7 @@ class BedrockEmbeddingClient:
             result = json.loads(response["body"].read())
             embedding = result.get("embedding")
             if isinstance(embedding, list) and len(embedding) == EMBEDDING_DIM:
+                self._cache_put(truncated, embedding)
                 return embedding
             LOGGER.warning("Unexpected embedding response shape")
             return None

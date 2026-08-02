@@ -34,6 +34,14 @@ Parameters:
     Type: String
     Default: global.anthropic.claude-haiku-4-5-20251001-v1:0
     Description: Bedrock model or inference profile used for online query normalization
+  BedrockEmbeddingModelId:
+    Type: String
+    Default: ""
+    Description: >-
+      Bedrock text-embedding model for the hybrid BM25 + kNN vector leg. Empty
+      keeps retrieval_mode=bm25_only. Set this only after the index has been
+      backfilled with embeddings, otherwise kNN returns nothing and every
+      search pays a Bedrock call for no recall.
   NeptuneGraphId:
     Type: String
     Default: ""
@@ -80,13 +88,14 @@ Globals:
     Environment:
       Variables:
         INDEX_PATH: /var/task/artifacts/demo-index.json
-        LTR_MODEL_PATH: /var/task/artifacts/models/ltr-quality-final.trees.json
+        LTR_MODEL_PATH: /var/task/artifacts/models/ltr-quality-remote-salary.trees.json
         OPENSEARCH_ENDPOINT: !Ref OpenSearchEndpoint
         OPENSEARCH_SERVICE: !Ref OpenSearchService
         OPENSEARCH_INDEX: !Ref OpenSearchIndex
         OPENSEARCH_DOCUMENT_COUNT: !Ref OpenSearchDocumentCount
         OPENSEARCH_TIMEOUT_SECONDS: "4.0"
         BEDROCK_QUERY_MODEL_ID: !Ref BedrockQueryModelId
+        BEDROCK_EMBEDDING_MODEL_ID: !Ref BedrockEmbeddingModelId
         # A batch of ten structured intents needs far more than the 128 tokens
         # a single-answer budget allowed; the old value truncated every response.
         BEDROCK_QUERY_MAX_TOKENS: "4000"

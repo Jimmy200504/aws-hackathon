@@ -344,6 +344,25 @@ class SkillWeaveRanker:
                 return "seed_occupation"
             return "technical"
 
+        def display_label(skill_id: str, fallback: Any = "") -> str:
+            label = self.skills.get(skill_id, {}).get("label")
+            return str(label or fallback or skill_id)
+
+        def node_kind(skill_id: str) -> str:
+            configured_type = str(self.skills.get(skill_id, {}).get("type", ""))
+            if configured_type.lower() == "occupation" or skill_id.startswith(
+                ("occupation.", "duty.")
+            ):
+                return "Occupation"
+            return "Skill"
+
+        def node_ref(skill_id: str, fallback: Any = "", *, display: bool) -> str:
+            value = display_label(skill_id, fallback) if display else skill_id
+            return f"{node_kind(skill_id)}:{value}"
+
+        def job_relation(skill_id: str) -> str:
+            return "INSTANCE_OF" if node_kind(skill_id) == "Occupation" else "REQUIRES"
+
         job_skills = set(job.get("skills", []))
         direct_score = 0.0
         best_related = 0.0
@@ -364,10 +383,16 @@ class SkillWeaveRanker:
                     {
                         "path": [
                             f"Query:{intent.raw}",
-                            f"Skill:{query_skill}",
+                            node_ref(query_skill, display=False),
                             f"Job:{job['id']}",
                         ],
-                        "edges": ["RESOLVES_TO", "REQUIRES"],
+                        "display_path": [
+                            f"Query:{intent.raw}",
+                            node_ref(query_skill, display=True),
+                            f"Job:{job['id']}",
+                        ],
+                        "edges": ["RESOLVES_TO", job_relation(query_skill)],
+                        "edge_directions": ["forward", "reverse"],
                         "weight": round(confidence, 3),
                         "evidence": job.get("skill_evidence", {}).get(
                             query_skill, "structured field"
@@ -408,15 +433,30 @@ class SkillWeaveRanker:
                     best_related_trace = {
                         "path": [
                             f"Query:{intent.raw}",
-                            f"Skill:{query_skill}",
-                            f"Skill:{candidate_skill}",
+                            node_ref(query_skill, display=False),
+                            node_ref(candidate_skill, display=False),
+                            f"Job:{job['id']}",
+                        ],
+                        "display_path": [
+                            f"Query:{intent.raw}",
+                            node_ref(
+                                query_skill,
+                                relation_meta.get("source_label"),
+                                display=True,
+                            ),
+                            node_ref(
+                                candidate_skill,
+                                relation_meta.get("target_label"),
+                                display=True,
+                            ),
                             f"Job:{job['id']}",
                         ],
                         "edges": [
                             "RESOLVES_TO",
                             relation_meta.get("relation_type", "RELATED_TO"),
-                            "REQUIRES",
+                            job_relation(candidate_skill),
                         ],
+                        "edge_directions": ["forward", "undirected", "reverse"],
                         "weight": round(weight, 3),
                         "edge_id": relation_meta.get("edge_id"),
                         "relation_confidence": relation_meta.get("confidence"),
@@ -918,9 +958,15 @@ class SkillWeaveRanker:
                 "results": [],
                 "candidate_source": "none",
                 "degraded_components": [],
+                "retrieval_mode": "none",
             }
         limit = max(1, min(int(top_k), 100))
-        stage_one, candidate_source, degraded_components = self._collect_stage_one(
+        (
+            stage_one,
+            candidate_source,
+            degraded_components,
+            retrieval_mode,
+        ) = self._collect_stage_one(
             intent,
             structured_intent=structured_intent,
             limit=limit,
@@ -941,13 +987,15 @@ class SkillWeaveRanker:
                 normalized_query=expansion,
                 structured_intent=structured_intent,
             )
-            rescue, rescue_source, rescue_degraded = self._collect_stage_one(
-                rescue_intent,
-                structured_intent=structured_intent,
-                limit=limit,
-                include_graph=include_graph,
-                candidate_ids=candidate_ids,
-                external_relations=external_relations,
+            rescue, rescue_source, rescue_degraded, rescue_mode = (
+                self._collect_stage_one(
+                    rescue_intent,
+                    structured_intent=structured_intent,
+                    limit=limit,
+                    include_graph=include_graph,
+                    candidate_ids=candidate_ids,
+                    external_relations=external_relations,
+                )
             )
             seen = {item[1] for item in stage_one}
             stage_one = stage_one + [item for item in rescue if item[1] not in seen]
@@ -955,9 +1003,13 @@ class SkillWeaveRanker:
             degraded_components = list(
                 dict.fromkeys(degraded_components + rescue_degraded)
             )
+            # The rescue pass is the one that produced the surviving tail, so a
+            # degraded vector leg there must not be reported as full hybrid.
+            if rescue_mode != retrieval_mode:
+                retrieval_mode = "bm25_only"
         ranked = self._rerank(stage_one, limit=limit, include_graph=include_graph)
         return self._assemble(
-            intent, ranked, candidate_source, degraded_components
+            intent, ranked, candidate_source, degraded_components, retrieval_mode
         )
 
     def _collect_stage_one(
@@ -969,8 +1021,9 @@ class SkillWeaveRanker:
         include_graph: bool,
         candidate_ids: set[str] | None,
         external_relations: dict[str, dict[str, dict[str, Any]]] | None,
-    ) -> tuple[list[Any], str, list[str]]:
+    ) -> tuple[list[Any], str, list[str], str]:
         degraded_components: list[str] = []
+        retrieval_mode = "embedded_index"
         external_candidates: list[dict[str, Any]] | None = None
         if self.candidate_retriever is not None and candidate_ids is None:
             try:
@@ -1009,6 +1062,19 @@ class SkillWeaveRanker:
                     type(exc).__name__,
                 )
                 degraded_components.append("opensearch")
+            else:
+                telemetry = getattr(
+                    self.candidate_retriever, "last_retrieval_telemetry", None
+                )
+                if callable(telemetry):
+                    observed = telemetry()
+                    retrieval_mode = str(observed.get("mode") or "bm25_only")
+                    if observed.get("knn_degraded"):
+                        # A configured vector leg that failed is a partial
+                        # outage and must be visible, not silently absorbed.
+                        degraded_components.append("opensearch_knn")
+                else:
+                    retrieval_mode = "bm25_only"
 
         if external_candidates is not None:
             stage_one = []
@@ -1081,7 +1147,7 @@ class SkillWeaveRanker:
                     elif item[:2] > heap[0][:2]:
                         heapq.heapreplace(heap, item)
             stage_one = sorted(heap, key=lambda item: (-item[0], item[1]))
-        return stage_one, candidate_source, degraded_components
+        return stage_one, candidate_source, degraded_components, retrieval_mode
 
     def _assemble(
         self,
@@ -1089,6 +1155,7 @@ class SkillWeaveRanker:
         ranked: list[Any],
         candidate_source: str,
         degraded_components: list[str],
+        retrieval_mode: str = "embedded_index",
     ) -> dict[str, Any]:
         results: list[dict[str, Any]] = []
         for rank, (score, _, job, features, traces, direct) in enumerate(ranked, 1):
@@ -1123,6 +1190,7 @@ class SkillWeaveRanker:
             "results": results,
             "candidate_source": candidate_source,
             "degraded_components": degraded_components,
+            "retrieval_mode": retrieval_mode,
         }
 
     @staticmethod

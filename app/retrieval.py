@@ -4,6 +4,8 @@ import hashlib
 import json
 import logging
 import os
+import threading
+import time
 from typing import Any, Iterable
 from urllib.parse import quote
 from urllib.request import Request, urlopen
@@ -11,12 +13,39 @@ from urllib.request import Request, urlopen
 LOGGER = logging.getLogger(__name__)
 
 
+def hybrid_retrieval_meta(retriever: Any) -> dict[str, Any]:
+    """Disclose whether vector retrieval is on and how much of the index it covers.
+
+    Reporting `enabled: true` without the vector document count would let a
+    partially backfilled index look like full semantic coverage, so both values
+    are always published together.
+    """
+    if retriever is None or not getattr(retriever, "hybrid_enabled", False):
+        return {
+            "enabled": False,
+            "embedding_model_id": None,
+            "vector_document_count": None,
+            "fusion_method": None,
+        }
+    probe = getattr(retriever, "vector_document_count", None)
+    return {
+        "enabled": True,
+        "embedding_model_id": getattr(
+            getattr(retriever, "embedding_client", None), "model_id", None
+        ),
+        "vector_document_count": probe() if callable(probe) else None,
+        "fusion_method": getattr(retriever, "FUSION_METHOD", None),
+    }
+
+
 class OpenSearchRetriever:
     """Retrieve full-corpus job candidates from an IAM-protected OpenSearch index.
 
-    Supports hybrid retrieval: BM25 keyword search + kNN vector search merged
-    via Reciprocal Rank Fusion (RRF). Falls back to BM25-only when embedding
-    is unavailable.
+    Supports hybrid retrieval: BM25 keyword search plus kNN vector search.
+    BM25 keeps its own ordering and the kNN leg only appends novel candidates
+    at the tail, so semantic recall can never demote a precise keyword match.
+    The retriever falls back to BM25-only whenever the embedding client is
+    absent, the query embedding fails, or the index holds no vectors.
 
     Imports from botocore are intentionally lazy. The local 12,000-job demo
     remains dependency-free unless an OpenSearch endpoint is configured.
@@ -60,6 +89,9 @@ class OpenSearchRetriever:
         timeout_seconds: float = 2.0,
         embedding_client: Any = None,
         service: str | None = None,
+        hybrid_deadline_seconds: float | None = None,
+        knn_reserve: int | None = None,
+        knn_extra_slots: int | None = None,
     ) -> None:
         endpoint = endpoint.strip().rstrip("/")
         if not endpoint:
@@ -85,6 +117,100 @@ class OpenSearchRetriever:
             ("http://127.0.0.1", "http://localhost")
         )
         self.embedding_client = embedding_client
+        # A cold Bedrock embedding round trip measured ~430 ms, which alone
+        # would consume most of the release latency budget. The vector leg is
+        # therefore time-boxed: exceed the deadline and the request ships BM25
+        # results instead of waiting.
+        self.hybrid_deadline_seconds = max(
+            0.05,
+            float(
+                hybrid_deadline_seconds
+                if hybrid_deadline_seconds is not None
+                else os.getenv("HYBRID_DEADLINE_SECONDS", "0.35")
+            ),
+        )
+        self._pool: Any = None
+        self._pool_lock = threading.Lock()
+        # Measured on the 498-query validation split: holding slots open for the
+        # vector leg by evicting the BM25 tail cost NDCG@10 -14.2% with a paired
+        # CI entirely below zero, because the evicted tail contained relevant
+        # documents. The vector leg is therefore additive by default -- it may
+        # append novel candidates beyond the BM25 budget but never displace one.
+        self.knn_reserve = max(
+            0,
+            int(
+                knn_reserve
+                if knn_reserve is not None
+                else os.getenv("HYBRID_KNN_RESERVE", "0")
+            ),
+        )
+        self.knn_extra_slots = max(
+            0,
+            int(
+                knn_extra_slots
+                if knn_extra_slots is not None
+                else os.getenv("HYBRID_KNN_EXTRA_SLOTS", "40")
+            ),
+        )
+        # Retrieval mode is per-request state on a retriever shared by every
+        # worker thread, so it must not live on the instance.
+        self._telemetry = threading.local()
+        self._vector_count_lock = threading.Lock()
+        self._vector_count: int | None = None
+
+    BM25_ONLY = "bm25_only"
+    HYBRID_BM25_KNN = "hybrid_bm25_knn"
+    FUSION_METHOD = "bm25_first_knn_tail_expansion"
+
+    @property
+    def hybrid_enabled(self) -> bool:
+        """True when a query embedding provider is configured."""
+        return self.embedding_client is not None
+
+    def _get_pool(self) -> Any:
+        """Small shared pool so the vector leg overlaps the BM25 round trip."""
+        if self._pool is not None:
+            return self._pool
+        with self._pool_lock:
+            if self._pool is None:
+                import concurrent.futures
+
+                self._pool = concurrent.futures.ThreadPoolExecutor(
+                    max_workers=8, thread_name_prefix="skillweave-knn"
+                )
+        return self._pool
+
+    def last_retrieval_telemetry(self) -> dict[str, Any]:
+        """Per-thread record of how the most recent retrieve() actually ran."""
+        return dict(getattr(self._telemetry, "value", None) or {})
+
+    def vector_document_count(self) -> int | None:
+        """Count indexed documents that actually carry an embedding vector.
+
+        Hybrid retrieval is only meaningful for the documents that were
+        backfilled, so the deployment must be able to disclose the real vector
+        coverage instead of implying the whole corpus is searchable by vector.
+        The value is cached per process; a backfill needs a restart to refresh.
+        """
+        if not self.hybrid_enabled:
+            return None
+        with self._vector_count_lock:
+            if self._vector_count is not None:
+                return self._vector_count
+            try:
+                result = self._signed_request(
+                    "POST",
+                    f"/{quote(self.index, safe='-_.')}/_count",
+                    {"query": {"exists": {"field": "embedding"}}},
+                )
+                count = int(result.get("count", 0))
+            except Exception as exc:
+                LOGGER.warning(
+                    "Vector coverage probe failed: %s", type(exc).__name__
+                )
+                return None
+            self._vector_count = count
+            return count
 
     @classmethod
     def from_environment(cls) -> OpenSearchRetriever | None:
@@ -103,7 +229,6 @@ class OpenSearchRetriever:
             embedding_client=embedding_client,
             service=os.getenv("OPENSEARCH_SERVICE"),
         )
-
     @staticmethod
     def _clean_names(values: Iterable[str]) -> list[str]:
         return list(dict.fromkeys(value.strip() for value in values if value.strip()))
@@ -384,12 +509,14 @@ class OpenSearchRetriever:
         knn_weight: float = 0.4,
         limit: int = 200,
     ) -> list[dict[str, Any]]:
-        """Merge BM25 and kNN results using weighted Reciprocal Rank Fusion.
+        """Weighted Reciprocal Rank Fusion. Retained as an evaluated alternative.
+
+        `retrieve()` deliberately uses `_bm25_plus_knn_expansion` instead: RRF
+        lets the vector leg demote exact keyword matches, which is the wrong
+        trade for job search where a title match is near-certain intent. Every
+        checked-in hybrid measurement was produced with the expansion path.
 
         RRF score = sum(weight_i / (k + rank_i)) for each result list.
-        k=60 is the standard constant that prevents top ranks from dominating.
-        BM25 gets higher weight (1.0) vs kNN (0.4) since keyword precision
-        is more important for job search; kNN contributes semantic diversity.
         """
         scores: dict[str, float] = {}
         hit_map: dict[str, dict[str, Any]] = {}
@@ -419,17 +546,33 @@ class OpenSearchRetriever:
         knn_hits: list[dict[str, Any]],
         *,
         limit: int = 200,
+        knn_reserve: int = 0,
     ) -> list[dict[str, Any]]:
-        """BM25 results keep original ranking; kNN adds novel candidates at tail.
+        """BM25 results keep original ranking; kNN adds novel candidates.
 
-        This preserves BM25's precision for the top positions while using
-        kNN to expand recall with semantically related jobs that BM25 missed.
+        `knn_reserve` is the number of slots held open for semantically novel
+        documents. Without it the vector leg is silently a no-op whenever BM25
+        already returns `limit` hits, which is the common case: measured on a
+        200-candidate budget, hybrid and BM25-only produced identical candidate
+        sets. Reserving slots trades the weakest BM25 tail ranks for candidates
+        keyword search could not reach; the reranker still decides final order.
         """
         result: list[dict[str, Any]] = []
         seen_ids: set[str] = set()
 
+        novel = [
+            hit
+            for hit in knn_hits
+            if hit.get("_id")
+            and hit.get("_id") not in {item.get("_id") for item in bm25_hits}
+        ]
+        reserved = min(max(0, knn_reserve), len(novel))
+        bm25_budget = max(1, limit - reserved) if reserved else limit
+
         # BM25 results first, in original order
         for hit in bm25_hits:
+            if len(result) >= bm25_budget:
+                break
             doc_id = hit.get("_id", "")
             if doc_id and doc_id not in seen_ids:
                 seen_ids.add(doc_id)
@@ -437,6 +580,15 @@ class OpenSearchRetriever:
 
         # kNN novel candidates appended at the tail
         for hit in knn_hits:
+            if len(result) >= limit:
+                break
+            doc_id = hit.get("_id", "")
+            if doc_id and doc_id not in seen_ids:
+                seen_ids.add(doc_id)
+                result.append(hit)
+
+        # Any BM25 tail that still fits is restored rather than discarded.
+        for hit in bm25_hits:
             if len(result) >= limit:
                 break
             doc_id = hit.get("_id", "")
@@ -460,6 +612,34 @@ class OpenSearchRetriever:
         locations = self._clean_names(location_names)
         duties = self._clean_names(duty_names)
         effective_limit = max(1, min(int(limit), 500))
+        started = time.monotonic()
+        telemetry: dict[str, Any] = {
+            "mode": self.HYBRID_BM25_KNN if self.hybrid_enabled else self.BM25_ONLY,
+            "fusion_method": self.FUSION_METHOD if self.hybrid_enabled else None,
+            "knn_candidates": 0,
+            # `knn_degraded` means a component failed and must be disclosed as a
+            # degradation. `knn_deadline_skipped` means the latency policy chose
+            # not to wait, which is designed behaviour, not an outage. Conflating
+            # them would either hide real failures or report a healthy system as
+            # degraded on every slow tail query.
+            "knn_degraded": False,
+            "knn_deadline_skipped": False,
+        }
+        self._telemetry.value = telemetry
+
+        # Start the query embedding before BM25 so the Bedrock round trip
+        # overlaps the search instead of being serialised after it.
+        embedding_future = None
+        if self.embedding_client is not None:
+            try:
+                embedding_future = self._get_pool().submit(
+                    self.embedding_client.embed, query
+                )
+            except Exception as exc:
+                telemetry["knn_degraded"] = True
+                LOGGER.warning(
+                    "Query embedding could not be scheduled: %s", type(exc).__name__
+                )
 
         # Always run BM25 keyword search
         bm25_hits = self._search_bm25(
@@ -472,12 +652,19 @@ class OpenSearchRetriever:
             intent=intent,
         )
 
-        # Attempt kNN vector search if embedding client is available
+        # Attempt kNN vector search if a query embedding arrived in time
         knn_hits: list[dict[str, Any]] = []
-        if self.embedding_client is not None:
+        if embedding_future is not None:
             try:
-                query_embedding = self.embedding_client.embed(query)
-                if query_embedding is not None:
+                remaining = self.hybrid_deadline_seconds - (
+                    time.monotonic() - started
+                )
+                if remaining <= 0:
+                    raise TimeoutError("hybrid deadline exhausted by BM25")
+                query_embedding = embedding_future.result(timeout=remaining)
+                if query_embedding is None:
+                    telemetry["knn_degraded"] = True
+                else:
                     # kNN fetches fewer results (top-50) to contribute semantic
                     # diversity without overwhelming BM25's precise matches.
                     knn_limit = min(50, effective_limit)
@@ -485,18 +672,36 @@ class OpenSearchRetriever:
                         query_embedding,
                         limit=knn_limit,
                     )
+            except TimeoutError:
+                # Expected under load: ship BM25 now rather than wait.
+                telemetry["knn_deadline_skipped"] = True
+                embedding_future.cancel()
+                LOGGER.info("kNN leg skipped at the hybrid deadline")
             except Exception as exc:
+                telemetry["knn_degraded"] = True
+                embedding_future.cancel()
                 LOGGER.warning(
-                    "kNN search failed; using BM25-only: %s", type(exc).__name__
+                    "kNN leg failed; using BM25-only: %s", type(exc).__name__
                 )
 
         # Merge results: BM25 results keep original order, kNN adds novel
         # candidates at the tail (expansion-only, does not reorder BM25).
         if knn_hits:
+            telemetry["knn_candidates"] = len(knn_hits)
             merged_hits = self._bm25_plus_knn_expansion(
-                bm25_hits, knn_hits, limit=effective_limit
+                bm25_hits,
+                knn_hits,
+                # Additive: BM25's own budget is untouched and the vector leg
+                # may only append beyond it.
+                limit=effective_limit + self.knn_extra_slots,
+                knn_reserve=self.knn_reserve,
             )
         else:
+            if self.hybrid_enabled:
+                # An enabled-but-empty vector leg is a real coverage gap, not a
+                # silent no-op: report BM25-only so the API cannot overstate it.
+                telemetry["mode"] = self.BM25_ONLY
+                telemetry["fusion_method"] = None
             merged_hits = bm25_hits
 
         # Parse hits into candidate dicts
@@ -513,4 +718,7 @@ class OpenSearchRetriever:
                 hit.get("_rrf_score") or hit.get("_score") or 0.0
             )
             candidates.append(job)
+        # Diagnostics only: lets an offline ablation attribute a ranking change
+        # to retrieval recall instead of guessing. Overwritten on every call.
+        telemetry["retrieved_ids"] = [job["id"] for job in candidates]
         return candidates

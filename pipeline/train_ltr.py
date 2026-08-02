@@ -88,8 +88,17 @@ QUALITY_MINIMAL_FEATURES = [
     *BEHAVIOR_GRAPH_FEATURES,
     "retrieval_reciprocal_rank",
 ]
+QUALITY_REMOTE_SALARY_FEATURES = [
+    *BEHAVIOR_GRAPH_FEATURES,
+    "retrieval_reciprocal_rank",
+    "remote",
+    "salary",
+    "is_remote",
+    "salary_min",
+    "salary_max",
+]
 # What the Bedrock query normalizer reads out of the query text. Kept as a
-# separate list appended to a new feature set rather than folded into
+# separate list appended to new feature sets rather than folded into
 # BASE_FEATURES, so every previously published ablation stays reproducible
 # against the exact column order it was trained on.
 INTENT_FEATURES = [
@@ -100,6 +109,13 @@ INTENT_FEATURES = [
 ]
 QUALITY_MINIMAL_INTENT_FEATURES = [
     *QUALITY_MINIMAL_FEATURES,
+    *INTENT_FEATURES,
+]
+# The shipped configuration plus query understanding. This is the set to train
+# when both families are wanted; the two narrower sets above stay so each can
+# be attributed on its own.
+QUALITY_REMOTE_SALARY_INTENT_FEATURES = [
+    *QUALITY_REMOTE_SALARY_FEATURES,
     *INTENT_FEATURES,
 ]
 QUALITY_COMPANY_FEATURES = [
@@ -159,6 +175,8 @@ def main() -> None:
             "quality",
             "quality_minimal",
             "quality_minimal_intent",
+            "quality_remote_salary",
+            "quality_remote_salary_intent",
             "quality_company",
         ],
         required=True,
@@ -184,6 +202,8 @@ def main() -> None:
         "quality": QUALITY_FEATURES,
         "quality_minimal": QUALITY_MINIMAL_FEATURES,
         "quality_minimal_intent": QUALITY_MINIMAL_INTENT_FEATURES,
+        "quality_remote_salary": QUALITY_REMOTE_SALARY_FEATURES,
+        "quality_remote_salary_intent": QUALITY_REMOTE_SALARY_INTENT_FEATURES,
         "quality_company": QUALITY_COMPANY_FEATURES,
     }[args.feature_set]
     train_parts = [

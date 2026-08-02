@@ -168,6 +168,8 @@ main { width: min(100%, 1540px); margin: auto; }
 .graph-node strong { display: -webkit-box; overflow: hidden; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-size: 9px; line-height: 1.3; overflow-wrap: anywhere; }
 .graph-node.query { background: var(--acid); border-color: rgba(213,255,53,.8); }
 .graph-node.query span { color: #52620d; }
+.graph-node.occupation { background: #fff0df; border-color: rgba(255,181,120,.85); }
+.graph-node.occupation span { color: #9a4d18; }
 .graph-node.job { background: var(--mint); border-color: rgba(188,239,220,.85); }
 .graph-node.job span { color: var(--forest); }
 .graph-legend { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 8px; }

@@ -14,7 +14,7 @@ from urllib.parse import unquote, urlparse
 
 from app.query_normalizer import BedrockQueryNormalizer
 from app.ranker import SkillWeaveRanker
-from app.retrieval import OpenSearchRetriever
+from app.retrieval import OpenSearchRetriever, hybrid_retrieval_meta
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -97,6 +97,9 @@ class Handler(BaseHTTPRequestHandler):
                         if self.ranker.candidate_retriever is not None
                         else "embedded_12000"
                     ),
+                    "hybrid_retrieval": hybrid_retrieval_meta(
+                        self.ranker.candidate_retriever
+                    ),
                 }
             )
             return
@@ -154,6 +157,7 @@ class Handler(BaseHTTPRequestHandler):
                     "resolved_skills": list(result["intent"].skills),
                     "index_version": self.ranker.metadata.get("index_version"),
                     "candidate_source": result["candidate_source"],
+                    "retrieval_mode": result.get("retrieval_mode", "embedded_index"),
                     "degraded_components": normalization.merge_degraded_components(
                         result["degraded_components"]
                     ),

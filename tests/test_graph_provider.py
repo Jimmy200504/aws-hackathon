@@ -12,6 +12,7 @@ class GraphProviderTests(unittest.TestCase):
                 self.request = kwargs
                 return {"payload": {"results": [{
                     "source_id": "skill:a", "target_id": "skill:b", "edge_id": "edge:1",
+                    "source_label": "Skill A", "target_label": "Skill B",
                     "relation_type": "RELATED_TO", "weight": 0.8, "confidence": 0.94,
                     "support_jobs": 30, "support_companies": 7,
                     "evidence": '[{"job_id":"1"}]',
@@ -25,6 +26,8 @@ class GraphProviderTests(unittest.TestCase):
         self.assertEqual(result.backend, "neptune_analytics")
         self.assertEqual(result.relations["skill:a"]["skill:b"]["edge_id"], "edge:1")
         relation = result.relations["skill:a"]["skill:b"]
+        self.assertEqual(relation["source_label"], "Skill A")
+        self.assertEqual(relation["target_label"], "Skill B")
         self.assertEqual(relation["evidence"], [{"job_id": "1"}])
         self.assertEqual(relation["rules_version"], "statistical-related-to-v1")
         self.assertEqual(relation["corpus_hash"], "abc123")
@@ -33,6 +36,7 @@ class GraphProviderTests(unittest.TestCase):
         )
         self.assertEqual(client.request["parameters"], {"skill_ids": ["skill:a"]})
         self.assertIn("[edge:RELATED_TO]", client.request["queryString"])
+        self.assertIn("source.label AS source_label", client.request["queryString"])
 
     def test_malformed_neptune_response_degrades_without_relations(self) -> None:
         class Client:

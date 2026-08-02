@@ -13,7 +13,7 @@ from urllib.parse import unquote
 from app.graph_provider import GraphExpansion, GraphFeatureProvider
 from app.query_normalizer import BedrockQueryNormalizer
 from app.ranker import SkillWeaveRanker
-from app.retrieval import OpenSearchRetriever
+from app.retrieval import OpenSearchRetriever, hybrid_retrieval_meta
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -140,6 +140,7 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
                 else "heuristic_fallback"
             ),
             "candidate_source": ranked["candidate_source"],
+            "retrieval_mode": ranked.get("retrieval_mode", "embedded_index"),
             "degraded_components": normalization.merge_degraded_components(
                 [*ranked["degraded_components"], *graph.degraded_components]
             ),
@@ -232,6 +233,9 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
                         "full_corpus_opensearch"
                         if RANKER.candidate_retriever is not None
                         else "embedded_12000"
+                    ),
+                    "hybrid_retrieval": hybrid_retrieval_meta(
+                        RANKER.candidate_retriever
                     ),
                 },
             )

@@ -13,6 +13,7 @@ cd "$(dirname "$0")/.."
 FUNCTION_NAME="${SKILLWEAVE_FUNCTION_NAME:-}"
 AWS_REGION_NAME="${AWS_REGION:-us-east-1}"
 STACK_NAME="${SKILLWEAVE_STACK_NAME:-skillweave-demo}"
+ALIAS_NAME="${SKILLWEAVE_ALIAS_NAME:-live}"
 BUNDLE="dist/skillweave-lambda.zip"
 EXPECTED_AWS_ACCOUNT_ID="${SKILLWEAVE_EXPECTED_AWS_ACCOUNT_ID:-851558740348}"
 
@@ -44,7 +45,8 @@ for required in \
   config/query-intent-prompt.txt \
   web/index.html \
   web/app.js \
-  web/styles.css; do
+  web/styles.css \
+  artifacts/models/ltr-quality-remote-salary.trees.json; do
   .venv/bin/python - "$required" <<'PY'
 import sys, zipfile
 name = sys.argv[1]
@@ -57,8 +59,7 @@ echo "Updating code on ${FUNCTION_NAME}..."
 aws lambda update-function-code \
   --function-name "$FUNCTION_NAME" \
   --region "$AWS_REGION_NAME" \
-  --zip-file "fileb://$BUNDLE" \
-  --publish >/dev/null
+  --zip-file "fileb://$BUNDLE" >/dev/null
 aws lambda wait function-updated \
   --function-name "$FUNCTION_NAME" --region "$AWS_REGION_NAME"
 
@@ -67,6 +68,7 @@ CURRENT="$(aws lambda get-function-configuration \
   --function-name "$FUNCTION_NAME" --region "$AWS_REGION_NAME" \
   --query 'Environment.Variables' --output json)"
 MERGED="$(BEDROCK_QUERY_MODEL_ID_VALUE="${BEDROCK_QUERY_MODEL_ID:-global.anthropic.claude-haiku-4-5-20251001-v1:0}" \
+  BEDROCK_EMBEDDING_MODEL_ID_VALUE="${BEDROCK_EMBEDDING_MODEL_ID:-}" \
   .venv/bin/python - "$CURRENT" <<'PY'
 import json, os, sys
 
@@ -86,8 +88,23 @@ current.update(
         "BEDROCK_QUERY_DEADLINE_SECONDS": "6.0",
         "QUERY_VOCAB_PATH": "/var/task/config/query-intent-vocab.json",
         "QUERY_INTENTS_PATH": "/var/task/config/query-intents.json",
+        # This script does not run `sam deploy`, so template.yaml's value never
+        # reaches the live function. The bundle ships exactly one ranking model
+        # and the ranker silently disables reranking when the path is missing,
+        # so pin the key here to keep code and configuration in lockstep.
+        "LTR_MODEL_PATH": (
+            "/var/task/artifacts/models/ltr-quality-remote-salary.trees.json"
+        ),
     }
 )
+# Hybrid retrieval is opt-in and must survive a deploy that does not mention
+# it: only write the key when the operator supplies a value, and let an
+# explicit empty value turn the vector leg back off.
+embedding_model = os.environ["BEDROCK_EMBEDDING_MODEL_ID_VALUE"].strip()
+if embedding_model:
+    current["BEDROCK_EMBEDDING_MODEL_ID"] = embedding_model
+elif "BEDROCK_EMBEDDING_MODEL_ID" in os.environ:
+    current.pop("BEDROCK_EMBEDDING_MODEL_ID", None)
 print(json.dumps({"Variables": current}, ensure_ascii=False))
 PY
 )"
@@ -97,6 +114,21 @@ aws lambda update-function-configuration \
   --environment "$MERGED" >/dev/null
 aws lambda wait function-updated \
   --function-name "$FUNCTION_NAME" --region "$AWS_REGION_NAME"
+
+# API Gateway invokes the stable alias, not $LATEST. Publish only after both
+# code and environment have converged so the immutable version contains the
+# complete release, then atomically move production traffic to it.
+PUBLISHED_VERSION="$(aws lambda publish-version \
+  --function-name "$FUNCTION_NAME" \
+  --region "$AWS_REGION_NAME" \
+  --query Version --output text)"
+aws lambda update-alias \
+  --function-name "$FUNCTION_NAME" \
+  --name "$ALIAS_NAME" \
+  --function-version "$PUBLISHED_VERSION" \
+  --routing-config '{"AdditionalVersionWeights":{}}' \
+  --region "$AWS_REGION_NAME" >/dev/null
+echo "Alias ${ALIAS_NAME} now points to version ${PUBLISHED_VERSION}."
 
 DEMO_URL="$(aws cloudformation describe-stacks \
   --stack-name "$STACK_NAME" --region "$AWS_REGION_NAME" \
