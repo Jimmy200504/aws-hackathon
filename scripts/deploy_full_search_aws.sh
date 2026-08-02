@@ -15,6 +15,13 @@ COLLECTION_NAME="${SKILLWEAVE_COLLECTION_NAME:-skillweave-jobs}"
 COLLECTION_GROUP_NAME="${SKILLWEAVE_COLLECTION_GROUP_NAME:-skillweave-search}"
 INDEX_NAME="${OPENSEARCH_INDEX:-skillweave-jobs-v1}"
 PYTHON="${PYTHON:-.venv/bin/python}"
+INDEX_BATCH_SIZE="${SKILLWEAVE_INDEX_BATCH_SIZE:-2000}"
+INDEX_WORKERS="${SKILLWEAVE_INDEX_WORKERS:-4}"
+INDEX_SKIP_CREATE="${SKILLWEAVE_INDEX_SKIP_CREATE:-no}"
+INDEX_START_RECORD="${SKILLWEAVE_INDEX_START_RECORD:-0}"
+INDEX_EXPECTED_COUNT="${SKILLWEAVE_INDEX_EXPECTED_COUNT:-0}"
+MAX_INDEXING_OCU="${SKILLWEAVE_MAX_INDEXING_OCU:-8}"
+MAX_SEARCH_OCU="${SKILLWEAVE_MAX_SEARCH_OCU:-2}"
 
 if [[ ! -x "$PYTHON" ]]; then
   echo "Missing Python environment: $PYTHON" >&2
@@ -51,9 +58,12 @@ aws cloudformation deploy \
   --stack-name "$SEARCH_STACK_NAME" \
   --region "$AWS_REGION_NAME" \
   --template-file infra/opensearch-serverless.yaml \
+  --capabilities CAPABILITY_IAM \
   --parameter-overrides \
     "CollectionName=$COLLECTION_NAME" \
     "CollectionGroupName=$COLLECTION_GROUP_NAME" \
+    "MaxIndexingOcu=$MAX_INDEXING_OCU" \
+    "MaxSearchOcu=$MAX_SEARCH_OCU" \
     "RuntimePrincipalArn=$RUNTIME_PRINCIPAL_ARN" \
     "IngestionPrincipalArn=$INGESTION_PRINCIPAL_ARN" \
   --no-fail-on-empty-changeset
@@ -72,15 +82,41 @@ COLLECTION_ARN="$(
     --query "Stacks[0].Outputs[?OutputKey=='CollectionArn'].OutputValue | [0]" \
     --output text
 )"
-if [[ "$COLLECTION_ENDPOINT" != https://* || "$COLLECTION_ARN" != arn:aws:aoss:* ]]; then
+INGESTION_ROLE_ARN="$(
+  aws cloudformation describe-stacks \
+    --stack-name "$SEARCH_STACK_NAME" \
+    --region "$AWS_REGION_NAME" \
+    --query "Stacks[0].Outputs[?OutputKey=='IngestionRoleArn'].OutputValue | [0]" \
+    --output text
+)"
+if [[ "$COLLECTION_ENDPOINT" != https://* || "$COLLECTION_ARN" != arn:aws:aoss:* || "$INGESTION_ROLE_ARN" != arn:aws:iam::*:role/* ]]; then
   echo "OpenSearch stack did not return a valid endpoint and ARN" >&2
   exit 1
 fi
 
+read -r AWS_ACCESS_KEY_ID_VALUE AWS_SECRET_ACCESS_KEY_VALUE AWS_SESSION_TOKEN_VALUE < <(
+  aws sts assume-role \
+    --role-arn "$INGESTION_ROLE_ARN" \
+    --role-session-name skillweave-full-index \
+    --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
+    --output text
+)
+INDEXER_ARGS=(
+  --batch-size "$INDEX_BATCH_SIZE"
+  --workers "$INDEX_WORKERS"
+  --start-record "$INDEX_START_RECORD"
+  --expected-count "$INDEX_EXPECTED_COUNT"
+)
+if [[ "$INDEX_SKIP_CREATE" == "yes" ]]; then
+  INDEXER_ARGS+=(--skip-create)
+fi
 OPENSEARCH_ENDPOINT="$COLLECTION_ENDPOINT" \
 OPENSEARCH_INDEX="$INDEX_NAME" \
 AWS_REGION="$AWS_REGION_NAME" \
-  "$PYTHON" scripts/index_full_opensearch.py
+AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID_VALUE" \
+AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY_VALUE" \
+AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN_VALUE" \
+  "$PYTHON" scripts/index_full_opensearch.py "${INDEXER_ARGS[@]}"
 
 OPENSEARCH_ENDPOINT="$COLLECTION_ENDPOINT" \
 OPENSEARCH_COLLECTION_ARN="$COLLECTION_ARN" \

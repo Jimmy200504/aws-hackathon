@@ -1,10 +1,15 @@
 {
   "metadata": {
     "schema": "skillweave-aws-production-smoke-v1",
-    "verified_at_utc": "2026-07-29T13:52:09Z",
-    "base_url": "https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/",
+    "verified_at_utc": "2026-08-02T03:44:20Z",
+    "base_url": "https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/",
     "index_version": "demo-2026.06.05-v1",
-    "client": "stdlib urllib; public HTTPS; no AWS session"
+    "client": "stdlib urllib; public HTTPS; no AWS session",
+    "require_full_corpus": true,
+    "require_neptune": true,
+    "expected_graph_version": "deterministic-v1-rules-v2-evaluation-cutoff",
+    "max_p95_ms": 800.0,
+    "p95_gate_basis": "response.meta.latency_ms (service-side)"
   },
   "passed": true,
   "checks": {
@@ -13,64 +18,90 @@
     "relative_javascript_asset": true,
     "health_contract": true,
     "metadata_contract": true,
+    "full_corpus_scope_when_required": true,
+    "full_corpus_count_when_required": true,
+    "full_corpus_candidate_source_when_required": true,
     "quality_ltr_deployed": true,
     "real_bedrock_pilot_deployed": true,
     "graph_on_contract": true,
     "graph_off_contract": true,
     "graph_toggle_changes_ranking": true,
     "graph_trace_provenance": true,
-    "bedrock_trace_provenance": true,
+    "trace_source_provenance": true,
+    "neptune_backend_when_required": true,
+    "graph_version_when_required": true,
     "load_all_http_200": true,
     "load_all_top_10": true,
     "load_index_version": true,
     "load_quality_ltr_model": true,
-    "load_p95_below_timeout": true
+    "load_full_corpus_when_required": true,
+    "load_neptune_when_required": true,
+    "load_graph_version_when_required": true,
+    "load_p95_below_threshold": true
   },
   "observed": {
     "job_count": 12000,
     "skill_count": 928,
+    "search_scope": "full_corpus_opensearch",
+    "search_corpus_job_count": 1218635,
+    "candidate_source": "opensearch_full_corpus",
+    "graph_backend": "neptune_analytics",
+    "graph_version": "deterministic-v1-rules-v2-evaluation-cutoff",
+    "degraded_components": [],
     "graph_on_job_ids": [
-      "132469993",
-      "132209785",
-      "103766259",
       "132446961",
+      "132486869",
       "130249640",
-      "131987268",
+      "130184426",
       "132481149",
-      "132481157",
+      "132469993",
       "98836873",
-      "132746570"
+      "132096201",
+      "132008834",
+      "132084842"
     ],
     "graph_off_job_ids": [
       "132446961",
-      "132438691",
-      "132469993",
       "132481149",
-      "132481157",
+      "132469993",
+      "132486869",
+      "130249640",
+      "130184426",
       "98836873",
-      "132209785",
-      "131987268",
-      "103766259",
-      "130249640"
+      "130405380",
+      "132096201",
+      "132446910"
     ],
-    "graph_trace_path_count": 6,
-    "bedrock_trace_path_count": 1
+    "graph_trace_path_count": 8,
+    "bedrock_trace_path_count": 0,
+    "deterministic_full_corpus_trace_path_count": 8
   },
   "load": {
     "requests": 30,
+    "graph_on_requests": 15,
     "concurrency": 5,
     "http_200": 30,
     "top_10_responses": 30,
     "matching_index_version": 30,
     "matching_ranking_model": 30,
-    "elapsed_ms": 15607.92,
-    "throughput_requests_per_second": 1.92,
+    "matching_graph_backend": 15,
+    "matching_graph_version": 15,
+    "full_corpus_responses": 30,
+    "elapsed_ms": 9905.94,
+    "throughput_requests_per_second": 3.03,
     "latency_ms": {
-      "min": 1449.16,
-      "p50": 1769.39,
-      "p95": 4461.61,
-      "p99": 4505.13,
-      "max": 4505.13
+      "min": 1204.33,
+      "p50": 1365.96,
+      "p95": 2591.9,
+      "p99": 2959.17,
+      "max": 2959.17
+    },
+    "service_latency_ms": {
+      "min": 150.7,
+      "p50": 209.63,
+      "p95": 348.26,
+      "p99": 456.62,
+      "max": 456.62
     },
     "errors": []
   }

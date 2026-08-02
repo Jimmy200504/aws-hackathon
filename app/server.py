@@ -16,7 +16,7 @@ from app.geo_graph import GeoGraph
 from app.query_normalizer import BedrockQueryNormalizer
 from app.ranker import SkillWeaveRanker
 from app.region_graph import RegionGraph
-from app.retrieval import OpenSearchRetriever
+from app.retrieval import OpenSearchRetriever, hybrid_retrieval_meta
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,6 +24,9 @@ WEB_ROOT = ROOT / "web"
 DEFAULT_ARTIFACT = ROOT / "artifacts" / "demo-index.json"
 DEFAULT_LTR_MODEL = (
     ROOT / "artifacts" / "models" / "ltr-quality-final.trees.json"
+)
+FULL_CORPUS_JOB_COUNT = max(
+    0, int(os.getenv("OPENSEARCH_DOCUMENT_COUNT", "0"))
 )
 
 
@@ -62,10 +65,17 @@ class Handler(BaseHTTPRequestHandler):
                     "service": "skillweave-search",
                     "index_version": self.ranker.metadata.get("index_version"),
                     "jobs": len(self.ranker.jobs),
+                    "full_corpus_jobs": (
+                        FULL_CORPUS_JOB_COUNT
+                        if self.ranker.candidate_retriever is not None
+                        and FULL_CORPUS_JOB_COUNT > 0
+                        else None
+                    ),
                     "full_corpus_retrieval": self.ranker.candidate_retriever is not None,
                     "bedrock_query_normalization": self.query_normalizer.enabled,
                     "region_graph": self.region_graph.enabled,
                     "geo_graph": self.geo_graph.enabled,
+                    "query_intent_cache": self.query_normalizer.batch_stats,
                 }
             )
             return
@@ -74,11 +84,27 @@ class Handler(BaseHTTPRequestHandler):
                 {
                     "metadata": self.ranker.metadata,
                     "job_count": len(self.ranker.jobs),
+                    "embedded_job_count": len(self.ranker.jobs),
+                    "full_corpus_job_count": (
+                        FULL_CORPUS_JOB_COUNT
+                        if self.ranker.candidate_retriever is not None
+                        and FULL_CORPUS_JOB_COUNT > 0
+                        else None
+                    ),
+                    "search_corpus_job_count": (
+                        FULL_CORPUS_JOB_COUNT
+                        if self.ranker.candidate_retriever is not None
+                        and FULL_CORPUS_JOB_COUNT > 0
+                        else len(self.ranker.jobs)
+                    ),
                     "skill_count": len(self.ranker.skills),
                     "search_scope": (
                         "full_corpus_opensearch"
                         if self.ranker.candidate_retriever is not None
                         else "embedded_12000"
+                    ),
+                    "hybrid_retrieval": hybrid_retrieval_meta(
+                        self.ranker.candidate_retriever
                     ),
                 }
             )
@@ -121,6 +147,7 @@ class Handler(BaseHTTPRequestHandler):
                 top_k=top_k,
                 include_graph=include_graph,
                 normalized_query=normalization.query,
+                structured_intent=normalization.intent,
             )
             request_id = "req_" + uuid.uuid4().hex[:16]
             elapsed_ms = round((time.perf_counter() - started) * 1000, 2)
@@ -136,6 +163,7 @@ class Handler(BaseHTTPRequestHandler):
                     "resolved_skills": list(result["intent"].skills),
                     "index_version": self.ranker.metadata.get("index_version"),
                     "candidate_source": result["candidate_source"],
+                    "retrieval_mode": result.get("retrieval_mode", "embedded_index"),
                     "degraded_components": normalization.merge_degraded_components(
                         result["degraded_components"]
                     ),
@@ -213,6 +241,14 @@ def main() -> None:
         type=Path,
         default=Path(os.getenv("LTR_MODEL_PATH", DEFAULT_LTR_MODEL)),
     )
+    parser.add_argument(
+        "--require-bedrock-query-normalization",
+        action="store_true",
+        help=(
+            "perform a live Amazon Bedrock normalization probe before opening "
+            "the local server, and fail startup if it cannot connect"
+        ),
+    )
     args = parser.parse_args()
     if not args.artifact.is_file():
         raise SystemExit(
@@ -223,9 +259,33 @@ def main() -> None:
         ltr_model_path=args.ltr_model,
         candidate_retriever=OpenSearchRetriever.from_environment(),
     )
+    # This process serves many concurrent requests, which is the only shape
+    # where coalescing pays off: the library default is tuned for Lambda, where
+    # one invocation serves one request and a long window is pure added latency.
+    # Here a full window is what turns ten concurrent queries into one Bedrock
+    # request. An explicit environment value still wins.
+    os.environ.setdefault("BEDROCK_QUERY_MAX_WAIT_SECONDS", "1.0")
     Handler.query_normalizer = BedrockQueryNormalizer.from_environment()
     Handler.region_graph = RegionGraph.from_environment()
     Handler.geo_graph = GeoGraph.from_environment()
+    if args.require_bedrock_query_normalization:
+        model_id = Handler.query_normalizer.model_id or "not configured"
+        print(f"Checking Amazon Bedrock query normalization ({model_id})...")
+        try:
+            Handler.query_normalizer.verify_connection()
+        except Exception as exc:
+            raise SystemExit(
+                "Amazon Bedrock query normalization is required but the live "
+                f"startup probe failed ({type(exc).__name__}: {exc}). "
+                "Run `aws login`, verify AWS_REGION/model access, and retry."
+            ) from exc
+        print("Amazon Bedrock query normalization connected (live inference passed)")
+    # Warming the head of the query distribution turns most traffic into a
+    # microsecond cache hit. Backgrounded so the port opens immediately; only
+    # done here, not in the Lambda handler, because Lambda freezes the container
+    # between invocations and a warming thread would not run to completion.
+    if Handler.query_normalizer.prewarm_from_config() is not None:
+        print("Pre-warming query intents from config/top-queries.json in background")
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     print(f"SkillWeave listening on http://{args.host}:{args.port}")
     print(f"Loaded {len(Handler.ranker.jobs):,} jobs from {args.artifact}")

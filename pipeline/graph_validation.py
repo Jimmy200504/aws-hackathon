@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
+import re
 
 
 ALLOWED_MENTION_TYPES = {
@@ -18,7 +19,8 @@ ALLOWED_MENTION_TYPES = {
     "soft_skill",
 }
 ALLOWED_LEVELS = {"required", "preferred", "mentioned"}
-ALLOWED_RELATIONS = {"RELATED_TO", "PREREQUISITE_OF", "SPECIALIZATION_OF"}
+ALLOWED_RELATIONS = {"RELATED_TO"}
+NEGATION_PATTERN = re.compile(r"(?:不需(?:要)?|不要求|無需|不必|免具備|not required).{0,12}$", re.IGNORECASE)
 
 
 @dataclass
@@ -26,10 +28,11 @@ class ValidationResult:
     accepted_mentions: list[dict[str, Any]] = field(default_factory=list)
     accepted_relations: list[dict[str, Any]] = field(default_factory=list)
     rejected: list[dict[str, str]] = field(default_factory=list)
+    accepted_empty: bool = False
 
     @property
     def valid(self) -> bool:
-        return bool(self.accepted_mentions) and not any(
+        return (bool(self.accepted_mentions) or self.accepted_empty) and not any(
             item["severity"] == "fatal" for item in self.rejected
         )
 
@@ -40,6 +43,8 @@ def validate_extraction(
     graph_cutoff: str,
     payload: dict[str, Any],
     confidence_threshold: float = 0.75,
+    *,
+    allow_empty: bool = False,
 ) -> ValidationResult:
     result = ValidationResult()
     modified = datetime.fromisoformat(source_modified_at)
@@ -88,6 +93,12 @@ def validate_extraction(
             errors.append("unknown evidence_field")
         elif not evidence or evidence not in source_fields[evidence_field]:
             errors.append("evidence is not an exact source substring")
+        elif level == "required":
+            source_value = source_fields[evidence_field]
+            offset = source_value.find(evidence)
+            prefix = source_value[max(0, offset - 20):offset]
+            if NEGATION_PATTERN.search(prefix):
+                errors.append("negated evidence cannot be required")
         if errors:
             result.rejected.append(
                 {
@@ -138,4 +149,10 @@ def validate_extraction(
         accepted["validated"] = True
         accepted["requires_corpus_corroboration"] = True
         result.accepted_relations.append(accepted)
+    if allow_empty and not result.accepted_mentions and not any(
+        item["severity"] == "fatal" for item in result.rejected
+    ):
+        # A grounded extraction may legitimately abstain. This keeps the
+        # accepted/quarantine accounting exhaustive without inventing a node.
+        result.accepted_empty = True
     return result

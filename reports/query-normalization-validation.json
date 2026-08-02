@@ -1,0 +1,702 @@
+{
+  "schema": "skillweave-query-normalization-validation-v1",
+  "model_id": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+  "index": "/Users/roger/SynologyDrive/projects/aws-hackathon/artifacts/demo-index.json",
+  "candidate_source": "embedded_demo_index",
+  "queries": 15,
+  "batching": {
+    "batches_dispatched": 2,
+    "queries_dispatched": 15,
+    "cache_hits": 0,
+    "cache_misses": 15,
+    "prewarmed": 0,
+    "cached_queries": 15,
+    "max_batch": 10,
+    "max_wait_seconds": 1.0,
+    "wall_clock_seconds": 10.77,
+    "queries_per_bedrock_request": 7.5
+  },
+  "totals": {
+    "baseline_zero_result_queries": 0,
+    "structured_zero_result_queries": 0,
+    "baseline_returned_rows": 263,
+    "structured_returned_rows": 300
+  },
+  "cases": [
+    {
+      "query": "現領",
+      "normalized_query": "現領",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "attribute",
+        "duty_categories": [
+          "門市／店員／專櫃人員",
+          "餐飲服務人員",
+          "包裝員／作業員",
+          "行政人員",
+          "外務／快遞／送貨"
+        ],
+        "locations": [],
+        "employment_types": [
+          "全職",
+          "兼職",
+          "工讀"
+        ],
+        "shifts": [],
+        "salary_type": null,
+        "company": null,
+        "keep_terms": [
+          "現領"
+        ],
+        "confidence": 0.48
+      },
+      "baseline": {
+        "results": 2,
+        "latency_ms": 324.0,
+        "resolved_skills": [],
+        "top_titles": [
+          "旅館助理員,週六日6-8小時8:00-17:00,現領,時薪200元",
+          "‼️我想賺大錢‼️非派遣｜月收10萬不是夢｜搬運人員｜職業駕駛｜無經"
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 509.6,
+        "resolved_skills": [],
+        "top_titles": [
+          "旅館助理員,週六日6-8小時8:00-17:00,現領,時薪200元",
+          "內勤行政人員(出單)(火災保險部火險核保處)",
+          "團體保險行政人員(契約)"
+        ]
+      }
+    },
+    {
+      "query": "正職",
+      "normalized_query": "正職",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "attribute",
+        "duty_categories": [
+          "門市／店員／專櫃人員",
+          "行政人員",
+          "餐飲服務人員",
+          "包裝員／作業員",
+          "客服人員"
+        ],
+        "locations": [],
+        "employment_types": [
+          "全職"
+        ],
+        "shifts": [],
+        "salary_type": null,
+        "company": null,
+        "keep_terms": [],
+        "confidence": 0.45
+      },
+      "baseline": {
+        "results": 20,
+        "latency_ms": 250.5,
+        "resolved_skills": [],
+        "top_titles": [
+          "【正職】行政人員",
+          "正職-遊戲本地化專案管理 (有經驗者)",
+          "北區蘇耳鼻喉科診所｜正職護理行政人員"
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 248.5,
+        "resolved_skills": [],
+        "top_titles": [
+          "【正職】行政人員",
+          "正職-遊戲本地化專案管理 (有經驗者)",
+          "北區蘇耳鼻喉科診所｜正職護理行政人員"
+        ]
+      }
+    },
+    {
+      "query": "二度就業",
+      "normalized_query": "二度就業",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "attribute",
+        "duty_categories": [
+          "行政人員",
+          "門市／店員／專櫃人員",
+          "餐飲服務人員",
+          "客服人員",
+          "包裝員／作業員"
+        ],
+        "locations": [],
+        "employment_types": [
+          "全職",
+          "兼職"
+        ],
+        "shifts": [],
+        "salary_type": null,
+        "company": null,
+        "keep_terms": [
+          "二度就業"
+        ],
+        "confidence": 0.42
+      },
+      "baseline": {
+        "results": 20,
+        "latency_ms": 245.1,
+        "resolved_skills": [],
+        "top_titles": [
+          "歡迎無經驗、二度就業、應屆畢業生【房仲業務】(高獎金制/福利佳)",
+          "六日時薪+15元《時薪215元起》【日商壽司郎】中壢中正店-洗碗作業",
+          "板橋四川路站-中班洗車服務員(二度就業)"
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 242.5,
+        "resolved_skills": [],
+        "top_titles": [
+          "歡迎無經驗、二度就業、應屆畢業生【房仲業務】(高獎金制/福利佳)",
+          "六日時薪+15元《時薪215元起》【日商壽司郎】中壢中正店-洗碗作業",
+          "板橋四川路站-中班洗車服務員(二度就業)"
+        ]
+      }
+    },
+    {
+      "query": "早班兼職",
+      "normalized_query": "早班兼職 早班",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "mixed",
+        "duty_categories": [
+          "門市／店員／專櫃人員",
+          "餐飲服務人員",
+          "工讀生",
+          "包裝員／作業員",
+          "行政人員"
+        ],
+        "locations": [],
+        "employment_types": [
+          "兼職"
+        ],
+        "shifts": [
+          "日班"
+        ],
+        "salary_type": null,
+        "company": null,
+        "keep_terms": [
+          "早班"
+        ],
+        "confidence": 0.52
+      },
+      "baseline": {
+        "results": 20,
+        "latency_ms": 242.1,
+        "resolved_skills": [],
+        "top_titles": [
+          "低溫理貨人員(早班兼職)",
+          "TS-宜蘭蘇澳/早班兼職/人事行政 /205元",
+          "TS-宜蘭蘇澳/早班兼職/人事招募 /福利多多"
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 252.6,
+        "resolved_skills": [],
+        "top_titles": [
+          "低溫理貨人員(早班兼職)",
+          "TS-宜蘭蘇澳/早班兼職/人事行政 /205元",
+          "TS-宜蘭蘇澳/早班兼職/人事招募 /福利多多"
+        ]
+      }
+    },
+    {
+      "query": "工讀生",
+      "normalized_query": "工讀生",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "occupation",
+        "duty_categories": [
+          "工讀生",
+          "門市／店員／專櫃人員",
+          "餐飲服務人員",
+          "包裝員／作業員",
+          "行政助理"
+        ],
+        "locations": [],
+        "employment_types": [
+          "工讀"
+        ],
+        "shifts": [],
+        "salary_type": null,
+        "company": null,
+        "keep_terms": [],
+        "confidence": 0.75
+      },
+      "baseline": {
+        "results": 20,
+        "latency_ms": 374.5,
+        "resolved_skills": [],
+        "top_titles": [
+          "工讀生",
+          "工讀生",
+          "牙醫助理【晚班~時薪190元以上】 工讀生/兼職/PT"
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 279.8,
+        "resolved_skills": [],
+        "top_titles": [
+          "工讀生",
+          "工讀生",
+          "牙醫助理【晚班~時薪190元以上】 工讀生/兼職/PT"
+        ]
+      }
+    },
+    {
+      "query": "親子",
+      "normalized_query": "親子",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "noise",
+        "duty_categories": [],
+        "locations": [],
+        "employment_types": [],
+        "shifts": [],
+        "salary_type": null,
+        "company": null,
+        "keep_terms": [
+          "親子"
+        ],
+        "confidence": 0.15
+      },
+      "baseline": {
+        "results": 20,
+        "latency_ms": 249.6,
+        "resolved_skills": [],
+        "top_titles": [
+          "服務人員(教保員)- 樹林秀泰館 (大型室內親子樂園)",
+          "【芙醫親子診所】皮膚科門診醫師(桃園)",
+          "【幸福企業徵才】親子台-行銷公關  Marketing & PR ("
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 244.8,
+        "resolved_skills": [],
+        "top_titles": [
+          "服務人員(教保員)- 樹林秀泰館 (大型室內親子樂園)",
+          "【芙醫親子診所】皮膚科門診醫師(桃園)",
+          "【幸福企業徵才】親子台-行銷公關  Marketing & PR ("
+        ]
+      }
+    },
+    {
+      "query": "萊爾富",
+      "normalized_query": "萊爾富",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "company",
+        "duty_categories": [
+          "門市／店員／專櫃人員",
+          "售票／收銀人員",
+          "商化人員"
+        ],
+        "locations": [],
+        "employment_types": [],
+        "shifts": [],
+        "salary_type": null,
+        "company": "萊爾富",
+        "keep_terms": [
+          "萊爾富"
+        ],
+        "confidence": 0.88
+      },
+      "baseline": {
+        "results": 1,
+        "latency_ms": 234.6,
+        "resolved_skills": [],
+        "top_titles": [
+          "兼職消防設備師士(夜校生可)"
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 508.4,
+        "resolved_skills": [],
+        "top_titles": [
+          "商化人員",
+          "BOSE音響專賣店 專櫃人員",
+          "【起士公爵台南新光】 正職甜點專櫃人員"
+        ]
+      }
+    },
+    {
+      "query": "青埔",
+      "normalized_query": "青埔",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "location",
+        "duty_categories": [
+          "門市／店員／專櫃人員",
+          "包裝員／作業員",
+          "倉管／物料管理員"
+        ],
+        "locations": [
+          "桃園市"
+        ],
+        "employment_types": [],
+        "shifts": [],
+        "salary_type": null,
+        "company": null,
+        "keep_terms": [
+          "青埔",
+          "中壢區"
+        ],
+        "confidence": 0.42
+      },
+      "baseline": {
+        "results": 20,
+        "latency_ms": 241.7,
+        "resolved_skills": [],
+        "top_titles": [
+          "【桃園市/中壢青埔】豪宅日班安管人員 (12H、固定班次)",
+          "【青埔區】豪宅社區財務/會計秘書",
+          "【桃園市/中壢青埔】豪宅夜班安管人員 (12H、固定班次)"
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 238.4,
+        "resolved_skills": [],
+        "top_titles": [
+          "【桃園市/中壢青埔】豪宅日班安管人員 (12H、固定班次)",
+          "【青埔區】豪宅社區財務/會計秘書",
+          "【桃園市/中壢青埔】豪宅夜班安管人員 (12H、固定班次)"
+        ]
+      }
+    },
+    {
+      "query": "診所",
+      "normalized_query": "診所",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "occupation",
+        "duty_categories": [
+          "診所助理",
+          "牙醫助理",
+          "醫務行政",
+          "護理助理(護佐)",
+          "醫院行政管理人員"
+        ],
+        "locations": [],
+        "employment_types": [],
+        "shifts": [],
+        "salary_type": null,
+        "company": null,
+        "keep_terms": [
+          "診所"
+        ],
+        "confidence": 0.72
+      },
+      "baseline": {
+        "results": 20,
+        "latency_ms": 258.8,
+        "resolved_skills": [
+          "skill.clinic"
+        ],
+        "top_titles": [
+          "北區蘇耳鼻喉科診所｜正職護理行政人員",
+          "**禾林牙醫診所**禾瑞牙醫診所**林口區/牙科護理長/有經驗五年",
+          "中醫診所-護理人員/醫療助理"
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 260.1,
+        "resolved_skills": [
+          "skill.clinic"
+        ],
+        "top_titles": [
+          "北區蘇耳鼻喉科診所｜正職護理行政人員",
+          "**禾林牙醫診所**禾瑞牙醫診所**林口區/牙科護理長/有經驗五年",
+          "中醫診所-護理人員/醫療助理"
+        ]
+      }
+    },
+    {
+      "query": "學徒",
+      "normalized_query": "學徒",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "occupation",
+        "duty_categories": [
+          "學徒",
+          "包裝員／作業員",
+          "組裝組立技術人員",
+          "操作技術",
+          "機械操作人員"
+        ],
+        "locations": [],
+        "employment_types": [
+          "全職"
+        ],
+        "shifts": [],
+        "salary_type": null,
+        "company": null,
+        "keep_terms": [],
+        "confidence": 0.68
+      },
+      "baseline": {
+        "results": 20,
+        "latency_ms": 252.2,
+        "resolved_skills": [],
+        "top_titles": [
+          "消防安全設備學徒",
+          "機電技術員(學徒)",
+          "專業汽車美容人員 [學徒@台南]"
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 244.3,
+        "resolved_skills": [],
+        "top_titles": [
+          "消防安全設備學徒",
+          "機電技術員(學徒)",
+          "專業汽車美容人員 [學徒@台南]"
+        ]
+      }
+    },
+    {
+      "query": "冷凍空調學徒+技術人員",
+      "normalized_query": "冷凍空調學徒+技術人員 冷凍空調 學徒",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "occupation",
+        "duty_categories": [
+          "冷凍空調技術人員／安裝員",
+          "學徒",
+          "機械操作人員"
+        ],
+        "locations": [],
+        "employment_types": [
+          "全職"
+        ],
+        "shifts": [],
+        "salary_type": null,
+        "company": null,
+        "keep_terms": [
+          "冷凍空調",
+          "學徒"
+        ],
+        "confidence": 0.88
+      },
+      "baseline": {
+        "results": 20,
+        "latency_ms": 258.1,
+        "resolved_skills": [],
+        "top_titles": [
+          "冷凍空調學徒 | 技術員【 保障年薪14個月 | 另計加班費 | 無",
+          "滑冰場場務冷凍空調助理技術員/學徒",
+          "冷凍空調技術員"
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 257.7,
+        "resolved_skills": [],
+        "top_titles": [
+          "冷凍空調學徒 | 技術員【 保障年薪14個月 | 另計加班費 | 無",
+          "滑冰場場務冷凍空調助理技術員/學徒",
+          "冷凍空調技術員"
+        ]
+      }
+    },
+    {
+      "query": "機台操作員(輪班人員)",
+      "normalized_query": "機台操作員(輪班人員) 機台操作 輪班",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "occupation",
+        "duty_categories": [
+          "機械操作人員",
+          "堆高機操作人員",
+          "CNC車床人員"
+        ],
+        "locations": [],
+        "employment_types": [
+          "全職"
+        ],
+        "shifts": [
+          "輪班"
+        ],
+        "salary_type": null,
+        "company": null,
+        "keep_terms": [
+          "機台操作",
+          "輪班"
+        ],
+        "confidence": 0.82
+      },
+      "baseline": {
+        "results": 20,
+        "latency_ms": 256.8,
+        "resolved_skills": [],
+        "top_titles": [
+          "二班制機台操作技術員(輪班人員,二班制薪資+二班制加班費(46H)+",
+          "機台操作員 / 作業員-台南｜★冷氣廠房★穩定就業★免費咖啡★無經驗",
+          "✿【學習技術員】機台操作員★免費供午餐(無經驗可.薪資:31000元"
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 260.6,
+        "resolved_skills": [],
+        "top_titles": [
+          "二班制機台操作技術員(輪班人員,二班制薪資+二班制加班費(46H)+",
+          "機台操作員 / 作業員-台南｜★冷氣廠房★穩定就業★免費咖啡★無經驗",
+          "✿【學習技術員】機台操作員★免費供午餐(無經驗可.薪資:31000元"
+        ]
+      }
+    },
+    {
+      "query": "護理師+護士+藝文特區+誠徵",
+      "normalized_query": "護理師+護士+藝文特區+誠徵 護理師 護士 藝文特區",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "mixed",
+        "duty_categories": [
+          "護理師",
+          "護理助理(護佐)",
+          "醫院行政管理人員"
+        ],
+        "locations": [
+          "桃園市"
+        ],
+        "employment_types": [],
+        "shifts": [],
+        "salary_type": null,
+        "company": null,
+        "keep_terms": [
+          "護理師",
+          "護士",
+          "藝文特區",
+          "桃園區"
+        ],
+        "confidence": 0.75
+      },
+      "baseline": {
+        "results": 20,
+        "latency_ms": 267.5,
+        "resolved_skills": [
+          "occupation.nurse"
+        ],
+        "top_titles": [
+          "刀房護理師",
+          "法務助理 (桃園市藝文特區-環球企業總部)",
+          "[北]研究護理師"
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 262.5,
+        "resolved_skills": [
+          "occupation.nurse"
+        ],
+        "top_titles": [
+          "刀房護理師",
+          "法務助理 (桃園市藝文特區-環球企業總部)",
+          "[北]研究護理師"
+        ]
+      }
+    },
+    {
+      "query": "104人力銀行////////",
+      "normalized_query": "104人力銀行////////",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "noise",
+        "duty_categories": [],
+        "locations": [],
+        "employment_types": [],
+        "shifts": [],
+        "salary_type": null,
+        "company": null,
+        "keep_terms": [
+          "104人力銀行////////"
+        ],
+        "confidence": 0.02
+      },
+      "baseline": {
+        "results": 20,
+        "latency_ms": 249.9,
+        "resolved_skills": [],
+        "top_titles": [
+          "教育訓練人員-人力訓練室",
+          "人力資源總務主管",
+          "【日商企業銀行】Administrator, Assistant R"
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 268.7,
+        "resolved_skills": [],
+        "top_titles": [
+          "教育訓練人員-人力訓練室",
+          "人力資源總務主管",
+          "【日商企業銀行】Administrator, Assistant R"
+        ]
+      }
+    },
+    {
+      "query": "包裝員/作業員",
+      "normalized_query": "包裝員/作業員 包裝員 作業員",
+      "source": "amazon_bedrock",
+      "intent": {
+        "intent_type": "occupation",
+        "duty_categories": [
+          "包裝員／作業員",
+          "倉管／物料管理員",
+          "組裝組立技術人員"
+        ],
+        "locations": [],
+        "employment_types": [
+          "全職"
+        ],
+        "shifts": [],
+        "salary_type": null,
+        "company": null,
+        "keep_terms": [
+          "包裝員",
+          "作業員"
+        ],
+        "confidence": 0.9
+      },
+      "baseline": {
+        "results": 20,
+        "latency_ms": 261.0,
+        "resolved_skills": [
+          "occupation.operator"
+        ],
+        "top_titles": [
+          "包裝員/作業員",
+          "V 🐲 入職獎金65000 .滿月領起來/ 💲周領10000/ 包吃",
+          "V 🚀入職獎金65000 .滿月領起來/ 💲周領10000/ 包吃包"
+        ]
+      },
+      "structured": {
+        "results": 20,
+        "latency_ms": 258.9,
+        "resolved_skills": [
+          "occupation.operator"
+        ],
+        "top_titles": [
+          "早班 理貨出貨員 包裝員  作業員(近鳳山)",
+          "包裝員/作業員",
+          "06 🐲 入職獎金65000 .滿月領起來/ 💲周領10000/ 包"
+        ]
+      }
+    }
+  ]
+}

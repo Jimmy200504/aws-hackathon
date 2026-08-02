@@ -72,8 +72,8 @@ class SubmissionAuditStateTests(unittest.TestCase):
             )
             for relative in (
                 "web/index.html",
-                "pipeline/bedrock_extract.py",
-                "pipeline/graph_validation.py",
+                "pipeline/deterministic_extract.py",
+                "pipeline/skill_graph.py",
                 "docs/genai-safety.md",
                 "docs/data-card.md",
                 "docs/graph-schema.md",
@@ -98,7 +98,7 @@ class SubmissionAuditStateTests(unittest.TestCase):
             report = json.loads(output.read_text(encoding="utf-8"))
             self.assertEqual(
                 report["blockers"],
-                ["R2a_full_train_only_bedrock_graph_executed"],
+                ["R2a_full_deterministic_graph_release_gates_passed"],
             )
             manifest = json.loads(
                 (root / "release-manifest.json").read_text(encoding="utf-8")

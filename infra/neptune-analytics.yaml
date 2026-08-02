@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: SkillWeave Neptune Analytics blue/green graph and bulk-import role
+
+Parameters:
+  GraphName:
+    Type: String
+    Default: skillweave-graph-green
+  ArtifactBucketName:
+    Type: String
+    Description: Immutable Skill Graph artifact bucket
+  ArtifactPrefix:
+    Type: String
+    Default: graph-artifacts/
+  ProvisionedMemory:
+    Type: Number
+    Default: 64
+    MinValue: 16
+  PublicConnectivity:
+    Type: String
+    Default: "true"
+    AllowedValues: ["true", "false"]
+
+Conditions:
+  EnablePublicConnectivity: !Equals [!Ref PublicConnectivity, "true"]
+
+Resources:
+  Graph:
+    Type: AWS::NeptuneGraph::Graph
+    Properties:
+      GraphName: !Ref GraphName
+      ProvisionedMemory: !Ref ProvisionedMemory
+      ReplicaCount: 0
+      PublicConnectivity: !If [EnablePublicConnectivity, true, false]
+      DeletionProtection: true
+      Tags:
+        - Key: workload
+          Value: skillweave
+
+  GraphImportRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: neptune-graph.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ReadImmutableGraphArtifacts
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub arn:${AWS::Partition}:s3:::${ArtifactBucketName}
+                  - !Sub arn:${AWS::Partition}:s3:::${ArtifactBucketName}/${ArtifactPrefix}*
+
+  GraphQueryErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Neptune Analytics query errors
+      Namespace: AWS/NeptuneGraph
+      MetricName: QueryErrorsPerSec
+      Dimensions:
+        - Name: GraphIdentifier
+          Value: !GetAtt Graph.GraphId
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+
+  GraphCpuAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Neptune Analytics sustained CPU pressure
+      Namespace: AWS/NeptuneGraph
+      MetricName: CPUUtilization
+      Dimensions:
+        - Name: GraphIdentifier
+          Value: !GetAtt Graph.GraphId
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 3
+      Threshold: 85
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+
+Outputs:
+  GraphId:
+    Value: !GetAtt Graph.GraphId
+  GraphArn:
+    Value: !GetAtt Graph.GraphArn
+  GraphImportRoleArn:
+    Value: !GetAtt GraphImportRole.Arn

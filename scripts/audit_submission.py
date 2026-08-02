@@ -51,13 +51,16 @@ def main() -> None:
             and video.get("metadata", {}).get("release") == manifest.get("release")
         ),
         "R1c_public_demo_video_url": bool(external.get("demo_video_url")),
-        "R2_genai_method_and_failure_modes": (
-            exists("pipeline/bedrock_extract.py")
-            and exists("pipeline/graph_validation.py")
+        "R2_deterministic_graph_method_and_failure_modes": (
+            exists("pipeline/deterministic_extract.py")
+            and exists("pipeline/skill_graph.py")
             and exists("docs/genai-safety.md")
         ),
-        "R2a_full_train_only_bedrock_graph_executed": False,
-        "R2b_real_train_only_bedrock_pilot_executed": (
+        "R2a_full_deterministic_graph_release_gates_passed": (
+            manifest.get("graph_build", {}).get("neptune_release_status")
+            == "release_gates_passed"
+        ),
+        "R2b_historical_bedrock_pilot_archived": (
             bedrock.get("metadata", {}).get("analysis_status")
             == "bounded_real_bedrock_train_only_pilot"
             and int(bedrock.get("records", {}).get("input", 0)) >= 100
@@ -120,12 +123,6 @@ def main() -> None:
             and exists("scripts/build_submission_packet.py")
         ),
     }
-    if not bedrock:
-        # Preserve the legacy audit contract for old release fixtures that
-        # predate the real bounded pilot.
-        requirements.pop(
-            "R2b_real_train_only_bedrock_pilot_executed", None
-        )
     mandatory_external = [
         "R1a_public_cloud_demo_url",
         "R1c_public_demo_video_url",
@@ -135,24 +132,15 @@ def main() -> None:
     blockers = [
         name for name in mandatory_external if not requirements[name]
     ]
-    bedrock_requirement = (
-        "R2b_real_train_only_bedrock_pilot_executed"
-        if "R2b_real_train_only_bedrock_pilot_executed"
-        in requirements
-        else "R2a_full_train_only_bedrock_graph_executed"
-    )
-    if not requirements[bedrock_requirement]:
-        blockers.append(bedrock_requirement)
+    if not requirements["R2a_full_deterministic_graph_release_gates_passed"]:
+        blockers.append("R2a_full_deterministic_graph_release_gates_passed")
     blocker_labels = {
         "R1a_public_cloud_demo_url": "public cloud demo URL",
         "R1c_public_demo_video_url": "hosted video URL",
         "R5a_actual_aws_deployment": "actual AWS deployment",
         "R6_public_github": "public GitHub release",
-        "R2a_full_train_only_bedrock_graph_executed": (
-            "full production-corpus Bedrock graph"
-        ),
-        "R2b_real_train_only_bedrock_pilot_executed": (
-            "real train-only Bedrock pilot"
+        "R2a_full_deterministic_graph_release_gates_passed": (
+            "full deterministic cutoff graph release gates"
         ),
     }
     remaining = ", ".join(blocker_labels[name] for name in blockers)
@@ -174,10 +162,10 @@ def main() -> None:
         "production_scale_gap": (
             None
             if requirements[
-                "R2a_full_train_only_bedrock_graph_executed"
+                "R2a_full_deterministic_graph_release_gates_passed"
             ]
             else (
-                "The real Bedrock pilot is bounded to 200 records; full-corpus "
+                "The deterministic implementation and corpus inventory are complete; full-corpus "
                 "managed-service rollout remains a production migration."
             )
         ),

@@ -69,5 +69,5 @@ all searches
 ```
 
 目前 locked evidence 顯示同一個 frozen model 在兩個互斥 confirmation
-buckets 都通過 5% NDCG gate。下一個投資假設是用 train-only Bedrock
+buckets 都通過 5% NDCG gate。下一個投資假設是用 train-only deterministic
 extraction 擴大可驗證的靜態技能邊，而不是放寬 evidence 規則來追求表面 lift。

@@ -1,0 +1,49 @@
+{
+  "schema_version": "skillgraph-deterministic-v1",
+  "region": "ap-northeast-1",
+  "input": {
+    "expected_jobs": 1218635,
+    "evaluation_cutoff": "2026-06-05 23:59:59.999",
+    "expected_cutoff_eligible_jobs": 967377
+  },
+  "extraction": {
+    "extractor": "deterministic-v1",
+    "model_id": null,
+    "part_size": 1000,
+    "normalization": ["NFKC", "casefold", "collapse_whitespace", "臺_to_台"],
+    "match": "longest_exact_reviewed_alias",
+    "llm_requests": 0,
+    "embedding_requests": 0
+  },
+  "entity_resolution": {
+    "merge_rule": "unique_exact_reviewed_alias_only",
+    "candidate_min_jobs": 3,
+    "candidate_min_companies": 2,
+    "candidate_serving_eligible": false
+  },
+  "relations": {
+    "edge_type": "RELATED_TO",
+    "min_jobs": 20,
+    "min_companies": 5,
+    "min_lift": 2.0,
+    "min_npmi": 0.15,
+    "candidate_neighbor_cap": 20,
+    "published_degree_cap": 20,
+    "confidence_formula": "0.6*normalized_npmi + 0.3*normalized_lift + 0.1*min(support_jobs/100,1)",
+    "normalization": {
+      "npmi": "clip((npmi-0.15)/0.85,0,1)",
+      "lift": "clip((lift-2.0)/8.0,0,1)"
+    },
+    "rules_version": "statistical-related-to-v1"
+  },
+  "artifacts": {
+    "scopes": ["evaluation-cutoff", "latest"],
+    "default_serving_scope": "evaluation-cutoff",
+    "immutable": true
+  },
+  "serving": {
+    "backend": "neptune_analytics",
+    "graph_query_timeout_ms": 150,
+    "search_p95_release_gate_ms": 800
+  }
+}

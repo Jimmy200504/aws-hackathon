@@ -69,7 +69,7 @@
 - Position bias：view/apply 只可能發生在既有系統曝光的職缺，且前排得到更多互動。
 - Selection bias：正式 API 不含 `talentNo`，不可把會員行為個人化收益帶進線上評估。
 - Freshness bias：新職缺互動時間較短，不能把低互動直接解釋為低相關。
-- Missing-not-at-random：技能欄位缺值高度不均，因此 LLM 必須讀 JD；但 LLM edge 需要 evidence gate。
+- Missing-not-at-random：技能欄位缺值高度不均；production extractor 會在各欄位做 reviewed exact matching，但不推論未出現技能。未知詞只進 candidate frequency/review artifacts。
 - Bot/noise：抽樣高頻 query 出現異常極端值（例如「現領」）；train pipeline 要做 query-rate 與 repeated-session downweight，而不是人工刪除真實求職意圖。
 
 ## 公開 artifact 原則

@@ -22,10 +22,39 @@ Parameters:
   OpenSearchIndex:
     Type: String
     Default: skillweave-jobs-v1
+  OpenSearchDocumentCount:
+    Type: Number
+    Default: 0
+    MinValue: 0
+  OpenSearchService:
+    Type: String
+    Default: none
+    AllowedValues: [none, aoss, es]
   BedrockQueryModelId:
     Type: String
-    Default: us.anthropic.claude-sonnet-4-6
+    Default: global.anthropic.claude-haiku-4-5-20251001-v1:0
     Description: Bedrock model or inference profile used for online query normalization
+  BedrockEmbeddingModelId:
+    Type: String
+    Default: ""
+    Description: >-
+      Bedrock text-embedding model for the hybrid BM25 + kNN vector leg. Empty
+      keeps retrieval_mode=bm25_only. Set this only after the index has been
+      backfilled with embeddings, otherwise kNN returns nothing and every
+      search pays a Bedrock call for no recall.
+  NeptuneGraphId:
+    Type: String
+    Default: ""
+    Description: Optional blue/green Neptune Analytics graph identifier
+  NeptuneGraphRegion:
+    Type: String
+    Default: us-east-1
+  GraphVersion:
+    Type: String
+    Default: evaluation-cutoff-embedded
+  SkillAliasIndex:
+    Type: String
+    Default: skillweave-skill-alias-v1
 
 Rules:
   OpenSearchParametersTogether:
@@ -45,23 +74,48 @@ Conditions:
   UseFullCorpusOpenSearch: !And
     - !Not [!Equals [!Ref OpenSearchEndpoint, ""]]
     - !Not [!Equals [!Ref OpenSearchCollectionArn, ""]]
+  UseProvisionedOpenSearch: !Equals [!Ref OpenSearchService, es]
+  UseNeptuneGraph: !Not
+    - !Equals [!Ref NeptuneGraphId, ""]
 
 Globals:
   Function:
     Runtime: python3.13
     Architectures: [arm64]
-    MemorySize: 2048
+    MemorySize: 4096
     Timeout: 10
     Tracing: Active
     Environment:
       Variables:
         INDEX_PATH: /var/task/artifacts/demo-index.json
-        LTR_MODEL_PATH: /var/task/artifacts/models/ltr-quality-final.trees.json
+        LTR_MODEL_PATH: /var/task/artifacts/models/ltr-quality-remote-salary-intent.trees.json
         OPENSEARCH_ENDPOINT: !Ref OpenSearchEndpoint
+        OPENSEARCH_SERVICE: !Ref OpenSearchService
         OPENSEARCH_INDEX: !Ref OpenSearchIndex
-        OPENSEARCH_TIMEOUT_SECONDS: "2.0"
+        OPENSEARCH_DOCUMENT_COUNT: !Ref OpenSearchDocumentCount
+        OPENSEARCH_TIMEOUT_SECONDS: "4.0"
         BEDROCK_QUERY_MODEL_ID: !Ref BedrockQueryModelId
-        BEDROCK_QUERY_MAX_TOKENS: "128"
+        BEDROCK_EMBEDDING_MODEL_ID: !Ref BedrockEmbeddingModelId
+        # A batch of ten structured intents needs far more than the 128 tokens
+        # a single-answer budget allowed; the old value truncated every response.
+        BEDROCK_QUERY_MAX_TOKENS: "4000"
+        BEDROCK_QUERY_MAX_BATCH: "10"
+        # A Lambda invocation serves one request, so there is no sibling query
+        # to coalesce with and a long window would be pure added latency. The
+        # multi-request path (app/server.py, ECS Fargate) uses a full window.
+        BEDROCK_QUERY_MAX_WAIT_SECONDS: "0.05"
+        # A single live Bedrock call measures ~2.1s; 2.5s degraded requests that
+        # would have completed.
+        BEDROCK_QUERY_DEADLINE_SECONDS: "6.0"
+        # Precomputed intents for the head of the query distribution, shipped in
+        # the bundle. Present only when the file was built before packaging.
+        QUERY_INTENTS_PATH: /var/task/config/query-intents.json
+        QUERY_VOCAB_PATH: /var/task/config/query-intent-vocab.json
+        NEPTUNE_GRAPH_ID: !Ref NeptuneGraphId
+        NEPTUNE_GRAPH_REGION: !Ref NeptuneGraphRegion
+        GRAPH_VERSION: !Ref GraphVersion
+        SKILL_ALIAS_INDEX: !Ref SkillAliasIndex
+        GRAPH_QUERY_TIMEOUT_MS: "500"
 
 Resources:
   HttpApi:
@@ -102,11 +156,28 @@ Resources:
               Resource: "*"
         - !If
           - UseFullCorpusOpenSearch
+          - !If
+            - UseProvisionedOpenSearch
+            - Statement:
+                - Effect: Allow
+                  Action:
+                    - es:ESHttpGet
+                    - es:ESHttpPost
+                    - es:ESHttpHead
+                  Resource: !Sub ${OpenSearchCollectionArn}/*
+            - Statement:
+                - Effect: Allow
+                  Action:
+                    - aoss:APIAccessAll
+                  Resource: !Ref OpenSearchCollectionArn
+          - !Ref AWS::NoValue
+        - !If
+          - UseNeptuneGraph
           - Statement:
               - Effect: Allow
                 Action:
-                  - aoss:APIAccessAll
-                Resource: !Ref OpenSearchCollectionArn
+                  - neptune-graph:ReadDataViaQuery
+                Resource: !Sub arn:${AWS::Partition}:neptune-graph:${NeptuneGraphRegion}:${AWS::AccountId}:graph/${NeptuneGraphId}
           - !Ref AWS::NoValue
       Events:
         Root:

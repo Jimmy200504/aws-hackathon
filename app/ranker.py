@@ -1,16 +1,18 @@
 from __future__ import annotations
 
 import heapq
+import inspect
 import json
 import logging
 import math
 import re
 import threading
 import unicodedata
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Iterable
 
+from app.job_fields import is_remote_job, parse_salary_intent
 from app.tree_ranker import PortableTreeRanker
 
 # Canonical node-ID prefix for Amazon Bedrock structured extraction output.
@@ -22,6 +24,35 @@ _EN_TOKEN = re.compile(r"[a-z0-9][a-z0-9.+#/-]*")
 _SPACE = re.compile(r"\s+")
 _PUNCT = re.compile(r"[\s,，、/／|｜;；:：()（）\[\]【】{}「」『』·・_]+")
 LOGGER = logging.getLogger(__name__)
+
+# Same remote-work vocabulary used to derive `is_remote` at index time. A
+# query containing one of these terms expresses remote-work intent, mirrored
+# against userSearchLog_20260601_20260607.csv's most frequent `ks` values
+# (遠端, 在家工作, 居家辦公, WFH, ...).
+_REMOTE_QUERY_TERMS = (
+    "遠端",
+    "在家工作",
+    "在家上班",
+    "在家兼職",
+    "居家辦公",
+    "居家工作",
+    "wfh",
+    "work from home",
+    "remote work",
+    "remote job",
+)
+
+
+def wants_remote(normalized_query: str) -> bool:
+    return any(term in normalized_query for term in _REMOTE_QUERY_TERMS)
+
+
+def wants_salary(normalized_query: str) -> dict[str, Any] | None:
+    """Parse an explicit salary condition (type + target number) from the
+    normalized query, e.g. 月薪4萬以上, 時薪200, 年薪百萬. Returns None when
+    the query does not state a salary type + number.
+    """
+    return parse_salary_intent(normalized_query)
 
 
 def normalize(text: str | None) -> str:
@@ -49,6 +80,14 @@ def lexical_units(text: str | None) -> set[str]:
     return parts
 
 
+def signed_match_score(value: float, reward: float, penalty: float) -> float:
+    if value > 0:
+        return reward
+    if value < 0:
+        return penalty
+    return 0.0
+
+
 def _as_codes(value: Any) -> list[str]:
     if value is None:
         return []
@@ -60,6 +99,34 @@ def _as_codes(value: Any) -> list[str]:
             result.extend(_as_codes(item))
         return result
     return [str(value)]
+
+
+def _as_strings(value: Any) -> list[str]:
+    """Read a normalizer-supplied name list defensively.
+
+    The structured intent crosses a process boundary as JSON, so a malformed or
+    partially-parsed payload must degrade to "no inferred names" rather than
+    raise inside ranking.
+    """
+    if not value or isinstance(value, (str, bytes, dict)):
+        return []
+    try:
+        return [str(item).strip() for item in value if str(item).strip()]
+    except TypeError:
+        return []
+
+
+def _as_name(value: Any) -> str:
+    if not value or isinstance(value, (list, tuple, set, dict)):
+        return ""
+    return normalize(str(value))
+
+
+def _as_confidence(value: Any) -> float:
+    try:
+        return min(1.0, max(0.0, float(value)))
+    except (TypeError, ValueError):
+        return 0.0
 
 
 @dataclass(frozen=True)
@@ -75,6 +142,19 @@ class QueryIntent:
     llm_surface: str | None = None
     # Nodes that only the LLM surface could resolve, for attribution reporting.
     llm_only_skills: tuple[str, ...] = ()
+    wants_remote: bool = False
+    salary_intent: dict[str, Any] | None = None
+    # Read from the query text by the normalizer, as opposed to the codes the
+    # caller supplied. Empty when normalization did not run, which keeps every
+    # offline path that builds an intent without a normalizer unchanged.
+    inferred_locations: tuple[str, ...] = ()
+    inferred_duty_categories: tuple[str, ...] = ()
+    inferred_company: str = ""
+    # Carried as a feature rather than used as a cut-off. The override below is
+    # unconditional because a location the user typed outranks a filter code,
+    # but the ranker still sees how sure the normalizer was and can learn to
+    # discount a low-confidence reading instead of obeying a fixed threshold.
+    inferred_confidence: float = 0.0
 
 
 class SkillWeaveRanker:
@@ -133,6 +213,7 @@ class SkillWeaveRanker:
         )
         self.alias_to_skill: dict[str, str] = {}
         self.alias_to_skills: dict[str, list[str]] = {}
+        self.skill_blocked_phrases: dict[str, tuple[str, ...]] = {}
         for skill_id, skill in self.skills.items():
             aliases = set(skill.get("aliases", []))
             aliases.add(skill.get("label", skill_id))
@@ -142,6 +223,13 @@ class SkillWeaveRanker:
                 if key:
                     self.alias_to_skill[key] = skill_id
                     self.alias_to_skills.setdefault(key, []).append(skill_id)
+            blocked_phrases = tuple(
+                normalized
+                for phrase in skill.get("blocked_phrases", [])
+                if (normalized := normalize(phrase))
+            )
+            if blocked_phrases:
+                self.skill_blocked_phrases[skill_id] = blocked_phrases
         alias_alternatives = "|".join(
             (
                 rf"(?<![a-z0-9.+#]){re.escape(alias)}(?![a-z0-9.+#])"
@@ -180,6 +268,7 @@ class SkillWeaveRanker:
         location_code: Any = None,
         duty_code: Any = None,
         normalized_query: str | None = None,
+        structured_intent: Any = None,
     ) -> QueryIntent:
         # The raw query is the only surface allowed to drive literal phrase
         # features and behavior-edge lookups. Those were learned from raw search
@@ -202,6 +291,15 @@ class SkillWeaveRanker:
             for match in self._alias_pattern.finditer(surface):
                 alias = normalize(match.group(0))
                 for skill_id in self.alias_to_skills.get(alias, []):
+                    # The suppression list is read against the raw query, not the
+                    # surface being scanned. Checking it per surface would let an
+                    # LLM rewrite that happens to drop the blocking phrase
+                    # resurrect a match the curated list deliberately removes.
+                    if any(
+                        phrase in normalized_value
+                        for phrase in self.skill_blocked_phrases.get(skill_id, ())
+                    ):
+                        continue
                     resolved.append((len(alias), skill_id))
                     if surface == normalized_value:
                         raw_resolvable.add(skill_id)
@@ -236,6 +334,22 @@ class SkillWeaveRanker:
             llm_only_skills=tuple(
                 skill_id for skill_id in selected if skill_id not in raw_resolvable
             ),
+            wants_remote=wants_remote(normalized_value),
+            salary_intent=wants_salary(normalized_value),
+            inferred_locations=tuple(
+                normalize(name)
+                for name in _as_strings(getattr(structured_intent, "locations", ()))
+            ),
+            inferred_duty_categories=tuple(
+                normalize(name)
+                for name in _as_strings(
+                    getattr(structured_intent, "duty_categories", ())
+                )
+            ),
+            inferred_company=_as_name(getattr(structured_intent, "company", "")),
+            inferred_confidence=_as_confidence(
+                getattr(structured_intent, "confidence", 0.0)
+            ),
         )
 
     def _filter_names(self, codes: Iterable[str], lookup: dict[str, list[str]]) -> set[str]:
@@ -246,7 +360,11 @@ class SkillWeaveRanker:
         return names
 
     def _graph_feature(
-        self, intent: QueryIntent, job: dict[str, Any], include_graph: bool
+        self,
+        intent: QueryIntent,
+        job: dict[str, Any],
+        include_graph: bool,
+        external_relations: dict[str, dict[str, dict[str, Any]]] | None = None,
     ) -> tuple[float, list[dict[str, Any]], list[str], dict[str, float]]:
         component_names = (
             "technical",
@@ -275,6 +393,25 @@ class SkillWeaveRanker:
                 return "llm_extracted"
             return "technical"
 
+        def display_label(skill_id: str, fallback: Any = "") -> str:
+            label = self.skills.get(skill_id, {}).get("label")
+            return str(label or fallback or skill_id)
+
+        def node_kind(skill_id: str) -> str:
+            configured_type = str(self.skills.get(skill_id, {}).get("type", ""))
+            if configured_type.lower() == "occupation" or skill_id.startswith(
+                ("occupation.", "duty.")
+            ):
+                return "Occupation"
+            return "Skill"
+
+        def node_ref(skill_id: str, fallback: Any = "", *, display: bool) -> str:
+            value = display_label(skill_id, fallback) if display else skill_id
+            return f"{node_kind(skill_id)}:{value}"
+
+        def job_relation(skill_id: str) -> str:
+            return "INSTANCE_OF" if node_kind(skill_id) == "Occupation" else "REQUIRES"
+
         job_skills = set(job.get("skills", []))
         direct_score = 0.0
         best_related = 0.0
@@ -293,10 +430,22 @@ class SkillWeaveRanker:
                 direct_matches.append(query_skill)
                 traces.append(
                     {
-                        "path": [f"Query:{intent.raw}", f"Skill:{query_skill}", f"Job:{job['id']}"],
-                        "edges": ["RESOLVES_TO", "REQUIRES"],
+                        "path": [
+                            f"Query:{intent.raw}",
+                            node_ref(query_skill, display=False),
+                            f"Job:{job['id']}",
+                        ],
+                        "display_path": [
+                            f"Query:{intent.raw}",
+                            node_ref(query_skill, display=True),
+                            f"Job:{job['id']}",
+                        ],
+                        "edges": ["RESOLVES_TO", job_relation(query_skill)],
+                        "edge_directions": ["forward", "reverse"],
                         "weight": round(confidence, 3),
-                        "evidence": job.get("skill_evidence", {}).get(query_skill, "structured field"),
+                        "evidence": job.get("skill_evidence", {}).get(
+                            query_skill, "structured field"
+                        ),
                         "provenance": job.get(
                             "skill_provenance", {}
                         ).get(
@@ -308,9 +457,15 @@ class SkillWeaveRanker:
                     }
                 )
                 continue
-            related = self.skills.get(query_skill, {}).get("related", {})
+            related: dict[str, Any] = (
+                external_relations.get(query_skill, {})
+                if external_relations is not None
+                else self.skills.get(query_skill, {}).get("related", {})
+            )
             for candidate_skill in job_skills:
-                weight = float(related.get(candidate_skill, 0.0))
+                relation = related.get(candidate_skill, 0.0)
+                relation_meta = relation if isinstance(relation, dict) else {}
+                weight = float(relation_meta.get("weight", 0.0) if relation_meta else relation)
                 if weight <= 0:
                     continue
                 contribution = 2.6 * weight
@@ -319,18 +474,49 @@ class SkillWeaveRanker:
                 )
                 if contribution > best_related:
                     best_related = contribution
+                    relation_evidence = relation_meta.get("evidence")
+                    if not relation_evidence:
+                        relation_evidence = self.skills.get(query_skill, {}).get(
+                            "relation_evidence", {}
+                        ).get(candidate_skill, "validated ontology relation")
                     best_related_trace = {
                         "path": [
                             f"Query:{intent.raw}",
-                            f"Skill:{query_skill}",
-                            f"Skill:{candidate_skill}",
+                            node_ref(query_skill, display=False),
+                            node_ref(candidate_skill, display=False),
                             f"Job:{job['id']}",
                         ],
-                        "edges": ["RESOLVES_TO", "RELATED_TO", "REQUIRES"],
+                        "display_path": [
+                            f"Query:{intent.raw}",
+                            node_ref(
+                                query_skill,
+                                relation_meta.get("source_label"),
+                                display=True,
+                            ),
+                            node_ref(
+                                candidate_skill,
+                                relation_meta.get("target_label"),
+                                display=True,
+                            ),
+                            f"Job:{job['id']}",
+                        ],
+                        "edges": [
+                            "RESOLVES_TO",
+                            relation_meta.get("relation_type", "RELATED_TO"),
+                            job_relation(candidate_skill),
+                        ],
+                        "edge_directions": ["forward", "undirected", "reverse"],
                         "weight": round(weight, 3),
-                        "evidence": self.skills.get(query_skill, {}).get("relation_evidence", {}).get(
-                            candidate_skill, "validated ontology relation"
+                        "edge_id": relation_meta.get("edge_id"),
+                        "relation_confidence": relation_meta.get("confidence"),
+                        "support_jobs": relation_meta.get("support_jobs"),
+                        "support_companies": relation_meta.get("support_companies"),
+                        "rules_version": relation_meta.get("rules_version"),
+                        "corpus_hash": relation_meta.get("corpus_hash"),
+                        "provenance": relation_meta.get(
+                            "provenance", "reviewed_statistical_relation"
                         ),
+                        "evidence": relation_evidence,
                     }
         if best_related_trace is not None:
             traces.append(best_related_trace)
@@ -370,6 +556,7 @@ class SkillWeaveRanker:
         intent: QueryIntent,
         include_graph: bool,
         behavior_snapshot_day: str | None = None,
+        external_relations: dict[str, dict[str, dict[str, Any]]] | None = None,
     ) -> tuple[float, dict[str, float], list[dict[str, Any]], list[str]]:
         job = self.jobs[index]
         fields = self._job_norm[index]
@@ -381,6 +568,7 @@ class SkillWeaveRanker:
             intent,
             include_graph,
             behavior_snapshot_day,
+            external_relations,
         )
 
     def _score_job(
@@ -391,6 +579,7 @@ class SkillWeaveRanker:
         intent: QueryIntent,
         include_graph: bool,
         behavior_snapshot_day: str | None = None,
+        external_relations: dict[str, dict[str, dict[str, Any]]] | None = None,
     ) -> tuple[float, dict[str, float], list[dict[str, Any]], list[str]]:
         q = intent.normalized
 
@@ -399,7 +588,9 @@ class SkillWeaveRanker:
         category_phrase = 1.0 if q and q in fields["category"] else 0.0
         description_phrase = 1.0 if q and q in fields["description"] else 0.0
         overlap = len(intent.units & job_units) / max(1, len(intent.units))
-        title_overlap = len(intent.units & lexical_units(fields["title"])) / max(1, len(intent.units))
+        title_overlap = len(
+            intent.units & lexical_units(fields["title"])
+        ) / max(1, len(intent.units))
 
         lexical = (
             18.0 * exact_title
@@ -410,22 +601,75 @@ class SkillWeaveRanker:
             + 3.5 * overlap
         )
 
-        wanted_locations = self._filter_names(intent.location_codes, self.locations)
+        # A location the user typed into the query outranks a filter code: the
+        # code is often a leftover from a previous search or a default the user
+        # never chose, while the text is a deliberate statement of intent. The
+        # inferred names are already city names, so they bypass the code->name
+        # lookup that `location_codes` needs.
+        wanted_locations = set(intent.inferred_locations) or self._filter_names(
+            intent.location_codes, self.locations
+        )
         location_match = 0.0
         if wanted_locations:
-            location_match = 1.0 if any(name in fields["city"] for name in wanted_locations) else -1.0
+            location_match = (
+                1.0
+                if any(name in fields["city"] for name in wanted_locations)
+                else -1.0
+            )
 
         wanted_duties = self._filter_names(intent.duty_codes, self.duties)
         duty_match = 0.0
         if wanted_duties:
             duty_match = (
                 1.0
-                if any(name and (name in fields["category"] or name in fields["title"]) for name in wanted_duties)
+                if any(
+                    name
+                    and (
+                        name in fields["category"]
+                        or name in fields["title"]
+                    )
+                    for name in wanted_duties
+                )
                 else -0.7
             )
 
+        # Remote-work is one of the most frequent explicit conditions in
+        # search logs (遠端/在家工作/WFH) but is never present as a
+        # structured field on the job posting itself, so it has to be
+        # matched as an explicit query condition rather than folded into
+        # generic lexical overlap.
+        remote_match = 0.0
+        if intent.wants_remote:
+            remote_match = 1.0 if job.get("is_remote", False) else -1.0
+
+        # Salary conditions (時薪200, 月薪4萬以上, 年薪百萬, ...) must be
+        # compared against the job's structured salary_min/salary_max range,
+        # not against whether the exact number happens to appear in the
+        # title. A query target that falls anywhere in [salary_min,
+        # salary_max] (or at/above salary_min when salary_max is unset,
+        # e.g. "面議" floors) counts as a match; a job whose salary_type
+        # does not match the query's salary_type (e.g. hourly vs monthly)
+        # is not comparable and is neither rewarded nor penalized.
+        salary_match = 0.0
+        if intent.salary_intent is not None:
+            job_salary_type = job.get("salary_type", "unknown")
+            if job_salary_type == intent.salary_intent["salary_type"]:
+                job_min = float(job.get("salary_min", 0.0) or 0.0)
+                job_max = float(job.get("salary_max", 0.0) or 0.0)
+                target = intent.salary_intent["target"]
+                if job_min > 0 or job_max > 0:
+                    upper_bound = job_max if job_max > 0 else job_min
+                    if intent.salary_intent["comparator"] == "exact":
+                        covers = job_min <= target <= upper_bound
+                    else:
+                        # "at_least": job seekers want *this number or more*.
+                        # The job's own range must reach at or above the
+                        # target somewhere in [job_min, upper_bound].
+                        covers = upper_bound >= target
+                    salary_match = 1.0 if covers else -1.0
+
         graph_raw, traces, direct_matches, graph_components = self._graph_feature(
-            intent, job, include_graph
+            intent, job, include_graph, external_relations
         )
         behavior_source = self.behavior_graph
         if behavior_snapshot_day:
@@ -526,8 +770,33 @@ class SkillWeaveRanker:
             "description_phrase": description_phrase,
             "query_unit_overlap": round(overlap, 4),
             "title_unit_overlap": round(title_overlap, 4),
-            "location": round(2.8 if location_match > 0 else -16.0 if location_match < 0 else 0.0, 4),
-            "duty": round(2.4 if duty_match > 0 else -10.0 if duty_match < 0 else 0.0, 4),
+            "location": signed_match_score(location_match, 2.8, -16.0),
+            "duty": signed_match_score(duty_match, 2.4, -10.0),
+            "remote": signed_match_score(remote_match, 2.4, -1.4),
+            "salary": signed_match_score(salary_match, 2.4, -1.4),
+            # Normalizer-derived evidence, exposed as plain 0/1 signals with no
+            # hand-set magnitude. Until a model is trained on them these carry
+            # no weight, which is deliberate: the retrieval-side boosts already
+            # in production must not be double-counted by a guessed constant.
+            "intent_duty_match": float(
+                bool(intent.inferred_duty_categories)
+                and any(
+                    name in fields["category"] or name in fields["title"]
+                    for name in intent.inferred_duty_categories
+                )
+            ),
+            "intent_company_match": float(
+                bool(intent.inferred_company)
+                and (
+                    intent.inferred_company in fields["title"]
+                    or intent.inferred_company in fields["description"]
+                )
+            ),
+            "intent_location_inferred": float(bool(intent.inferred_locations)),
+            "intent_confidence": round(intent.inferred_confidence, 4),
+            "is_remote": float(job.get("is_remote", False)),
+            "salary_min": float(job.get("salary_min", 0.0) or 0.0),
+            "salary_max": float(job.get("salary_max", 0.0) or 0.0),
             "behavior": round(behavior, 4),
             "freshness": round(0.7 * freshness, 4),
             "post_cutoff_jd": float(
@@ -660,7 +929,7 @@ class SkillWeaveRanker:
         }
         score = sum(
             features[name]
-            for name in ["lexical", "graph", "location", "duty", "behavior", "freshness"]
+            for name in ["lexical", "graph", "location", "duty", "remote", "salary", "behavior", "freshness"]
         )
         return score, features, traces, direct_matches
 
@@ -739,32 +1008,122 @@ class SkillWeaveRanker:
         include_graph: bool = True,
         candidate_ids: set[str] | None = None,
         normalized_query: str | None = None,
+        resolved_skill_ids: Iterable[str] | None = None,
+        external_relations: dict[str, dict[str, dict[str, Any]]] | None = None,
+        structured_intent: Any = None,
     ) -> dict[str, Any]:
         intent = self.parse_intent(
             query,
             location_code,
             duty_code,
             normalized_query=normalized_query,
+            structured_intent=structured_intent,
         )
+        if resolved_skill_ids is not None:
+            combined = tuple(dict.fromkeys((*resolved_skill_ids, *intent.skills)))[:16]
+            # `replace` rather than a positional rebuild: the latter silently
+            # dropped any field added to QueryIntent after it was written.
+            intent = replace(intent, skills=combined)
         if not intent.normalized:
             return {
                 "intent": intent,
                 "results": [],
                 "candidate_source": "none",
                 "degraded_components": [],
+                "retrieval_mode": "none",
             }
         limit = max(1, min(int(top_k), 100))
+        (
+            stage_one,
+            candidate_source,
+            degraded_components,
+            retrieval_mode,
+        ) = self._collect_stage_one(
+            intent,
+            structured_intent=structured_intent,
+            limit=limit,
+            include_graph=include_graph,
+            candidate_ids=candidate_ids,
+            external_relations=external_relations,
+        )
+        # Attribute and brand queries (現領, 萊爾富) name nothing that occurs in
+        # job text, so the first pass comes back thin. Retry with the taxonomy
+        # expansion only in that case: a query that already retrieves well must
+        # not have five duty labels diluting its title-phrase evidence.
+        expansion = getattr(structured_intent, "recall_expansion", "") or ""
+        if expansion and len(stage_one) < limit:
+            rescue_intent = self.parse_intent(
+                query,
+                location_code,
+                duty_code,
+                normalized_query=expansion,
+                structured_intent=structured_intent,
+            )
+            rescue, rescue_source, rescue_degraded, rescue_mode = (
+                self._collect_stage_one(
+                    rescue_intent,
+                    structured_intent=structured_intent,
+                    limit=limit,
+                    include_graph=include_graph,
+                    candidate_ids=candidate_ids,
+                    external_relations=external_relations,
+                )
+            )
+            seen = {item[1] for item in stage_one}
+            stage_one = stage_one + [item for item in rescue if item[1] not in seen]
+            candidate_source = f"{rescue_source}+taxonomy_expansion"
+            degraded_components = list(
+                dict.fromkeys(degraded_components + rescue_degraded)
+            )
+            # The rescue pass is the one that produced the surviving tail, so a
+            # degraded vector leg there must not be reported as full hybrid.
+            if rescue_mode != retrieval_mode:
+                retrieval_mode = "bm25_only"
+        ranked = self._rerank(stage_one, limit=limit, include_graph=include_graph)
+        return self._assemble(
+            intent, ranked, candidate_source, degraded_components, retrieval_mode
+        )
+
+    def _collect_stage_one(
+        self,
+        intent: QueryIntent,
+        *,
+        structured_intent: Any,
+        limit: int,
+        include_graph: bool,
+        candidate_ids: set[str] | None,
+        external_relations: dict[str, dict[str, dict[str, Any]]] | None,
+    ) -> tuple[list[Any], str, list[str], str]:
         degraded_components: list[str] = []
+        retrieval_mode = "embedded_index"
         external_candidates: list[dict[str, Any]] | None = None
         if self.candidate_retriever is not None and candidate_ids is None:
             try:
-                external_candidates = self.candidate_retriever.retrieve(
+                retrieve = self.candidate_retriever.retrieve
+                parameters = inspect.signature(retrieve).parameters
+                supports_kwargs = any(
+                    parameter.kind is inspect.Parameter.VAR_KEYWORD
+                    for parameter in parameters.values()
+                )
+                optional_retrieval_kwargs = {
+                    "wants_remote": intent.wants_remote,
+                    "salary_intent": intent.salary_intent,
+                    "intent": structured_intent,
+                }
+                if not supports_kwargs:
+                    optional_retrieval_kwargs = {
+                        name: value
+                        for name, value in optional_retrieval_kwargs.items()
+                        if name in parameters
+                    }
+                external_candidates = retrieve(
                     intent.normalized,
                     limit=max(200, limit),
                     location_names=self._filter_names(
                         intent.location_codes, self.locations
                     ),
                     duty_names=self._filter_names(intent.duty_codes, self.duties),
+                    **optional_retrieval_kwargs,
                 )
             except Exception as exc:
                 # Keep the API contract alive if full-corpus retrieval is
@@ -775,6 +1134,19 @@ class SkillWeaveRanker:
                     type(exc).__name__,
                 )
                 degraded_components.append("opensearch")
+            else:
+                telemetry = getattr(
+                    self.candidate_retriever, "last_retrieval_telemetry", None
+                )
+                if callable(telemetry):
+                    observed = telemetry()
+                    retrieval_mode = str(observed.get("mode") or "bm25_only")
+                    if observed.get("knn_degraded"):
+                        # A configured vector leg that failed is a partial
+                        # outage and must be visible, not silently absorbed.
+                        degraded_components.append("opensearch_knn")
+                else:
+                    retrieval_mode = "bm25_only"
 
         if external_candidates is not None:
             stage_one = []
@@ -786,11 +1158,12 @@ class SkillWeaveRanker:
                 seen_ids.add(job_id)
                 fields, job_units = self._normalized_job_fields(job)
                 score, features, traces, direct = self._score_job(
-                    job, fields, job_units, intent, include_graph
+                    job, fields, job_units, intent, include_graph,
+                    external_relations=external_relations,
                 )
                 has_direct_candidate_evidence = bool(
                     set(intent.skills) & set(job.get("skills", []))
-                )
+                ) or features["salary"] > 0
                 if features["lexical"] <= 0 and not has_direct_candidate_evidence:
                     continue
                 if score <= 0:
@@ -822,13 +1195,17 @@ class SkillWeaveRanker:
                     if candidate_ids is not None and job["id"] not in candidate_ids:
                         continue
                     score, features, traces, direct = self._score(
-                        index, intent, include_graph
+                        index, intent, include_graph,
+                        external_relations=external_relations,
                     )
                     # A graph neighbor is a feature, not sufficient candidate evidence.
-                    # Require lexical overlap or an exact canonical skill match.
+                    # Require lexical overlap, an exact canonical skill match, or a
+                    # structured salary-range match (e.g. 時薪210 covered by a job's
+                    # salary_min/salary_max even when the title never literally says
+                    # "210").
                     has_direct_candidate_evidence = bool(
                         set(intent.skills) & set(job.get("skills", []))
-                    )
+                    ) or features["salary"] > 0
                     if (
                         features["lexical"] <= 0
                         and not has_direct_candidate_evidence
@@ -842,9 +1219,16 @@ class SkillWeaveRanker:
                     elif item[:2] > heap[0][:2]:
                         heapq.heapreplace(heap, item)
             stage_one = sorted(heap, key=lambda item: (-item[0], item[1]))
-        ranked = self._rerank(
-            stage_one, limit=limit, include_graph=include_graph
-        )
+        return stage_one, candidate_source, degraded_components, retrieval_mode
+
+    def _assemble(
+        self,
+        intent: QueryIntent,
+        ranked: list[Any],
+        candidate_source: str,
+        degraded_components: list[str],
+        retrieval_mode: str = "embedded_index",
+    ) -> dict[str, Any]:
         results: list[dict[str, Any]] = []
         for rank, (score, _, job, features, traces, direct) in enumerate(ranked, 1):
             matched_labels = [
@@ -860,6 +1244,10 @@ class SkillWeaveRanker:
                     "title": job.get("title", ""),
                     "city": job.get("city", ""),
                     "salary": job.get("salary", ""),
+                    "salary_min": job.get("salary_min", 0.0),
+                    "salary_max": job.get("salary_max", 0.0),
+                    "salary_type": job.get("salary_type", "unknown"),
+                    "is_remote": bool(job.get("is_remote", False)),
                     "category": (job.get("categories") or [""])[-1],
                     "industry": job.get("industry", ""),
                     "matched_skills": matched_labels,
@@ -874,6 +1262,7 @@ class SkillWeaveRanker:
             "results": results,
             "candidate_source": candidate_source,
             "degraded_components": degraded_components,
+            "retrieval_mode": retrieval_mode,
         }
 
     @staticmethod
@@ -893,6 +1282,10 @@ class SkillWeaveRanker:
             evidence.append("地區條件吻合")
         if features["duty"] > 0:
             evidence.append("職務分類吻合")
+        if features["remote"] > 0:
+            evidence.append("遠端／在家工作條件吻合")
+        if features["salary"] > 0:
+            evidence.append("薪資範圍符合查詢條件")
         if features["behavior"] > 1:
             evidence.append("訓練期正向互動訊號")
         if not job.get("graph_eligible", False):

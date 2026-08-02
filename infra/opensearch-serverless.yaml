@@ -26,6 +26,25 @@ Parameters:
     Description: ARN of the IAM principal that runs index_full_opensearch.py
 
 Resources:
+  IngestionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Ref IngestionPrincipalArn
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: OpenSearchServerlessIngestion
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: aoss:APIAccessAll
+                Resource: !Sub arn:${AWS::Partition}:aoss:${AWS::Region}:${AWS::AccountId}:collection/*
+
   CollectionGroup:
     Type: AWS::OpenSearchServerless::CollectionGroup
     Properties:
@@ -78,7 +97,7 @@ Resources:
               {"ResourceType":"collection","Resource":["collection/${CollectionName}"],"Permission":["aoss:DescribeCollectionItems"]},
               {"ResourceType":"index","Resource":["index/${CollectionName}/*"],"Permission":["aoss:CreateIndex","aoss:DescribeIndex","aoss:WriteDocument","aoss:UpdateIndex","aoss:ReadDocument"]}
             ],
-            "Principal":["${IngestionPrincipalArn}"]
+            "Principal":["${IngestionRole.Arn}"]
           }
         ]
 
@@ -108,3 +127,6 @@ Outputs:
   CollectionGroupId:
     Description: NextGen collection group configured for scale-to-zero
     Value: !Ref CollectionGroup
+  IngestionRoleArn:
+    Description: Deploy-time role assumed by the full-corpus indexer
+    Value: !GetAtt IngestionRole.Arn

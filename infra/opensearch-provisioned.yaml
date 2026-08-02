@@ -1,0 +1,119 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: SkillWeave provisioned OpenSearch domain and private snapshot repository
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: skillweave-jobs
+    AllowedPattern: "[a-z][a-z0-9-]{2,27}"
+  EngineVersion:
+    Type: String
+    Default: OpenSearch_3.3
+  InstanceType:
+    Type: String
+    Default: m6g.large.search
+  VolumeSize:
+    Type: Number
+    Default: 20
+    MinValue: 10
+  RuntimePrincipalArn:
+    Type: String
+    Description: Lambda execution role allowed to query the domain
+  DeploymentPrincipalArn:
+    Type: String
+    Description: IAM role allowed to register and restore the snapshot
+
+Resources:
+  SnapshotBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: AbortIncompleteMultipartUploads
+            Status: Enabled
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 1
+
+  SnapshotRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: es.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ReadSkillWeaveSnapshots
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:GetBucketLocation
+                Resource: !GetAtt SnapshotBucket.Arn
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                Resource: !Sub ${SnapshotBucket.Arn}/*
+
+  Domain:
+    Type: AWS::OpenSearchService::Domain
+    Properties:
+      DomainName: !Ref DomainName
+      EngineVersion: !Ref EngineVersion
+      ClusterConfig:
+        InstanceCount: 1
+        InstanceType: !Ref InstanceType
+        DedicatedMasterEnabled: false
+        ZoneAwarenessEnabled: false
+      EBSOptions:
+        EBSEnabled: true
+        VolumeType: gp3
+        VolumeSize: !Ref VolumeSize
+      EncryptionAtRestOptions:
+        Enabled: true
+      NodeToNodeEncryptionOptions:
+        Enabled: true
+      DomainEndpointOptions:
+        EnforceHTTPS: true
+        TLSSecurityPolicy: Policy-Min-TLS-1-2-2019-07
+      SoftwareUpdateOptions:
+        AutoSoftwareUpdateEnabled: true
+      AccessPolicies:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Ref RuntimePrincipalArn
+                - !Ref DeploymentPrincipalArn
+            Action: es:ESHttp*
+            Resource: !Sub arn:${AWS::Partition}:es:${AWS::Region}:${AWS::AccountId}:domain/${DomainName}/*
+
+Outputs:
+  DomainEndpoint:
+    Description: HTTPS endpoint used by the judge Lambda
+    Value: !Sub https://${Domain.DomainEndpoint}
+  DomainArn:
+    Description: Domain ARN used by the Lambda IAM policy
+    Value: !GetAtt Domain.Arn
+  SnapshotBucketName:
+    Value: !Ref SnapshotBucket
+  SnapshotRoleArn:
+    Value: !GetAtt SnapshotRole.Arn

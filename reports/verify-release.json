@@ -1,11 +1,11 @@
 {
   "verifier_version": "1",
-  "verified_at_utc": "2026-07-29T13:52:36Z",
+  "verified_at_utc": "2026-08-02T03:57:36Z",
   "release": "skillweave-2026.07.28-rc6",
   "passed": true,
   "summary": {
-    "total": 89,
-    "passed": 89,
+    "total": 94,
+    "passed": 94,
     "failed": 0,
     "warnings": 0
   },
@@ -235,13 +235,13 @@
         }
       ]
     },
-    "G16_bedrock_pilot": {
+    "G16_historical_bedrock_pilot": {
       "passed": true,
       "checks": [
         {
           "id": "G16.1",
           "status": "PASS",
-          "message": "Real Bedrock pilot schema and bounded status are registered."
+          "message": "Historical Bedrock pilot schema and bounded status are registered."
         },
         {
           "id": "G16.2",
@@ -251,7 +251,7 @@
         {
           "id": "G16.3",
           "status": "PASS",
-          "message": "Bedrock produced substantial validated mentions and quarantined relations."
+          "message": "Historical pilot records substantial validated mentions and quarantined relations."
         },
         {
           "id": "G16.4",
@@ -262,6 +262,36 @@
           "id": "G16.5",
           "status": "PASS",
           "message": "Public Bedrock evidence is aggregate-only."
+        }
+      ]
+    },
+    "G17_deterministic_graph_build": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "G17.1",
+          "status": "PASS",
+          "message": "Full-corpus and cutoff inventory counts match the release baseline."
+        },
+        {
+          "id": "G17.2",
+          "status": "PASS",
+          "message": "Offline graph extraction declares zero model and embedding requests."
+        },
+        {
+          "id": "G17.3",
+          "status": "PASS",
+          "message": "Graph workflow has four deterministic stages and no Bedrock worker permission."
+        },
+        {
+          "id": "G17.4",
+          "status": "PASS",
+          "message": "Release manifest defaults to cutoff and records a gated graph rollout state."
+        },
+        {
+          "id": "G17.5",
+          "status": "PASS",
+          "message": "Real-data dual-scope canary has provenance, integrity, and candidate isolation."
         }
       ]
     },
@@ -426,7 +456,7 @@
         {
           "id": "G12.4",
           "status": "PASS",
-          "message": "Local demo video hash matches the report."
+          "message": "Absent rebuildable video is covered by its source and report hash."
         },
         {
           "id": "G12.5",
@@ -506,7 +536,7 @@
         {
           "id": "G7.3",
           "status": "PASS",
-          "message": "Verified 25 artifact hashes."
+          "message": "Verified 43 artifact hashes; skipped absent rebuildable dist/skillweave-demo-5min.mp4."
         },
         {
           "id": "G7.4",

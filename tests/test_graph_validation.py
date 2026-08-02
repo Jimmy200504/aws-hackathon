@@ -60,6 +60,28 @@ class GraphValidationTests(unittest.TestCase):
         self.assertFalse(result.valid)
         self.assertEqual(result.rejected[0]["code"], "future_source")
 
+    def test_negated_skill_cannot_be_published_as_required(self) -> None:
+        result = validate_extraction(
+            {"職務內容": "本職缺不需要 Python 經驗"},
+            "2026-06-01 00:00:00", "2026-06-05 23:59:59",
+            {"mentions": [{
+                "surface": "Python", "canonical_skill": "Python", "type": "language",
+                "level": "required", "evidence": "Python", "evidence_field": "職務內容",
+                "confidence": 0.99,
+            }]},
+        )
+        self.assertFalse(result.valid)
+        self.assertIn("negated evidence", result.rejected[0]["message"])
+
+    def test_explicit_empty_abstention_is_accepted(self) -> None:
+        result = validate_extraction(
+            {"職務內容": "一般行政工作"},
+            "2026-06-01 00:00:00", "2026-06-05 23:59:59",
+            {"mentions": []}, allow_empty=True,
+        )
+        self.assertTrue(result.valid)
+        self.assertEqual(result.accepted_mentions, [])
+
 
 if __name__ == "__main__":
     unittest.main()

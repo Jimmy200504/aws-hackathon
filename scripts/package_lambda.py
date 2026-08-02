@@ -14,17 +14,46 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Create deterministic Lambda source bundle")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
+    # Without the vocabulary and prompt the query normalizer silently falls back
+    # to the legacy string contract: no closed vocabulary, no validation, no
+    # structure. The intent files are optional -- a Lambda invocation serves one
+    # request, so neither batching nor pre-warming applies there, and shipping
+    # the precomputed head of the query distribution is what makes structured
+    # intents reachable; absent, every query just takes the live path.
+    required_config = [
+        ROOT / "config" / "query-intent-vocab.json",
+        ROOT / "config" / "query-intent-prompt.txt",
+    ]
+    optional_config = [
+        ROOT / "config" / "query-intents.json",
+        ROOT / "config" / "query-intents-release.json",
+    ]
+    required_web = [
+        ROOT / "web" / "index.html",
+        ROOT / "web" / "app.js",
+        ROOT / "web" / "styles.css",
+    ]
     include = [
         *sorted((ROOT / "app").glob("*.py")),
-        *sorted((ROOT / "web").glob("*")),
+        *required_config,
+        *(path for path in optional_config if path.is_file()),
+        *required_web,
+        *(
+            path
+            for path in sorted((ROOT / "web").glob("*"))
+            if path not in required_web
+        ),
         ROOT / "artifacts" / "demo-index.json",
         (
             ROOT
             / "artifacts"
             / "models"
-            / "ltr-quality-final.trees.json"
+            / "ltr-quality-remote-salary-intent.trees.json"
         ),
     ]
+    # Both merge sides listed the config files; a duplicate name makes the
+    # archive larger and makes unzip prompt for overwrite.
+    include = list(dict.fromkeys(include))
     missing = [path for path in include if not path.is_file()]
     if missing:
         raise SystemExit("Missing package inputs: " + ", ".join(map(str, missing)))

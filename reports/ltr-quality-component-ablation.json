@@ -55,8 +55,8 @@
       "min_child_weight": 12.0,
       "learning_rate": 0.05,
       "train_sources": [
-        "artifacts/quality/ltr/train.jsonl",
-        "artifacts/quality/ltr/validation.jsonl"
+        "artifacts/quality/primary/ltr/train.jsonl",
+        "artifacts/quality/primary/ltr/validation.jsonl"
       ],
       "best_iteration": 39,
       "xgboost_version": "3.2.0"
@@ -145,7 +145,7 @@
       },
       "paired_ndcg_vs_retrieval_text": {
         "mean": 0.004033376425683519,
-        "ci95_low": -0.0008794089262488352,
+        "ci95_low": -0.0008794089262488343,
         "ci95_high": 0.008985645247349534
       }
     },
@@ -193,9 +193,9 @@
         "precision@10": 0.012281240405281002
       },
       "paired_ndcg_vs_retrieval_text": {
-        "mean": 0.004464420701760591,
-        "ci95_low": -0.0033874864749822747,
-        "ci95_high": 0.012542297213406549
+        "mean": 0.00446442070176059,
+        "ci95_low": -0.0033874864749822756,
+        "ci95_high": 0.012542297213406547
       }
     },
     "plus_query_job_graph": {
@@ -246,9 +246,9 @@
         "precision@10": 0.014430457476205083
       },
       "paired_ndcg_vs_retrieval_text": {
-        "mean": 0.011520427924097059,
-        "ci95_low": 0.0030333931054292275,
-        "ci95_high": 0.020379726073757518
+        "mean": 0.011520427924097057,
+        "ci95_low": 0.003033393105429226,
+        "ci95_high": 0.020379726073757515
       }
     },
     "plus_global_job_prior": {
@@ -305,9 +305,9 @@
         "precision@10": 0.015965612526865458
       },
       "paired_ndcg_vs_retrieval_text": {
-        "mean": 0.010837144625781378,
-        "ci95_low": 0.0014963906045351288,
-        "ci95_high": 0.02038385111963941
+        "mean": 0.010837144625781376,
+        "ci95_low": 0.001496390604535127,
+        "ci95_high": 0.020383851119639407
       }
     },
     "full_with_company_prior": {
@@ -371,8 +371,8 @@
       },
       "paired_ndcg_vs_retrieval_text": {
         "mean": 0.025699221646155297,
-        "ci95_low": 0.014909498927261473,
-        "ci95_high": 0.03606651131679442
+        "ci95_low": 0.014909498927261471,
+        "ci95_high": 0.03606651131679441
       }
     }
   }

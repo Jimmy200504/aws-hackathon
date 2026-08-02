@@ -1,13 +1,49 @@
 {
   "release": "skillweave-2026.07.28-rc6",
-  "status": "public_aws_demo_deployed_quality_gate_passed",
+  "status": "public_aws_demo_deterministic_graph_serving",
   "random_seed": 1111,
   "dataset_version": "1111-2026-06-01_2026-06-07",
   "schema_fingerprint": "105f60c88cdef8a3",
   "graph_cutoff": "2026-06-05 23:59:59.999",
   "demo_index_version": "demo-2026.06.05-v1",
   "benchmark_index_version": "benchmark-2026.06.05-v1",
-  "graph_schema": "skillgraph-v1",
+  "graph_schema": "skillgraph-deterministic-v1",
+  "graph_build": {
+    "extractor": "deterministic-v1",
+    "model_id": null,
+    "llm_requests": 0,
+    "embedding_requests": 0,
+    "default_scope": "evaluation-cutoff",
+    "workflow": [
+      "DeterministicExtract",
+      "ResolveExactAliases",
+      "BuildStatisticalRelations",
+      "ExportAndValidate"
+    ],
+    "inventory_report": "reports/deterministic-corpus-inventory.json",
+    "canary_report": "reports/deterministic-graph-canary.json",
+    "run_id": "deterministic-v1-rules-v2-full",
+    "graph_id": "g-tew85zms65",
+    "graph_version": "deterministic-v1-rules-v2-evaluation-cutoff",
+    "graph_manifest": "artifacts/skill-graph-full-v2/release/runs/deterministic-v1-rules-v2-full/evaluation-cutoff/manifest.json",
+    "graph_manifest_hash": "94fe982a6e919dd424ed605e09f2ee4c50c6ca17529b7ca6407d14018ba610db",
+    "neptune_import_task": "t-9tlkesfq76",
+    "skill_alias_index": "skillweave-skill-alias-v2-94fe982a",
+    "node_count": 968113,
+    "edge_count": 4167973,
+    "related_to_edges": 216,
+    "managed_runtime_report": "reports/deterministic-graph-managed-runtime.json",
+    "release_gate_report": "reports/deterministic-graph-release-gates.json",
+    "general_release_report": "reports/verify-release.json",
+    "serving_pointer": "s3://skillweave-provisioned-search-snapshotbucket-rigq6j18z9ma/graph-artifacts/serving/production-manifest.json",
+    "neptune_release_status": "serving"
+  },
+  "historical_pilots": {
+    "bedrock": {
+      "report": "reports/bedrock-pilot.json",
+      "production_graph_input": false
+    }
+  },
   "model": {
     "framework": "XGBoost 3.2.0",
     "objective": "rank:ndcg",
@@ -32,10 +68,11 @@
     ],
     "ndcg_at_10_relative_lift": 0.05718023510343073,
     "paired_ci95": [
-      0.014909498927261473,
-      0.03606651131679442
+      0.014909498927261471,
+      0.03606651131679441
     ],
-    "aspirational_five_percent_gate_passed": true
+    "aspirational_five_percent_gate_passed": true,
+    "data_cleaning": "userSearchLog_cleaned.csv (spam/URL/china-region removed)"
   },
   "replication": {
     "queries": 1992,
@@ -43,42 +80,61 @@
       3400,
       4400
     ],
-    "ndcg_at_10_relative_lift": 0.05067678634656092,
+    "ndcg_at_10_relative_lift": 0.05067678606977122,
     "paired_ci95": [
-      0.012182405969284028,
-      0.032721610820001704
+      0.01218242642145476,
+      0.03272155458507608
     ],
     "five_percent_gate_passed": true
   },
   "sha256": {
-    "dist/skillweave-lambda.zip": "8d98fbab29a4c9318449acef48e045ca6ff0aca61d1a843b30f0b45c6e22ee62",
+    "dist/skillweave-lambda.zip": "13ceabd5234f7b637f6afdf358f40dd007d8ec054dc745d0033dadb4d0ad8ec4",
     "dist/skillweave-demo-5min.mp4": "2c7ee08c5851ac8e3673d7f94d7116108846515edaa4ad47188d56cf17f8509a",
     "artifacts/models/ltr-graph-final.ubj": "d90693ac66358b847ba74cfb4dd0b1f3a4895fd28ecb061563d107f89ca1366e",
     "artifacts/models/ltr-graph-final.manifest.json": "f857cb7f05afbbaa7498a4f687a8fccce6d773074f1fd2870544fb1acf053f26",
     "artifacts/models/ltr-quality-final.ubj": "d280a0952e7604934d669eee3aacb1a2f158793f0187e35ef34ce1725656bced",
-    "artifacts/models/ltr-quality-final.manifest.json": "c4ec92c3f94e5affb3769d8cf89de9716aeb491a197f389f4aa2932b13d00c07",
+    "artifacts/models/ltr-quality-final.manifest.json": "047032228c63a473889e36472c0a2b78cc22a21041fb4c1cc06cb158df47a185",
     "artifacts/models/ltr-quality-final.trees.json": "df02f5ddbed46617ce40e0813fd0608c7883136a08cc9249d99da9c332b68d44",
-    "artifacts/demo-index.json": "c8184d4b814b0ba1af9f18de07c460d3636cb75c8fc3f68db326449861de21fa",
+    "artifacts/models/ltr-quality-remote-salary.ubj": "cbb5e26dc63e24c6137a6aac0a23ff0a5ddbcf27ae71b66611997afd62c9792e",
+    "artifacts/models/ltr-quality-remote-salary.manifest.json": "b4a60f5491d2bea243800da15fe5ff6a9c86858c4297a02993807c4c5ee9173a",
+    "artifacts/models/ltr-quality-remote-salary.trees.json": "9d575028fdc29f7f55c13077c8cf34ea75c0338232ae10a044a2bbdf13e9b6e8",
+    "reports/ltr-quality-remote-salary-test.json": "72d053f6fdd4518f41b74a735312ece3018f4c124d7b3852791d7ac74396da6d",
+    "reports/ltr-remote-salary-vs-baseline-test.json": "861d973d2cccfbf5ecdf00ce7972c9bffe20550f09b3f70fc0b837f55ccbb298",
+    "reports/portable-ltr-remote-salary-parity.json": "5d65b779a45df3a5760e194eb3ce69922923d7e520fb79fcf8810af26417f8f1",
+    "artifacts/demo-index.json": "b29b2a5412842bfaf47ffd9b9026c6079e9eb6190f102fd3c68ed9a5573c3158",
     "reports/ltr-ablation-test.json": "76af3080dbb569860ada4e42fa72ab313bda450b6f54bc5a8e51c54d4e211daa",
     "reports/ltr-ablation-holdout-1-failed.json": "a9bd07f7436c27bf3eb1140c788b265005e5cd4c599536b31674ce2135c2c1d9",
-    "reports/ltr-quality-confirmation.json": "93271b00dc6765c2ff01179c089598f1bd142c49be7458dd32288c63d06d13cf",
-    "reports/ltr-quality-replication.json": "3e260f3771b9a9b18de92d3464e00dd6b8013a293a0016805f82895d2d0b1dd2",
+    "reports/ltr-quality-confirmation.json": "11de11f52f0500f9c90e6566e99b2d835d21106f85d19184fcdec05e41d4b021",
+    "reports/ltr-quality-replication.json": "d970ae208886f0801f9d011c501de86a02e29cdd72d51b254a5978aeb3deef43",
     "reports/ltr-quality-company-holdout.json": "6096db8499fb7eee48bf60055cdd5aaba8da4bacb1624be49b4f1cd7363f9d2a",
-    "reports/ltr-quality-component-ablation.json": "1f3f1f38eea18b9a8ccf910ac16ed13997e659a4393fe2d4ca30fb3c9d367fe6",
+    "reports/ltr-quality-component-ablation.json": "3ccaf81810a28505a991205f5439cd5136f39d0b41d70df91b6625d44171d0b0",
     "reports/verify-quality-release.json": "4a7b759ab799ff423feb36943ee8892dd72ca887a4ff7332dba19689e43fb173",
-    "reports/portable-ltr-parity.json": "c49010675316f4419b370f430f0deca477c58ae9dc6688e3ce637a84bff5f981",
+    "reports/portable-ltr-parity.json": "dd29eabdd6d02dd34dceadce1fd4f01fd56a280e903e85cf2dc6ee4645ca56d2",
     "reports/graph-coverage.json": "13246d0dea3240cef6196a3f40fab7c5e28d479420b0a62e183ec0c6d0d8a808",
     "reports/business-impact.json": "2c80c8c7b5a9b6f72c75dda12e9fafab7c4f2d9ddbd57750822b6b3cd4825ae3",
-    "reports/sam-local-smoke.json": "416e17229e9c8e6eb1aaddd8506a2d09fa6450827c559d7de94d405081c7365e",
-    "reports/bedrock-pilot.json": "aba2f738a954ac1f3da494352d175741f0a98477080c0d8bb423be0192082c17",
+    "reports/sam-local-smoke.json": "045f9e05bbc18bd0437548120940091695730429bfeb5d0c91cb4b69e6a51187",
+    "reports/bedrock-pilot.json": "e28b387b3799d81e154e7b74d7d662fc442343b80d3af6668825126b085c50e9",
     "reports/demo-video.json": "4d174b4e3904e5bce5de12f7d48bb8e18efeef310ab1d8cf19504adc2230ad45",
-    "reports/submission-audit.json": "5deff83203be01ce16803ab5aaa38061ff6b3afa24312626090d86f77a90efc3",
+    "reports/submission-audit.json": "fba406fad7374dd73ff2826ebd34b48c8c013663e8b13bafbeab0e0c38918760",
     "reports/load-smoke.json": "d476cafd0e62204c488495bc3f4ecdcd685b7ac10c9a6b6d89e5df1399d5c89c",
-    "docs/submission-packet.md": "257ebdbbeb481c1df176a5c4e9ea97bd71538c25826ea66747f3ee816eda7b1a",
-    "reports/aws-production-smoke.json": "a75eb681a894cf9528cda050d08e56a4abbf5bf5b836ccadfd501d1345a60d7c"
+    "docs/submission-packet.md": "ee85efdeaebd7c54337351a7159cbb9d1792bd80506e250719432591844ebe4b",
+    "reports/deterministic-corpus-inventory.json": "3ce4a219cdb77202f1c7b1e8d0945a5656dc0d448c9b7026c82ef89af1e18bd1",
+    "reports/deterministic-graph-canary.json": "cf507d7eb658f9b6a72a1ed24db35c9a059f5cdbf4185c1e9783b7769e32e3e0",
+    "artifacts/skill-graph-full-v2/release/runs/deterministic-v1-rules-v2-full/evaluation-cutoff/manifest.json": "dada9b72647e2cb8bbdb96cc97399f3fff09ea54d942f3b9c1d8d02147918d62",
+    "config/query-intents-release.json": "9c67366db594b01380f7eba17007ee6388e97157964d0c14ce5db234ee96d77a",
+    "reports/deterministic-graph-managed-runtime.json": "7a6c6089112f5c6c16dd45eda19605f98570465797e3c88e118d4fbeeb8a8794",
+    "reports/deterministic-graph-release-gates.json": "e748ae87306f5a673e84a0265e3d5f58884d4259e968a41d9ed1775af20ef500",
+    "reports/deterministic-graph-runtime-preflight.json": "9186a01caed199a6aa9783036c35b879a14160a67287cf88fad845b6f328e7df",
+    "reports/ltr-quality-deterministic-v2.json": "6b39f718bebaa5e2d48b395a80200df6ca1cdf559e6f838f4ff1fcd85a2f9f58",
+    "reports/skill-alias-index-v2.json": "defd3b33e4acd4cd9a1e3258312dea622236ff4831e78dbc936577ba10389ef2",
+    "reports/aws-production-smoke.json": "f6f9f93608ee96630117adaff460d6dfee214cdaa224d5393dc4a4abd31cea24",
+    "artifacts/models/ltr-quality-remote-salary-intent.trees.json": "7a6bc2125a2da59e80d00a3ec654923f23a2e9da33bf8541bc0130429d7112b9",
+    "artifacts/models/ltr-quality-remote-salary-intent.ubj": "cb07c70bc42b9cd2269bd97cb2b4e4b8b9b54cbd076e4ede7a9eb035d8b611fd",
+    "artifacts/models/ltr-quality-remote-salary-intent.manifest.json": "e8c5befa8b89da66da9c6492b88ed7c568874829e5b0da2da88673b8dfa90402",
+    "reports/ltr-quality-remote-salary-intent-confirmation.json": "edfda3a8a4e0839f9eac13925a18eea3d90ef34dd33242a04d844aaa814f12c0"
   },
   "external_deliverables": {
-    "aws_url": "https://38r6a90fb3.execute-api.us-east-1.amazonaws.com/prod/",
+    "aws_url": "https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/",
     "github_url": "https://github.com/Jimmy200504/aws-hackathon/releases/tag/skillweave-2026.07.28-rc6",
     "demo_video_url": "https://github.com/Jimmy200504/aws-hackathon/releases/download/skillweave-2026.07.28-rc6/skillweave-demo-5min.mp4"
   }

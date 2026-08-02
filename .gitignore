@@ -6,9 +6,20 @@ __pycache__/
 .pytest_cache/
 .coverage
 
+# Local JavaScript dependencies.
+node_modules/
+
 # Organizer-provided data must not be published.
 data/dataset/*.csv
 docs/*.pdf
+# Verbatim job-seeker search strings; rebuild with scripts/build_top_queries.py
+# and scripts/build_query_intents.py.
+config/top-queries.json
+# config/query-intents.json is tracked on purpose: the Lambda bundle ships it
+# as the online lookup, and without it a fresh checkout deploys a 5-entry cache.
+# Per-job view/apply aggregates; rebuild with scripts/build_job_behavior.py.
+artifacts/job-behavior.json
+docs/Supported AWS Services List*.csv
 
 # Organizer-provided competition briefs, rules, and service allowlists.
 hackathon_docs/
@@ -28,12 +39,31 @@ artifacts/llm-exp/
 artifacts/ltr/
 artifacts/quality/
 artifacts/bedrock-pilot/
+artifacts/quality-v2/
+artifacts/skill-graph-canary/
+artifacts/skill-graph-full/
+artifacts/skill-graph-review/
+artifacts/skill-graph-full-v2/extraction/
+artifacts/skill-graph-full-v2/relations/
+artifacts/skill-graph-full-v2/resolved/
+artifacts/skill-graph-full-v2/pipeline-state.json
+artifacts/skill-graph-full-v2/release/runs/*/*/edges/
+artifacts/skill-graph-full-v2/release/runs/*/*/extraction/
+artifacts/skill-graph-full-v2/release/runs/*/*/neptune/
+artifacts/skill-graph-full-v2/release/runs/*/*/nodes/
+artifacts/skill-graph-full-v2/release/runs/*/*/review/
 artifacts/models/*
 !artifacts/models/ltr-graph-final.ubj
 !artifacts/models/ltr-graph-final.manifest.json
 !artifacts/models/ltr-quality-final.ubj
 !artifacts/models/ltr-quality-final.manifest.json
 !artifacts/models/ltr-quality-final.trees.json
+!artifacts/models/ltr-quality-remote-salary.ubj
+!artifacts/models/ltr-quality-remote-salary.manifest.json
+!artifacts/models/ltr-quality-remote-salary-intent.ubj
+!artifacts/models/ltr-quality-remote-salary-intent.manifest.json
+!artifacts/models/ltr-quality-remote-salary-intent.trees.json
+!artifacts/models/ltr-quality-remote-salary.trees.json
 
 # Local model-selection traces are retained for diagnosis, not submitted as
 # authoritative evidence. Locked confirmations are tracked explicitly.
@@ -44,4 +74,15 @@ reports/ltr-tuning-*.json
 .aws-sam/
 cdk.out/
 dist/
+snapshots/
 *.log
+
+# Throwaway resume helper generated during an interrupted index run.
+RESUME-INDEX.sh
+.agents/
+
+# Internal development notes; not part of the judged submission.
+notes/
+
+artifacts/exp-intent/
+artifacts/exp-full/

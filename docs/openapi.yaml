@@ -76,7 +76,14 @@ components:
           items: { type: string }
         graph_trace:
           type: array
-          items: { type: object }
+          items:
+            type: object
+            properties:
+              edge_id: { type: [string, "null"] }
+              relation_confidence: { type: [number, "null"] }
+              support_jobs: { type: [integer, "null"] }
+              support_companies: { type: [integer, "null"] }
+              evidence: {}
     RegionExpansion:
       type: object
       required: [county, from, evidence, explanation]
@@ -135,12 +142,20 @@ components:
     SearchMeta:
       type: object
       additionalProperties: true
+      required: [graph_backend, graph_version, degraded_components]
       properties:
+        graph_backend:
+          type: string
+          enum: [neptune_analytics, embedded_artifact, disabled]
+        graph_version: { type: string }
+        degraded_components:
+          type: array
+          items: { type: string }
         region_trace:
           $ref: "#/components/schemas/RegionTrace"
     SearchResponse:
       type: object
-      required: [request_id, result]
+      required: [request_id, result, meta]
       properties:
         request_id: { type: string }
         result:

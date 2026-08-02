@@ -1,0 +1,65 @@
+{
+  "schema": "skillweave-query-intents-release-v1",
+  "purpose": "online_query_normalization_cold_start_cache",
+  "model_id": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+  "generated_at_utc": "2026-08-01T12:28:00Z",
+  "bedrock_requests": 1,
+  "excluded_from_offline_skill_graph_build": true,
+  "intents": {
+    "AWS Docker Kubernetes": {
+      "intent_type": "skill",
+      "duty_categories": ["雲端架構師", "雲端工程師", "系統工程師", "DevOps工程師", "MIS工程師"],
+      "locations": [],
+      "employment_types": [],
+      "shifts": [],
+      "salary_type": null,
+      "company": null,
+      "keep_terms": ["AWS", "Docker", "Kubernetes"],
+      "confidence": 0.75
+    },
+    "React 前端工程師": {
+      "intent_type": "occupation",
+      "duty_categories": ["前端工程師", "網站程式設計師", "軟體工程師", "全端工程師"],
+      "locations": [],
+      "employment_types": [],
+      "shifts": [],
+      "salary_type": null,
+      "company": null,
+      "keep_terms": ["React"],
+      "confidence": 0.9
+    },
+    "後端工程師 Node.js": {
+      "intent_type": "occupation",
+      "duty_categories": ["後端工程師", "軟體工程師", "全端工程師", "網站程式設計師"],
+      "locations": [],
+      "employment_types": [],
+      "shifts": [],
+      "salary_type": null,
+      "company": null,
+      "keep_terms": ["Node.js"],
+      "confidence": 0.9
+    },
+    "資料工程師 Python": {
+      "intent_type": "occupation",
+      "duty_categories": ["資料科學工程師", "數據分析師／資料分析師", "後端工程師", "軟體工程師"],
+      "locations": [],
+      "employment_types": [],
+      "shifts": [],
+      "salary_type": null,
+      "company": null,
+      "keep_terms": ["Python"],
+      "confidence": 0.85
+    },
+    "Python": {
+      "intent_type": "skill",
+      "duty_categories": ["資料科學工程師", "軟體工程師", "後端工程師", "數據分析師／資料分析師", "AI工程師"],
+      "locations": [],
+      "employment_types": [],
+      "shifts": [],
+      "salary_type": null,
+      "company": null,
+      "keep_terms": ["Python"],
+      "confidence": 0.65
+    }
+  }
+}

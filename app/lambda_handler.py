@@ -11,10 +11,11 @@ from typing import Any
 from urllib.parse import unquote
 
 from app.geo_graph import GeoGraph
+from app.graph_provider import GraphExpansion, GraphFeatureProvider
 from app.query_normalizer import BedrockQueryNormalizer
 from app.ranker import SkillWeaveRanker
 from app.region_graph import RegionGraph
-from app.retrieval import OpenSearchRetriever
+from app.retrieval import OpenSearchRetriever, hybrid_retrieval_meta
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,6 +35,10 @@ RANKER = SkillWeaveRanker(
 QUERY_NORMALIZER = BedrockQueryNormalizer.from_environment()
 REGION_GRAPH = RegionGraph.from_environment()
 GEO_GRAPH = GeoGraph.from_environment()
+GRAPH_PROVIDER = GraphFeatureProvider.from_environment()
+FULL_CORPUS_JOB_COUNT = max(
+    0, int(os.getenv("OPENSEARCH_DOCUMENT_COUNT", "0"))
+)
 
 
 def response(
@@ -95,6 +100,18 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
             400, {"error": {"code": "invalid_request", "message": "use_graph must be boolean"}}
         )
     normalization = QUERY_NORMALIZER.normalize(query)
+    embedded_graph_version = RANKER.metadata.get(
+        "graph_version", RANKER.metadata.get("index_version", "")
+    )
+    graph = GraphExpansion(
+        backend="embedded_artifact",
+        version=str(embedded_graph_version),
+    )
+    if include_graph and GRAPH_PROVIDER is not None:
+        fallback_ids = RANKER.parse_intent(
+            query, location, duty, normalized_query=normalization.query
+        ).skills
+        graph = GRAPH_PROVIDER.expand(normalization.query, fallback_ids)
     ranked = RANKER.search(
         query,
         location_code=location,
@@ -102,6 +119,11 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
         top_k=body.get("top_k", 20),
         include_graph=include_graph,
         normalized_query=normalization.query,
+        resolved_skill_ids=graph.canonical_ids or None,
+        external_relations=(
+            graph.relations if GRAPH_PROVIDER is not None else None
+        ),
+        structured_intent=normalization.intent,
     )
     rows = ranked["results"]
     payload: dict[str, Any] = {
@@ -112,6 +134,8 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
             "count": len(rows),
             "latency_ms": round((time.perf_counter() - started) * 1000, 2),
             "graph_enabled": include_graph,
+            "graph_backend": graph.backend if include_graph else "disabled",
+            "graph_version": graph.version,
             "resolved_skills": list(ranked["intent"].skills),
             "index_version": RANKER.metadata.get("index_version"),
             "ranking_model": (
@@ -120,8 +144,9 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
                 else "heuristic_fallback"
             ),
             "candidate_source": ranked["candidate_source"],
+            "retrieval_mode": ranked.get("retrieval_mode", "embedded_index"),
             "degraded_components": normalization.merge_degraded_components(
-                ranked["degraded_components"]
+                [*ranked["degraded_components"], *graph.degraded_components]
             ),
             "query_normalization": normalization.metadata(),
         },
@@ -183,10 +208,19 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
                     "service": "skillweave-search",
                     "index_version": RANKER.metadata.get("index_version"),
                     "jobs": len(RANKER.jobs),
+                    "full_corpus_jobs": (
+                        FULL_CORPUS_JOB_COUNT
+                        if RANKER.candidate_retriever is not None
+                        and FULL_CORPUS_JOB_COUNT > 0
+                        else None
+                    ),
                     "full_corpus_retrieval": RANKER.candidate_retriever is not None,
                     "bedrock_query_normalization": QUERY_NORMALIZER.enabled,
                     "region_graph": REGION_GRAPH.enabled,
                     "geo_graph": GEO_GRAPH.enabled,
+                    "graph_backend": (
+                        "neptune_analytics" if GRAPH_PROVIDER is not None else "embedded_artifact"
+                    ),
                 },
             )
         if method == "GET" and path == "/api/v1/meta":
@@ -195,11 +229,27 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
                 {
                     "metadata": RANKER.metadata,
                     "job_count": len(RANKER.jobs),
+                    "embedded_job_count": len(RANKER.jobs),
+                    "full_corpus_job_count": (
+                        FULL_CORPUS_JOB_COUNT
+                        if RANKER.candidate_retriever is not None
+                        and FULL_CORPUS_JOB_COUNT > 0
+                        else None
+                    ),
+                    "search_corpus_job_count": (
+                        FULL_CORPUS_JOB_COUNT
+                        if RANKER.candidate_retriever is not None
+                        and FULL_CORPUS_JOB_COUNT > 0
+                        else len(RANKER.jobs)
+                    ),
                     "skill_count": len(RANKER.skills),
                     "search_scope": (
                         "full_corpus_opensearch"
                         if RANKER.candidate_retriever is not None
                         else "embedded_12000"
+                    ),
+                    "hybrid_retrieval": hybrid_retrieval_meta(
+                        RANKER.candidate_retriever
                     ),
                 },
             )

@@ -7,6 +7,7 @@ from unittest.mock import patch
 import app.lambda_handler as lambda_handler
 from app.lambda_handler import handler
 from app.query_normalizer import QueryNormalization
+from app.graph_provider import GraphFeatureProvider
 
 
 def event(
@@ -32,14 +33,34 @@ class LambdaHandlerTests(unittest.TestCase):
         self.assertEqual(result["statusCode"], 200)
         self.assertEqual(json.loads(result["body"])["status"], "ok")
 
+    def test_meta_discloses_full_corpus_and_embedded_counts(self) -> None:
+        with (
+            patch.object(lambda_handler.RANKER, "candidate_retriever", object()),
+            patch.object(lambda_handler, "FULL_CORPUS_JOB_COUNT", 1_218_635),
+        ):
+            result = handler(event("GET", "/api/v1/meta"), None)
+
+        body = json.loads(result["body"])
+        self.assertEqual(body["embedded_job_count"], 12_000)
+        self.assertEqual(body["full_corpus_job_count"], 1_218_635)
+        self.assertEqual(body["search_corpus_job_count"], 1_218_635)
+        self.assertEqual(body["search_scope"], "full_corpus_opensearch")
+
     def test_search_contract(self) -> None:
-        result = handler(
-            event("POST", "/api/v1/jobs/search", {"query": "行政助理", "top_k": 10}),
-            None,
-        )
+        # GRAPH_PROVIDER is built from the environment at import time, so without
+        # this patch the assertion below depends on whether NEPTUNE_GRAPH_ID
+        # happens to be exported -- which it always is when following the AWS
+        # runbook, making the documented deploy command fail its own gate.
+        with patch.object(lambda_handler, "GRAPH_PROVIDER", None):
+            result = handler(
+                event("POST", "/api/v1/jobs/search", {"query": "行政助理", "top_k": 10}),
+                None,
+            )
         body = json.loads(result["body"])
         self.assertEqual(result["statusCode"], 200)
         self.assertEqual([row["rank"] for row in body["result"]], list(range(1, 11)))
+        self.assertEqual(body["meta"]["graph_backend"], "embedded_artifact")
+        self.assertIn("graph_version", body["meta"])
 
     def test_search_uses_bedrock_normalized_query(self) -> None:
         class FakeNormalizer:
@@ -93,6 +114,33 @@ class LambdaHandlerTests(unittest.TestCase):
 
         body = json.loads(result["body"])
         self.assertIn("bedrock_query_normalizer", body["meta"]["degraded_components"])
+
+    def test_neptune_failure_degrades_to_safe_search(self) -> None:
+        class FailingClient:
+            def execute_query(self, **kwargs):
+                raise RuntimeError("injected")
+
+        provider = GraphFeatureProvider(
+            "graph-green",
+            graph_version="deterministic-v2-cutoff",
+            client=FailingClient(),
+        )
+        with patch.object(lambda_handler, "GRAPH_PROVIDER", provider):
+            result = handler(
+                event(
+                    "POST",
+                    "/api/v1/jobs/search",
+                    {"query": "AWS Docker", "top_k": 10, "use_graph": True},
+                ),
+                None,
+            )
+
+        body = json.loads(result["body"])
+        self.assertEqual(result["statusCode"], 200)
+        self.assertEqual(len(body["result"]), 10)
+        self.assertEqual(body["meta"]["graph_backend"], "neptune_analytics")
+        self.assertEqual(body["meta"]["graph_version"], "deterministic-v2-cutoff")
+        self.assertIn("neptune", body["meta"]["degraded_components"])
 
     def test_invalid_query(self) -> None:
         result = handler(event("POST", "/api/v1/jobs/search", {"query": ""}), None)
