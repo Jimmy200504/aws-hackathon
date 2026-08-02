@@ -337,10 +337,16 @@ class GeoArtifactTests(unittest.TestCase):
 
     def test_authored_shortcuts_do_not_change_any_edge_weight(self) -> None:
         # Both authored shortcuts land on pairs the search logs already connect,
-        # so the behaviour-only graph must have exactly the same edges.
-        behaviour_only = build_geo_graph(ARTIFACT, AUTHORED, include_authored=False)
-        self.assertEqual(self.graph.edge_count, behaviour_only.edge_count)
+        # so neither adds an edge and neither moves a weight. The adjacency map
+        # does add edges, which is why this counts shortcuts rather than edges.
         self.assertTrue(self.graph.corroborated)
+        for row in self.graph.corroborated:
+            hop = self.graph._adjacency[row["a"]][row["b"]]
+            self.assertEqual(hop.provenance, "behaviour")
+            self.assertAlmostEqual(hop.weight, row["behaviour_substitutability"])
+        added = self.graph.metadata.get("adjacency_edges_added", 0)
+        behaviour_only = build_geo_graph(ARTIFACT, AUTHORED, include_authored=False)
+        self.assertEqual(self.graph.edge_count, behaviour_only.edge_count + added)
 
     def test_published_sites_resolve_and_rejected_ones_do_not(self) -> None:
         self.assertEqual(
@@ -504,6 +510,101 @@ class L4TableTests(unittest.TestCase):
             self.table["surfaces"]["suffix_dropped"]["大安"],
             {"台中市": "大安區", "台北市": "大安區"},
         )
+
+
+class AdjacencyTests(unittest.TestCase):
+    """The hand-authored land-border map and what behaviour says about it."""
+
+    ADJACENCY = ROOT / "config" / "geo-adjacency.json"
+    VALIDATION = ROOT / "reports" / "geo-adjacency-validation.json"
+
+    def setUp(self) -> None:
+        if not self.ADJACENCY.is_file() or not ARTIFACT.is_file():
+            self.skipTest("adjacency artifacts not present")
+        self.adjacency = json.loads(self.ADJACENCY.read_text(encoding="utf-8"))
+
+    def test_covers_every_district_and_names_them_correctly(self) -> None:
+        graph = json.loads(ARTIFACT.read_text(encoding="utf-8"))
+        nodes = {node["id"] for node in graph["nodes"]}
+        for edge in self.adjacency["edges"]:
+            self.assertIn(edge["a"], nodes)
+            self.assertIn(edge["b"], nodes)
+        self.assertEqual(self.adjacency["unknown_nodes"], [])
+
+    def test_no_district_is_stranded_without_explanation(self) -> None:
+        # A district with no land neighbour must be a recorded island, not an
+        # oversight in the table.
+        self.assertEqual(self.adjacency["districts_with_no_land_neighbour"], [])
+
+    def test_edges_are_undirected_and_unique(self) -> None:
+        seen = {frozenset((e["a"], e["b"])) for e in self.adjacency["edges"]}
+        self.assertEqual(len(seen), len(self.adjacency["edges"]))
+        for edge in self.adjacency["edges"]:
+            self.assertNotEqual(edge["a"], edge["b"])
+
+    def test_impassable_borders_carry_a_named_barrier(self) -> None:
+        for edge in self.adjacency["edges"]:
+            if edge["commute"] in {"hard", "impassable"}:
+                self.assertNotEqual(edge["barrier"], "none", f"{edge['a']}--{edge['b']}")
+
+    def test_authored_adjacency_never_overwrites_a_behaviour_edge(self) -> None:
+        graph = build_geo_graph(ARTIFACT, AUTHORED)
+        behaviour = json.loads(ARTIFACT.read_text(encoding="utf-8"))
+        for edge in behaviour["substitutable_with"]:
+            hop = graph._adjacency[edge["a"]][edge["b"]]
+            self.assertEqual(hop.provenance, "behaviour")
+            self.assertAlmostEqual(hop.weight, edge["jaccard"])
+
+    def test_authored_edges_are_priced_from_measured_medians(self) -> None:
+        graph = build_geo_graph(ARTIFACT, AUTHORED)
+        calibration = graph.metadata["adjacency_calibration"]
+        self.assertTrue(calibration)
+        weights = {
+            edge.weight
+            for targets in graph._adjacency.values()
+            for edge in targets.values()
+            if edge.provenance == "authored"
+        }
+        # Every authored weight is one of the measured medians, never a number
+        # written into the table by hand.
+        self.assertTrue(weights <= set(calibration.values()))
+
+    def test_switching_the_authored_layer_off_returns_pure_behaviour(self) -> None:
+        with_authored = build_geo_graph(ARTIFACT, AUTHORED)
+        behaviour_only = build_geo_graph(ARTIFACT, AUTHORED, include_authored=False)
+        self.assertGreater(with_authored.edge_count, behaviour_only.edge_count)
+        self.assertEqual(
+            behaviour_only.edge_count,
+            len(json.loads(ARTIFACT.read_text(encoding="utf-8"))["substitutable_with"]),
+        )
+
+
+class AdjacencyValidationTests(unittest.TestCase):
+    def setUp(self) -> None:
+        report = ROOT / "reports" / "geo-adjacency-validation.json"
+        if not report.is_file():
+            self.skipTest("geo-adjacency-validation.json not present")
+        self.report = json.loads(report.read_text(encoding="utf-8"))
+
+    def test_commute_grade_orders_behaviour(self) -> None:
+        # The grades were authored before any of this was computed, so this is
+        # a real prediction rather than a description.
+        self.assertTrue(self.report["commute_grade_vs_behaviour"]["monotonic"])
+
+    def test_impassable_borders_have_no_behaviour_edge_at_all(self) -> None:
+        grades = self.report["commute_grade_vs_behaviour"]["by_grade"]
+        self.assertEqual(grades["impassable"]["share_with_behaviour_edge"], 0.0)
+
+    def test_most_authored_adjacency_is_confirmed_by_behaviour(self) -> None:
+        self.assertGreater(self.report["coverage"]["authored_share_confirmed"], 0.85)
+
+    def test_most_behaviour_edges_are_not_adjacent(self) -> None:
+        # The finding that makes an adjacency-only geo graph the wrong model.
+        self.assertGreater(self.report["coverage"]["behaviour_share_not_adjacent"], 0.5)
+
+    def test_the_county_line_effect_is_reported(self) -> None:
+        effect = self.report["county_line_effect"]
+        self.assertGreater(effect["ratio_intra_over_cross"], 1.0)
 
 
 class GeoTraceContractTests(unittest.TestCase):

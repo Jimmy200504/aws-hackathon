@@ -39,6 +39,7 @@ import json
 import logging
 import math
 import os
+import statistics
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -52,6 +53,7 @@ DEFAULT_AUTHORED = ROOT / "config" / "geo-authored.json"
 # config/geo-l5-table.json and is deliberately not read here: entries reach the
 # graph by surviving scripts/validate_l5_table.py, not by being written down.
 DEFAULT_L5 = ROOT / "config" / "geo-l5-published.json"
+DEFAULT_ADJACENCY = ROOT / "config" / "geo-adjacency.json"
 
 # The graph is built as of the first evaluation day, so an edge that only comes
 # into existence later must not be present. Passed to `build_geo_graph`.
@@ -176,6 +178,7 @@ class GeoGraph:
         district_graph_path: Path | None = None,
         authored_path: Path | None = None,
         l5_path: Path | None = None,
+        adjacency_path: Path | None = None,
         *,
         cutoff_date: str = DEFAULT_CUTOFF,
         max_cost: float = DEFAULT_MAX_COST,
@@ -185,6 +188,7 @@ class GeoGraph:
         self.district_graph_path = Path(district_graph_path or DEFAULT_DISTRICT_GRAPH)
         self.authored_path = Path(authored_path or DEFAULT_AUTHORED)
         self.l5_path = Path(l5_path or DEFAULT_L5)
+        self.adjacency_path = Path(adjacency_path or DEFAULT_ADJACENCY)
         self.cutoff_date = cutoff_date
         self.max_cost = float(max_cost)
         self.limit = max(0, int(limit))
@@ -210,10 +214,12 @@ class GeoGraph:
         override = os.getenv("GEO_GRAPH_PATH")
         authored = os.getenv("GEO_AUTHORED_PATH")
         l5 = os.getenv("GEO_L5_PATH")
+        adjacency = os.getenv("GEO_ADJACENCY_PATH")
         return cls(
             Path(override) if override else None,
             Path(authored) if authored else None,
             Path(l5) if l5 else None,
+            Path(adjacency) if adjacency else None,
             cutoff_date=os.getenv("GEO_GRAPH_CUTOFF", DEFAULT_CUTOFF),
             max_cost=float(os.getenv("GEO_GRAPH_MAX_COST", DEFAULT_MAX_COST)),
             limit=int(os.getenv("GEO_GRAPH_LIMIT", DEFAULT_LIMIT)),
@@ -254,6 +260,56 @@ class GeoGraph:
         if self.include_authored:
             self._load_authored()
             self._load_l5()
+            self._load_adjacency()
+
+    def _load_adjacency(self) -> None:
+        """Fill gaps in the behaviour graph with hand-authored land borders.
+
+        Behaviour covers 355 of 368 districts; the rest are rural or offshore
+        and nobody searches them, so the graph simply has nothing to say. A map
+        does, and this supplies it - subject to the same rule the shortcuts
+        follow, that an authored edge never overwrites a measured one.
+
+        The weight is not invented. For each commute grade the median
+        substitutability of adjacency pairs that *do* carry a behaviour edge is
+        computed here, and pairs with no behaviour edge inherit that median. So
+        an authored border is priced at what comparable measured borders turned
+        out to be worth, and grades whose measured median is zero - `hard` and
+        `impassable` - contribute no edge at all.
+        """
+        try:
+            payload = json.loads(self.adjacency_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            LOGGER.warning("Adjacency map unavailable: %s", type(exc).__name__)
+            return
+
+        observed: dict[str, list[float]] = {}
+        missing: list[tuple[str, str, str]] = []
+        for edge in payload.get("edges", []):
+            a, b = edge.get("a"), edge.get("b")
+            if a not in self.districts or b not in self.districts:
+                continue
+            bucket = f"{edge.get('commute')}|{edge.get('scope')}"
+            existing = self._adjacency.get(a, {}).get(b)
+            if existing is not None and existing.provenance == BEHAVIOUR:
+                observed.setdefault(bucket, []).append(existing.weight)
+            elif existing is None:
+                missing.append((a, b, bucket))
+
+        calibration = {
+            bucket: round(statistics.median(values), 5)
+            for bucket, values in observed.items()
+            if values
+        }
+        self.metadata["adjacency_calibration"] = calibration
+        added = 0
+        for a, b, bucket in missing:
+            weight = calibration.get(bucket, 0.0)
+            if weight <= 0.0:
+                continue
+            self._link(a, b, GeoEdge(weight=weight, provenance=AUTHORED, label="相鄰"))
+            added += 1
+        self.metadata["adjacency_edges_added"] = added
 
     def _load_l5(self) -> None:
         """Corpus-validated landmarks, stations, parks and arterial roads."""

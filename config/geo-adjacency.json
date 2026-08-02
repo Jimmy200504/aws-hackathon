@@ -1,0 +1,8096 @@
+{
+  "schema": "skillweave-geo-adjacency-v1",
+  "provenance": "authored",
+  "method": "hand-authored land-border adjacency between the 368 official districts",
+  "honesty": "the least trustworthy artifact in the repo, because it is written from geographic knowledge rather than measured. scripts/validate_geo_adjacency.py scores it against the behaviour graph and app/geo_graph.py loads it as a separately ablatable layer",
+  "commute_scale": {
+    "easy": "an ordinary boundary, crossed without noticing",
+    "moderate": "a specific bridge, tunnel or pass carries the traffic",
+    "hard": "a mountain road or a ferry; not a daily commute for most",
+    "impassable": "the border exists on the map and no usable road crosses it"
+  },
+  "counts": {
+    "districts": 368,
+    "edges": 888,
+    "intra_county": 719,
+    "cross_county": 169,
+    "by_commute": {
+      "easy": 850,
+      "moderate": 8,
+      "hard": 12,
+      "impassable": 18
+    },
+    "by_barrier": {
+      "coast": 1,
+      "mountain": 35,
+      "none": 844,
+      "river": 8
+    },
+    "islands": 11,
+    "districts_with_no_land_neighbour": 0
+  },
+  "unknown_nodes": [],
+  "districts_with_no_land_neighbour": [],
+  "island_links": [
+    {
+      "district": "屏東縣/琉球鄉",
+      "mainland": "屏東縣/東港鎮",
+      "link": "ferry",
+      "commute": "hard"
+    },
+    {
+      "district": "台東縣/綠島鄉",
+      "mainland": "台東縣/台東市",
+      "link": "ferry/air",
+      "commute": "impassable"
+    },
+    {
+      "district": "台東縣/蘭嶼鄉",
+      "mainland": "台東縣/台東市",
+      "link": "ferry/air",
+      "commute": "impassable"
+    },
+    {
+      "district": "澎湖縣/望安鄉",
+      "mainland": "澎湖縣/馬公市",
+      "link": "ferry",
+      "commute": "hard"
+    },
+    {
+      "district": "澎湖縣/七美鄉",
+      "mainland": "澎湖縣/馬公市",
+      "link": "ferry/air",
+      "commute": "hard"
+    },
+    {
+      "district": "金門縣/烈嶼鄉",
+      "mainland": "金門縣/金城鎮",
+      "link": "金門大橋",
+      "commute": "moderate"
+    },
+    {
+      "district": "金門縣/烏坵鄉",
+      "mainland": null,
+      "link": "none",
+      "commute": "impassable"
+    },
+    {
+      "district": "連江縣/南竿鄉",
+      "mainland": null,
+      "link": "ferry/air",
+      "commute": "impassable"
+    },
+    {
+      "district": "連江縣/北竿鄉",
+      "mainland": "連江縣/南竿鄉",
+      "link": "ferry",
+      "commute": "hard"
+    },
+    {
+      "district": "連江縣/莒光鄉",
+      "mainland": "連江縣/南竿鄉",
+      "link": "ferry",
+      "commute": "impassable"
+    },
+    {
+      "district": "連江縣/東引鄉",
+      "mainland": "連江縣/南竿鄉",
+      "link": "ferry",
+      "commute": "impassable"
+    }
+  ],
+  "edges": [
+    {
+      "a": "南投縣/中寮鄉",
+      "b": "南投縣/南投市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/中寮鄉",
+      "b": "南投縣/名間鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/中寮鄉",
+      "b": "南投縣/國姓鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/中寮鄉",
+      "b": "南投縣/水里鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/中寮鄉",
+      "b": "南投縣/草屯鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/中寮鄉",
+      "b": "南投縣/集集鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/仁愛鄉",
+      "b": "南投縣/信義鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/仁愛鄉",
+      "b": "南投縣/埔里鎮",
+      "scope": "intra_county",
+      "barrier": "mountain",
+      "crossing": "台14線",
+      "commute": "moderate",
+      "note": null
+    },
+    {
+      "a": "南投縣/仁愛鄉",
+      "b": "台中市/和平區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "hard",
+      "note": null
+    },
+    {
+      "a": "南投縣/仁愛鄉",
+      "b": "花蓮縣/秀林鄉",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": "中橫公路 台8線",
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "南投縣/仁愛鄉",
+      "b": "花蓮縣/萬榮鄉",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "南投縣/信義鄉",
+      "b": "南投縣/水里鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/信義鄉",
+      "b": "南投縣/魚池鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/信義鄉",
+      "b": "南投縣/鹿谷鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/信義鄉",
+      "b": "嘉義縣/阿里山鄉",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": "新中橫 台21線",
+      "commute": "hard",
+      "note": null
+    },
+    {
+      "a": "南投縣/信義鄉",
+      "b": "花蓮縣/卓溪鄉",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "南投縣/信義鄉",
+      "b": "高雄市/桃源區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "南投縣/南投市",
+      "b": "南投縣/名間鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/南投市",
+      "b": "南投縣/草屯鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/南投市",
+      "b": "彰化縣/芬園鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/名間鄉",
+      "b": "南投縣/竹山鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/名間鄉",
+      "b": "南投縣/集集鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/名間鄉",
+      "b": "彰化縣/二水鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/名間鄉",
+      "b": "彰化縣/社頭鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/名間鄉",
+      "b": "雲林縣/林內鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/國姓鄉",
+      "b": "南投縣/埔里鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/國姓鄉",
+      "b": "南投縣/草屯鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/國姓鄉",
+      "b": "台中市/太平區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/國姓鄉",
+      "b": "台中市/新社區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/國姓鄉",
+      "b": "台中市/東勢區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/埔里鎮",
+      "b": "南投縣/魚池鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/水里鄉",
+      "b": "南投縣/集集鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/水里鄉",
+      "b": "南投縣/魚池鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/水里鄉",
+      "b": "南投縣/鹿谷鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/竹山鎮",
+      "b": "南投縣/集集鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/竹山鎮",
+      "b": "南投縣/鹿谷鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/竹山鎮",
+      "b": "嘉義縣/梅山鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/竹山鎮",
+      "b": "雲林縣/古坑鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/竹山鎮",
+      "b": "雲林縣/林內鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/草屯鎮",
+      "b": "台中市/霧峰區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/草屯鎮",
+      "b": "彰化縣/芬園鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/集集鎮",
+      "b": "南投縣/魚池鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "南投縣/集集鎮",
+      "b": "南投縣/鹿谷鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/中區",
+      "b": "台中市/北區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/中區",
+      "b": "台中市/南區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/中區",
+      "b": "台中市/東區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/中區",
+      "b": "台中市/西區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/北區",
+      "b": "台中市/北屯區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/北區",
+      "b": "台中市/東區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/北區",
+      "b": "台中市/西區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/北區",
+      "b": "台中市/西屯區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/北屯區",
+      "b": "台中市/大雅區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/北屯區",
+      "b": "台中市/太平區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/北屯區",
+      "b": "台中市/新社區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/北屯區",
+      "b": "台中市/東區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/北屯區",
+      "b": "台中市/潭子區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/北屯區",
+      "b": "台中市/西屯區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/南區",
+      "b": "台中市/南屯區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/南區",
+      "b": "台中市/大里區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/南區",
+      "b": "台中市/東區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/南區",
+      "b": "台中市/烏日區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/南區",
+      "b": "台中市/西區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/南屯區",
+      "b": "台中市/大肚區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/南屯區",
+      "b": "台中市/烏日區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/南屯區",
+      "b": "台中市/西區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/南屯區",
+      "b": "台中市/西屯區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/南屯區",
+      "b": "台中市/龍井區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/后里區",
+      "b": "台中市/外埔區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/后里區",
+      "b": "台中市/石岡區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/后里區",
+      "b": "台中市/神岡區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/后里區",
+      "b": "台中市/豐原區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/后里區",
+      "b": "苗栗縣/三義鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/和平區",
+      "b": "台中市/新社區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/和平區",
+      "b": "台中市/東勢區",
+      "scope": "intra_county",
+      "barrier": "mountain",
+      "crossing": "台8線",
+      "commute": "moderate",
+      "note": null
+    },
+    {
+      "a": "台中市/和平區",
+      "b": "宜蘭縣/大同鄉",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": "台7甲線",
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "台中市/和平區",
+      "b": "新竹縣/尖石鄉",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "台中市/和平區",
+      "b": "花蓮縣/秀林鄉",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": "中橫公路 台8線, partly closed since 1999",
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "台中市/和平區",
+      "b": "苗栗縣/泰安鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/外埔區",
+      "b": "台中市/大安區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/外埔區",
+      "b": "台中市/大甲區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/外埔區",
+      "b": "台中市/清水區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/外埔區",
+      "b": "台中市/神岡區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/外埔區",
+      "b": "苗栗縣/三義鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/外埔區",
+      "b": "苗栗縣/苑裡鎮",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大安區",
+      "b": "台中市/大甲區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大安區",
+      "b": "台中市/清水區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大甲區",
+      "b": "台中市/清水區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大甲區",
+      "b": "苗栗縣/苑裡鎮",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大肚區",
+      "b": "台中市/沙鹿區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大肚區",
+      "b": "台中市/烏日區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大肚區",
+      "b": "台中市/龍井區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大肚區",
+      "b": "彰化縣/伸港鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大肚區",
+      "b": "彰化縣/彰化市",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大里區",
+      "b": "台中市/太平區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大里區",
+      "b": "台中市/烏日區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大里區",
+      "b": "台中市/霧峰區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大雅區",
+      "b": "台中市/沙鹿區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大雅區",
+      "b": "台中市/清水區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大雅區",
+      "b": "台中市/潭子區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大雅區",
+      "b": "台中市/神岡區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/大雅區",
+      "b": "台中市/西屯區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/太平區",
+      "b": "台中市/新社區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/太平區",
+      "b": "台中市/東區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/太平區",
+      "b": "台中市/霧峰區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/新社區",
+      "b": "台中市/東勢區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/新社區",
+      "b": "台中市/石岡區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/新社區",
+      "b": "台中市/豐原區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/新社區",
+      "b": "苗栗縣/卓蘭鎮",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/東勢區",
+      "b": "台中市/石岡區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/東勢區",
+      "b": "苗栗縣/卓蘭鎮",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/梧棲區",
+      "b": "台中市/沙鹿區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/梧棲區",
+      "b": "台中市/清水區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/梧棲區",
+      "b": "台中市/龍井區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/沙鹿區",
+      "b": "台中市/清水區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/沙鹿區",
+      "b": "台中市/西屯區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/沙鹿區",
+      "b": "台中市/龍井區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/清水區",
+      "b": "台中市/神岡區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/潭子區",
+      "b": "台中市/神岡區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/潭子區",
+      "b": "台中市/豐原區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/烏日區",
+      "b": "台中市/霧峰區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/烏日區",
+      "b": "彰化縣/彰化市",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/烏日區",
+      "b": "彰化縣/芬園鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/石岡區",
+      "b": "台中市/豐原區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/石岡區",
+      "b": "苗栗縣/卓蘭鎮",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/神岡區",
+      "b": "台中市/豐原區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/西區",
+      "b": "台中市/西屯區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/西屯區",
+      "b": "台中市/龍井區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/霧峰區",
+      "b": "彰化縣/芬園鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台中市/龍井區",
+      "b": "彰化縣/伸港鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/中山區",
+      "b": "台北市/中正區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/中山區",
+      "b": "台北市/內湖區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/中山區",
+      "b": "台北市/士林區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/中山區",
+      "b": "台北市/大同區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/中山區",
+      "b": "台北市/大安區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/中山區",
+      "b": "台北市/松山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/中山區",
+      "b": "新北市/三重區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/中正區",
+      "b": "台北市/大同區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/中正區",
+      "b": "台北市/大安區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/中正區",
+      "b": "台北市/文山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/中正區",
+      "b": "台北市/萬華區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/中正區",
+      "b": "新北市/永和區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/信義區",
+      "b": "台北市/南港區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/信義區",
+      "b": "台北市/大安區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/信義區",
+      "b": "台北市/文山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/信義區",
+      "b": "台北市/松山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/內湖區",
+      "b": "台北市/南港區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/內湖區",
+      "b": "台北市/士林區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/內湖區",
+      "b": "台北市/松山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/內湖區",
+      "b": "新北市/汐止區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/北投區",
+      "b": "台北市/士林區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/北投區",
+      "b": "新北市/三芝區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/北投區",
+      "b": "新北市/淡水區",
+      "scope": "cross_county",
+      "barrier": "river",
+      "crossing": "關渡大橋",
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/北投區",
+      "b": "新北市/萬里區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "hard",
+      "note": null
+    },
+    {
+      "a": "台北市/北投區",
+      "b": "新北市/金山區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "hard",
+      "note": null
+    },
+    {
+      "a": "台北市/南港區",
+      "b": "台北市/文山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/南港區",
+      "b": "台北市/松山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/南港區",
+      "b": "新北市/汐止區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/南港區",
+      "b": "新北市/深坑區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/南港區",
+      "b": "新北市/石碇區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/士林區",
+      "b": "台北市/大同區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/士林區",
+      "b": "新北市/三重區",
+      "scope": "cross_county",
+      "barrier": "river",
+      "crossing": "重陽橋",
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/士林區",
+      "b": "新北市/淡水區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/士林區",
+      "b": "新北市/萬里區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "hard",
+      "note": null
+    },
+    {
+      "a": "台北市/大同區",
+      "b": "台北市/萬華區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/大同區",
+      "b": "新北市/三重區",
+      "scope": "cross_county",
+      "barrier": "river",
+      "crossing": "台北橋、忠孝橋",
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/大安區",
+      "b": "台北市/文山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/大安區",
+      "b": "台北市/松山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/大安區",
+      "b": "新北市/永和區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/文山區",
+      "b": "新北市/中和區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/文山區",
+      "b": "新北市/新店區",
+      "scope": "cross_county",
+      "barrier": "river",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/文山區",
+      "b": "新北市/永和區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/文山區",
+      "b": "新北市/深坑區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/文山區",
+      "b": "新北市/石碇區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/萬華區",
+      "b": "新北市/中和區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台北市/萬華區",
+      "b": "新北市/板橋區",
+      "scope": "cross_county",
+      "barrier": "river",
+      "crossing": "華江橋、萬板大橋",
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/七股區",
+      "b": "台南市/佳里區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/七股區",
+      "b": "台南市/安南區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/七股區",
+      "b": "台南市/將軍區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/七股區",
+      "b": "台南市/西港區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/下營區",
+      "b": "台南市/六甲區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/下營區",
+      "b": "台南市/學甲區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/下營區",
+      "b": "台南市/官田區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/下營區",
+      "b": "台南市/新營區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/下營區",
+      "b": "台南市/柳營區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/下營區",
+      "b": "台南市/鹽水區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/下營區",
+      "b": "台南市/麻豆區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/中西區",
+      "b": "台南市/北區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/中西區",
+      "b": "台南市/南區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/中西區",
+      "b": "台南市/安平區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/中西區",
+      "b": "台南市/東區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/仁德區",
+      "b": "台南市/南區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/仁德區",
+      "b": "台南市/東區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/仁德區",
+      "b": "台南市/歸仁區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/仁德區",
+      "b": "台南市/永康區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/仁德區",
+      "b": "台南市/關廟區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/仁德區",
+      "b": "高雄市/湖內區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/佳里區",
+      "b": "台南市/學甲區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/佳里區",
+      "b": "台南市/將軍區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/佳里區",
+      "b": "台南市/西港區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/佳里區",
+      "b": "台南市/麻豆區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/六甲區",
+      "b": "台南市/官田區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/六甲區",
+      "b": "台南市/東山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/六甲區",
+      "b": "台南市/柳營區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/北區",
+      "b": "台南市/安南區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/北區",
+      "b": "台南市/東區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/北區",
+      "b": "台南市/永康區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/北門區",
+      "b": "台南市/學甲區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/北門區",
+      "b": "台南市/將軍區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/北門區",
+      "b": "台南市/鹽水區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/北門區",
+      "b": "嘉義縣/布袋鎮",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/南化區",
+      "b": "台南市/左鎮區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/南化區",
+      "b": "台南市/楠西區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/南化區",
+      "b": "台南市/玉井區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/南化區",
+      "b": "嘉義縣/大埔鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/南化區",
+      "b": "高雄市/內門區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/南化區",
+      "b": "高雄市/杉林區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/南化區",
+      "b": "高雄市/甲仙區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/南區",
+      "b": "台南市/安平區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/南區",
+      "b": "台南市/東區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/善化區",
+      "b": "台南市/大內區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/善化區",
+      "b": "台南市/安定區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/善化區",
+      "b": "台南市/官田區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/善化區",
+      "b": "台南市/山上區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/善化區",
+      "b": "台南市/新市區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/善化區",
+      "b": "台南市/麻豆區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/大內區",
+      "b": "台南市/官田區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/大內區",
+      "b": "台南市/山上區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/大內區",
+      "b": "台南市/左鎮區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/大內區",
+      "b": "台南市/楠西區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/大內區",
+      "b": "台南市/玉井區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/學甲區",
+      "b": "台南市/將軍區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/學甲區",
+      "b": "台南市/鹽水區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/學甲區",
+      "b": "台南市/麻豆區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/學甲區",
+      "b": "嘉義縣/義竹鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/安南區",
+      "b": "台南市/安定區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/安南區",
+      "b": "台南市/安平區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/安南區",
+      "b": "台南市/永康區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/安南區",
+      "b": "台南市/西港區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/安定區",
+      "b": "台南市/新市區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/安定區",
+      "b": "台南市/永康區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/安定區",
+      "b": "台南市/西港區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/安定區",
+      "b": "台南市/麻豆區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/官田區",
+      "b": "台南市/麻豆區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/山上區",
+      "b": "台南市/左鎮區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/山上區",
+      "b": "台南市/新化區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/山上區",
+      "b": "台南市/新市區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/左鎮區",
+      "b": "台南市/新化區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/左鎮區",
+      "b": "台南市/玉井區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/後壁區",
+      "b": "台南市/新營區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/後壁區",
+      "b": "台南市/東山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/後壁區",
+      "b": "台南市/白河區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/後壁區",
+      "b": "台南市/鹽水區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/後壁區",
+      "b": "嘉義縣/水上鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/新化區",
+      "b": "台南市/新市區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/新化區",
+      "b": "台南市/歸仁區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/新化區",
+      "b": "台南市/永康區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/新化區",
+      "b": "台南市/關廟區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/新化區",
+      "b": "台南市/龍崎區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/新市區",
+      "b": "台南市/永康區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/新營區",
+      "b": "台南市/東山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/新營區",
+      "b": "台南市/柳營區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/新營區",
+      "b": "台南市/鹽水區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/東區",
+      "b": "台南市/永康區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/東山區",
+      "b": "台南市/柳營區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/東山區",
+      "b": "台南市/白河區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/東山區",
+      "b": "嘉義縣/大埔鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/楠西區",
+      "b": "台南市/玉井區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/楠西區",
+      "b": "嘉義縣/大埔鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/歸仁區",
+      "b": "台南市/永康區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/歸仁區",
+      "b": "台南市/關廟區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/歸仁區",
+      "b": "高雄市/湖內區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/歸仁區",
+      "b": "高雄市/阿蓮區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/白河區",
+      "b": "嘉義縣/中埔鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/西港區",
+      "b": "台南市/麻豆區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/關廟區",
+      "b": "台南市/龍崎區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/關廟區",
+      "b": "高雄市/田寮區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/關廟區",
+      "b": "高雄市/阿蓮區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/鹽水區",
+      "b": "嘉義縣/義竹鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/龍崎區",
+      "b": "高雄市/內門區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台南市/龍崎區",
+      "b": "高雄市/田寮區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/卑南鄉",
+      "b": "台東縣/台東市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/卑南鄉",
+      "b": "台東縣/太麻里鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/卑南鄉",
+      "b": "台東縣/延平鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/卑南鄉",
+      "b": "台東縣/東河鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/卑南鄉",
+      "b": "台東縣/金峰鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/卑南鄉",
+      "b": "台東縣/鹿野鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/台東市",
+      "b": "台東縣/太麻里鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/大武鄉",
+      "b": "台東縣/太麻里鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/大武鄉",
+      "b": "台東縣/達仁鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/大武鄉",
+      "b": "台東縣/金峰鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/太麻里鄉",
+      "b": "台東縣/金峰鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/延平鄉",
+      "b": "台東縣/海端鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/延平鄉",
+      "b": "台東縣/鹿野鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/延平鄉",
+      "b": "屏東縣/霧台鄉",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "台東縣/成功鎮",
+      "b": "台東縣/東河鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/成功鎮",
+      "b": "台東縣/長濱鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/東河鄉",
+      "b": "台東縣/關山鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/東河鄉",
+      "b": "台東縣/鹿野鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/池上鄉",
+      "b": "台東縣/海端鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/池上鄉",
+      "b": "台東縣/長濱鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/池上鄉",
+      "b": "台東縣/關山鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/池上鄉",
+      "b": "花蓮縣/富里鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/海端鄉",
+      "b": "台東縣/關山鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/海端鄉",
+      "b": "花蓮縣/卓溪鄉",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "台東縣/海端鄉",
+      "b": "高雄市/桃源區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": "南橫公路 台20線",
+      "commute": "hard",
+      "note": null
+    },
+    {
+      "a": "台東縣/達仁鄉",
+      "b": "台東縣/金峰鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/達仁鄉",
+      "b": "屏東縣/春日鄉",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "台東縣/達仁鄉",
+      "b": "屏東縣/牡丹鄉",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": "南迴改 台9線",
+      "commute": "hard",
+      "note": null
+    },
+    {
+      "a": "台東縣/達仁鄉",
+      "b": "屏東縣/獅子鄉",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": "南迴改 草埔隧道",
+      "commute": "hard",
+      "note": null
+    },
+    {
+      "a": "台東縣/長濱鄉",
+      "b": "花蓮縣/富里鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/長濱鄉",
+      "b": "花蓮縣/豐濱鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "台東縣/關山鎮",
+      "b": "台東縣/鹿野鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義市/東區",
+      "b": "嘉義市/西區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義市/東區",
+      "b": "嘉義縣/中埔鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義市/東區",
+      "b": "嘉義縣/民雄鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義市/東區",
+      "b": "嘉義縣/水上鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義市/東區",
+      "b": "嘉義縣/番路鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義市/東區",
+      "b": "嘉義縣/竹崎鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義市/西區",
+      "b": "嘉義縣/太保市",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義市/西區",
+      "b": "嘉義縣/民雄鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義市/西區",
+      "b": "嘉義縣/水上鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/中埔鄉",
+      "b": "嘉義縣/大埔鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/中埔鄉",
+      "b": "嘉義縣/水上鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/中埔鄉",
+      "b": "嘉義縣/番路鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/中埔鄉",
+      "b": "嘉義縣/竹崎鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/六腳鄉",
+      "b": "嘉義縣/太保市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/六腳鄉",
+      "b": "嘉義縣/新港鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/六腳鄉",
+      "b": "嘉義縣/朴子市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/六腳鄉",
+      "b": "嘉義縣/東石鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/六腳鄉",
+      "b": "嘉義縣/鹿草鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/六腳鄉",
+      "b": "雲林縣/北港鎮",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/六腳鄉",
+      "b": "雲林縣/水林鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/大埔鄉",
+      "b": "嘉義縣/阿里山鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/大林鎮",
+      "b": "嘉義縣/梅山鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/大林鎮",
+      "b": "嘉義縣/民雄鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/大林鎮",
+      "b": "嘉義縣/溪口鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/大林鎮",
+      "b": "嘉義縣/竹崎鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/大林鎮",
+      "b": "雲林縣/古坑鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/大林鎮",
+      "b": "雲林縣/大埤鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/大林鎮",
+      "b": "雲林縣/斗南鎮",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/太保市",
+      "b": "嘉義縣/新港鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/太保市",
+      "b": "嘉義縣/朴子市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/太保市",
+      "b": "嘉義縣/民雄鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/太保市",
+      "b": "嘉義縣/水上鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/太保市",
+      "b": "嘉義縣/鹿草鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/布袋鎮",
+      "b": "嘉義縣/東石鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/布袋鎮",
+      "b": "嘉義縣/義竹鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/新港鄉",
+      "b": "嘉義縣/民雄鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/新港鄉",
+      "b": "嘉義縣/溪口鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/新港鄉",
+      "b": "雲林縣/元長鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/新港鄉",
+      "b": "雲林縣/北港鎮",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/朴子市",
+      "b": "嘉義縣/東石鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/朴子市",
+      "b": "嘉義縣/義竹鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/朴子市",
+      "b": "嘉義縣/鹿草鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/東石鄉",
+      "b": "嘉義縣/義竹鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/東石鄉",
+      "b": "雲林縣/口湖鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/梅山鄉",
+      "b": "嘉義縣/番路鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/梅山鄉",
+      "b": "嘉義縣/竹崎鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/梅山鄉",
+      "b": "嘉義縣/阿里山鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/梅山鄉",
+      "b": "雲林縣/古坑鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/民雄鄉",
+      "b": "嘉義縣/溪口鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/民雄鄉",
+      "b": "嘉義縣/竹崎鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/水上鄉",
+      "b": "嘉義縣/鹿草鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/溪口鄉",
+      "b": "雲林縣/大埤鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/番路鄉",
+      "b": "嘉義縣/竹崎鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/番路鄉",
+      "b": "嘉義縣/阿里山鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/竹崎鄉",
+      "b": "嘉義縣/阿里山鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/義竹鄉",
+      "b": "嘉義縣/鹿草鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/阿里山鄉",
+      "b": "高雄市/桃源區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "嘉義縣/阿里山鄉",
+      "b": "高雄市/那瑪夏區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "基隆市/七堵區",
+      "b": "基隆市/安樂區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/七堵區",
+      "b": "基隆市/暖暖區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/七堵區",
+      "b": "新北市/平溪區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/七堵區",
+      "b": "新北市/汐止區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/七堵區",
+      "b": "新北市/萬里區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/中山區",
+      "b": "基隆市/中正區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/中山區",
+      "b": "基隆市/仁愛區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/中山區",
+      "b": "基隆市/安樂區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/中山區",
+      "b": "新北市/萬里區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/中正區",
+      "b": "基隆市/仁愛區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/中正區",
+      "b": "基隆市/信義區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/中正區",
+      "b": "新北市/瑞芳區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/仁愛區",
+      "b": "基隆市/信義區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/仁愛區",
+      "b": "基隆市/安樂區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/信義區",
+      "b": "基隆市/安樂區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/信義區",
+      "b": "基隆市/暖暖區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/信義區",
+      "b": "新北市/瑞芳區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/安樂區",
+      "b": "新北市/萬里區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/暖暖區",
+      "b": "新北市/平溪區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "基隆市/暖暖區",
+      "b": "新北市/瑞芳區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/三星鄉",
+      "b": "宜蘭縣/五結鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/三星鄉",
+      "b": "宜蘭縣/冬山鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/三星鄉",
+      "b": "宜蘭縣/員山鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/三星鄉",
+      "b": "宜蘭縣/大同鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/三星鄉",
+      "b": "宜蘭縣/羅東鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/五結鄉",
+      "b": "宜蘭縣/冬山鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/五結鄉",
+      "b": "宜蘭縣/壯圍鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/五結鄉",
+      "b": "宜蘭縣/宜蘭市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/五結鄉",
+      "b": "宜蘭縣/羅東鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/五結鄉",
+      "b": "宜蘭縣/蘇澳鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/冬山鄉",
+      "b": "宜蘭縣/羅東鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/冬山鄉",
+      "b": "宜蘭縣/蘇澳鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/南澳鄉",
+      "b": "宜蘭縣/大同鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/南澳鄉",
+      "b": "宜蘭縣/蘇澳鎮",
+      "scope": "intra_county",
+      "barrier": "mountain",
+      "crossing": "蘇花改 台9線",
+      "commute": "moderate",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/南澳鄉",
+      "b": "花蓮縣/秀林鄉",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": "蘇花改 觀音隧道",
+      "commute": "hard",
+      "note": "the 蘇花 corridor is the only land route between 宜蘭 and 花蓮"
+    },
+    {
+      "a": "宜蘭縣/員山鄉",
+      "b": "宜蘭縣/大同鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/員山鄉",
+      "b": "宜蘭縣/宜蘭市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/員山鄉",
+      "b": "宜蘭縣/礁溪鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/員山鄉",
+      "b": "宜蘭縣/頭城鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/壯圍鄉",
+      "b": "宜蘭縣/宜蘭市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/壯圍鄉",
+      "b": "宜蘭縣/礁溪鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/大同鄉",
+      "b": "新北市/烏來區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/大同鄉",
+      "b": "新竹縣/尖石鄉",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/大同鄉",
+      "b": "桃園市/復興區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": "北橫公路 台7線",
+      "commute": "hard",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/大同鄉",
+      "b": "花蓮縣/秀林鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/宜蘭市",
+      "b": "宜蘭縣/礁溪鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/礁溪鄉",
+      "b": "宜蘭縣/頭城鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/礁溪鄉",
+      "b": "新北市/坪林區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": "北宜公路 台9線",
+      "commute": "hard",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/頭城鎮",
+      "b": "新北市/坪林區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": "雪山隧道 (國道5號)",
+      "commute": "moderate",
+      "note": "12.9km under the 雪山山脈; the alternative is the 北宜公路 mountain road"
+    },
+    {
+      "a": "宜蘭縣/頭城鎮",
+      "b": "新北市/貢寮區",
+      "scope": "cross_county",
+      "barrier": "coast",
+      "crossing": "台2線 濱海公路",
+      "commute": "moderate",
+      "note": null
+    },
+    {
+      "a": "宜蘭縣/頭城鎮",
+      "b": "新北市/雙溪區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "hard",
+      "note": null
+    },
+    {
+      "a": "屏東縣/三地門鄉",
+      "b": "屏東縣/瑪家鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/三地門鄉",
+      "b": "屏東縣/長治鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/三地門鄉",
+      "b": "屏東縣/霧台鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/三地門鄉",
+      "b": "屏東縣/高樹鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/三地門鄉",
+      "b": "屏東縣/鹽埔鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/三地門鄉",
+      "b": "高雄市/六龜區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/三地門鄉",
+      "b": "高雄市/茂林區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/九如鄉",
+      "b": "屏東縣/屏東市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/九如鄉",
+      "b": "屏東縣/里港鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/九如鄉",
+      "b": "屏東縣/長治鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/九如鄉",
+      "b": "屏東縣/鹽埔鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/九如鄉",
+      "b": "高雄市/大樹區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/佳冬鄉",
+      "b": "屏東縣/南州鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/佳冬鄉",
+      "b": "屏東縣/新埤鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/佳冬鄉",
+      "b": "屏東縣/枋寮鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/佳冬鄉",
+      "b": "屏東縣/林邊鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/來義鄉",
+      "b": "屏東縣/新埤鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/來義鄉",
+      "b": "屏東縣/春日鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/來義鄉",
+      "b": "屏東縣/泰武鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/來義鄉",
+      "b": "屏東縣/潮州鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/來義鄉",
+      "b": "屏東縣/萬巒鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/內埔鄉",
+      "b": "屏東縣/泰武鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/內埔鄉",
+      "b": "屏東縣/潮州鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/內埔鄉",
+      "b": "屏東縣/瑪家鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/內埔鄉",
+      "b": "屏東縣/竹田鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/內埔鄉",
+      "b": "屏東縣/萬巒鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/內埔鄉",
+      "b": "屏東縣/長治鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/內埔鄉",
+      "b": "屏東縣/鹽埔鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/內埔鄉",
+      "b": "屏東縣/麟洛鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/南州鄉",
+      "b": "屏東縣/崁頂鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/南州鄉",
+      "b": "屏東縣/新埤鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/南州鄉",
+      "b": "屏東縣/林邊鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/南州鄉",
+      "b": "屏東縣/潮州鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/屏東市",
+      "b": "屏東縣/萬丹鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/屏東市",
+      "b": "屏東縣/長治鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/屏東市",
+      "b": "屏東縣/麟洛鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/屏東市",
+      "b": "高雄市/大寮區",
+      "scope": "cross_county",
+      "barrier": "river",
+      "crossing": "高屏大橋",
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/崁頂鄉",
+      "b": "屏東縣/新園鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/崁頂鄉",
+      "b": "屏東縣/東港鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/崁頂鄉",
+      "b": "屏東縣/潮州鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/崁頂鄉",
+      "b": "屏東縣/萬丹鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/恆春鎮",
+      "b": "屏東縣/滿州鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/恆春鎮",
+      "b": "屏東縣/牡丹鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/恆春鎮",
+      "b": "屏東縣/車城鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/新園鄉",
+      "b": "屏東縣/東港鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/新園鄉",
+      "b": "屏東縣/萬丹鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/新園鄉",
+      "b": "高雄市/大寮區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/新園鄉",
+      "b": "高雄市/林園區",
+      "scope": "cross_county",
+      "barrier": "river",
+      "crossing": "雙園大橋, 高屏溪",
+      "commute": "moderate",
+      "note": null
+    },
+    {
+      "a": "屏東縣/新埤鄉",
+      "b": "屏東縣/春日鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/新埤鄉",
+      "b": "屏東縣/潮州鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/春日鄉",
+      "b": "屏東縣/枋寮鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/春日鄉",
+      "b": "屏東縣/枋山鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/春日鄉",
+      "b": "屏東縣/獅子鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/東港鎮",
+      "b": "屏東縣/林邊鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/東港鎮",
+      "b": "高雄市/林園區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/枋寮鄉",
+      "b": "屏東縣/枋山鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/枋山鄉",
+      "b": "屏東縣/獅子鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/枋山鄉",
+      "b": "屏東縣/車城鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/泰武鄉",
+      "b": "屏東縣/瑪家鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/泰武鄉",
+      "b": "屏東縣/萬巒鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/滿州鄉",
+      "b": "屏東縣/牡丹鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/潮州鎮",
+      "b": "屏東縣/竹田鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/潮州鎮",
+      "b": "屏東縣/萬巒鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/牡丹鄉",
+      "b": "屏東縣/獅子鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/牡丹鄉",
+      "b": "屏東縣/車城鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/獅子鄉",
+      "b": "屏東縣/車城鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/瑪家鄉",
+      "b": "屏東縣/霧台鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/竹田鄉",
+      "b": "屏東縣/萬丹鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/竹田鄉",
+      "b": "屏東縣/萬巒鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/竹田鄉",
+      "b": "屏東縣/麟洛鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/萬丹鄉",
+      "b": "屏東縣/麟洛鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/萬丹鄉",
+      "b": "高雄市/大寮區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/里港鄉",
+      "b": "屏東縣/高樹鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/里港鄉",
+      "b": "屏東縣/鹽埔鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/里港鄉",
+      "b": "高雄市/大樹區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/里港鄉",
+      "b": "高雄市/旗山區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/里港鄉",
+      "b": "高雄市/美濃區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/長治鄉",
+      "b": "屏東縣/鹽埔鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/長治鄉",
+      "b": "屏東縣/麟洛鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/霧台鄉",
+      "b": "高雄市/茂林區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/高樹鄉",
+      "b": "屏東縣/鹽埔鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/高樹鄉",
+      "b": "高雄市/六龜區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "屏東縣/高樹鄉",
+      "b": "高雄市/美濃區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/二林鎮",
+      "b": "彰化縣/埤頭鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/二林鎮",
+      "b": "彰化縣/大城鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/二林鎮",
+      "b": "彰化縣/溪湖鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/二林鎮",
+      "b": "彰化縣/福興鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/二林鎮",
+      "b": "彰化縣/竹塘鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/二林鎮",
+      "b": "彰化縣/芳苑鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/二水鄉",
+      "b": "彰化縣/溪州鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/二水鄉",
+      "b": "彰化縣/田中鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/二水鄉",
+      "b": "雲林縣/林內鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/伸港鄉",
+      "b": "彰化縣/和美鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/伸港鄉",
+      "b": "彰化縣/線西鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/北斗鎮",
+      "b": "彰化縣/埤頭鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/北斗鎮",
+      "b": "彰化縣/溪州鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/北斗鎮",
+      "b": "彰化縣/田中鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/北斗鎮",
+      "b": "彰化縣/田尾鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/和美鎮",
+      "b": "彰化縣/彰化市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/和美鎮",
+      "b": "彰化縣/秀水鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/和美鎮",
+      "b": "彰化縣/線西鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/和美鎮",
+      "b": "彰化縣/鹿港鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/員林市",
+      "b": "彰化縣/埔心鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/員林市",
+      "b": "彰化縣/大村鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/員林市",
+      "b": "彰化縣/永靖鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/員林市",
+      "b": "彰化縣/社頭鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/員林市",
+      "b": "彰化縣/花壇鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/埔心鄉",
+      "b": "彰化縣/埔鹽鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/埔心鄉",
+      "b": "彰化縣/大村鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/埔心鄉",
+      "b": "彰化縣/永靖鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/埔心鄉",
+      "b": "彰化縣/溪湖鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/埔鹽鄉",
+      "b": "彰化縣/溪湖鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/埔鹽鄉",
+      "b": "彰化縣/福興鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/埔鹽鄉",
+      "b": "彰化縣/秀水鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/埔鹽鄉",
+      "b": "彰化縣/鹿港鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/埤頭鄉",
+      "b": "彰化縣/溪州鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/埤頭鄉",
+      "b": "彰化縣/溪湖鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/埤頭鄉",
+      "b": "彰化縣/田尾鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/埤頭鄉",
+      "b": "彰化縣/竹塘鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/大城鄉",
+      "b": "彰化縣/竹塘鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/大城鄉",
+      "b": "彰化縣/芳苑鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/大城鄉",
+      "b": "雲林縣/麥寮鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/大村鄉",
+      "b": "彰化縣/芬園鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/大村鄉",
+      "b": "彰化縣/花壇鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/彰化市",
+      "b": "彰化縣/秀水鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/彰化市",
+      "b": "彰化縣/芬園鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/彰化市",
+      "b": "彰化縣/花壇鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/永靖鄉",
+      "b": "彰化縣/田尾鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/永靖鄉",
+      "b": "彰化縣/社頭鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/溪州鄉",
+      "b": "彰化縣/竹塘鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/溪州鄉",
+      "b": "雲林縣/西螺鎮",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/溪湖鎮",
+      "b": "彰化縣/田尾鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/田中鎮",
+      "b": "彰化縣/田尾鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/田中鎮",
+      "b": "彰化縣/社頭鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/田尾鄉",
+      "b": "彰化縣/社頭鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/福興鄉",
+      "b": "彰化縣/秀水鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/福興鄉",
+      "b": "彰化縣/芳苑鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/福興鄉",
+      "b": "彰化縣/鹿港鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/秀水鄉",
+      "b": "彰化縣/花壇鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/秀水鄉",
+      "b": "彰化縣/鹿港鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/竹塘鄉",
+      "b": "雲林縣/二崙鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/線西鄉",
+      "b": "彰化縣/鹿港鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "彰化縣/芬園鄉",
+      "b": "彰化縣/花壇鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/三峽區",
+      "b": "新北市/土城區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/三峽區",
+      "b": "新北市/樹林區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/三峽區",
+      "b": "新北市/烏來區",
+      "scope": "intra_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "新北市/三峽區",
+      "b": "新北市/鶯歌區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/三峽區",
+      "b": "桃園市/大溪區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/三峽區",
+      "b": "桃園市/復興區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/三芝區",
+      "b": "新北市/淡水區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/三芝區",
+      "b": "新北市/石門區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/三芝區",
+      "b": "新北市/金山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/三重區",
+      "b": "新北市/五股區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/三重區",
+      "b": "新北市/新莊區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/三重區",
+      "b": "新北市/板橋區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/三重區",
+      "b": "新北市/蘆洲區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/中和區",
+      "b": "新北市/土城區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/中和區",
+      "b": "新北市/新店區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/中和區",
+      "b": "新北市/板橋區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/中和區",
+      "b": "新北市/永和區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/五股區",
+      "b": "新北市/八里區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/五股區",
+      "b": "新北市/新莊區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/五股區",
+      "b": "新北市/林口區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/五股區",
+      "b": "新北市/泰山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/五股區",
+      "b": "新北市/蘆洲區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/八里區",
+      "b": "新北市/林口區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/八里區",
+      "b": "新北市/淡水區",
+      "scope": "intra_county",
+      "barrier": "river",
+      "crossing": "淡江大橋 (2026-05-12)",
+      "commute": "moderate",
+      "note": "a 15km detour via 關渡大橋 until the bridge opened; the reported peak-hour saving is 25 minutes"
+    },
+    {
+      "a": "新北市/土城區",
+      "b": "新北市/新店區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/土城區",
+      "b": "新北市/板橋區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/土城區",
+      "b": "新北市/樹林區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/坪林區",
+      "b": "新北市/新店區",
+      "scope": "intra_county",
+      "barrier": "mountain",
+      "crossing": "北宜公路",
+      "commute": "moderate",
+      "note": null
+    },
+    {
+      "a": "新北市/坪林區",
+      "b": "新北市/石碇區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/坪林區",
+      "b": "新北市/雙溪區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/平溪區",
+      "b": "新北市/汐止區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/平溪區",
+      "b": "新北市/瑞芳區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/平溪區",
+      "b": "新北市/石碇區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/平溪區",
+      "b": "新北市/雙溪區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/新店區",
+      "b": "新北市/深坑區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/新店區",
+      "b": "新北市/烏來區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/新店區",
+      "b": "新北市/石碇區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/新莊區",
+      "b": "新北市/板橋區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/新莊區",
+      "b": "新北市/樹林區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/新莊區",
+      "b": "新北市/泰山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/新莊區",
+      "b": "桃園市/龜山區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/板橋區",
+      "b": "新北市/樹林區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/板橋區",
+      "b": "新北市/永和區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/林口區",
+      "b": "新北市/泰山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/林口區",
+      "b": "桃園市/蘆竹區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/林口區",
+      "b": "桃園市/龜山區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/樹林區",
+      "b": "新北市/鶯歌區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/樹林區",
+      "b": "桃園市/龜山區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/汐止區",
+      "b": "新北市/瑞芳區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/汐止區",
+      "b": "新北市/石碇區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/深坑區",
+      "b": "新北市/石碇區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/烏來區",
+      "b": "桃園市/復興區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "新北市/瑞芳區",
+      "b": "新北市/貢寮區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/瑞芳區",
+      "b": "新北市/雙溪區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/石門區",
+      "b": "新北市/金山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/萬里區",
+      "b": "新北市/金山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/貢寮區",
+      "b": "新北市/雙溪區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/鶯歌區",
+      "b": "桃園市/八德區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/鶯歌區",
+      "b": "桃園市/大溪區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新北市/鶯歌區",
+      "b": "桃園市/龜山區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹市/北區",
+      "b": "新竹市/東區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹市/北區",
+      "b": "新竹市/香山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹市/北區",
+      "b": "新竹縣/竹北市",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹市/東區",
+      "b": "新竹市/香山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹市/東區",
+      "b": "新竹縣/寶山鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹市/東區",
+      "b": "新竹縣/竹北市",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹市/東區",
+      "b": "新竹縣/竹東鎮",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹市/香山區",
+      "b": "新竹縣/寶山鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹市/香山區",
+      "b": "苗栗縣/竹南鎮",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/五峰鄉",
+      "b": "新竹縣/北埔鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/五峰鄉",
+      "b": "新竹縣/尖石鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/五峰鄉",
+      "b": "新竹縣/峨眉鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/五峰鄉",
+      "b": "新竹縣/竹東鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/五峰鄉",
+      "b": "苗栗縣/南庄鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/五峰鄉",
+      "b": "苗栗縣/泰安鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/北埔鄉",
+      "b": "新竹縣/寶山鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/北埔鄉",
+      "b": "新竹縣/峨眉鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/北埔鄉",
+      "b": "新竹縣/橫山鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/北埔鄉",
+      "b": "新竹縣/竹東鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/寶山鄉",
+      "b": "新竹縣/竹東鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/寶山鄉",
+      "b": "苗栗縣/頭份市",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/尖石鄉",
+      "b": "新竹縣/橫山鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/尖石鄉",
+      "b": "新竹縣/關西鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/尖石鄉",
+      "b": "桃園市/復興區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "新竹縣/峨眉鄉",
+      "b": "苗栗縣/三灣鄉",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/峨眉鄉",
+      "b": "苗栗縣/頭份市",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/新埔鎮",
+      "b": "新竹縣/湖口鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/新埔鎮",
+      "b": "新竹縣/竹北市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/新埔鎮",
+      "b": "新竹縣/芎林鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/新埔鎮",
+      "b": "新竹縣/關西鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/新埔鎮",
+      "b": "桃園市/楊梅區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/新埔鎮",
+      "b": "桃園市/龍潭區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/新豐鄉",
+      "b": "新竹縣/湖口鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/新豐鄉",
+      "b": "新竹縣/竹北市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/新豐鄉",
+      "b": "桃園市/新屋區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/橫山鄉",
+      "b": "新竹縣/竹東鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/橫山鄉",
+      "b": "新竹縣/芎林鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/橫山鄉",
+      "b": "新竹縣/關西鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/湖口鄉",
+      "b": "新竹縣/竹北市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/湖口鄉",
+      "b": "桃園市/新屋區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/湖口鄉",
+      "b": "桃園市/楊梅區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/竹北市",
+      "b": "新竹縣/竹東鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/竹北市",
+      "b": "新竹縣/芎林鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/竹東鎮",
+      "b": "新竹縣/芎林鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/芎林鄉",
+      "b": "新竹縣/關西鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "新竹縣/關西鎮",
+      "b": "桃園市/龍潭區",
+      "scope": "cross_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/中壢區",
+      "b": "桃園市/八德區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/中壢區",
+      "b": "桃園市/大園區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/中壢區",
+      "b": "桃園市/平鎮區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/中壢區",
+      "b": "桃園市/新屋區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/中壢區",
+      "b": "桃園市/桃園區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/中壢區",
+      "b": "桃園市/楊梅區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/中壢區",
+      "b": "桃園市/觀音區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/八德區",
+      "b": "桃園市/大溪區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/八德區",
+      "b": "桃園市/平鎮區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/八德區",
+      "b": "桃園市/桃園區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/八德區",
+      "b": "桃園市/龜山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/大園區",
+      "b": "桃園市/桃園區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/大園區",
+      "b": "桃園市/蘆竹區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/大園區",
+      "b": "桃園市/觀音區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/大溪區",
+      "b": "桃園市/復興區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/大溪區",
+      "b": "桃園市/龍潭區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/平鎮區",
+      "b": "桃園市/楊梅區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/平鎮區",
+      "b": "桃園市/龍潭區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/新屋區",
+      "b": "桃園市/楊梅區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/新屋區",
+      "b": "桃園市/觀音區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/桃園區",
+      "b": "桃園市/蘆竹區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/桃園區",
+      "b": "桃園市/龜山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/楊梅區",
+      "b": "桃園市/龍潭區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "桃園市/蘆竹區",
+      "b": "桃園市/龜山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "澎湖縣/湖西鄉",
+      "b": "澎湖縣/馬公市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "澎湖縣/白沙鄉",
+      "b": "澎湖縣/西嶼鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "澎湖縣/白沙鄉",
+      "b": "澎湖縣/馬公市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/光復鄉",
+      "b": "花蓮縣/瑞穗鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/光復鄉",
+      "b": "花蓮縣/萬榮鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/光復鄉",
+      "b": "花蓮縣/豐濱鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/光復鄉",
+      "b": "花蓮縣/鳳林鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/卓溪鄉",
+      "b": "花蓮縣/富里鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/卓溪鄉",
+      "b": "花蓮縣/玉里鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/卓溪鄉",
+      "b": "花蓮縣/瑞穗鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/卓溪鄉",
+      "b": "花蓮縣/萬榮鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/卓溪鄉",
+      "b": "高雄市/桃源區",
+      "scope": "cross_county",
+      "barrier": "mountain",
+      "crossing": null,
+      "commute": "impassable",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/吉安鄉",
+      "b": "花蓮縣/壽豐鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/吉安鄉",
+      "b": "花蓮縣/秀林鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/吉安鄉",
+      "b": "花蓮縣/花蓮市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/壽豐鄉",
+      "b": "花蓮縣/萬榮鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/壽豐鄉",
+      "b": "花蓮縣/豐濱鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/壽豐鄉",
+      "b": "花蓮縣/鳳林鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/富里鄉",
+      "b": "花蓮縣/玉里鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/新城鄉",
+      "b": "花蓮縣/秀林鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/新城鄉",
+      "b": "花蓮縣/花蓮市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/玉里鎮",
+      "b": "花蓮縣/瑞穗鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/瑞穗鄉",
+      "b": "花蓮縣/萬榮鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/瑞穗鄉",
+      "b": "花蓮縣/豐濱鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/秀林鄉",
+      "b": "花蓮縣/花蓮市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/秀林鄉",
+      "b": "花蓮縣/萬榮鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "花蓮縣/萬榮鄉",
+      "b": "花蓮縣/鳳林鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/三灣鄉",
+      "b": "苗栗縣/南庄鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/三灣鄉",
+      "b": "苗栗縣/獅潭鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/三灣鄉",
+      "b": "苗栗縣/造橋鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/三灣鄉",
+      "b": "苗栗縣/頭份市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/三義鄉",
+      "b": "苗栗縣/卓蘭鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/三義鄉",
+      "b": "苗栗縣/大湖鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/三義鄉",
+      "b": "苗栗縣/苑裡鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/三義鄉",
+      "b": "苗栗縣/通霄鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/三義鄉",
+      "b": "苗栗縣/銅鑼鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/公館鄉",
+      "b": "苗栗縣/大湖鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/公館鄉",
+      "b": "苗栗縣/獅潭鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/公館鄉",
+      "b": "苗栗縣/苗栗市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/公館鄉",
+      "b": "苗栗縣/銅鑼鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/公館鄉",
+      "b": "苗栗縣/頭屋鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/卓蘭鎮",
+      "b": "苗栗縣/大湖鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/卓蘭鎮",
+      "b": "苗栗縣/泰安鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/南庄鄉",
+      "b": "苗栗縣/泰安鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/南庄鄉",
+      "b": "苗栗縣/獅潭鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/大湖鄉",
+      "b": "苗栗縣/泰安鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/大湖鄉",
+      "b": "苗栗縣/獅潭鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/大湖鄉",
+      "b": "苗栗縣/銅鑼鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/後龍鎮",
+      "b": "苗栗縣/竹南鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/後龍鎮",
+      "b": "苗栗縣/苗栗市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/後龍鎮",
+      "b": "苗栗縣/西湖鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/後龍鎮",
+      "b": "苗栗縣/通霄鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/後龍鎮",
+      "b": "苗栗縣/造橋鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/泰安鄉",
+      "b": "苗栗縣/獅潭鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/獅潭鄉",
+      "b": "苗栗縣/造橋鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/獅潭鄉",
+      "b": "苗栗縣/頭屋鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/竹南鎮",
+      "b": "苗栗縣/造橋鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/竹南鎮",
+      "b": "苗栗縣/頭份市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/苑裡鎮",
+      "b": "苗栗縣/通霄鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/苗栗市",
+      "b": "苗栗縣/西湖鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/苗栗市",
+      "b": "苗栗縣/造橋鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/苗栗市",
+      "b": "苗栗縣/銅鑼鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/苗栗市",
+      "b": "苗栗縣/頭屋鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/西湖鄉",
+      "b": "苗栗縣/通霄鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/西湖鄉",
+      "b": "苗栗縣/銅鑼鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/通霄鎮",
+      "b": "苗栗縣/銅鑼鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/造橋鄉",
+      "b": "苗栗縣/頭份市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "苗栗縣/造橋鄉",
+      "b": "苗栗縣/頭屋鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "金門縣/金城鎮",
+      "b": "金門縣/金寧鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "金門縣/金城鎮",
+      "b": "金門縣/金湖鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "金門縣/金寧鄉",
+      "b": "金門縣/金沙鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "金門縣/金寧鄉",
+      "b": "金門縣/金湖鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "金門縣/金沙鎮",
+      "b": "金門縣/金湖鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/二崙鄉",
+      "b": "雲林縣/崙背鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/二崙鄉",
+      "b": "雲林縣/虎尾鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/二崙鄉",
+      "b": "雲林縣/西螺鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/元長鄉",
+      "b": "雲林縣/北港鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/元長鄉",
+      "b": "雲林縣/四湖鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/元長鄉",
+      "b": "雲林縣/土庫鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/元長鄉",
+      "b": "雲林縣/東勢鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/元長鄉",
+      "b": "雲林縣/虎尾鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/北港鎮",
+      "b": "雲林縣/水林鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/口湖鄉",
+      "b": "雲林縣/四湖鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/口湖鄉",
+      "b": "雲林縣/水林鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/古坑鄉",
+      "b": "雲林縣/大埤鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/古坑鄉",
+      "b": "雲林縣/斗六市",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/古坑鄉",
+      "b": "雲林縣/斗南鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/台西鄉",
+      "b": "雲林縣/四湖鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/台西鄉",
+      "b": "雲林縣/東勢鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/台西鄉",
+      "b": "雲林縣/褒忠鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/台西鄉",
+      "b": "雲林縣/麥寮鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/四湖鄉",
+      "b": "雲林縣/東勢鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/四湖鄉",
+      "b": "雲林縣/水林鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/土庫鎮",
+      "b": "雲林縣/崙背鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/土庫鎮",
+      "b": "雲林縣/東勢鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/土庫鎮",
+      "b": "雲林縣/虎尾鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/土庫鎮",
+      "b": "雲林縣/褒忠鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/大埤鄉",
+      "b": "雲林縣/斗南鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/大埤鄉",
+      "b": "雲林縣/虎尾鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/崙背鄉",
+      "b": "雲林縣/褒忠鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/崙背鄉",
+      "b": "雲林縣/麥寮鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/斗六市",
+      "b": "雲林縣/斗南鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/斗六市",
+      "b": "雲林縣/林內鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/斗六市",
+      "b": "雲林縣/莿桐鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/斗南鎮",
+      "b": "雲林縣/虎尾鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/東勢鄉",
+      "b": "雲林縣/褒忠鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/林內鄉",
+      "b": "雲林縣/莿桐鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/莿桐鄉",
+      "b": "雲林縣/虎尾鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/莿桐鄉",
+      "b": "雲林縣/西螺鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/虎尾鎮",
+      "b": "雲林縣/西螺鎮",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "雲林縣/褒忠鄉",
+      "b": "雲林縣/麥寮鄉",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/三民區",
+      "b": "高雄市/仁武區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/三民區",
+      "b": "高雄市/前金區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/三民區",
+      "b": "高雄市/左營區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/三民區",
+      "b": "高雄市/新興區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/三民區",
+      "b": "高雄市/楠梓區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/三民區",
+      "b": "高雄市/苓雅區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/三民區",
+      "b": "高雄市/鳥松區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/三民區",
+      "b": "高雄市/鳳山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/三民區",
+      "b": "高雄市/鹽埕區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/三民區",
+      "b": "高雄市/鼓山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/仁武區",
+      "b": "高雄市/大樹區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/仁武區",
+      "b": "高雄市/大社區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/仁武區",
+      "b": "高雄市/左營區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/仁武區",
+      "b": "高雄市/楠梓區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/仁武區",
+      "b": "高雄市/橋頭區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/仁武區",
+      "b": "高雄市/燕巢區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/仁武區",
+      "b": "高雄市/鳥松區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/仁武區",
+      "b": "高雄市/鳳山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/內門區",
+      "b": "高雄市/旗山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/內門區",
+      "b": "高雄市/杉林區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/內門區",
+      "b": "高雄市/田寮區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/內門區",
+      "b": "高雄市/甲仙區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/六龜區",
+      "b": "高雄市/杉林區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/六龜區",
+      "b": "高雄市/桃源區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/六龜區",
+      "b": "高雄市/甲仙區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/六龜區",
+      "b": "高雄市/美濃區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/六龜區",
+      "b": "高雄市/茂林區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/前金區",
+      "b": "高雄市/新興區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/前金區",
+      "b": "高雄市/苓雅區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/前金區",
+      "b": "高雄市/鹽埕區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/前鎮區",
+      "b": "高雄市/小港區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/前鎮區",
+      "b": "高雄市/旗津區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/前鎮區",
+      "b": "高雄市/苓雅區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/前鎮區",
+      "b": "高雄市/鳳山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/大寮區",
+      "b": "高雄市/大樹區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/大寮區",
+      "b": "高雄市/小港區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/大寮區",
+      "b": "高雄市/林園區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/大寮區",
+      "b": "高雄市/鳳山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/大樹區",
+      "b": "高雄市/旗山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/大樹區",
+      "b": "高雄市/燕巢區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/大樹區",
+      "b": "高雄市/鳥松區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/大社區",
+      "b": "高雄市/橋頭區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/大社區",
+      "b": "高雄市/燕巢區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/小港區",
+      "b": "高雄市/林園區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/小港區",
+      "b": "高雄市/鳳山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/岡山區",
+      "b": "高雄市/彌陀區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/岡山區",
+      "b": "高雄市/橋頭區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/岡山區",
+      "b": "高雄市/永安區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/岡山區",
+      "b": "高雄市/燕巢區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/岡山區",
+      "b": "高雄市/田寮區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/岡山區",
+      "b": "高雄市/路竹區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/岡山區",
+      "b": "高雄市/阿蓮區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/左營區",
+      "b": "高雄市/楠梓區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/左營區",
+      "b": "高雄市/鼓山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/彌陀區",
+      "b": "高雄市/梓官區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/彌陀區",
+      "b": "高雄市/橋頭區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/彌陀區",
+      "b": "高雄市/永安區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/新興區",
+      "b": "高雄市/苓雅區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/旗山區",
+      "b": "高雄市/杉林區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/旗山區",
+      "b": "高雄市/燕巢區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/旗山區",
+      "b": "高雄市/田寮區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/旗山區",
+      "b": "高雄市/美濃區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/杉林區",
+      "b": "高雄市/甲仙區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/杉林區",
+      "b": "高雄市/美濃區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/桃源區",
+      "b": "高雄市/甲仙區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/桃源區",
+      "b": "高雄市/茂林區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/桃源區",
+      "b": "高雄市/那瑪夏區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/梓官區",
+      "b": "高雄市/楠梓區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/梓官區",
+      "b": "高雄市/橋頭區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/楠梓區",
+      "b": "高雄市/橋頭區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/橋頭區",
+      "b": "高雄市/燕巢區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/永安區",
+      "b": "高雄市/茄萣區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/永安區",
+      "b": "高雄市/路竹區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/湖內區",
+      "b": "高雄市/茄萣區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/湖內區",
+      "b": "高雄市/路竹區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/湖內區",
+      "b": "高雄市/阿蓮區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/燕巢區",
+      "b": "高雄市/田寮區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/田寮區",
+      "b": "高雄市/阿蓮區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/甲仙區",
+      "b": "高雄市/那瑪夏區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/茄萣區",
+      "b": "高雄市/路竹區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/路竹區",
+      "b": "高雄市/阿蓮區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/鳥松區",
+      "b": "高雄市/鳳山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    },
+    {
+      "a": "高雄市/鹽埕區",
+      "b": "高雄市/鼓山區",
+      "scope": "intra_county",
+      "barrier": "none",
+      "crossing": null,
+      "commute": "easy",
+      "note": null
+    }
+  ]
+}

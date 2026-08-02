@@ -25,6 +25,7 @@ LLM 判斷跑了兩次（一次不採用、一次採用）。本文件第 2～4 
 | L3 生活圈 | `config/geo-authored.json` | 25 個 | cohesion（21 過）+ 文字集中度 |
 | L4 行政區 | `config/geo-l4-districts.json` | 368 區、705 surface | 誤留率閘門 |
 | L5 地標 | `config/geo-l5-table.json` → `geo-l5-published.json` | 666 → 365 | 集中度 + occurrence 過濾 |
+| 地理相鄰 | `config/geo-adjacency.json` | 888 條邊、368 節點 | 對行為圖交叉檢驗 |
 
 `config/geo-l4-districts.json` 是從 `城市對照表.csv` 生成後 commit 的，
 只含行政區劃（縣市名、區名、6 位代碼），不含任何職缺／求職者內容，
@@ -75,7 +76,9 @@ LLM 判斷跑了兩次（一次不採用、一次採用）。本文件第 2～4 
 .\.venv\Scripts\python.exe scripts\mine_region_aliases.py              # ~70s
 .\.venv\Scripts\python.exe scripts\build_l5_table.py                   # 即時
 .\.venv\Scripts\python.exe scripts\validate_l5_table.py                # ~90s
-.\.venv\Scripts\python.exe -m unittest discover -s tests               # 185 tests
+.\.venv\Scripts\python.exe scripts\build_geo_adjacency.py              # 即時
+.\.venv\Scripts\python.exe scripts\validate_geo_adjacency.py           # 即時
+.\.venv\Scripts\python.exe -m unittest discover -s tests               # 197 tests
 ```
 
 完整 collocation 佇列（LLM 步驟的輸入）要另外產，且**不要蓋掉** checked-in 報告：
@@ -157,13 +160,16 @@ Repo 規定本機 demo 零依賴、`python3 -m app.server` 可跑，production �
 | 層 | 權重來源 | 現況 |
 |---|---|---|
 | L2 縣市對 | 行為（201 + 62 條邊，零人工值） | `artifacts/region-graph.json` 已完成 |
-| L4 區對 | 行為（2,723 條，見 §2.3） | **未建，下一步** |
-| L5 園區歸屬 | 手填表 + 集中度驗證 | 表未給 |
-| `shortcut` | 手填 + `effective_date`，標 `external` | 未建 |
+| L4 區對 | 行為（4,857 條） | `artifacts/district-graph.json` 已完成 |
+| L5 園區歸屬 | 手填表 + 集中度驗證 | 365 筆已發布 |
+| 地理相鄰 | 手繪 888 條，權重取同類行為邊中位數 | `config/geo-adjacency.json` 已完成 |
+| `shortcut` | 手填 + `effective_date`，標 `external` | 已完成，兩條都被行為佐證 |
 
 每條邊帶 `provenance: behaviour | authored | external`，消融時能分開關。
 
-手填相鄰表**仍然值得做**，但價值在於它與行為圖的**不一致處**，見 §3.3。
+手填相鄰表**仍然值得做**，但價值在於它與行為圖的**不一致處** —— 這點後來被證實了：
+93.98% 的手繪相鄰被行為證實，但 **83.8% 的行為邊並不相鄰**，而且同樣平坦的界線在縣市內的
+可替代度是跨縣市的 **4.74 倍**。完整結果見 `docs/graph-schema.md` 的「手繪相鄰圖」一節。
 
 ### 3.3 你的八里例子被驗證了，而且有一個你猜錯的地方
 

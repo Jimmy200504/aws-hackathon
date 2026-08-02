@@ -1,0 +1,1291 @@
+{
+  "metadata": {
+    "schema": "skillweave-geo-adjacency-validation-v1",
+    "adjacency": "config/geo-adjacency.json",
+    "behaviour": {
+      "schema": "skillweave-district-graph-v1",
+      "method": "behaviour-derived; no hand-assigned edge weight",
+      "dataset_version": "1111-2026-06-01_2026-06-07",
+      "graph_cutoff": "2026-06-05 23:59:59.999000",
+      "train_days": [
+        "2026-06-01",
+        "2026-06-02",
+        "2026-06-03",
+        "2026-06-04",
+        "2026-06-05"
+      ],
+      "leakage_policy": "district co-selection restricted to train days; anonymous talentNo dropped",
+      "domestic_only": true,
+      "provenance": "behaviour",
+      "min_co_selected": 30,
+      "max_districts_per_search": 10,
+      "commute_edges_excluded_reason": "application flow needs the job's district, and only 26.53% of jobs resolve to one; see reports/job-district-extraction.json",
+      "random_seed": 1111
+    },
+    "testable_rule": "both districts selected in at least 100 train-window searches",
+    "corridor_min_jaccard": 0.05
+  },
+  "coverage": {
+    "authored_edges": 888,
+    "authored_edges_testable": 797,
+    "authored_with_behaviour_edge": 749,
+    "authored_share_confirmed": 0.9398,
+    "behaviour_edges": 4857,
+    "behaviour_edges_not_adjacent": 4070,
+    "behaviour_share_not_adjacent": 0.838
+  },
+  "commute_grade_vs_behaviour": {
+    "monotonic": true,
+    "reading": "mean substitutability falls as the authored commute grade worsens",
+    "by_grade": {
+      "easy": {
+        "pairs": 774,
+        "mean_jaccard": 0.22566,
+        "median_jaccard": 0.20292,
+        "share_with_behaviour_edge": 0.9587
+      },
+      "moderate": {
+        "pairs": 7,
+        "mean_jaccard": 0.07598,
+        "median_jaccard": 0.03408,
+        "share_with_behaviour_edge": 0.7143
+      },
+      "hard": {
+        "pairs": 7,
+        "mean_jaccard": 0.00035,
+        "median_jaccard": 0.0,
+        "share_with_behaviour_edge": 0.2857
+      },
+      "impassable": {
+        "pairs": 9,
+        "mean_jaccard": 0.0,
+        "median_jaccard": 0.0,
+        "share_with_behaviour_edge": 0.0
+      }
+    }
+  },
+  "county_line_effect": {
+    "rule": "adjacent pairs graded easy with no barrier, split by whether the border is a county line",
+    "by_scope": {
+      "intra_county": {
+        "pairs": 649,
+        "mean_jaccard": 0.25787,
+        "median_jaccard": 0.24054
+      },
+      "cross_county": {
+        "pairs": 119,
+        "mean_jaccard": 0.05443,
+        "median_jaccard": 0.04241
+      }
+    },
+    "ratio_intra_over_cross": 4.74,
+    "reading": "the same flat, unobstructed border is treated as far more substitutable inside a county than across one; the map cannot see that boundary and the search log can"
+  },
+  "barriers": {
+    "rule": "adjacent but jaccard below 0.05",
+    "count": 146,
+    "top": [
+      {
+        "a": "基隆市/七堵區",
+        "b": "新北市/萬里區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          1851,
+          1522
+        ]
+      },
+      {
+        "a": "基隆市/中山區",
+        "b": "新北市/萬里區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          1668,
+          1522
+        ]
+      },
+      {
+        "a": "台北市/北投區",
+        "b": "新北市/金山區",
+        "scope": "cross_county",
+        "authored_barrier": "mountain",
+        "authored_commute": "hard",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          20271,
+          1119
+        ]
+      },
+      {
+        "a": "南投縣/竹山鎮",
+        "b": "嘉義縣/梅山鄉",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          2870,
+          1028
+        ]
+      },
+      {
+        "a": "嘉義縣/東石鄉",
+        "b": "雲林縣/口湖鄉",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          1514,
+          882
+        ]
+      },
+      {
+        "a": "南投縣/集集鎮",
+        "b": "南投縣/魚池鄉",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          886,
+          840
+        ]
+      },
+      {
+        "a": "宜蘭縣/礁溪鄉",
+        "b": "新北市/坪林區",
+        "scope": "cross_county",
+        "authored_barrier": "mountain",
+        "authored_commute": "hard",
+        "crossing": "北宜公路 台9線",
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          4122,
+          783
+        ]
+      },
+      {
+        "a": "宜蘭縣/頭城鎮",
+        "b": "新北市/坪林區",
+        "scope": "cross_county",
+        "authored_barrier": "mountain",
+        "authored_commute": "moderate",
+        "crossing": "雪山隧道 (國道5號)",
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          2009,
+          783
+        ]
+      },
+      {
+        "a": "新北市/三峽區",
+        "b": "桃園市/復興區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          20805,
+          771
+        ]
+      },
+      {
+        "a": "台中市/和平區",
+        "b": "花蓮縣/秀林鄉",
+        "scope": "cross_county",
+        "authored_barrier": "mountain",
+        "authored_commute": "impassable",
+        "crossing": "中橫公路 台8線, partly closed since 1999",
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          672,
+          871
+        ]
+      },
+      {
+        "a": "南投縣/中寮鄉",
+        "b": "南投縣/水里鄉",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          1084,
+          644
+        ]
+      },
+      {
+        "a": "南投縣/中寮鄉",
+        "b": "南投縣/國姓鄉",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          1084,
+          541
+        ]
+      },
+      {
+        "a": "南投縣/國姓鄉",
+        "b": "台中市/新社區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          541,
+          3227
+        ]
+      },
+      {
+        "a": "南投縣/國姓鄉",
+        "b": "台中市/東勢區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          541,
+          4023
+        ]
+      },
+      {
+        "a": "新北市/三峽區",
+        "b": "新北市/烏來區",
+        "scope": "intra_county",
+        "authored_barrier": "mountain",
+        "authored_commute": "impassable",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          20805,
+          492
+        ]
+      },
+      {
+        "a": "新北市/烏來區",
+        "b": "桃園市/復興區",
+        "scope": "cross_county",
+        "authored_barrier": "mountain",
+        "authored_commute": "impassable",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          492,
+          771
+        ]
+      },
+      {
+        "a": "高雄市/內門區",
+        "b": "高雄市/田寮區",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          382,
+          1163
+        ]
+      },
+      {
+        "a": "新北市/坪林區",
+        "b": "新北市/石碇區",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          783,
+          371
+        ]
+      },
+      {
+        "a": "台南市/東山區",
+        "b": "嘉義縣/大埔鄉",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          1872,
+          308
+        ]
+      },
+      {
+        "a": "南投縣/仁愛鄉",
+        "b": "台中市/和平區",
+        "scope": "cross_county",
+        "authored_barrier": "mountain",
+        "authored_commute": "hard",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          297,
+          672
+        ]
+      },
+      {
+        "a": "南投縣/仁愛鄉",
+        "b": "花蓮縣/秀林鄉",
+        "scope": "cross_county",
+        "authored_barrier": "mountain",
+        "authored_commute": "impassable",
+        "crossing": "中橫公路 台8線",
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          297,
+          871
+        ]
+      },
+      {
+        "a": "台南市/龍崎區",
+        "b": "高雄市/內門區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          256,
+          382
+        ]
+      },
+      {
+        "a": "台南市/龍崎區",
+        "b": "高雄市/田寮區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          256,
+          1163
+        ]
+      },
+      {
+        "a": "台中市/和平區",
+        "b": "新竹縣/尖石鄉",
+        "scope": "cross_county",
+        "authored_barrier": "mountain",
+        "authored_commute": "impassable",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          672,
+          250
+        ]
+      },
+      {
+        "a": "新竹縣/尖石鄉",
+        "b": "桃園市/復興區",
+        "scope": "cross_county",
+        "authored_barrier": "mountain",
+        "authored_commute": "impassable",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          250,
+          771
+        ]
+      },
+      {
+        "a": "台南市/大內區",
+        "b": "台南市/左鎮區",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          803,
+          237
+        ]
+      },
+      {
+        "a": "南投縣/仁愛鄉",
+        "b": "南投縣/信義鄉",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          297,
+          220
+        ]
+      },
+      {
+        "a": "南投縣/信義鄉",
+        "b": "南投縣/鹿谷鄉",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          220,
+          210
+        ]
+      },
+      {
+        "a": "南投縣/水里鄉",
+        "b": "南投縣/鹿谷鄉",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          644,
+          210
+        ]
+      },
+      {
+        "a": "基隆市/七堵區",
+        "b": "新北市/平溪區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          1851,
+          195
+        ]
+      },
+      {
+        "a": "基隆市/暖暖區",
+        "b": "新北市/平溪區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          686,
+          195
+        ]
+      },
+      {
+        "a": "苗栗縣/三灣鄉",
+        "b": "苗栗縣/獅潭鄉",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          293,
+          188
+        ]
+      },
+      {
+        "a": "宜蘭縣/頭城鎮",
+        "b": "新北市/貢寮區",
+        "scope": "cross_county",
+        "authored_barrier": "coast",
+        "authored_commute": "moderate",
+        "crossing": "台2線 濱海公路",
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          2009,
+          184
+        ]
+      },
+      {
+        "a": "新竹縣/峨眉鄉",
+        "b": "苗栗縣/三灣鄉",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          179,
+          293
+        ]
+      },
+      {
+        "a": "新竹縣/峨眉鄉",
+        "b": "苗栗縣/頭份市",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          179,
+          11050
+        ]
+      },
+      {
+        "a": "台中市/和平區",
+        "b": "宜蘭縣/大同鄉",
+        "scope": "cross_county",
+        "authored_barrier": "mountain",
+        "authored_commute": "impassable",
+        "crossing": "台7甲線",
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          672,
+          176
+        ]
+      },
+      {
+        "a": "宜蘭縣/大同鄉",
+        "b": "新北市/烏來區",
+        "scope": "cross_county",
+        "authored_barrier": "mountain",
+        "authored_commute": "impassable",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          176,
+          492
+        ]
+      },
+      {
+        "a": "宜蘭縣/大同鄉",
+        "b": "新竹縣/尖石鄉",
+        "scope": "cross_county",
+        "authored_barrier": "mountain",
+        "authored_commute": "impassable",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          176,
+          250
+        ]
+      },
+      {
+        "a": "宜蘭縣/大同鄉",
+        "b": "桃園市/復興區",
+        "scope": "cross_county",
+        "authored_barrier": "mountain",
+        "authored_commute": "hard",
+        "crossing": "北橫公路 台7線",
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          176,
+          771
+        ]
+      },
+      {
+        "a": "宜蘭縣/大同鄉",
+        "b": "花蓮縣/秀林鄉",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.0,
+        "co_selected": 0,
+        "searches": [
+          176,
+          871
+        ]
+      }
+    ],
+    "highest_traffic": [
+      {
+        "a": "新北市/新莊區",
+        "b": "桃園市/龜山區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.03983,
+        "co_selected": 4853,
+        "searches": [
+          87251,
+          39434
+        ]
+      },
+      {
+        "a": "新北市/樹林區",
+        "b": "桃園市/龜山區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.04924,
+        "co_selected": 4261,
+        "searches": [
+          51371,
+          39434
+        ]
+      },
+      {
+        "a": "台中市/烏日區",
+        "b": "彰化縣/彰化市",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.04835,
+        "co_selected": 2728,
+        "searches": [
+          30577,
+          28573
+        ]
+      },
+      {
+        "a": "台中市/清水區",
+        "b": "台中市/神岡區",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.04596,
+        "co_selected": 2063,
+        "searches": [
+          24842,
+          22112
+        ]
+      },
+      {
+        "a": "新北市/三峽區",
+        "b": "桃園市/大溪區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.02546,
+        "co_selected": 883,
+        "searches": [
+          20805,
+          14756
+        ]
+      },
+      {
+        "a": "台中市/大肚區",
+        "b": "彰化縣/彰化市",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.01839,
+        "co_selected": 751,
+        "searches": [
+          13006,
+          28573
+        ]
+      },
+      {
+        "a": "台北市/南港區",
+        "b": "台北市/文山區",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.03797,
+        "co_selected": 1196,
+        "searches": [
+          19790,
+          12907
+        ]
+      },
+      {
+        "a": "新竹縣/新豐鄉",
+        "b": "桃園市/新屋區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.03914,
+        "co_selected": 841,
+        "searches": [
+          10705,
+          11623
+        ]
+      },
+      {
+        "a": "高雄市/大樹區",
+        "b": "高雄市/燕巢區",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.04917,
+        "co_selected": 1014,
+        "searches": [
+          8407,
+          13230
+        ]
+      },
+      {
+        "a": "台南市/歸仁區",
+        "b": "高雄市/湖內區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.04928,
+        "co_selected": 1405,
+        "searches": [
+          21826,
+          8088
+        ]
+      },
+      {
+        "a": "台中市/大肚區",
+        "b": "彰化縣/伸港鄉",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.01821,
+        "co_selected": 376,
+        "searches": [
+          13006,
+          8017
+        ]
+      },
+      {
+        "a": "台中市/龍井區",
+        "b": "彰化縣/伸港鄉",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.02496,
+        "co_selected": 830,
+        "searches": [
+          26061,
+          8017
+        ]
+      },
+      {
+        "a": "屏東縣/萬丹鄉",
+        "b": "高雄市/大寮區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.04686,
+        "co_selected": 2138,
+        "searches": [
+          7886,
+          39882
+        ]
+      },
+      {
+        "a": "屏東縣/九如鄉",
+        "b": "高雄市/大樹區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.04061,
+        "co_selected": 487,
+        "searches": [
+          4071,
+          8407
+        ]
+      },
+      {
+        "a": "彰化縣/二林鎮",
+        "b": "彰化縣/福興鄉",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.03528,
+        "co_selected": 475,
+        "searches": [
+          3927,
+          10011
+        ]
+      },
+      {
+        "a": "屏東縣/新園鄉",
+        "b": "高雄市/大寮區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.02327,
+        "co_selected": 983,
+        "searches": [
+          3346,
+          39882
+        ]
+      },
+      {
+        "a": "台中市/北屯區",
+        "b": "台中市/新社區",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.01301,
+        "co_selected": 1124,
+        "searches": [
+          84321,
+          3227
+        ]
+      },
+      {
+        "a": "台中市/太平區",
+        "b": "台中市/新社區",
+        "scope": "intra_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.01732,
+        "co_selected": 927,
+        "searches": [
+          51228,
+          3227
+        ]
+      },
+      {
+        "a": "南投縣/名間鄉",
+        "b": "彰化縣/社頭鄉",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.00442,
+        "co_selected": 44,
+        "searches": [
+          3189,
+          6800
+        ]
+      },
+      {
+        "a": "新竹縣/新埔鎮",
+        "b": "桃園市/楊梅區",
+        "scope": "cross_county",
+        "authored_barrier": "none",
+        "authored_commute": "easy",
+        "crossing": null,
+        "jaccard": 0.01437,
+        "co_selected": 441,
+        "searches": [
+          2994,
+          28133
+        ]
+      }
+    ]
+  },
+  "corridors": {
+    "rule": "not adjacent but jaccard at least 0.05",
+    "count": 725,
+    "cross_county_count": 68,
+    "top": [
+      {
+        "a": "台東縣/海端鄉",
+        "b": "台東縣/鹿野鄉",
+        "same_county": true,
+        "jaccard": 0.72523,
+        "co_selected": 161
+      },
+      {
+        "a": "台東縣/池上鄉",
+        "b": "台東縣/鹿野鄉",
+        "same_county": true,
+        "jaccard": 0.55305,
+        "co_selected": 172
+      },
+      {
+        "a": "宜蘭縣/員山鄉",
+        "b": "宜蘭縣/壯圍鄉",
+        "same_county": true,
+        "jaccard": 0.51781,
+        "co_selected": 2224
+      },
+      {
+        "a": "台南市/北區",
+        "b": "台南市/安平區",
+        "same_county": true,
+        "jaccard": 0.49089,
+        "co_selected": 26100
+      },
+      {
+        "a": "台南市/北區",
+        "b": "台南市/南區",
+        "same_county": true,
+        "jaccard": 0.45178,
+        "co_selected": 25566
+      },
+      {
+        "a": "高雄市/前鎮區",
+        "b": "高雄市/新興區",
+        "same_county": true,
+        "jaccard": 0.43164,
+        "co_selected": 30660
+      },
+      {
+        "a": "台中市/東區",
+        "b": "台中市/西區",
+        "same_county": true,
+        "jaccard": 0.40704,
+        "co_selected": 36572
+      },
+      {
+        "a": "台南市/柳營區",
+        "b": "台南市/鹽水區",
+        "same_county": true,
+        "jaccard": 0.39549,
+        "co_selected": 3173
+      },
+      {
+        "a": "高雄市/前金區",
+        "b": "高雄市/前鎮區",
+        "same_county": true,
+        "jaccard": 0.3924,
+        "co_selected": 26171
+      },
+      {
+        "a": "高雄市/新興區",
+        "b": "高雄市/鹽埕區",
+        "same_county": true,
+        "jaccard": 0.3824,
+        "co_selected": 19841
+      },
+      {
+        "a": "嘉義縣/東石鄉",
+        "b": "嘉義縣/鹿草鄉",
+        "same_county": true,
+        "jaccard": 0.36299,
+        "co_selected": 1179
+      },
+      {
+        "a": "台南市/中西區",
+        "b": "台南市/永康區",
+        "same_county": true,
+        "jaccard": 0.36108,
+        "co_selected": 27077
+      },
+      {
+        "a": "高雄市/新興區",
+        "b": "高雄市/鼓山區",
+        "same_county": true,
+        "jaccard": 0.35887,
+        "co_selected": 22625
+      },
+      {
+        "a": "基隆市/中山區",
+        "b": "基隆市/信義區",
+        "same_county": true,
+        "jaccard": 0.35615,
+        "co_selected": 1176
+      },
+      {
+        "a": "屏東縣/新埤鄉",
+        "b": "屏東縣/枋寮鄉",
+        "same_county": true,
+        "jaccard": 0.35287,
+        "co_selected": 614
+      },
+      {
+        "a": "台南市/安平區",
+        "b": "台南市/東區",
+        "same_county": true,
+        "jaccard": 0.34855,
+        "co_selected": 21459
+      },
+      {
+        "a": "高雄市/前金區",
+        "b": "高雄市/鼓山區",
+        "same_county": true,
+        "jaccard": 0.34848,
+        "co_selected": 19858
+      },
+      {
+        "a": "屏東縣/潮州鎮",
+        "b": "屏東縣/萬丹鄉",
+        "same_county": true,
+        "jaccard": 0.34317,
+        "co_selected": 4476
+      },
+      {
+        "a": "高雄市/苓雅區",
+        "b": "高雄市/鳳山區",
+        "same_county": true,
+        "jaccard": 0.34043,
+        "co_selected": 31494
+      },
+      {
+        "a": "台中市/北區",
+        "b": "台中市/南區",
+        "same_county": true,
+        "jaccard": 0.33877,
+        "co_selected": 34338
+      },
+      {
+        "a": "花蓮縣/瑞穗鄉",
+        "b": "花蓮縣/鳳林鎮",
+        "same_county": true,
+        "jaccard": 0.33611,
+        "co_selected": 121
+      },
+      {
+        "a": "屏東縣/內埔鄉",
+        "b": "屏東縣/萬丹鄉",
+        "same_county": true,
+        "jaccard": 0.33509,
+        "co_selected": 3933
+      },
+      {
+        "a": "高雄市/大社區",
+        "b": "高雄市/楠梓區",
+        "same_county": true,
+        "jaccard": 0.33338,
+        "co_selected": 15077
+      },
+      {
+        "a": "台中市/清水區",
+        "b": "台中市/龍井區",
+        "same_county": true,
+        "jaccard": 0.33243,
+        "co_selected": 12700
+      },
+      {
+        "a": "台南市/中西區",
+        "b": "台南市/安南區",
+        "same_county": true,
+        "jaccard": 0.32845,
+        "co_selected": 20685
+      }
+    ],
+    "top_cross_county": [
+      {
+        "a": "台北市/萬華區",
+        "b": "新北市/永和區",
+        "same_county": false,
+        "jaccard": 0.14125,
+        "co_selected": 9480
+      },
+      {
+        "a": "台北市/北投區",
+        "b": "新北市/八里區",
+        "same_county": false,
+        "jaccard": 0.12703,
+        "co_selected": 3489
+      },
+      {
+        "a": "台北市/中正區",
+        "b": "新北市/中和區",
+        "same_county": false,
+        "jaccard": 0.12198,
+        "co_selected": 12631
+      },
+      {
+        "a": "台北市/大同區",
+        "b": "新北市/蘆洲區",
+        "same_county": false,
+        "jaccard": 0.11942,
+        "co_selected": 9538
+      },
+      {
+        "a": "台北市/中正區",
+        "b": "新北市/板橋區",
+        "same_county": false,
+        "jaccard": 0.11676,
+        "co_selected": 15078
+      },
+      {
+        "a": "台北市/士林區",
+        "b": "新北市/蘆洲區",
+        "same_county": false,
+        "jaccard": 0.11129,
+        "co_selected": 8035
+      },
+      {
+        "a": "台北市/中正區",
+        "b": "新北市/三重區",
+        "same_county": false,
+        "jaccard": 0.10322,
+        "co_selected": 11590
+      },
+      {
+        "a": "彰化縣/埤頭鄉",
+        "b": "雲林縣/西螺鎮",
+        "same_county": false,
+        "jaccard": 0.10009,
+        "co_selected": 893
+      },
+      {
+        "a": "台北市/大安區",
+        "b": "新北市/新店區",
+        "same_county": false,
+        "jaccard": 0.09771,
+        "co_selected": 5830
+      },
+      {
+        "a": "台北市/中正區",
+        "b": "新北市/新店區",
+        "same_county": false,
+        "jaccard": 0.09523,
+        "co_selected": 6737
+      },
+      {
+        "a": "台南市/北門區",
+        "b": "嘉義縣/義竹鄉",
+        "same_county": false,
+        "jaccard": 0.09319,
+        "co_selected": 197
+      },
+      {
+        "a": "台北市/大安區",
+        "b": "新北市/中和區",
+        "same_county": false,
+        "jaccard": 0.09262,
+        "co_selected": 8833
+      },
+      {
+        "a": "彰化縣/竹塘鄉",
+        "b": "雲林縣/西螺鎮",
+        "same_county": false,
+        "jaccard": 0.09004,
+        "co_selected": 539
+      },
+      {
+        "a": "台中市/大安區",
+        "b": "苗栗縣/苑裡鎮",
+        "same_county": false,
+        "jaccard": 0.08991,
+        "co_selected": 726
+      },
+      {
+        "a": "台北市/中山區",
+        "b": "新北市/蘆洲區",
+        "same_county": false,
+        "jaccard": 0.08674,
+        "co_selected": 7993
+      },
+      {
+        "a": "台北市/萬華區",
+        "b": "新北市/三重區",
+        "same_county": false,
+        "jaccard": 0.08437,
+        "co_selected": 8535
+      },
+      {
+        "a": "台南市/仁德區",
+        "b": "高雄市/路竹區",
+        "same_county": false,
+        "jaccard": 0.08425,
+        "co_selected": 3396
+      },
+      {
+        "a": "台北市/松山區",
+        "b": "新北市/汐止區",
+        "same_county": false,
+        "jaccard": 0.0839,
+        "co_selected": 4055
+      },
+      {
+        "a": "新北市/鶯歌區",
+        "b": "桃園市/桃園區",
+        "same_county": false,
+        "jaccard": 0.08354,
+        "co_selected": 6559
+      },
+      {
+        "a": "台北市/萬華區",
+        "b": "新北市/新店區",
+        "same_county": false,
+        "jaccard": 0.08199,
+        "co_selected": 4796
+      },
+      {
+        "a": "台北市/士林區",
+        "b": "新北市/八里區",
+        "same_county": false,
+        "jaccard": 0.07918,
+        "co_selected": 2918
+      },
+      {
+        "a": "彰化縣/北斗鎮",
+        "b": "雲林縣/西螺鎮",
+        "same_county": false,
+        "jaccard": 0.07698,
+        "co_selected": 916
+      },
+      {
+        "a": "南投縣/竹山鎮",
+        "b": "彰化縣/二水鄉",
+        "same_county": false,
+        "jaccard": 0.07579,
+        "co_selected": 263
+      },
+      {
+        "a": "台北市/中山區",
+        "b": "新北市/板橋區",
+        "same_county": false,
+        "jaccard": 0.07554,
+        "co_selected": 10283
+      },
+      {
+        "a": "台北市/中山區",
+        "b": "新北市/永和區",
+        "same_county": false,
+        "jaccard": 0.07491,
+        "co_selected": 6480
+      }
+    ]
+  }
+}
