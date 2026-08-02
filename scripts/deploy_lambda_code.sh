@@ -109,6 +109,7 @@ aws lambda update-alias \
   --function-name "$FUNCTION_NAME" \
   --name "$ALIAS_NAME" \
   --function-version "$PUBLISHED_VERSION" \
+  --routing-config '{"AdditionalVersionWeights":{}}' \
   --region "$AWS_REGION_NAME" >/dev/null
 echo "Alias ${ALIAS_NAME} now points to version ${PUBLISHED_VERSION}."
 
