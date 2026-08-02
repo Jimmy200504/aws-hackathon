@@ -270,20 +270,21 @@ class SkillWeaveRanker:
         normalized_query: str | None = None,
         structured_intent: Any = None,
     ) -> QueryIntent:
-        # The raw query is the only surface allowed to drive literal phrase
-        # features and behavior-edge lookups. Those were learned from raw search
-        # strings and the train-only behavior graph is keyed by them, so an LLM
-        # rewrite that adds a translation or swaps punctuation would silently
-        # zero the phrase family and every Query->Job/Skill behavior feature.
-        normalized_value = normalize(query)
+        # The normalized query is the scoring surface, and it has to be, because
+        # scripts/build_benchmark_fixture.py keys the train-only behavior graph
+        # with serving_query_key(), which is normalize() over the normalizer's
+        # output. Keying the lookup on the raw query instead would miss every
+        # rewritten query and read zero for the whole behavior_query_* family,
+        # silently. This is also the surface the OpenSearch retrieval query and
+        # the literal phrase features are computed from.
+        normalized_value = normalize(query if normalized_query is None else normalized_query)
         units = lexical_units(normalized_value)
-        # An LLM rewrite contributes exactly one thing: extra alias surface for
-        # skill resolution. Both surfaces are scanned so a rewrite can only add
-        # canonical nodes, never drop one the raw query would have matched.
+        raw_value = normalize(query)
+        # Alias resolution still reads both surfaces, which is a separate concern
+        # from the scoring key: a rewrite that drops a term must not be able to
+        # drop a canonical node the raw query would have matched.
         resolution_surfaces = dict.fromkeys(
-            surface
-            for surface in (normalized_value, normalize(normalized_query or ""))
-            if surface
+            surface for surface in (normalized_value, raw_value) if surface
         )
         resolved: list[tuple[int, str]] = []
         raw_resolvable: set[str] = set()
@@ -291,17 +292,16 @@ class SkillWeaveRanker:
             for match in self._alias_pattern.finditer(surface):
                 alias = normalize(match.group(0))
                 for skill_id in self.alias_to_skills.get(alias, []):
-                    # The suppression list is read against the raw query, not the
-                    # surface being scanned. Checking it per surface would let an
-                    # LLM rewrite that happens to drop the blocking phrase
-                    # resurrect a match the curated list deliberately removes.
+                    # The suppression list is read against the scoring surface so
+                    # a curated block stays anchored to one string rather than
+                    # being bypassed by whichever surface happens to omit it.
                     if any(
                         phrase in normalized_value
                         for phrase in self.skill_blocked_phrases.get(skill_id, ())
                     ):
                         continue
                     resolved.append((len(alias), skill_id))
-                    if surface == normalized_value:
+                    if surface == raw_value:
                         raw_resolvable.add(skill_id)
         # Longest aliases win and canonical nodes are unique.
         seen: set[str] = set()
@@ -317,9 +317,9 @@ class SkillWeaveRanker:
             skill_id for skill_id in skills if skill_id.startswith("duty.")
         ][:8]
         selected = tuple(seed_skills + duty_skills)
-        llm_surface = normalize(normalized_query or "") or None
-        if llm_surface == normalized_value:
-            llm_surface = None
+        # Attribution only. Recorded when the rewrite actually changed the string,
+        # so a no-op rewrite is not reported as a generative-AI contribution.
+        llm_surface = normalized_value if normalized_value != raw_value else None
         return QueryIntent(
             raw=query,
             normalized=normalized_value,

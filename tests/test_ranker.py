@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from app.ranker import SkillWeaveRanker
+from app.ranker import SkillWeaveRanker, normalize
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,9 +28,9 @@ class RankerTests(unittest.TestCase):
             normalized_query="Node.js 後端工程師",
         )
         self.assertEqual(intent.raw, "node js backend")
-        # The scoring surface stays on the raw query: literal phrase features
-        # and behavior-edge keys are defined against what the user typed.
-        self.assertEqual(intent.normalized, "node.js backend")
+        # The scoring surface is the normalized query, because that is what
+        # serving_query_key() keys the behavior graph with.
+        self.assertEqual(intent.normalized, "node.js 後端工程師")
         # The rewrite is retained for provenance and widens alias resolution.
         self.assertEqual(intent.llm_surface, "node.js 後端工程師")
         self.assertIn("skill.nodejs", intent.skills)
@@ -96,12 +96,17 @@ class RankerTests(unittest.TestCase):
 
 
 class QueryNormalizationBoundaryTests(unittest.TestCase):
-    """An LLM query rewrite may only widen alias resolution.
+    """Where a query rewrite is allowed to reach, and where it must not.
 
-    Literal phrase features and behavior-edge keys were learned from raw search
-    strings, and the train-only behavior graph is keyed by them. A rewrite that
-    reached those would silently zero the highest-weighted lexical features and
-    every Query->Job/Skill behavior feature.
+    The rewrite is the scoring surface: scripts/build_benchmark_fixture.py keys
+    the train-only behavior graph with serving_query_key(), which is normalize()
+    over the normalizer output, so the ranker has to look those edges up with the
+    same string. A mismatch is silent, and reads zero for the entire
+    behavior_query_* family rather than raising.
+
+    Alias resolution is the separate concern. It reads the raw surface as well,
+    so a rewrite can only add canonical nodes and never drop one the raw query
+    would have matched.
     """
 
     def setUp(self) -> None:
@@ -160,29 +165,38 @@ class QueryNormalizationBoundaryTests(unittest.TestCase):
         _, features, _, _ = self.ranker._score(0, intent, include_graph=True)
         return features
 
-    def test_gloss_rewrite_does_not_touch_literal_or_behavior_features(self) -> None:
-        baseline = self._features()
-        rewritten = self._features("美語老師 (English teacher)")
-        for name in [
-            "exact_title",
-            "title_phrase",
-            "category_phrase",
-            "description_phrase",
-            "query_unit_overlap",
-            "title_unit_overlap",
-            "lexical",
-            "behavior_query_job_seen",
-            "behavior_query_job_positive_rate",
-            "behavior_query_skill_seen_count",
-            "behavior_query_skill_positive_rate",
-        ]:
-            self.assertEqual(
-                baseline[name],
-                rewritten[name],
-                "%s must be computed from the raw query surface" % name,
-            )
-        self.assertEqual(baseline["exact_title"], 1.0)
-        self.assertEqual(baseline["behavior_query_job_seen"], 1.0)
+    def test_scoring_surface_is_the_key_the_fixture_builder_writes(self) -> None:
+        """Pin the one thing whose failure mode is silence.
+
+        scripts/build_benchmark_fixture.py composes its behavior-graph keys as
+        normalize(normalizer_output). If parse_intent ever keys on the raw query
+        again, every rewritten query misses and behavior_query_* reads zero with
+        no error, so assert the composition rather than trusting a comment.
+        """
+        rewrite = "美語老師 english teacher"
+        intent = self.ranker.parse_intent("美語老師", normalized_query=rewrite)
+        self.assertEqual(intent.normalized, normalize(rewrite))
+
+    def test_behavior_edges_are_hit_when_keyed_on_the_rewrite(self) -> None:
+        rewrite = "美語老師 english teacher"
+        key = normalize(rewrite)
+        graph = self.ranker.behavior_graph
+        graph["query_job"][key] = {"job-1": [4, 3, 5]}
+        graph["query_skill"][key] = {"occupation.teacher": [4, 3, 5]}
+        features = self._features(rewrite)
+        self.assertEqual(features["behavior_query_job_seen"], 1.0)
+        self.assertEqual(features["behavior_query_skill_seen_count"], 1.0)
+
+    def test_a_rewrite_does_not_zero_the_behavior_family_by_accident(self) -> None:
+        """A rewrite with no matching edge must degrade, not corrupt.
+
+        The raw-keyed edge in the fixture is deliberately not re-keyed here, so
+        this is the miss case: the features read zero, every other family still
+        computes, and the response stays well-formed.
+        """
+        rewritten = self._features("完全不同的字串")
+        self.assertEqual(rewritten["behavior_query_job_seen"], 0.0)
+        self.assertEqual(self._features()["behavior_query_job_seen"], 1.0)
 
     def test_rewrite_can_only_add_resolved_skills(self) -> None:
         baseline = self.ranker.parse_intent("美語老師")
