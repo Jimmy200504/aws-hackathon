@@ -1,0 +1,78 @@
+{
+  "metadata": {
+    "schema": "skillweave-place-layer-arms-v1",
+    "l5_source": "config/geo-l5-published.json",
+    "l3_source": "config/geo-authored.json living_areas",
+    "excluded": "entries with requires_occurrence_filter, which are query-side only; see reports/l5-occurrence-judgement.json",
+    "guard": "every place match still has to name a district inside the posting's own 工作城市, the same consistency rule L4 uses"
+  },
+  "conclusion": {
+    "adopt": "l5_unambiguous",
+    "why": "the only arm that improves both metrics: coverage 26.53% -> 27.73% and single-district share 86.71% -> 86.75%",
+    "reject": "l5_l3_relaxed",
+    "why_not": "buys 2,451 more postings and costs 2.09 points of single-district share, because a living area tags eight districts at once and so resolves nothing 工作城市 did not already give",
+    "note": "L3 contributes nothing at --place-max-districts 1 by construction: a living area never resolves to a single district"
+  },
+  "arms": {
+    "l4_only": {
+      "eligible": 961780,
+      "postings_with_district": 255119,
+      "coverage_of_eligible": 0.2653,
+      "single_district_postings": 221212,
+      "single_district_share": 0.8671,
+      "match_from_l5_place": 0,
+      "match_from_l3_area": 0,
+      "match_rejected_county_mismatch": 58553,
+      "by_layer": {
+        "suffix_dropped": 167758,
+        "full_name": 152835
+      },
+      "place_surfaces": 0
+    },
+    "l5_unambiguous": {
+      "eligible": 961780,
+      "postings_with_district": 266704,
+      "coverage_of_eligible": 0.2773,
+      "single_district_postings": 231374,
+      "single_district_share": 0.8675,
+      "match_from_l5_place": 40375,
+      "match_from_l3_area": 0,
+      "match_rejected_county_mismatch": 62258,
+      "by_layer": {
+        "suffix_dropped": 163905,
+        "full_name": 152796,
+        "l5_place": 17955
+      },
+      "place_surfaces": 241,
+      "delta_vs_l4_only": {
+        "postings_with_district": 11585,
+        "coverage_of_eligible": 0.012,
+        "single_district_postings": 10162,
+        "single_district_share": 0.0004
+      }
+    },
+    "l5_l3_relaxed": {
+      "eligible": 961780,
+      "postings_with_district": 269155,
+      "coverage_of_eligible": 0.2799,
+      "single_district_postings": 227857,
+      "single_district_share": 0.8466,
+      "match_from_l5_place": 47033,
+      "match_from_l3_area": 2426,
+      "match_rejected_county_mismatch": 63087,
+      "by_layer": {
+        "suffix_dropped": 163881,
+        "full_name": 152796,
+        "l5_place": 28069,
+        "l3_area": 5591
+      },
+      "place_surfaces": 263,
+      "delta_vs_l4_only": {
+        "postings_with_district": 14036,
+        "coverage_of_eligible": 0.0146,
+        "single_district_postings": 6645,
+        "single_district_share": -0.0205
+      }
+    }
+  }
+}

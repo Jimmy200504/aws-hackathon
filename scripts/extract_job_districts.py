@@ -51,6 +51,12 @@ HAN = re.compile(r"[\u4e00-\u9fff]")
 
 LAYER_FULL = "full_name"
 LAYER_STRIPPED = "suffix_dropped"
+LAYER_L5 = "l5_place"
+LAYER_L3 = "l3_area"
+# Most specific first. A posting naming both 信義區 and 台北101 is resolved by
+# the district name; the landmark only has to carry postings that name no
+# district at all.
+LAYER_RANK = {LAYER_FULL: 0, LAYER_STRIPPED: 1, LAYER_L5: 2, LAYER_L3: 3}
 
 
 L4_TABLE = ROOT / "config" / "geo-l4-districts.json"
@@ -110,6 +116,52 @@ def load_districts(path: Path) -> tuple[set[str], dict[str, dict[str, str]], dic
             county: next(iter(names)) for county, names in per_county.items()
         }
     return counties, {"full": dict(full), "stripped": stripped}, intra_county_collisions
+
+
+L5_PUBLISHED = ROOT / "config" / "geo-l5-published.json"
+
+
+def load_place_surfaces(
+    path: Path, layers: str, max_districts: int
+) -> tuple[dict[str, dict[str, list[str]]], dict[str, str]]:
+    """L5 landmarks and L3 living areas as extra surface layers.
+
+    Only corpus-validated entries are loaded, and the 19 carrying
+    `requires_occurrence_filter` are excluded outright: they were readmitted
+    because a model reading the surrounding sentence can tell 保安人員 from
+    保安車站, and this scanner does not run that model. Using them here as bare
+    substring matches is exactly what the flag says not to do.
+
+    `max_districts` drops entries that do not narrow anything. 忠孝東路 spans
+    four 台北 districts, so tagging all four adds no resolution over 工作城市
+    while making the posting look multi-sited.
+    """
+    if layers == "none" or not path.is_file():
+        return {}, {}
+    wanted = {"l5": {LAYER_L5}, "l5+l3": {LAYER_L5, LAYER_L3}}[layers]
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    table: dict[str, dict[str, list[str]]] = {}
+    surface_layer: dict[str, str] = {}
+    for entry in payload.get("entries", []):
+        if entry.get("requires_occurrence_filter"):
+            continue
+        layer = LAYER_L3 if "living_area" in (entry.get("kind") or "") else LAYER_L5
+        if layer not in wanted:
+            continue
+        per_county: dict[str, list[str]] = defaultdict(list)
+        for node in entry.get("districts", []):
+            county, _, district = node.partition("/")
+            per_county[county].append(district)
+        per_county = {
+            county: districts
+            for county, districts in per_county.items()
+            if len(districts) <= max_districts
+        }
+        if not per_county:
+            continue
+        table[entry["surface"]] = per_county
+        surface_layer[entry["surface"]] = layer
+    return table, surface_layer
 
 
 def build_pattern(surfaces: list[str]) -> re.Pattern[str]:
@@ -277,6 +329,21 @@ def main() -> None:
         help="a collocation needs this much support before it can be a label",
     )
     parser.add_argument(
+        "--place-layers",
+        choices=("none", "l5", "l5+l3"),
+        default="none",
+        help="scan L5 landmarks and L3 living areas alongside the district names; "
+        "the checked-in report was produced with none",
+    )
+    parser.add_argument(
+        "--place-max-districts",
+        type=int,
+        default=1,
+        help="skip a place whose districts inside one county exceed this, since "
+        "an arterial road spanning four districts narrows nothing over 工作城市",
+    )
+    parser.add_argument("--l5-published", type=Path, default=L5_PUBLISHED)
+    parser.add_argument(
         "--collocation-judgements",
         type=Path,
         default=None,
@@ -321,7 +388,25 @@ def main() -> None:
     for name in stripped_table:
         surface_layer.setdefault(name, LAYER_STRIPPED)
     candidates = {**{k: v for k, v in stripped_table.items()}, **full_table}
-    pattern = build_pattern(list(surface_layer))
+    place_table, place_layer = load_place_surfaces(
+        args.l5_published, args.place_layers, args.place_max_districts
+    )
+    # A district name always wins: an L5 entry that repeats one adds nothing.
+    place_table = {s: v for s, v in place_table.items() if s not in candidates}
+    place_layer = {s: v for s, v in place_layer.items() if s in place_table}
+    # Kept out of `surface_layer` on purpose: that map drives the error-rate gate
+    # and the collocation queue, both of which are defined against the district
+    # code table. L5 and L3 surfaces already passed their own concentration gate
+    # in scripts/validate_l5_table.py and must not be re-judged by a rule that
+    # does not apply to them.
+    if place_table:
+        print(
+            f"place surfaces: {len(place_table)} "
+            f"({sum(1 for v in place_layer.values() if v == LAYER_L5)} L5, "
+            f"{sum(1 for v in place_layer.values() if v == LAYER_L3)} L3)",
+            flush=True,
+        )
+    pattern = build_pattern(list(surface_layer) + list(place_table))
     # Eight counties are named after their own seat, so the same two characters
     # can qualify a county or name a district. 桃園大園 is 大園區 inside 桃園市,
     # not 桃園區. Restricting the rule to these surfaces keeps 中和永和, which is
@@ -389,7 +474,7 @@ def main() -> None:
                     b_start, _, b_surface = spans[position + 1]
                     if a_end != b_start or seat_surface.get(a_surface) != county:
                         continue
-                    if county in candidates[b_surface]:
+                    if county in candidates.get(b_surface, {}):
                         # 桃園 immediately before 大園 is qualifying the county.
                         qualifier.add(position)
                 for position, (start, end, surface) in enumerate(spans):
@@ -416,8 +501,11 @@ def main() -> None:
             if not found:
                 continue
             for surface in found:
-                surface_counties[surface][county] += 1
+                if surface in candidates:
+                    surface_counties[surface][county] += 1
             for key, snippet in contexts.items():
+                if key[0] not in candidates:
+                    continue
                 inside = county in candidates[key[0]]
                 entry = collocations[key]
                 entry[0] += 1
@@ -477,6 +565,24 @@ def main() -> None:
     for job_id, county, found, keys in buffered:
         resolved: dict[str, dict[str, str]] = {}
         for surface, field in found.items():
+            if surface in place_table:
+                # L5 and L3 carry their own validation and their own county
+                # claim, so only the consistency guard applies here.
+                districts = place_table[surface].get(county)
+                if not districts:
+                    stats["match_rejected_county_mismatch"] += 1
+                    continue
+                layer = place_layer[surface]
+                for district in districts:
+                    previous = resolved.get(district)
+                    if previous is None or LAYER_RANK[layer] < LAYER_RANK[previous["layer"]]:
+                        resolved[district] = {
+                            "surface": surface,
+                            "layer": layer,
+                            "field": field,
+                        }
+                stats[f"match_from_{layer}"] += 1
+                continue
             occurrence = occurrence_verdict(occurrence_judgements, surface, keys.get(surface, ()))
             if occurrence == "not_place":
                 # Every occurrence of this surface in this posting was judged
@@ -497,9 +603,7 @@ def main() -> None:
                 continue
             layer = surface_layer[surface]
             previous = resolved.get(district)
-            if previous is None or (
-                previous["layer"] == LAYER_STRIPPED and layer == LAYER_FULL
-            ):
+            if previous is None or LAYER_RANK[layer] < LAYER_RANK[previous["layer"]]:
                 resolved[district] = {"surface": surface, "layer": layer, "field": field}
         if not resolved:
             continue
@@ -525,7 +629,10 @@ def main() -> None:
             "graph_cutoff": GRAPH_CUTOFF.isoformat(sep=" "),
             "leakage_policy": "only postings last modified on or before the graph cutoff",
             "disambiguation": "a matched surface is kept only if it names a district inside the posting's own 工作城市",
-            "surface_layers": [LAYER_FULL, LAYER_STRIPPED],
+            "surface_layers": sorted({LAYER_FULL, LAYER_STRIPPED} | set(place_layer.values())),
+            "place_layers": args.place_layers,
+            "place_max_districts": args.place_max_districts,
+            "place_surfaces": len(place_table),
             "surface_gate": "conservative upper bound on the share of kept matches "
             "that are not place references, applied to both layers",
             "max_error": args.max_error,

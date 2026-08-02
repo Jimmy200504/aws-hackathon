@@ -305,6 +305,89 @@ class JudgementLoaderTests(unittest.TestCase):
         )
 
 
+class PlaceLayerTests(unittest.TestCase):
+    """L5 and L3 as extra surface layers for the district extractor."""
+
+    L5 = ROOT / "config" / "geo-l5-published.json"
+
+    def setUp(self) -> None:
+        if not self.L5.is_file():
+            self.skipTest("geo-l5-published.json not present")
+
+    def load(self, layers: str, max_districts: int = 1):
+        return extract.load_place_surfaces(self.L5, layers, max_districts)
+
+    def test_disabled_by_default_layer_choice(self) -> None:
+        self.assertEqual(self.load("none"), ({}, {}))
+
+    def test_occurrence_filtered_entries_are_never_loaded(self) -> None:
+        # They are query-side only: this scanner does not run the model that
+        # tells 保安人員 from 保安車站.
+        published = json.loads(self.L5.read_text(encoding="utf-8"))
+        rescued = {
+            entry["surface"]
+            for entry in published["entries"]
+            if entry.get("requires_occurrence_filter")
+        }
+        self.assertTrue(rescued)
+        table, _ = self.load("l5+l3", 8)
+        self.assertEqual(rescued & set(table), set())
+
+    def test_multi_district_places_are_dropped_at_max_one(self) -> None:
+        table, _ = self.load("l5+l3", 1)
+        for surface, per_county in table.items():
+            for districts in per_county.values():
+                self.assertEqual(len(districts), 1, surface)
+
+    def test_living_areas_need_a_relaxed_limit_to_appear(self) -> None:
+        # A living area never resolves to a single district, so it contributes
+        # nothing at the default limit.
+        _, strict = self.load("l5+l3", 1)
+        _, relaxed = self.load("l5+l3", 8)
+        self.assertNotIn(extract.LAYER_L3, strict.values())
+        self.assertIn(extract.LAYER_L3, relaxed.values())
+
+    def test_l5_only_excludes_living_areas(self) -> None:
+        _, layers = self.load("l5", 8)
+        self.assertNotIn(extract.LAYER_L3, layers.values())
+        self.assertIn(extract.LAYER_L5, layers.values())
+
+    def test_districts_are_grouped_by_county(self) -> None:
+        table, _ = self.load("l5", 1)
+        self.assertEqual(table["中壢工業區"], {"桃園市": ["中壢區"]})
+
+    def test_layer_precedence_prefers_the_district_name(self) -> None:
+        rank = extract.LAYER_RANK
+        self.assertLess(rank[extract.LAYER_FULL], rank[extract.LAYER_STRIPPED])
+        self.assertLess(rank[extract.LAYER_STRIPPED], rank[extract.LAYER_L5])
+        self.assertLess(rank[extract.LAYER_L5], rank[extract.LAYER_L3])
+
+
+class ArmReportTests(unittest.TestCase):
+    REPORT = ROOT / "reports" / "place-layer-arms.json"
+
+    def setUp(self) -> None:
+        if not self.REPORT.is_file():
+            self.skipTest("place-layer-arms.json not present")
+        self.report = json.loads(self.REPORT.read_text(encoding="utf-8"))
+
+    def test_baseline_arm_matches_the_checked_in_extraction(self) -> None:
+        base = self.report["arms"]["l4_only"]
+        self.assertEqual(base["postings_with_district"], 255119)
+        self.assertEqual(base["coverage_of_eligible"], 0.2653)
+        self.assertEqual(base["single_district_share"], 0.8671)
+
+    def test_adopted_arm_improves_both_metrics(self) -> None:
+        delta = self.report["arms"]["l5_unambiguous"]["delta_vs_l4_only"]
+        self.assertGreater(delta["coverage_of_eligible"], 0)
+        self.assertGreaterEqual(delta["single_district_share"], 0)
+
+    def test_rejected_arm_trades_purity_for_coverage(self) -> None:
+        delta = self.report["arms"]["l5_l3_relaxed"]["delta_vs_l4_only"]
+        self.assertGreater(delta["coverage_of_eligible"], 0)
+        self.assertLess(delta["single_district_share"], 0)
+
+
 class QueueArtifactTests(unittest.TestCase):
     """The regenerated queue must hold every collocation, not the report's top 30."""
 
