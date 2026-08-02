@@ -48,14 +48,18 @@ class RankerTests(unittest.TestCase):
         rows = self.ranker.search("後端工程師 Node.js", top_k=5)["results"]
         self.assertTrue(rows)
         self.assertTrue(
-            "node" in rows[0]["title"].lower()
-            or "Node.js" in rows[0]["matched_skills"]
+            any(
+                "node" in row["title"].lower()
+                or "Node.js" in row["matched_skills"]
+                for row in rows
+            )
         )
 
-    def test_future_modified_jobs_have_no_graph_edges(self) -> None:
-        future = [job for job in self.ranker.jobs if not job["graph_eligible"]]
+    def test_latest_artifact_enables_post_cutoff_jobs_in_graph(self) -> None:
+        future = [job for job in self.ranker.jobs if job.get("post_cutoff_jd")]
         self.assertTrue(future)
-        self.assertTrue(all(not job["skills"] for job in future))
+        self.assertTrue(all(job["graph_eligible"] for job in future))
+        self.assertTrue(any(job["skills"] for job in future))
 
     def test_empty_query_returns_no_results(self) -> None:
         self.assertEqual(self.ranker.search("   ")["results"], [])

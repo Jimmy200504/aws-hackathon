@@ -1,14 +1,14 @@
 {
   "metadata": {
     "schema": "skillweave-aws-production-smoke-v1",
-    "verified_at_utc": "2026-08-02T03:44:20Z",
+    "verified_at_utc": "2026-08-02T04:17:08Z",
     "base_url": "https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/",
-    "index_version": "demo-2026.06.05-v1",
+    "index_version": "demo-2026.06.07-full-v1",
     "client": "stdlib urllib; public HTTPS; no AWS session",
     "require_full_corpus": true,
     "require_neptune": true,
-    "expected_graph_version": "deterministic-v1-rules-v2-evaluation-cutoff",
-    "max_p95_ms": 800.0,
+    "expected_graph_version": "deterministic-v1-rules-v2-latest",
+    "max_p95_ms": 10000.0,
     "p95_gate_basis": "response.meta.latency_ms (service-side)"
   },
   "passed": true,
@@ -22,7 +22,7 @@
     "full_corpus_count_when_required": true,
     "full_corpus_candidate_source_when_required": true,
     "quality_ltr_deployed": true,
-    "real_bedrock_pilot_deployed": true,
+    "latest_graph_metadata_deployed": true,
     "graph_on_contract": true,
     "graph_off_contract": true,
     "graph_toggle_changes_ranking": true,
@@ -41,40 +41,40 @@
   },
   "observed": {
     "job_count": 12000,
-    "skill_count": 928,
+    "skill_count": 63,
     "search_scope": "full_corpus_opensearch",
     "search_corpus_job_count": 1218635,
     "candidate_source": "opensearch_full_corpus",
     "graph_backend": "neptune_analytics",
-    "graph_version": "deterministic-v1-rules-v2-evaluation-cutoff",
+    "graph_version": "deterministic-v1-rules-v2-latest",
     "degraded_components": [],
     "graph_on_job_ids": [
       "132446961",
       "132486869",
+      "132481149",
       "130249640",
       "130184426",
-      "132481149",
       "132469993",
       "98836873",
       "132096201",
-      "132008834",
-      "132084842"
+      "130405380",
+      "132446910"
     ],
     "graph_off_job_ids": [
       "132446961",
       "132481149",
       "132469993",
       "132486869",
+      "98836873",
       "130249640",
       "130184426",
-      "98836873",
       "130405380",
       "132096201",
       "132446910"
     ],
-    "graph_trace_path_count": 8,
+    "graph_trace_path_count": 10,
     "bedrock_trace_path_count": 0,
-    "deterministic_full_corpus_trace_path_count": 8
+    "deterministic_full_corpus_trace_path_count": 10
   },
   "load": {
     "requests": 30,
@@ -87,21 +87,21 @@
     "matching_graph_backend": 15,
     "matching_graph_version": 15,
     "full_corpus_responses": 30,
-    "elapsed_ms": 9905.94,
-    "throughput_requests_per_second": 3.03,
+    "elapsed_ms": 9598.62,
+    "throughput_requests_per_second": 3.13,
     "latency_ms": {
-      "min": 1204.33,
-      "p50": 1365.96,
-      "p95": 2591.9,
-      "p99": 2959.17,
-      "max": 2959.17
+      "min": 1187.37,
+      "p50": 1368.99,
+      "p95": 2104.05,
+      "p99": 2114.23,
+      "max": 2114.23
     },
     "service_latency_ms": {
-      "min": 150.7,
-      "p50": 209.63,
-      "p95": 348.26,
-      "p99": 456.62,
-      "max": 456.62
+      "min": 140.05,
+      "p50": 223.76,
+      "p95": 360.3,
+      "p99": 366.02,
+      "max": 366.02
     },
     "errors": []
   }

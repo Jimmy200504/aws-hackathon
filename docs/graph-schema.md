@@ -65,14 +65,18 @@ evidence、`rules_version` 與 `corpus_hash`。
 ## Temporal artifacts
 
 - `evaluation-cutoff`：只含 `2026-06-05 23:59:59.999` 以前的 Job edges，是
-  hackathon evaluation 與 API 預設 graph。
-- `latest`：可含 cutoff 後資料，使用獨立 immutable manifest。
+  hackathon leakage-free evaluation graph，不是 production serving pointer。
+- `latest`：包含完整七日資料集，使用獨立 immutable manifest，為本機與 AWS API
+  的預設 serving graph。
 - 每個輸入必須進 accepted 或 quarantine；cutoff 後的有效資料另計為
   `post_cutoff_excluded`，不可偷偷進 cutoff graph。
 
 真實 inventory scan 已確認 1,218,635 筆輸入，其中 cutoff eligible 967,377、
 post-cutoff 251,258、無無效時間戳。完整 graph 發布仍需通過 referential integrity、
 ranking non-regression、至少一項主要 NDCG 正 lift、API/degraded smoke 與 p95 `<800 ms`。
+
+目前 `latest` production graph 實際包含 1,219,372 nodes、5,249,573 edges；
+其中 Job nodes 為 1,218,635，沒有職缺因 cutoff 被排除。
 
 ## Neptune query
 

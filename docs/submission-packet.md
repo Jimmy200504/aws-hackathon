@@ -23,8 +23,9 @@ Unbiased LambdaMART 重排搜尋結果；每條圖譜路徑都可追溯、可消
 主動應徵，但既有結構化技能欄位大量缺漏，同一技能也有多種寫法。SkillWeave
 在索引前使用 reviewed ontology exact matching 與 deterministic validator；未知
 surface 只進人工審閱佇列，技能關係則由有門檻的全量共現統計產生。
-線上以 Query → Skill → Job 的一跳路徑產生可解釋 ranking features；無信心或
-新職缺則回退 lexical cold-start，不用生成式 AI 自由撰寫結果文案。
+線上以 Query → Skill → Job 的一跳路徑產生可解釋 ranking features；完整七日
+職缺均由 latest graph 服務，只有無可用技能 evidence 時才回退 lexical 路徑，
+不用生成式 AI 自由撰寫結果文案。
 
 歷史 Amazon Bedrock Claude Haiku 4.5 pilot 曾處理
 200 筆 train-only 職缺：
@@ -111,7 +112,7 @@ gap。目前沒有因果轉換或單次相關曝光的貨幣價值，因此**不
 1. 搜尋 `AWS Docker Kubernetes`，確認 Graph ON 的 Top-10 與 trace。
 2. 切換 baseline，確認不是按鈕換色，而是排序與 graph contribution 改變。
 3. 搜尋 `React 前端工程師`，展開 Query → Skill → Job evidence。
-4. 查看 cold-start 職缺，確認 cutoff 後 JD 沒有 graph edge。
+4. 查看 6/5 後職缺，確認仍有 graph edge、`cold_start=0` 與可追溯 evidence。
 5. 開 `reports/aws-production-smoke.json`，核對 public UI/API、30/30 與 p95。
 6. 執行 `python3 scripts/verify_quality_release.py`，核對 frozen model、互斥
    buckets、5% gate 與 CI。

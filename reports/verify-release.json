@@ -1,6 +1,6 @@
 {
   "verifier_version": "1",
-  "verified_at_utc": "2026-08-02T04:27:36Z",
+  "verified_at_utc": "2026-08-02T04:47:19Z",
   "release": "skillweave-2026.07.28-rc6",
   "passed": true,
   "summary": {
@@ -66,7 +66,7 @@
         {
           "id": "G2.2",
           "status": "PASS",
-          "message": "Every cold-start demo job has an empty skill edge list."
+          "message": "Latest serving graph includes every demo job and post-cutoff edge set."
         },
         {
           "id": "G2.3",
@@ -286,7 +286,7 @@
         {
           "id": "G17.4",
           "status": "PASS",
-          "message": "Release manifest defaults to cutoff and records a gated graph rollout state."
+          "message": "Release manifest preserves cutoff evaluation and records a gated serving scope."
         },
         {
           "id": "G17.5",
@@ -456,7 +456,7 @@
         {
           "id": "G12.4",
           "status": "PASS",
-          "message": "Absent rebuildable video is covered by its source and report hash."
+          "message": "Local demo video hash matches the report."
         },
         {
           "id": "G12.5",
@@ -536,7 +536,7 @@
         {
           "id": "G7.3",
           "status": "PASS",
-          "message": "Verified 43 artifact hashes; skipped absent rebuildable dist/skillweave-demo-5min.mp4."
+          "message": "Verified 46 artifact hashes."
         },
         {
           "id": "G7.4",

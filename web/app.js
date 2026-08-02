@@ -317,7 +317,7 @@ function showTrace(row, query, graphEnabled) {
   }
   if (!traces.length) {
     graphPanel.innerHTML = row?.graph_eligible === false
-      ? '<p class="panel-empty">此職缺晚於圖譜 cutoff，刻意不使用 JD 建邊；目前以 cold-start 文字路徑排序。</p>'
+      ? '<p class="panel-empty">此職缺目前沒有可用的技能 evidence；系統以文字路徑安全降級排序。</p>'
       : '<p class="panel-empty">本筆未命中已驗證的技能邊，未生成推論式說明。</p>';
     return;
   }

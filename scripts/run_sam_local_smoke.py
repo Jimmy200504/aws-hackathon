@@ -88,7 +88,7 @@ def main() -> None:
         "contiguous_ranks": ranks == list(range(1, 11)),
         "unique_job_ids": len(job_ids) == len(set(job_ids)),
         "index_version": body.get("meta", {}).get("index_version")
-        == "demo-2026.06.05-v1",
+        == "demo-2026.06.07-full-v1",
         "graph_provenance": bool(paths)
         and all(
             path.get("path")

@@ -251,13 +251,33 @@ class ReleaseVerifier:
             "Release graph cutoff matches the registered cutoff.",
             "Release graph cutoff changed unexpectedly.",
         )
+        serving_scope = manifest.get("graph_build", {}).get(
+            "default_scope", "evaluation-cutoff"
+        )
         cold_jobs = [job for job in RANKER.jobs if not job.get("graph_eligible", False)]
+        post_cutoff_jobs = [
+            job for job in RANKER.jobs if job.get("post_cutoff_jd", False)
+        ]
+        if serving_scope == "latest":
+            eligibility_ok = (
+                not cold_jobs
+                and bool(post_cutoff_jobs)
+                and all(job.get("skills") for job in post_cutoff_jobs)
+            )
+            success = "Latest serving graph includes every demo job and post-cutoff edge set."
+            failure = "Latest serving graph still contains ineligible or edgeless post-cutoff jobs."
+        else:
+            eligibility_ok = bool(cold_jobs) and all(
+                not job.get("skills") for job in cold_jobs
+            )
+            success = "Every cold-start demo job has an empty skill edge list."
+            failure = "A cold-start demo job contains graph skills."
         self.add(
             graph_group,
             "G2.2",
-            bool(cold_jobs) and all(not job.get("skills") for job in cold_jobs),
-            "Every cold-start demo job has an empty skill edge list.",
-            "A cold-start demo job contains graph skills.",
+            eligibility_ok,
+            success,
+            failure,
         )
         paths = [
             path
@@ -563,10 +583,13 @@ class ReleaseVerifier:
             ),
             (
                 "G17.4",
-                graph_build.get("default_scope") == "evaluation-cutoff"
+                graph_build.get("evaluation_scope", "evaluation-cutoff")
+                == "evaluation-cutoff"
+                and graph_build.get("default_scope")
+                in {"evaluation-cutoff", "latest"}
                 and graph_build.get("neptune_release_status")
                 in {"pending_full_release_gates", "release_gates_passed", "serving"},
-                "Release manifest defaults to cutoff and records a gated graph rollout state.",
+                "Release manifest preserves cutoff evaluation and records a gated serving scope.",
                 "Graph release scope/status is missing or unsafe.",
             ),
             (

@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "schema": "skillweave-full-graph-serving-verification-v1",
+    "verified_at_utc": "2026-08-02T04:47:01Z",
+    "dataset_version": "1111-2026-06-01_2026-06-07"
+  },
+  "passed": true,
+  "checks": {
+    "local_latest_manifest": true,
+    "local_graph_integrity": true,
+    "local_demo_all_eligible": true,
+    "local_post_cutoff_trace": true,
+    "s3_artifact_sizes": true,
+    "serving_pointer_latest": true,
+    "neptune_import_succeeded": true,
+    "neptune_all_job_nodes": true,
+    "neptune_post_cutoff_edges": true,
+    "opensearch_all_eligible": true,
+    "lambda_latest_graph": true,
+    "public_api_latest_graph": true,
+    "public_post_cutoff_trace": true
+  },
+  "observed": {
+    "local_jobs": 1218635,
+    "local_nodes": 1219372,
+    "local_edges": 5249573,
+    "local_demo_jobs": 12000,
+    "remote_graph_id": "g-ndf9sijo15",
+    "remote_graph_version": "deterministic-v1-rules-v2-latest",
+    "lambda_live_version": "17",
+    "remote_job_nodes": 1218635,
+    "remote_post_cutoff_edge_count": 10,
+    "opensearch_eligible_jobs": 1218635,
+    "opensearch_ineligible_jobs": 0,
+    "public_post_cutoff_job_id": "113042386",
+    "public_post_cutoff_trace_count": 2
+  }
+}

@@ -107,7 +107,10 @@ def main() -> int:
         lambda_handler.QUERY_NORMALIZER = original_normalizer
 
     checks = {
-        "cutoff_scope": manifest.get("scope") == "evaluation-cutoff",
+        "serving_scope_supported": manifest.get("scope")
+        in {"evaluation-cutoff", "latest"},
+        "complete_corpus_when_latest": manifest.get("scope") != "latest"
+        or manifest.get("accepted") == 1_218_635,
         "offline_zero_llm": manifest.get("llm_requests") == 0
         and manifest.get("embedding_requests") == 0,
         "all_http_200": all(row["status"] == 200 for row in rows),

@@ -1,0 +1,24 @@
+{
+  "schema": "skillweave-graph-serving-pointer-v2",
+  "updated_at_utc": "2026-08-02T04:17:08Z",
+  "dataset_version": "1111-2026-06-01_2026-06-07",
+  "run_id": "deterministic-v1-rules-v2-full",
+  "scope": "latest",
+  "graph_id": "g-ndf9sijo15",
+  "graph_version": "deterministic-v1-rules-v2-latest",
+  "manifest_hash": "44d46505292696204b160e014b2cb7c8c38e49ac80057481cb014bd091223911",
+  "manifest_sha256": "61bb72249e7acdd4385847ed1393fc2643560c98896fc864aacc26980dbdd5f3",
+  "job_nodes": 1218635,
+  "nodes": 1219372,
+  "edges": 5249573,
+  "neptune_import_task": "t-3bl28qmjj8",
+  "neptune_import_status": "SUCCEEDED",
+  "opensearch_graph_eligible_jobs": 1218635,
+  "opensearch_graph_ineligible_jobs": 0,
+  "artifact_source": "s3://skillweave-provisioned-search-snapshotbucket-rigq6j18z9ma/graph-artifacts/deterministic-v1-rules-v2-full/latest/neptune/",
+  "previous": {
+    "graph_id": "g-tew85zms65",
+    "graph_version": "deterministic-v1-rules-v2-evaluation-cutoff",
+    "scope": "evaluation-cutoff"
+  }
+}

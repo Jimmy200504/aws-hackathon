@@ -41,7 +41,7 @@ class FullCorpusIndexTests(unittest.TestCase):
         }
         self.pattern, self.aliases = compile_alias_matcher(self.skills)
 
-    def test_post_cutoff_job_is_still_annotated_but_flagged(self) -> None:
+    def test_post_cutoff_job_is_eligible_in_latest_serving_graph(self) -> None:
         """The cutoff is offline-ablation provenance, not a live-index gate.
 
         Withholding skills here would leave a quarter of the corpus with no
@@ -54,10 +54,22 @@ class FullCorpusIndexTests(unittest.TestCase):
             self.aliases,
         )
         self.assertEqual(document["id"], "job-1")
-        self.assertFalse(document["graph_eligible"])
+        self.assertTrue(document["graph_eligible"])
         self.assertTrue(document["post_cutoff_jd"])
         self.assertEqual(document["skills"], ["skill.python"])
         self.assertIn("Python", document["description_search"])
+
+    def test_evaluation_scope_keeps_post_cutoff_job_out_of_graph(self) -> None:
+        document = job_document(
+            row(modified_at="2026-06-20 00:00:00", title="Python 工程師"),
+            self.skills,
+            self.pattern,
+            self.aliases,
+            graph_scope="evaluation-cutoff",
+        )
+        self.assertFalse(document["graph_eligible"])
+        self.assertTrue(document["post_cutoff_jd"])
+        self.assertEqual(document["skills"], ["skill.python"])
 
     def test_structured_attribute_columns_are_indexed(self) -> None:
         source = row(modified_at="2026-06-05 12:00:00")

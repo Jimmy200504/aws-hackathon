@@ -51,7 +51,7 @@ Parameters:
     Default: us-east-1
   GraphVersion:
     Type: String
-    Default: evaluation-cutoff-embedded
+    Default: deterministic-v1-rules-v2-latest
   SkillAliasIndex:
     Type: String
     Default: skillweave-skill-alias-v1

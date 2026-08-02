@@ -255,8 +255,9 @@ class GraphFeatureProvider:
             )
         except Exception as exc:
             LOGGER.warning(
-                "Neptune graph expansion failed safely: %s",
+                "Neptune graph expansion failed safely: %s: %s",
                 type(exc).__name__,
+                exc,
             )
             return GraphExpansion(
                 canonical_ids=tuple(fallback_ids),

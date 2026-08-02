@@ -69,6 +69,8 @@ CURRENT="$(aws lambda get-function-configuration \
   --query 'Environment.Variables' --output json)"
 MERGED="$(BEDROCK_QUERY_MODEL_ID_VALUE="${BEDROCK_QUERY_MODEL_ID:-global.anthropic.claude-haiku-4-5-20251001-v1:0}" \
   BEDROCK_EMBEDDING_MODEL_ID_VALUE="${BEDROCK_EMBEDDING_MODEL_ID:-}" \
+  NEPTUNE_GRAPH_ID_VALUE="${SKILLWEAVE_NEPTUNE_GRAPH_ID:-}" \
+  GRAPH_VERSION_VALUE="${SKILLWEAVE_GRAPH_VERSION:-}" \
   .venv/bin/python - "$CURRENT" <<'PY'
 import json, os, sys
 
@@ -105,6 +107,12 @@ if embedding_model:
     current["BEDROCK_EMBEDDING_MODEL_ID"] = embedding_model
 elif "BEDROCK_EMBEDDING_MODEL_ID" in os.environ:
     current.pop("BEDROCK_EMBEDDING_MODEL_ID", None)
+graph_id = os.environ["NEPTUNE_GRAPH_ID_VALUE"].strip()
+graph_version = os.environ["GRAPH_VERSION_VALUE"].strip()
+if graph_id:
+    current["NEPTUNE_GRAPH_ID"] = graph_id
+if graph_version:
+    current["GRAPH_VERSION"] = graph_version
 print(json.dumps({"Variables": current}, ensure_ascii=False))
 PY
 )"
@@ -146,7 +154,7 @@ fi
 if [[ "${SKILLWEAVE_REQUIRE_NEPTUNE:-yes}" == "yes" ]]; then
   VERIFY_ARGS+=(--require-neptune)
 fi
-EXPECTED_GRAPH_VERSION="${SKILLWEAVE_EXPECTED_GRAPH_VERSION-deterministic-v1-rules-v2-evaluation-cutoff}"
+EXPECTED_GRAPH_VERSION="${SKILLWEAVE_EXPECTED_GRAPH_VERSION-deterministic-v1-rules-v2-latest}"
 if [[ -n "$EXPECTED_GRAPH_VERSION" ]]; then
   VERIFY_ARGS+=(--expected-graph-version "$EXPECTED_GRAPH_VERSION")
 fi

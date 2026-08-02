@@ -53,7 +53,12 @@ def evaluate_release_gates(
                 and production_manifest.get("llm_requests") == 0
                 and production_manifest.get("embedding_requests") == 0
             ),
-            "cutoff_default": production_manifest.get("default_scope") == "evaluation-cutoff",
+            "cutoff_evaluation_preserved": production_manifest.get(
+                "evaluation_scope", production_manifest.get("default_scope")
+            )
+            == "evaluation-cutoff",
+            "serving_scope_valid": production_manifest.get("default_scope")
+            in {"evaluation-cutoff", "latest"},
             "candidate_isolation": production_manifest.get("candidate_nodes_published", 0) == 0,
         })
     failures = [name for name, passed in checks.items() if not passed]

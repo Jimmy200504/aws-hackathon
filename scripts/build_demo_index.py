@@ -28,6 +28,9 @@ DEFAULT_ONTOLOGY = ROOT / "config" / "skill_ontology.seed.json"
 DEFAULT_ONTOLOGY_EXTRA = ROOT / "config" / "skill_ontology.bedrock-titles.json"
 TRAIN_CUTOFF = datetime.fromisoformat("2026-06-05 23:59:59.999")
 MIN_DATE = datetime.fromisoformat("2024-01-01 00:00:00")
+GRAPH_SCOPES = ("latest", "evaluation-cutoff")
+
+
 def norm(value: str | None) -> str:
     text = unicodedata.normalize("NFKC", value or "").lower().replace("臺", "台")
     return re.sub(r"\s+", " ", text).strip()
@@ -76,7 +79,10 @@ def select_jobs(
     per_skill: int,
     per_category: int,
     max_jobs: int,
+    graph_scope: str = "latest",
 ) -> tuple[list[dict], dict]:
+    if graph_scope not in GRAPH_SCOPES:
+        raise ValueError(f"unsupported graph scope: {graph_scope}")
     aliases: dict[str, list[str]] = {
         skill_id: [spec.get("label", ""), *spec.get("aliases", [])]
         for skill_id, spec in ontology["skills"].items()
@@ -92,8 +98,9 @@ def select_jobs(
         for row in csv.DictReader(handle):
             seen_rows += 1
             modified = parse_time(row["職缺最後修改時間"])
-            graph_eligible = modified <= TRAIN_CUTOFF
-            future_modified += not graph_eligible
+            post_cutoff_jd = modified > TRAIN_CUTOFF
+            graph_eligible = graph_scope == "latest" or not post_cutoff_jd
+            future_modified += post_cutoff_jd
             title = row["職務名稱"].strip()
             description = row["職務內容"].strip()
             missing_text += not bool(title or description)
@@ -135,7 +142,12 @@ def select_jobs(
                 else:
                     evidence[skill_id] = f"職稱／分類文字：{matched_alias}"
                     confidence[skill_id] = 0.79
-            days = max(0.0, (min(modified, TRAIN_CUTOFF) - MIN_DATE).total_seconds() / 86400)
+            freshness_date = (
+                modified if graph_scope == "latest" else min(modified, TRAIN_CUTOFF)
+            )
+            days = max(
+                0.0, (freshness_date - MIN_DATE).total_seconds() / 86400
+            )
             completeness = min(1.0, len(description) / 450)
             priority = days + completeness + (0.25 if graph_eligible else 0.0)
             job = {
@@ -149,6 +161,7 @@ def select_jobs(
                 "industry": row["產業中類"] or row["產業大類"],
                 "company_id": row["廠商編號"],
                 "modified_at": row["職缺最後修改時間"],
+                "post_cutoff_jd": post_cutoff_jd,
                 "graph_eligible": graph_eligible,
                 "skills": sorted(set(matched)) if graph_eligible else [],
                 "skill_evidence": evidence if graph_eligible else {},
@@ -186,7 +199,10 @@ def select_jobs(
     jobs = sorted(selected.values(), key=lambda job: (job["title"], job["id"]))[:max_jobs]
     stats = {
         "source_job_rows": seen_rows,
-        "future_modified_excluded_from_graph": future_modified,
+        "post_cutoff_source_jobs": future_modified,
+        "future_modified_excluded_from_graph": (
+            future_modified if graph_scope == "evaluation-cutoff" else 0
+        ),
         "missing_job_text": missing_text,
         "selected_demo_jobs": len(jobs),
     }
@@ -225,18 +241,24 @@ def add_behavior_counts(data_dir: Path, jobs: list[dict]) -> dict:
 
 def schema_fingerprint(data_dir: Path) -> str:
     digest = hashlib.sha256()
-    for name in [
+    names = [
         "城市對照表.csv",
         "職務對照表.csv",
         "職缺.csv",
-        "userSearchLog_cleaned.csv",
         "職缺瀏覽_20260601_20260607.csv",
         "主動應徵_0601-0607.csv",
-    ]:
+    ]
+    search_log = data_dir / "userSearchLog_cleaned.csv"
+    if not search_log.is_file():
+        search_log = data_dir / "userSearchLog_20260601_20260607.csv"
+    for name in names:
         path = data_dir / name
         with path.open("rb") as handle:
             digest.update(handle.readline())
         digest.update(str(path.stat().st_size).encode())
+    with search_log.open("rb") as handle:
+        digest.update(handle.readline())
+    digest.update(str(search_log.stat().st_size).encode())
     return digest.hexdigest()[:16]
 
 
@@ -263,6 +285,15 @@ def main() -> None:
     parser.add_argument("--per-skill", type=int, default=100)
     parser.add_argument("--per-category", type=int, default=30)
     parser.add_argument("--max-jobs", type=int, default=12000)
+    parser.add_argument(
+        "--graph-scope",
+        choices=GRAPH_SCOPES,
+        default="latest",
+        help=(
+            "latest publishes graph edges for the complete supplied corpus; "
+            "evaluation-cutoff preserves the frozen 2026-06-05 benchmark gate"
+        ),
+    )
     parser.add_argument("--skip-behavior", action="store_true")
     args = parser.parse_args()
 
@@ -289,9 +320,14 @@ def main() -> None:
         graph_extensions.append(
             {"source": str(path), **extension.get("provenance", {})}
         )
-    print("Selecting representative jobs with temporal graph gating…", flush=True)
+    print(f"Selecting representative jobs for {args.graph_scope} graph…", flush=True)
     jobs, stats = select_jobs(
-        args.data_dir, ontology, args.per_skill, args.per_category, args.max_jobs
+        args.data_dir,
+        ontology,
+        args.per_skill,
+        args.per_category,
+        args.max_jobs,
+        args.graph_scope,
     )
     if not args.skip_behavior:
         print("Aggregating view/apply signals for selected jobs…", flush=True)
@@ -305,10 +341,16 @@ def main() -> None:
     )
     artifact = {
         "metadata": {
-            "index_version": "demo-2026.06.05-v1",
+            "index_version": (
+                "demo-2026.06.07-full-v1"
+                if args.graph_scope == "latest"
+                else "demo-2026.06.05-v1"
+            ),
             "dataset_version": "1111-2026-06-01_2026-06-07",
             "schema_fingerprint": schema_fingerprint(args.data_dir),
             "graph_train_cutoff": TRAIN_CUTOFF.isoformat(sep=" "),
+            "graph_scope": args.graph_scope,
+            "graph_version": f"deterministic-v1-rules-v2-{args.graph_scope}",
             "graph_builder": (
                 "reviewed-bootstrap-fixture+validated-extraction"
                 if extraction_nodes
@@ -329,7 +371,13 @@ def main() -> None:
                     if extraction_nodes
                     else "Bootstrap ontology is a validation fixture, not claimed as Bedrock-generated benchmark output."
                 ),
-                "Jobs modified after the graph cutoff use an explicit cold-start path and contribute no JD-derived graph edges."
+                (
+                    "All jobs in the supplied 2026-06-01_2026-06-07 dataset "
+                    "participate in the serving skill graph."
+                    if args.graph_scope == "latest"
+                    else "Jobs modified after the graph cutoff use an explicit "
+                    "cold-start path and contribute no JD-derived graph edges."
+                )
             ],
         },
         "locations": locations,

@@ -4,6 +4,10 @@
 
 **Live demo:** https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/
 
+目前本機與 AWS production 均以 `deterministic-v1-rules-v2-latest` serving；
+完整 2026-06-01～2026-06-07 資料集的 1,218,635 筆職缺都在 skill graph 中。
+`evaluation-cutoff` artifact 僅保留作無 leakage 的離線評測與回滾證據。
+
 ## AWS production 架構
 
 以下是公開 Live demo 的完整流程，不是 `make demo` 的本機流程：
@@ -63,7 +67,7 @@ bash scripts/deploy_lambda_code.sh
 .venv/bin/python scripts/verify_app_deployment.py \
   --url https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/ \
   --require-full-corpus --require-neptune \
-  --expected-graph-version deterministic-v1-rules-v2-evaluation-cutoff
+  --expected-graph-version deterministic-v1-rules-v2-latest
 ```
 
 ## API

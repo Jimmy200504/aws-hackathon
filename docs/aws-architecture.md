@@ -104,16 +104,18 @@ bundle 出貨（頭部 2,000 筆查詢涵蓋約 61% 搜尋量，實測命中 13�
 | `view_count > 0` | 23.2% | 來自 `scripts/build_job_behavior.py`，824 萬筆瀏覽 |
 | `apply_count > 0` | 8.0% | 22.6 萬筆應徵 |
 | post-cutoff 職缺且有技能 | 18.9% | 原本這 24% 的職缺完全沒有技能標註 |
+| `graph_eligible` | 100.0% | production `latest` serving graph 不再套用評測 cutoff |
 
 `embedding` 欄位需要 `index.knn` 這個 **static setting**，無法對開啟中的索引啟用；
 啟用 hybrid kNN 必須另建索引重灌，因此 `--embed` 維持 opt-in。
 
 ## Release and rollback
 
-Neptune 採 blue/green import。只有 evaluation-cutoff graph 通過完整品質、locked
-graph-on/off ranking、API smoke、degraded fallback、referential integrity 與 latency
-gate 後，才更新小型 serving pointer。`latest` 永遠有獨立 manifest，不會被誤用於
-hackathon evaluation。Rollback 只切回上一個 immutable pointer，不重建資料。
+Neptune 採 blue/green import。`evaluation-cutoff` 用於 locked graph-on/off 評測；
+通過 referential integrity、API smoke、degraded fallback 與 latency gate 後，將
+完整 `latest` graph 更新為 production serving pointer。兩個 scope 都保留獨立
+immutable manifest，評測不會讀取 latest，production 也不再排除 cutoff 後職缺。
+Rollback 只切回上一個 immutable pointer，不重建資料。
 
 ## Historical Bedrock pilot
 

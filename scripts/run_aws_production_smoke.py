@@ -19,7 +19,7 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "release-manifest.json"
 OUTPUT = ROOT / "reports" / "aws-production-smoke.json"
-INDEX_VERSION = "demo-2026.06.05-v1"
+INDEX_VERSION = "demo-2026.06.07-full-v1"
 # The model the bundle ships, as the API reports it in `meta.ranking_model`
 # (the portable artifact's `source_model`). Hard-coding a single historical
 # name silently turned this gate into a check that the deployment had NOT been
@@ -272,15 +272,14 @@ def run_smoke(
             and graph_off.get("meta", {}).get("ranking_model")
             == QUALITY_MODEL
         ),
-        "real_bedrock_pilot_deployed": (
-            meta.get("metadata", {})
-            .get("bedrock_pilot", {})
-            .get("records_accepted")
-            == 180
+        "latest_graph_metadata_deployed": (
+            meta.get("metadata", {}).get("graph_scope") == "latest"
+            and meta.get("metadata", {}).get("graph_version")
+            == "deterministic-v1-rules-v2-latest"
             and meta.get("metadata", {})
-            .get("bedrock_pilot", {})
-            .get("model_id")
-            == "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+            .get("stats", {})
+            .get("future_modified_excluded_from_graph")
+            == 0
         ),
         "graph_on_contract": (
             graph_on_result["status"] == 200 and search_contract(graph_on)

@@ -32,6 +32,7 @@ DEMO_INDEX = ROOT / "artifacts" / "demo-index.json"
 BEHAVIOR = ROOT / "artifacts" / "job-behavior.json"
 TRAIN_CUTOFF = datetime.fromisoformat("2026-06-05 23:59:59.999")
 MIN_DATE = datetime.fromisoformat("2024-01-01 00:00:00")
+GRAPH_SCOPES = ("latest", "evaluation-cutoff")
 
 
 def norm(value: str | None) -> str:
@@ -296,9 +297,13 @@ def job_document(
     alias_to_skills: dict[str, list[str]],
     behavior: dict[str, list[int]] | None = None,
     embedding_client: Any = None,
+    graph_scope: str = "latest",
 ) -> dict[str, Any]:
+    if graph_scope not in GRAPH_SCOPES:
+        raise ValueError(f"unsupported graph scope: {graph_scope}")
     modified = parse_time(row["職缺最後修改時間"])
-    graph_eligible = modified <= TRAIN_CUTOFF
+    post_cutoff_jd = modified > TRAIN_CUTOFF
+    graph_eligible = graph_scope == "latest" or not post_cutoff_jd
     # The cutoff exists to keep the offline graph/no-graph ablation free of
     # future information. The live index has no such leakage concern, and
     # withholding skills from the 24% of postings modified after the cutoff
@@ -342,7 +347,7 @@ def job_document(
         "education": row.get("學歷需求", "").strip(),
         "experience": row.get("工作經驗需求", "").strip(),
         "modified_at": row["職缺最後修改時間"],
-        "post_cutoff_jd": not graph_eligible,
+        "post_cutoff_jd": post_cutoff_jd,
         "graph_eligible": graph_eligible,
         "skills": skill_ids,
         "skill_labels": [
@@ -538,6 +543,15 @@ def main() -> None:
     )
     parser.add_argument("--max-records", type=int, default=0)
     parser.add_argument(
+        "--graph-scope",
+        choices=GRAPH_SCOPES,
+        default="latest",
+        help=(
+            "latest enables graph ranking for the complete corpus; "
+            "evaluation-cutoff preserves the frozen benchmark eligibility gate"
+        ),
+    )
+    parser.add_argument(
         "--skip-records",
         type=int,
         default=0,
@@ -727,7 +741,13 @@ def main() -> None:
                 if args.max_records > 0 and indexed >= args.max_records:
                     break
                 document = job_document(
-                    row, skills, pattern, alias_to_skills, behavior, embedding_client
+                    row,
+                    skills,
+                    pattern,
+                    alias_to_skills,
+                    behavior,
+                    embedding_client,
+                    args.graph_scope,
                 )
                 pending.append(document)
                 graph_jobs += int(document["graph_eligible"])
@@ -783,6 +803,7 @@ def main() -> None:
         "verified_index_count": verified_count,
         "graph_eligible_jobs": graph_jobs,
         "cold_start_jobs": indexed - graph_jobs,
+        "graph_scope": args.graph_scope,
         "partial_update": partial_update,
         "all_source_jobs_are_search_targets": (
             verified_count >= indexed if verified_count is not None else None

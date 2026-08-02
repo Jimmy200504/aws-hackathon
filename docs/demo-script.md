@@ -41,13 +41,13 @@ weight + evidence + edge type
 
 > 同一個已訓練模型可以把 graph/behavior feature family 歸零，避免拿兩個不同容量的模型製造假 lift。凍結後的主要 1,991-query confirmation 中，NDCG 提升 5.72%、MRR 6.45%、Hit@1 9.35%，paired CI 完全大於 0。同一模型在第二個互斥 1,992-query bucket 仍提升 5.07%。歷史失敗 holdout與一個只到 4.62% 的 rejected candidate 也完整留在 repo。
 
-## 2:45–3:30 — Leakage / cold-start
+## 2:45–3:30 — Leakage-free evaluation / full serving graph
 
-開一筆標為 `COLD START` 的新職缺。
+開一筆 6/5 後修改的職缺。
 
 講稿：
 
-> 這筆 JD 修改時間晚於 train cutoff。系統仍能用文字搜尋它，但刻意沒有技能邊。這不是功能缺陷，而是我們避免 holdout leakage 的可驗證設計。新技能則走 ephemeral OOV node，不會偷偷寫進 production graph。
+> 這筆 JD 修改時間晚於 train cutoff；離線評測仍使用 frozen cutoff graph 避免 leakage，production 則使用獨立 latest graph，所以它現在有可追溯技能邊且不是 cold start。兩個 scope 的 immutable manifest 完全分離。
 
 ## 3:30–4:15 — AWS architecture
 
