@@ -853,9 +853,15 @@ class SkillWeaveRanker:
                 "results": [],
                 "candidate_source": "none",
                 "degraded_components": [],
+                "retrieval_mode": "none",
             }
         limit = max(1, min(int(top_k), 100))
-        stage_one, candidate_source, degraded_components = self._collect_stage_one(
+        (
+            stage_one,
+            candidate_source,
+            degraded_components,
+            retrieval_mode,
+        ) = self._collect_stage_one(
             intent,
             structured_intent=structured_intent,
             limit=limit,
@@ -872,13 +878,15 @@ class SkillWeaveRanker:
             rescue_intent = self.parse_intent(
                 query, location_code, duty_code, normalized_query=expansion
             )
-            rescue, rescue_source, rescue_degraded = self._collect_stage_one(
-                rescue_intent,
-                structured_intent=structured_intent,
-                limit=limit,
-                include_graph=include_graph,
-                candidate_ids=candidate_ids,
-                external_relations=external_relations,
+            rescue, rescue_source, rescue_degraded, rescue_mode = (
+                self._collect_stage_one(
+                    rescue_intent,
+                    structured_intent=structured_intent,
+                    limit=limit,
+                    include_graph=include_graph,
+                    candidate_ids=candidate_ids,
+                    external_relations=external_relations,
+                )
             )
             seen = {item[1] for item in stage_one}
             stage_one = stage_one + [item for item in rescue if item[1] not in seen]
@@ -886,9 +894,13 @@ class SkillWeaveRanker:
             degraded_components = list(
                 dict.fromkeys(degraded_components + rescue_degraded)
             )
+            # The rescue pass is the one that produced the surviving tail, so a
+            # degraded vector leg there must not be reported as full hybrid.
+            if rescue_mode != retrieval_mode:
+                retrieval_mode = "bm25_only"
         ranked = self._rerank(stage_one, limit=limit, include_graph=include_graph)
         return self._assemble(
-            intent, ranked, candidate_source, degraded_components
+            intent, ranked, candidate_source, degraded_components, retrieval_mode
         )
 
     def _collect_stage_one(
@@ -900,8 +912,9 @@ class SkillWeaveRanker:
         include_graph: bool,
         candidate_ids: set[str] | None,
         external_relations: dict[str, dict[str, dict[str, Any]]] | None,
-    ) -> tuple[list[Any], str, list[str]]:
+    ) -> tuple[list[Any], str, list[str], str]:
         degraded_components: list[str] = []
+        retrieval_mode = "embedded_index"
         external_candidates: list[dict[str, Any]] | None = None
         if self.candidate_retriever is not None and candidate_ids is None:
             try:
@@ -940,6 +953,19 @@ class SkillWeaveRanker:
                     type(exc).__name__,
                 )
                 degraded_components.append("opensearch")
+            else:
+                telemetry = getattr(
+                    self.candidate_retriever, "last_retrieval_telemetry", None
+                )
+                if callable(telemetry):
+                    observed = telemetry()
+                    retrieval_mode = str(observed.get("mode") or "bm25_only")
+                    if observed.get("knn_degraded"):
+                        # A configured vector leg that failed is a partial
+                        # outage and must be visible, not silently absorbed.
+                        degraded_components.append("opensearch_knn")
+                else:
+                    retrieval_mode = "bm25_only"
 
         if external_candidates is not None:
             stage_one = []
@@ -1012,7 +1038,7 @@ class SkillWeaveRanker:
                     elif item[:2] > heap[0][:2]:
                         heapq.heapreplace(heap, item)
             stage_one = sorted(heap, key=lambda item: (-item[0], item[1]))
-        return stage_one, candidate_source, degraded_components
+        return stage_one, candidate_source, degraded_components, retrieval_mode
 
     def _assemble(
         self,
@@ -1020,6 +1046,7 @@ class SkillWeaveRanker:
         ranked: list[Any],
         candidate_source: str,
         degraded_components: list[str],
+        retrieval_mode: str = "embedded_index",
     ) -> dict[str, Any]:
         results: list[dict[str, Any]] = []
         for rank, (score, _, job, features, traces, direct) in enumerate(ranked, 1):
@@ -1054,6 +1081,7 @@ class SkillWeaveRanker:
             "results": results,
             "candidate_source": candidate_source,
             "degraded_components": degraded_components,
+            "retrieval_mode": retrieval_mode,
         }
 
     @staticmethod

@@ -48,7 +48,7 @@ def main() -> None:
             ROOT
             / "artifacts"
             / "models"
-            / "ltr-quality-final.trees.json"
+            / "ltr-quality-remote-salary.trees.json"
         ),
     ]
     # Both merge sides listed the config files; a duplicate name makes the

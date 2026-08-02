@@ -45,7 +45,8 @@ for required in \
   config/query-intent-prompt.txt \
   web/index.html \
   web/app.js \
-  web/styles.css; do
+  web/styles.css \
+  artifacts/models/ltr-quality-remote-salary.trees.json; do
   .venv/bin/python - "$required" <<'PY'
 import sys, zipfile
 name = sys.argv[1]
@@ -67,6 +68,7 @@ CURRENT="$(aws lambda get-function-configuration \
   --function-name "$FUNCTION_NAME" --region "$AWS_REGION_NAME" \
   --query 'Environment.Variables' --output json)"
 MERGED="$(BEDROCK_QUERY_MODEL_ID_VALUE="${BEDROCK_QUERY_MODEL_ID:-global.anthropic.claude-haiku-4-5-20251001-v1:0}" \
+  BEDROCK_EMBEDDING_MODEL_ID_VALUE="${BEDROCK_EMBEDDING_MODEL_ID:-}" \
   .venv/bin/python - "$CURRENT" <<'PY'
 import json, os, sys
 
@@ -86,8 +88,23 @@ current.update(
         "BEDROCK_QUERY_DEADLINE_SECONDS": "6.0",
         "QUERY_VOCAB_PATH": "/var/task/config/query-intent-vocab.json",
         "QUERY_INTENTS_PATH": "/var/task/config/query-intents.json",
+        # This script does not run `sam deploy`, so template.yaml's value never
+        # reaches the live function. The bundle ships exactly one ranking model
+        # and the ranker silently disables reranking when the path is missing,
+        # so pin the key here to keep code and configuration in lockstep.
+        "LTR_MODEL_PATH": (
+            "/var/task/artifacts/models/ltr-quality-remote-salary.trees.json"
+        ),
     }
 )
+# Hybrid retrieval is opt-in and must survive a deploy that does not mention
+# it: only write the key when the operator supplies a value, and let an
+# explicit empty value turn the vector leg back off.
+embedding_model = os.environ["BEDROCK_EMBEDDING_MODEL_ID_VALUE"].strip()
+if embedding_model:
+    current["BEDROCK_EMBEDDING_MODEL_ID"] = embedding_model
+elif "BEDROCK_EMBEDDING_MODEL_ID" in os.environ:
+    current.pop("BEDROCK_EMBEDDING_MODEL_ID", None)
 print(json.dumps({"Variables": current}, ensure_ascii=False))
 PY
 )"

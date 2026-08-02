@@ -372,6 +372,29 @@ def job_document(
     return document
 
 
+def embedding_bulk_payload(
+    index: str, vectors: Iterable[tuple[str, list[float]]]
+) -> bytes:
+    """Bulk body that adds only the embedding field to existing documents.
+
+    A full `index` action would resend every field of all 1.2M documents just to
+    attach a vector. Partial `update` keeps the backfill independent of the
+    document schema and leaves the index queryable throughout.
+    """
+    lines: list[str] = []
+    for job_id, vector in vectors:
+        lines.append(
+            json.dumps(
+                {"update": {"_index": index, "_id": job_id}},
+                separators=(",", ":"),
+            )
+        )
+        lines.append(
+            json.dumps({"doc": {"embedding": vector}}, separators=(",", ":"))
+        )
+    return ("\n".join(lines) + "\n").encode("utf-8")
+
+
 def bulk_payload(index: str, documents: Iterable[dict[str, Any]]) -> bytes:
     lines: list[str] = []
     for document in documents:
@@ -385,6 +408,107 @@ def bulk_payload(index: str, documents: Iterable[dict[str, Any]]) -> bytes:
             json.dumps(document, ensure_ascii=False, separators=(",", ":"))
         )
     return ("\n".join(lines) + "\n").encode("utf-8")
+
+
+def run_embedding_backfill(
+    args: Any, client: Any, embedding_client: Any
+) -> None:
+    """Vectorize an already-indexed corpus with concurrent Bedrock calls.
+
+    Progress is printed per batch with the row offset so an interrupted run can
+    resume with --skip-records. Rows whose embedding fails are counted and
+    skipped rather than aborting the pass: a partially vectorized index is still
+    correct because the API reports the real vector coverage and the kNN leg
+    only ever appends candidates.
+    """
+    source_path = args.data_dir / "職缺.csv"
+    batch_size = max(1, min(args.batch_size, 500))
+    workers = max(1, min(args.embed_workers, 128))
+    embedded = failed = rows = 0
+    started = time.monotonic()
+
+    def embed_row(row: dict[str, str]) -> tuple[str, list[float]] | None:
+        job_id = row.get("職缺編號", "").strip()
+        if not job_id:
+            return None
+        vector = embedding_client.embed(job_embedding_text(row))
+        if vector is None:
+            return None
+        return job_id, vector
+
+    def flush(pool: Any, batch: list[dict[str, str]]) -> None:
+        nonlocal embedded, failed
+        results = list(pool.map(embed_row, batch))
+        vectors = [item for item in results if item is not None]
+        failed += len(results) - len(vectors)
+        if not vectors:
+            return
+        response = client.request(
+            "POST",
+            "/_bulk",
+            embedding_bulk_payload(args.index, vectors),
+            content_type="application/x-ndjson",
+        )
+        if response.get("errors"):
+            errored = [
+                item
+                for item in response.get("items", [])
+                if int(next(iter(item.values())).get("status", 500)) >= 300
+            ]
+            raise RuntimeError(
+                "Embedding backfill bulk failed: "
+                + json.dumps(errored[:3], ensure_ascii=False)
+            )
+        embedded += len(vectors)
+
+    # One pool for the whole pass: a four-hour run must not pay thread setup on
+    # every batch, and reusing threads keeps the boto3 connection pool warm.
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
+        with source_path.open(encoding="utf-8-sig", newline="") as handle:
+            reader = csv.DictReader(handle)
+            for skipped, _ in enumerate(reader, 1):
+                if skipped >= args.skip_records:
+                    break
+            if args.skip_records:
+                print(f"Resuming after {args.skip_records:,} rows", flush=True)
+            batch: list[dict[str, str]] = []
+            for row in reader:
+                if args.max_records > 0 and rows >= args.max_records:
+                    break
+                batch.append(row)
+                rows += 1
+                if len(batch) < batch_size:
+                    continue
+                flush(pool, batch)
+                batch.clear()
+                elapsed = max(0.001, time.monotonic() - started)
+                print(
+                    f"Embedded {embedded:,} jobs · {embedded / elapsed:,.0f} jobs/s "
+                    f"· failed {failed:,} · row offset {args.skip_records + rows:,}",
+                    flush=True,
+                )
+            if batch:
+                flush(pool, batch)
+
+    elapsed = max(0.001, time.monotonic() - started)
+    print(
+        json.dumps(
+            {
+                "mode": "embed_only_backfill",
+                "index": args.index,
+                "rows_read": rows,
+                "embedded": embedded,
+                "failed": failed,
+                "embed_workers": workers,
+                "elapsed_seconds": round(elapsed, 1),
+                "jobs_per_second": round(embedded / elapsed, 1),
+                "embedding_model_id": embedding_client.model_id,
+                "resume_with_skip_records": args.skip_records + rows,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
 
 
 def main() -> None:
@@ -441,6 +565,26 @@ def main() -> None:
         help="Generate embeddings via Bedrock for hybrid retrieval (slow)",
     )
     parser.add_argument(
+        "--embed-only",
+        action="store_true",
+        help=(
+            "Backfill embeddings onto an existing index without touching any "
+            "other field. Embeddings are generated concurrently, so this is the "
+            "only practical way to vectorize the full corpus; --embed generates "
+            "them one at a time inside the single-threaded document builder."
+        ),
+    )
+    parser.add_argument(
+        "--embed-workers",
+        type=int,
+        default=64,
+        help=(
+            "Concurrent Bedrock embedding calls for --embed-only. Measured "
+            "throughput in us-east-1: 34/s at 32, 82/s at 64, 86/s at 96, so 64 "
+            "is where the curve flattens for a full-corpus pass."
+        ),
+    )
+    parser.add_argument(
         "--update-mapping",
         action="store_true",
         help=(
@@ -466,7 +610,9 @@ def main() -> None:
     skills = demo["skills"]
     pattern, alias_to_skills = compile_alias_matcher(skills)
     embedding_client = (
-        BedrockEmbeddingClient.from_environment() if args.embed else None
+        BedrockEmbeddingClient.from_environment()
+        if args.embed or args.embed_only
+        else None
     )
     behavior: dict[str, list[int]] = {}
     if args.behavior and args.behavior.is_file():
@@ -512,6 +658,14 @@ def main() -> None:
             ),
         )
         print(f"Updated mapping on {args.index} with {len(properties)} properties")
+
+    if args.embed_only:
+        if client is None:
+            raise SystemExit("--embed-only requires a real endpoint")
+        if embedding_client is None or not embedding_client.enabled:
+            raise SystemExit("--embed-only requires BEDROCK_EMBEDDING_MODEL_ID")
+        run_embedding_backfill(args, client, embedding_client)
+        return
 
     def send(payload: bytes) -> None:
         response = client.request(

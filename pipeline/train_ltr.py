@@ -88,6 +88,15 @@ QUALITY_MINIMAL_FEATURES = [
     *BEHAVIOR_GRAPH_FEATURES,
     "retrieval_reciprocal_rank",
 ]
+QUALITY_REMOTE_SALARY_FEATURES = [
+    *BEHAVIOR_GRAPH_FEATURES,
+    "retrieval_reciprocal_rank",
+    "remote",
+    "salary",
+    "is_remote",
+    "salary_min",
+    "salary_max",
+]
 QUALITY_COMPANY_FEATURES = [
     *[
         name
@@ -144,6 +153,7 @@ def main() -> None:
             "behavior_graph",
             "quality",
             "quality_minimal",
+            "quality_remote_salary",
             "quality_company",
         ],
         required=True,
@@ -168,6 +178,7 @@ def main() -> None:
         "behavior_graph": BEHAVIOR_GRAPH_FEATURES,
         "quality": QUALITY_FEATURES,
         "quality_minimal": QUALITY_MINIMAL_FEATURES,
+        "quality_remote_salary": QUALITY_REMOTE_SALARY_FEATURES,
         "quality_company": QUALITY_COMPANY_FEATURES,
     }[args.feature_set]
     train_parts = [

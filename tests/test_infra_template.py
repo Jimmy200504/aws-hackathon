@@ -24,6 +24,17 @@ class InfrastructureTemplateTests(unittest.TestCase):
         self.assertIn("BEDROCK_QUERY_MODEL_ID: !Ref BedrockQueryModelId", template)
         self.assertIn("bedrock:InvokeModel", template)
 
+    def test_hybrid_vector_retrieval_is_opt_in(self) -> None:
+        """Shipping a non-empty default would embed queries against an index
+        that may hold no vectors, paying Bedrock latency for zero recall."""
+        template = (ROOT / "infra/template.yaml").read_text(encoding="utf-8")
+        self.assertIn("BedrockEmbeddingModelId:", template)
+        self.assertIn(
+            "BEDROCK_EMBEDDING_MODEL_ID: !Ref BedrockEmbeddingModelId", template
+        )
+        parameter = template.split("BedrockEmbeddingModelId:", 1)[1]
+        self.assertIn('Default: ""', parameter.split("Description:", 1)[0])
+
     def test_optional_neptune_runtime_is_read_only_and_bounded(self) -> None:
         template = (ROOT / "infra/template.yaml").read_text(encoding="utf-8")
         self.assertIn("NEPTUNE_GRAPH_ID: !Ref NeptuneGraphId", template)

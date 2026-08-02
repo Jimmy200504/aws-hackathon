@@ -395,8 +395,12 @@ class SalaryRangeFeatureTests(unittest.TestCase):
 
 
 class FakeFullCorpusRetriever:
-    def __init__(self, *, fail: bool = False) -> None:
+    def __init__(self, *, fail: bool = False, telemetry: dict | None = None) -> None:
         self.fail = fail
+        self._telemetry = telemetry
+
+    def last_retrieval_telemetry(self) -> dict:
+        return dict(self._telemetry or {})
 
     def retrieve(
         self,
@@ -456,7 +460,32 @@ class FullCorpusRankerTests(unittest.TestCase):
         result = ranker.search("行政助理", top_k=5)
         self.assertEqual(result["candidate_source"], "embedded_12000_fallback")
         self.assertEqual(result["degraded_components"], ["opensearch"])
+        self.assertEqual(result["retrieval_mode"], "embedded_index")
         self.assertEqual(len(result["results"]), 5)
+
+    def test_hybrid_retrieval_mode_is_reported(self) -> None:
+        ranker = SkillWeaveRanker(
+            ROOT / "artifacts" / "demo-index.json",
+            candidate_retriever=FakeFullCorpusRetriever(
+                telemetry={"mode": "hybrid_bm25_knn", "knn_degraded": False}
+            ),
+        )
+        result = ranker.search("Python 資料工程師", top_k=10)
+        self.assertEqual(result["retrieval_mode"], "hybrid_bm25_knn")
+        self.assertEqual(result["degraded_components"], [])
+
+    def test_failed_vector_leg_is_disclosed_as_degraded(self) -> None:
+        ranker = SkillWeaveRanker(
+            ROOT / "artifacts" / "demo-index.json",
+            candidate_retriever=FakeFullCorpusRetriever(
+                telemetry={"mode": "bm25_only", "knn_degraded": True}
+            ),
+        )
+        result = ranker.search("Python 資料工程師", top_k=10)
+        self.assertEqual(result["retrieval_mode"], "bm25_only")
+        self.assertIn("opensearch_knn", result["degraded_components"])
+        # Losing the vector leg must not lose the candidate itself.
+        self.assertEqual(result["candidate_source"], "opensearch_full_corpus")
 
 
 if __name__ == "__main__":

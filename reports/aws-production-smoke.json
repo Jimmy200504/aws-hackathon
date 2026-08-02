@@ -1,7 +1,7 @@
 {
   "metadata": {
     "schema": "skillweave-aws-production-smoke-v1",
-    "verified_at_utc": "2026-08-01T15:55:40Z",
+    "verified_at_utc": "2026-08-02T00:52:18Z",
     "base_url": "https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/",
     "index_version": "demo-2026.06.05-v1",
     "client": "stdlib urllib; public HTTPS; no AWS session",
@@ -87,21 +87,21 @@
     "matching_graph_backend": 15,
     "matching_graph_version": 15,
     "full_corpus_responses": 30,
-    "elapsed_ms": 12801.6,
-    "throughput_requests_per_second": 2.34,
+    "elapsed_ms": 10982.08,
+    "throughput_requests_per_second": 2.73,
     "latency_ms": {
-      "min": 1108.76,
-      "p50": 1187.45,
-      "p95": 4627.2,
-      "p99": 4693.44,
-      "max": 4693.44
+      "min": 1189.58,
+      "p50": 1386.37,
+      "p95": 4602.16,
+      "p99": 4702.53,
+      "max": 4702.53
     },
     "service_latency_ms": {
-      "min": 152.93,
-      "p50": 223.75,
-      "p95": 309.57,
-      "p99": 332.36,
-      "max": 332.36
+      "min": 156.69,
+      "p50": 216.27,
+      "p95": 360.06,
+      "p99": 387.24,
+      "max": 387.24
     },
     "errors": []
   }

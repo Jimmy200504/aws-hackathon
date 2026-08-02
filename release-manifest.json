@@ -88,13 +88,19 @@
     "five_percent_gate_passed": true
   },
   "sha256": {
-    "dist/skillweave-lambda.zip": "3d0edd3ebf9b18e8eacacf7ff54d36f329ddda8450e097ac890a4a3caa3c0b09",
+    "dist/skillweave-lambda.zip": "a5030be6dfc7f76091f979f4be9b35d12764e29efb23312a64cd3de5fafee364",
     "dist/skillweave-demo-5min.mp4": "2c7ee08c5851ac8e3673d7f94d7116108846515edaa4ad47188d56cf17f8509a",
     "artifacts/models/ltr-graph-final.ubj": "d90693ac66358b847ba74cfb4dd0b1f3a4895fd28ecb061563d107f89ca1366e",
     "artifacts/models/ltr-graph-final.manifest.json": "f857cb7f05afbbaa7498a4f687a8fccce6d773074f1fd2870544fb1acf053f26",
     "artifacts/models/ltr-quality-final.ubj": "d280a0952e7604934d669eee3aacb1a2f158793f0187e35ef34ce1725656bced",
     "artifacts/models/ltr-quality-final.manifest.json": "047032228c63a473889e36472c0a2b78cc22a21041fb4c1cc06cb158df47a185",
     "artifacts/models/ltr-quality-final.trees.json": "df02f5ddbed46617ce40e0813fd0608c7883136a08cc9249d99da9c332b68d44",
+    "artifacts/models/ltr-quality-remote-salary.ubj": "cbb5e26dc63e24c6137a6aac0a23ff0a5ddbcf27ae71b66611997afd62c9792e",
+    "artifacts/models/ltr-quality-remote-salary.manifest.json": "b4a60f5491d2bea243800da15fe5ff6a9c86858c4297a02993807c4c5ee9173a",
+    "artifacts/models/ltr-quality-remote-salary.trees.json": "9d575028fdc29f7f55c13077c8cf34ea75c0338232ae10a044a2bbdf13e9b6e8",
+    "reports/ltr-quality-remote-salary-test.json": "72d053f6fdd4518f41b74a735312ece3018f4c124d7b3852791d7ac74396da6d",
+    "reports/ltr-remote-salary-vs-baseline-test.json": "861d973d2cccfbf5ecdf00ce7972c9bffe20550f09b3f70fc0b837f55ccbb298",
+    "reports/portable-ltr-remote-salary-parity.json": "5d65b779a45df3a5760e194eb3ce69922923d7e520fb79fcf8810af26417f8f1",
     "artifacts/demo-index.json": "c8184d4b814b0ba1af9f18de07c460d3636cb75c8fc3f68db326449861de21fa",
     "reports/ltr-ablation-test.json": "76af3080dbb569860ada4e42fa72ab313bda450b6f54bc5a8e51c54d4e211daa",
     "reports/ltr-ablation-holdout-1-failed.json": "a9bd07f7436c27bf3eb1140c788b265005e5cd4c599536b31674ce2135c2c1d9",
@@ -121,7 +127,7 @@
     "reports/deterministic-graph-runtime-preflight.json": "9186a01caed199a6aa9783036c35b879a14160a67287cf88fad845b6f328e7df",
     "reports/ltr-quality-deterministic-v2.json": "6b39f718bebaa5e2d48b395a80200df6ca1cdf559e6f838f4ff1fcd85a2f9f58",
     "reports/skill-alias-index-v2.json": "defd3b33e4acd4cd9a1e3258312dea622236ff4831e78dbc936577ba10389ef2",
-    "reports/aws-production-smoke.json": "efa99e113a7097972f2a714e234b96a8ef85013fba5964b72090d854612e1241"
+    "reports/aws-production-smoke.json": "fa77cd75e2fb71b2a39222a0385dd43ea976f5f2620dd48bbb20bcdd6c5b1b35"
   },
   "external_deliverables": {
     "aws_url": "https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/",
