@@ -367,6 +367,10 @@ class L5TableTests(unittest.TestCase):
     def test_every_published_entry_carries_its_measured_evidence(self) -> None:
         for entry in self.published["entries"]:
             self.assertGreaterEqual(entry["appearances"], self.published["gate"]["min_appearances"])
+            if entry.get("requires_occurrence_filter"):
+                # Admitted by the occurrence filter instead; the surface gate is
+                # the thing it failed, so it cannot also be asserted here.
+                continue
             self.assertGreaterEqual(
                 entry["concentration"], self.published["gate"]["min_concentration"]
             )
@@ -382,9 +386,36 @@ class L5TableTests(unittest.TestCase):
 
     def test_common_words_that_are_also_station_names_are_not_published(self) -> None:
         # 保安 is a security guard, 成功 is success, 幸福 is a benefit adjective.
-        # All three are real station names and all three fail the gate.
+        # All three are real station names and all three fail the gate. The
+        # occurrence model was run on them too and accepted 1, 1 and 4 mentions
+        # out of 60, which confirms the rejection rather than overturning it.
         for surface in ("保安", "成功", "幸福"):
             self.assertEqual(self.graph.resolve_alias(surface), ())
+
+    def test_rescued_surfaces_are_marked_as_needing_the_occurrence_filter(self) -> None:
+        rescued = [
+            entry for entry in self.published["entries"]
+            if entry.get("requires_occurrence_filter")
+        ]
+        self.assertTrue(rescued)
+        for entry in rescued:
+            # Admitted despite failing the surface gate, so the evidence for the
+            # exception has to travel with it: filtered concentration clears the
+            # gate, and it is higher than the unfiltered sample.
+            filtered = entry["occurrence_filter"]
+            self.assertGreaterEqual(
+                filtered["accepted_concentration"],
+                self.published["gate"]["min_concentration"],
+            )
+            self.assertGreater(
+                filtered["accepted_concentration"], filtered["sample_concentration"]
+            )
+
+    def test_a_surface_the_model_could_not_rescue_stays_out(self) -> None:
+        # 青埔 is a real 高雄 metro station, but in job text it means 桃園青埔,
+        # so the model accepts the mentions and they still land in the wrong
+        # county. Word-sense filtering cannot repair a wrong place claim.
+        self.assertEqual(self.graph.resolve_alias("青埔"), ())
 
     def test_the_source_table_is_never_loaded_directly(self) -> None:
         rejected = {entry["surface"] for entry in self.source["entries"]} - {

@@ -68,6 +68,13 @@ def main() -> None:
     parser.add_argument("--districts", type=Path, default=DEFAULT_DISTRICTS)
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
     parser.add_argument("--published", type=Path, default=DEFAULT_PUBLISHED)
+    parser.add_argument(
+        "--rescued",
+        type=Path,
+        default=ROOT / "reports" / "l5-occurrence-judgement.json",
+        help="surfaces readmitted by scripts/judge_l5_occurrences.py; they carry "
+        "requires_occurrence_filter because the surface alone is not safe in job text",
+    )
     parser.add_argument("--min-appearances", type=int, default=20)
     parser.add_argument("--min-concentration", type=float, default=0.60)
     parser.add_argument(
@@ -226,6 +233,63 @@ def main() -> None:
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
+    entries_out = [
+        {
+            "id": f"L5/{row['surface']}",
+            "surface": row["surface"],
+            "kind": row["kind"],
+            "districts": row["claimed_districts"],
+            "appearances": row["appearances"],
+            "concentration": row["concentration"],
+            "district_agreement": (row["l4_cross_check"] or {}).get("agreement"),
+            "requires_occurrence_filter": False,
+        }
+        for row in sorted(published, key=lambda row: -row["appearances"])
+    ]
+    rescued_note = None
+    if args.rescued.is_file():
+        rescue = json.loads(args.rescued.read_text(encoding="utf-8"))
+        by_surface = {row["surface"]: row for row in rows_out}
+        added = 0
+        for row in rescue["surfaces"]:
+            if not row.get("rescued"):
+                continue
+            source = by_surface.get(row["surface"])
+            if source is None or source["verdict"] == "published":
+                continue
+            entries_out.append(
+                {
+                    "id": f"L5/{row['surface']}",
+                    "surface": row["surface"],
+                    "kind": source["kind"],
+                    "districts": source["claimed_districts"],
+                    "appearances": source["appearances"],
+                    "concentration": source["concentration"],
+                    "district_agreement": (source["l4_cross_check"] or {}).get("agreement"),
+                    # The bare surface stays unsafe in job text; it is admitted
+                    # because a model reading the surrounding sentence separates
+                    # the place sense from the ordinary word.
+                    "requires_occurrence_filter": True,
+                    "occurrence_filter": {
+                        "accepted_concentration": row["accepted_concentration"],
+                        "sample_concentration": row["sample_concentration"],
+                        "lift": row["lift"],
+                        "sampled": row["sampled"],
+                        "accepted": row["accepted"],
+                    },
+                }
+            )
+            added += 1
+        rescued_note = {
+            "source": "reports/l5-occurrence-judgement.json",
+            "surfaces_added": added,
+            "meaning": (
+                "safe to resolve from a user's query, where the searcher means the "
+                "place; unsafe as a bare substring match over job text without "
+                "running the occurrence filter first"
+            ),
+        }
+
     args.published.write_text(
         json.dumps(
             {
@@ -237,18 +301,8 @@ def main() -> None:
                     "min_concentration": args.min_concentration,
                     "min_district_agreement": args.min_district_agreement,
                 },
-                "entries": [
-                    {
-                        "id": f"L5/{row['surface']}",
-                        "surface": row["surface"],
-                        "kind": row["kind"],
-                        "districts": row["claimed_districts"],
-                        "appearances": row["appearances"],
-                        "concentration": row["concentration"],
-                        "district_agreement": (row["l4_cross_check"] or {}).get("agreement"),
-                    }
-                    for row in sorted(published, key=lambda row: -row["appearances"])
-                ],
+                "rescued": rescued_note,
+                "entries": entries_out,
             },
             ensure_ascii=False,
             indent=2,

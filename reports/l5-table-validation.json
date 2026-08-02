@@ -9,7 +9,7 @@
     "min_concentration": 0.6,
     "min_district_agreement": 0.5,
     "gate_calibration": "0.60 sits between the 0.2666 ceiling of the ten non-place control words and the 0.4647 of the highest rejected candidate in reports/region-alias-candidates.json",
-    "elapsed_seconds": 100.0
+    "elapsed_seconds": 77.9
   },
   "corpus": {
     "rows": 1218635,

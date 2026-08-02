@@ -7,6 +7,11 @@
     "min_concentration": 0.6,
     "min_district_agreement": 0.5
   },
+  "rescued": {
+    "source": "reports/l5-occurrence-judgement.json",
+    "surfaces_added": 17,
+    "meaning": "safe to resolve from a user's query, where the searcher means the place; unsafe as a bare substring match over job text without running the occurrence filter first"
+  },
   "entries": [
     {
       "id": "L5/竹北",
@@ -17,7 +22,8 @@
       ],
       "appearances": 5764,
       "concentration": 0.7505,
-      "district_agreement": 0.8368
+      "district_agreement": 0.8368,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/永康",
@@ -28,7 +34,8 @@
       ],
       "appearances": 3582,
       "concentration": 0.799,
-      "district_agreement": 0.8467
+      "district_agreement": 0.8467,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/湖口",
@@ -39,7 +46,8 @@
       ],
       "appearances": 3270,
       "concentration": 0.7061,
-      "district_agreement": 0.7395
+      "district_agreement": 0.7395,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/楠梓",
@@ -50,7 +58,8 @@
       ],
       "appearances": 2882,
       "concentration": 0.957,
-      "district_agreement": 0.9766
+      "district_agreement": 0.9766,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/內壢",
@@ -61,7 +70,8 @@
       ],
       "appearances": 2416,
       "concentration": 0.8117,
-      "district_agreement": 0.5883
+      "district_agreement": 0.5883,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/竹南",
@@ -72,7 +82,8 @@
       ],
       "appearances": 2357,
       "concentration": 0.6678,
-      "district_agreement": 0.7314
+      "district_agreement": 0.7314,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/岡山",
@@ -83,7 +94,8 @@
       ],
       "appearances": 2291,
       "concentration": 0.9738,
-      "district_agreement": 0.9841
+      "district_agreement": 0.9841,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/萬華",
@@ -94,7 +106,8 @@
       ],
       "appearances": 2275,
       "concentration": 0.8624,
-      "district_agreement": 0.8129
+      "district_agreement": 0.8129,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/小港",
@@ -105,7 +118,8 @@
       ],
       "appearances": 2028,
       "concentration": 0.9527,
-      "district_agreement": 0.9665
+      "district_agreement": 0.9665,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/大寮",
@@ -116,7 +130,8 @@
       ],
       "appearances": 1842,
       "concentration": 0.924,
-      "district_agreement": 0.944
+      "district_agreement": 0.944,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/新豐",
@@ -127,7 +142,8 @@
       ],
       "appearances": 1765,
       "concentration": 0.6572,
-      "district_agreement": 0.7039
+      "district_agreement": 0.7039,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/豐原",
@@ -138,7 +154,8 @@
       ],
       "appearances": 1709,
       "concentration": 0.9655,
-      "district_agreement": 0.9752
+      "district_agreement": 0.9752,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/斗六",
@@ -149,7 +166,8 @@
       ],
       "appearances": 1645,
       "concentration": 0.8748,
-      "district_agreement": 0.9033
+      "district_agreement": 0.9033,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/員林",
@@ -160,7 +178,8 @@
       ],
       "appearances": 1468,
       "concentration": 0.7875,
-      "district_agreement": 0.8257
+      "district_agreement": 0.8257,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/路竹",
@@ -171,7 +190,8 @@
       ],
       "appearances": 1379,
       "concentration": 0.9304,
-      "district_agreement": 0.9448
+      "district_agreement": 0.9448,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/安平",
@@ -182,7 +202,8 @@
       ],
       "appearances": 1260,
       "concentration": 0.9286,
-      "district_agreement": 0.9535
+      "district_agreement": 0.9535,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/文心",
@@ -195,7 +216,8 @@
       ],
       "appearances": 1237,
       "concentration": 0.9095,
-      "district_agreement": 0.8248
+      "district_agreement": 0.8248,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/中壢工業區",
@@ -206,7 +228,8 @@
       ],
       "appearances": 1190,
       "concentration": 0.9874,
-      "district_agreement": 0.9975
+      "district_agreement": 0.9975,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/新營",
@@ -217,7 +240,8 @@
       ],
       "appearances": 1187,
       "concentration": 0.8568,
-      "district_agreement": 0.9271
+      "district_agreement": 0.9271,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/龜山工業區",
@@ -228,7 +252,8 @@
       ],
       "appearances": 1187,
       "concentration": 0.8332,
-      "district_agreement": 0.9611
+      "district_agreement": 0.9611,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/善化",
@@ -239,7 +264,8 @@
       ],
       "appearances": 1113,
       "concentration": 0.9605,
-      "district_agreement": 0.9736
+      "district_agreement": 0.9736,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/忠孝東路",
@@ -253,7 +279,8 @@
       ],
       "appearances": 1014,
       "concentration": 0.9152,
-      "district_agreement": 0.9129
+      "district_agreement": 0.9129,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/潭子",
@@ -264,7 +291,8 @@
       ],
       "appearances": 1006,
       "concentration": 0.9821,
-      "district_agreement": 0.989
+      "district_agreement": 0.989,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/羅東",
@@ -275,7 +303,8 @@
       ],
       "appearances": 942,
       "concentration": 0.9533,
-      "district_agreement": 0.9868
+      "district_agreement": 0.9868,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/林口長庚",
@@ -286,7 +315,8 @@
       ],
       "appearances": 927,
       "concentration": 0.8015,
-      "district_agreement": 0.6849
+      "district_agreement": 0.6849,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/大林",
@@ -297,7 +327,8 @@
       ],
       "appearances": 767,
       "concentration": 0.6714,
-      "district_agreement": 0.7529
+      "district_agreement": 0.7529,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/夢時代",
@@ -308,7 +339,8 @@
       ],
       "appearances": 766,
       "concentration": 0.8721,
-      "district_agreement": 0.7812
+      "district_agreement": 0.7812,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/台北車站",
@@ -319,7 +351,8 @@
       ],
       "appearances": 726,
       "concentration": 0.8829,
-      "district_agreement": 0.5705
+      "district_agreement": 0.5705,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/埔心",
@@ -330,7 +363,8 @@
       ],
       "appearances": 693,
       "concentration": 0.8254,
-      "district_agreement": 0.679
+      "district_agreement": 0.679,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/礁溪",
@@ -341,7 +375,8 @@
       ],
       "appearances": 669,
       "concentration": 0.9656,
-      "district_agreement": 0.9818
+      "district_agreement": 0.9818,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/丹鳳",
@@ -352,7 +387,8 @@
       ],
       "appearances": 638,
       "concentration": 0.7759,
-      "district_agreement": 0.679
+      "district_agreement": 0.679,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/潮州",
@@ -363,7 +399,8 @@
       ],
       "appearances": 592,
       "concentration": 0.8395,
-      "district_agreement": 0.8614
+      "district_agreement": 0.8614,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/逢甲",
@@ -374,7 +411,8 @@
       ],
       "appearances": 591,
       "concentration": 0.8799,
-      "district_agreement": 0.538
+      "district_agreement": 0.538,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/文心路",
@@ -387,7 +425,8 @@
       ],
       "appearances": 582,
       "concentration": 0.9192,
-      "district_agreement": 0.9244
+      "district_agreement": 0.9244,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/大墩",
@@ -398,7 +437,8 @@
       ],
       "appearances": 564,
       "concentration": 0.9787,
-      "district_agreement": 0.8661
+      "district_agreement": 0.8661,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/承德路",
@@ -410,7 +450,8 @@
       ],
       "appearances": 563,
       "concentration": 0.7762,
-      "district_agreement": 0.659
+      "district_agreement": 0.659,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/南港展覽館",
@@ -421,7 +462,8 @@
       ],
       "appearances": 545,
       "concentration": 0.8257,
-      "district_agreement": 0.8539
+      "district_agreement": 0.8539,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/羅斯福路",
@@ -433,7 +475,8 @@
       ],
       "appearances": 531,
       "concentration": 0.8682,
-      "district_agreement": 0.557
+      "district_agreement": 0.557,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/北車",
@@ -444,7 +487,8 @@
       ],
       "appearances": 520,
       "concentration": 0.9442,
-      "district_agreement": 0.6364
+      "district_agreement": 0.6364,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/先嗇宮",
@@ -455,7 +499,8 @@
       ],
       "appearances": 510,
       "concentration": 0.9,
-      "district_agreement": 0.8839
+      "district_agreement": 0.8839,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/西湖",
@@ -466,7 +511,8 @@
       ],
       "appearances": 507,
       "concentration": 0.7061,
-      "district_agreement": 0.6199
+      "district_agreement": 0.6199,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/頂埔",
@@ -477,7 +523,8 @@
       ],
       "appearances": 507,
       "concentration": 0.8994,
-      "district_agreement": 0.9206
+      "district_agreement": 0.9206,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/銅鑼",
@@ -488,7 +535,8 @@
       ],
       "appearances": 484,
       "concentration": 0.8678,
-      "district_agreement": 0.9313
+      "district_agreement": 0.9313,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/湖口工業區",
@@ -499,7 +547,8 @@
       ],
       "appearances": 483,
       "concentration": 0.7329,
-      "district_agreement": 0.7679
+      "district_agreement": 0.7679,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/南京東路",
@@ -511,7 +560,8 @@
       ],
       "appearances": 477,
       "concentration": 0.9224,
-      "district_agreement": 0.8957
+      "district_agreement": 0.8957,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/民雄",
@@ -522,7 +572,8 @@
       ],
       "appearances": 468,
       "concentration": 0.8868,
-      "district_agreement": 0.9497
+      "district_agreement": 0.9497,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/中原大學",
@@ -533,7 +584,8 @@
       ],
       "appearances": 450,
       "concentration": 0.9956,
-      "district_agreement": 0.9711
+      "district_agreement": 0.9711,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/觀音工業區",
@@ -544,7 +596,8 @@
       ],
       "appearances": 448,
       "concentration": 0.9107,
-      "district_agreement": 0.9903
+      "district_agreement": 0.9903,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/五股工業區",
@@ -555,7 +608,8 @@
       ],
       "appearances": 446,
       "concentration": 0.9821,
-      "district_agreement": 0.991
+      "district_agreement": 0.991,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/石牌",
@@ -566,7 +620,8 @@
       ],
       "appearances": 443,
       "concentration": 0.9526,
-      "district_agreement": 0.8789
+      "district_agreement": 0.8789,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/橋和",
@@ -577,7 +632,8 @@
       ],
       "appearances": 432,
       "concentration": 0.9653,
-      "district_agreement": 0.9387
+      "district_agreement": 0.9387,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/南京復興",
@@ -588,7 +644,8 @@
       ],
       "appearances": 422,
       "concentration": 0.9668,
-      "district_agreement": 0.633
+      "district_agreement": 0.633,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/師大",
@@ -599,7 +656,8 @@
       ],
       "appearances": 416,
       "concentration": 0.7163,
-      "district_agreement": 0.5611
+      "district_agreement": 0.5611,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/林口三井",
@@ -610,7 +668,8 @@
       ],
       "appearances": 413,
       "concentration": 0.9128,
-      "district_agreement": 0.6525
+      "district_agreement": 0.6525,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/斗南",
@@ -621,7 +680,8 @@
       ],
       "appearances": 401,
       "concentration": 0.9576,
-      "district_agreement": 0.9697
+      "district_agreement": 0.9697,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/七堵",
@@ -632,7 +692,8 @@
       ],
       "appearances": 399,
       "concentration": 0.8371,
-      "district_agreement": 0.8721
+      "district_agreement": 0.8721,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/柳營",
@@ -643,7 +704,8 @@
       ],
       "appearances": 397,
       "concentration": 0.9899,
-      "district_agreement": 0.9949
+      "district_agreement": 0.9949,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/永寧",
@@ -654,7 +716,8 @@
       ],
       "appearances": 395,
       "concentration": 0.9241,
-      "district_agreement": 0.8789
+      "district_agreement": 0.8789,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/香山",
@@ -665,7 +728,8 @@
       ],
       "appearances": 383,
       "concentration": 0.658,
-      "district_agreement": 0.7304
+      "district_agreement": 0.7304,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/台大醫院",
@@ -676,7 +740,8 @@
       ],
       "appearances": 369,
       "concentration": 0.8428,
-      "district_agreement": 0.6176
+      "district_agreement": 0.6176,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/忠孝復興",
@@ -687,7 +752,8 @@
       ],
       "appearances": 367,
       "concentration": 0.9619,
-      "district_agreement": 0.7669
+      "district_agreement": 0.7669,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/汐科",
@@ -698,7 +764,8 @@
       ],
       "appearances": 350,
       "concentration": 0.9457,
-      "district_agreement": 0.9375
+      "district_agreement": 0.9375,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/景安",
@@ -709,7 +776,8 @@
       ],
       "appearances": 343,
       "concentration": 0.8746,
-      "district_agreement": 0.8889
+      "district_agreement": 0.8889,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/府中",
@@ -720,7 +788,8 @@
       ],
       "appearances": 337,
       "concentration": 0.9614,
-      "district_agreement": 0.5071
+      "district_agreement": 0.5071,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/東湖",
@@ -731,7 +800,8 @@
       ],
       "appearances": 337,
       "concentration": 0.8665,
-      "district_agreement": 0.8176
+      "district_agreement": 0.8176,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/木柵",
@@ -742,7 +812,8 @@
       ],
       "appearances": 336,
       "concentration": 0.8929,
-      "district_agreement": 0.6784
+      "district_agreement": 0.6784,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/敦化南路",
@@ -753,7 +824,8 @@
       ],
       "appearances": 331,
       "concentration": 0.9637,
-      "district_agreement": 0.9169
+      "district_agreement": 0.9169,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/桃園車站",
@@ -764,7 +836,8 @@
       ],
       "appearances": 325,
       "concentration": 0.6769,
-      "district_agreement": 0.7358
+      "district_agreement": 0.7358,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/冬山",
@@ -775,7 +848,8 @@
       ],
       "appearances": 309,
       "concentration": 0.9579,
-      "district_agreement": 0.99
+      "district_agreement": 0.99,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/港墘",
@@ -786,7 +860,8 @@
       ],
       "appearances": 308,
       "concentration": 0.9416,
-      "district_agreement": 0.9195
+      "district_agreement": 0.9195,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/南京三民",
@@ -797,7 +872,8 @@
       ],
       "appearances": 305,
       "concentration": 0.9672,
-      "district_agreement": 0.9695
+      "district_agreement": 0.9695,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/美術館",
@@ -808,7 +884,8 @@
       ],
       "appearances": 304,
       "concentration": 0.602,
-      "district_agreement": 0.5976
+      "district_agreement": 0.5976,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/行天宮",
@@ -819,7 +896,8 @@
       ],
       "appearances": 299,
       "concentration": 0.9298,
-      "district_agreement": 0.6994
+      "district_agreement": 0.6994,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/玉里",
@@ -830,7 +908,8 @@
       ],
       "appearances": 287,
       "concentration": 0.9024,
-      "district_agreement": 0.9152
+      "district_agreement": 0.9152,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/平鎮工業區",
@@ -841,7 +920,8 @@
       ],
       "appearances": 285,
       "concentration": 0.9333,
-      "district_agreement": 0.9603
+      "district_agreement": 0.9603,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/小碧潭",
@@ -852,7 +932,8 @@
       ],
       "appearances": 283,
       "concentration": 0.9576,
-      "district_agreement": 0.9634
+      "district_agreement": 0.9634,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/大里工業區",
@@ -863,7 +944,8 @@
       ],
       "appearances": 278,
       "concentration": 0.9928,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/幼獅工業區",
@@ -874,7 +956,8 @@
       ],
       "appearances": 278,
       "concentration": 0.8417,
-      "district_agreement": 0.7883
+      "district_agreement": 0.7883,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/江子翠",
@@ -885,7 +968,8 @@
       ],
       "appearances": 278,
       "concentration": 0.9388,
-      "district_agreement": 0.9409
+      "district_agreement": 0.9409,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/中央大學",
@@ -896,7 +980,8 @@
       ],
       "appearances": 276,
       "concentration": 0.913,
-      "district_agreement": 0.685
+      "district_agreement": 0.685,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/民生東路",
@@ -908,7 +993,8 @@
       ],
       "appearances": 265,
       "concentration": 0.9585,
-      "district_agreement": 0.8478
+      "district_agreement": 0.8478,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/中華五路",
@@ -919,7 +1005,8 @@
       ],
       "appearances": 264,
       "concentration": 0.8485,
-      "district_agreement": 0.875
+      "district_agreement": 0.875,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/古亭",
@@ -930,7 +1017,8 @@
       ],
       "appearances": 264,
       "concentration": 0.9205,
-      "district_agreement": 0.5812
+      "district_agreement": 0.5812,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/楠梓加工區",
@@ -941,7 +1029,8 @@
       ],
       "appearances": 262,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/花壇",
@@ -952,7 +1041,8 @@
       ],
       "appearances": 257,
       "concentration": 0.93,
-      "district_agreement": 0.9676
+      "district_agreement": 0.9676,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/松江南京",
@@ -963,7 +1053,8 @@
       ],
       "appearances": 256,
       "concentration": 0.9727,
-      "district_agreement": 0.8495
+      "district_agreement": 0.8495,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/崇德路",
@@ -975,7 +1066,8 @@
       ],
       "appearances": 252,
       "concentration": 0.631,
-      "district_agreement": 0.6512
+      "district_agreement": 0.6512,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/西門町",
@@ -986,7 +1078,8 @@
       ],
       "appearances": 249,
       "concentration": 0.9598,
-      "district_agreement": 0.5932
+      "district_agreement": 0.5932,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/土城工業區",
@@ -997,7 +1090,8 @@
       ],
       "appearances": 247,
       "concentration": 0.9879,
-      "district_agreement": 0.9959
+      "district_agreement": 0.9959,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/景平",
@@ -1008,7 +1102,8 @@
       ],
       "appearances": 247,
       "concentration": 0.9474,
-      "district_agreement": 0.9388
+      "district_agreement": 0.9388,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/七張",
@@ -1019,7 +1114,8 @@
       ],
       "appearances": 242,
       "concentration": 0.9339,
-      "district_agreement": 0.9421
+      "district_agreement": 0.9421,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/關渡",
@@ -1030,7 +1126,8 @@
       ],
       "appearances": 241,
       "concentration": 0.6017,
-      "district_agreement": 0.515
+      "district_agreement": 0.515,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/松竹",
@@ -1041,7 +1138,8 @@
       ],
       "appearances": 234,
       "concentration": 0.9316,
-      "district_agreement": 0.872
+      "district_agreement": 0.872,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/敦化北路",
@@ -1052,7 +1150,8 @@
       ],
       "appearances": 233,
       "concentration": 0.9485,
-      "district_agreement": 0.9434
+      "district_agreement": 0.9434,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/大坪林",
@@ -1063,7 +1162,8 @@
       ],
       "appearances": 224,
       "concentration": 0.9286,
-      "district_agreement": 0.5829
+      "district_agreement": 0.5829,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/基隆路",
@@ -1075,7 +1175,8 @@
       ],
       "appearances": 222,
       "concentration": 0.9189,
-      "district_agreement": 0.9198
+      "district_agreement": 0.9198,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/輔大",
@@ -1086,7 +1187,8 @@
       ],
       "appearances": 221,
       "concentration": 0.9367,
-      "district_agreement": 0.9068
+      "district_agreement": 0.9068,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/忠孝敦化",
@@ -1097,7 +1199,8 @@
       ],
       "appearances": 220,
       "concentration": 0.9773,
-      "district_agreement": 0.7015
+      "district_agreement": 0.7015,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/草衙",
@@ -1108,7 +1211,8 @@
       ],
       "appearances": 218,
       "concentration": 0.9954,
-      "district_agreement": 0.6139
+      "district_agreement": 0.6139,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/忠孝新生",
@@ -1119,7 +1223,8 @@
       ],
       "appearances": 213,
       "concentration": 0.9671,
-      "district_agreement": 0.7025
+      "district_agreement": 0.7025,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/吉安",
@@ -1130,7 +1235,8 @@
       ],
       "appearances": 210,
       "concentration": 0.9333,
-      "district_agreement": 0.9751
+      "district_agreement": 0.9751,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/國父紀念館",
@@ -1141,7 +1247,8 @@
       ],
       "appearances": 210,
       "concentration": 0.9905,
-      "district_agreement": 0.7027
+      "district_agreement": 0.7027,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/淡江大學",
@@ -1152,7 +1259,8 @@
       ],
       "appearances": 206,
       "concentration": 0.9029,
-      "district_agreement": 0.9388
+      "district_agreement": 0.9388,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/田中",
@@ -1163,7 +1271,8 @@
       ],
       "appearances": 206,
       "concentration": 0.8835,
-      "district_agreement": 0.9239
+      "district_agreement": 0.9239,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/大發工業區",
@@ -1174,7 +1283,8 @@
       ],
       "appearances": 191,
       "concentration": 0.9948,
-      "district_agreement": 0.9664
+      "district_agreement": 0.9664,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/菜寮",
@@ -1185,7 +1295,8 @@
       ],
       "appearances": 188,
       "concentration": 0.9574,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/七期",
@@ -1196,7 +1307,8 @@
       ],
       "appearances": 186,
       "concentration": 0.9946,
-      "district_agreement": 0.7059
+      "district_agreement": 0.7059,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/頭城",
@@ -1207,7 +1319,8 @@
       ],
       "appearances": 177,
       "concentration": 0.9435,
-      "district_agreement": 0.9598
+      "district_agreement": 0.9598,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/光復南路",
@@ -1219,7 +1332,8 @@
       ],
       "appearances": 174,
       "concentration": 0.9138,
-      "district_agreement": 0.8639
+      "district_agreement": 0.8639,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/新竹工業區",
@@ -1230,7 +1344,8 @@
       ],
       "appearances": 173,
       "concentration": 0.7225,
-      "district_agreement": 0.7296
+      "district_agreement": 0.7296,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/南勢角",
@@ -1241,7 +1356,8 @@
       ],
       "appearances": 168,
       "concentration": 0.9702,
-      "district_agreement": 0.9255
+      "district_agreement": 0.9255,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/板橋車站",
@@ -1252,7 +1368,8 @@
       ],
       "appearances": 168,
       "concentration": 0.9048,
-      "district_agreement": 0.962
+      "district_agreement": 0.962,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/松山機場",
@@ -1263,7 +1380,8 @@
       ],
       "appearances": 165,
       "concentration": 0.8121,
-      "district_agreement": 0.8816
+      "district_agreement": 0.8816,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/旗津",
@@ -1274,7 +1392,8 @@
       ],
       "appearances": 161,
       "concentration": 0.9814,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/科技大樓",
@@ -1285,7 +1404,8 @@
       ],
       "appearances": 161,
       "concentration": 0.8323,
-      "district_agreement": 0.7931
+      "district_agreement": 0.7931,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/昆陽",
@@ -1296,7 +1416,8 @@
       ],
       "appearances": 158,
       "concentration": 0.8987,
-      "district_agreement": 0.8125
+      "district_agreement": 0.8125,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/安平工業區",
@@ -1307,7 +1428,8 @@
       ],
       "appearances": 157,
       "concentration": 0.9299,
-      "district_agreement": 0.9481
+      "district_agreement": 0.9481,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/路竹科學園區",
@@ -1318,7 +1440,8 @@
       ],
       "appearances": 155,
       "concentration": 0.8903,
-      "district_agreement": 0.9517
+      "district_agreement": 0.9517,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/公益路",
@@ -1330,7 +1453,8 @@
       ],
       "appearances": 153,
       "concentration": 0.9739,
-      "district_agreement": 0.9153
+      "district_agreement": 0.9153,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/彰濱工業區",
@@ -1342,7 +1466,8 @@
       ],
       "appearances": 150,
       "concentration": 0.8867,
-      "district_agreement": 0.8056
+      "district_agreement": 0.8056,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/後山埤",
@@ -1353,7 +1478,8 @@
       ],
       "appearances": 150,
       "concentration": 0.9467,
-      "district_agreement": 0.6458
+      "district_agreement": 0.6458,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/頂溪",
@@ -1364,7 +1490,8 @@
       ],
       "appearances": 147,
       "concentration": 0.932,
-      "district_agreement": 0.8922
+      "district_agreement": 0.8922,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/台北小巨蛋",
@@ -1375,7 +1502,8 @@
       ],
       "appearances": 144,
       "concentration": 0.9306,
-      "district_agreement": 0.8488
+      "district_agreement": 0.8488,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/壽豐",
@@ -1386,7 +1514,8 @@
       ],
       "appearances": 143,
       "concentration": 0.986,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/中正紀念堂",
@@ -1397,7 +1526,8 @@
       ],
       "appearances": 138,
       "concentration": 0.8116,
-      "district_agreement": 0.7912
+      "district_agreement": 0.7912,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/紅樹林",
@@ -1408,7 +1538,8 @@
       ],
       "appearances": 138,
       "concentration": 0.9203,
-      "district_agreement": 0.6691
+      "district_agreement": 0.6691,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/浮洲",
@@ -1419,7 +1550,8 @@
       ],
       "appearances": 134,
       "concentration": 0.9701,
-      "district_agreement": 0.8231
+      "district_agreement": 0.8231,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/桃園航空城",
@@ -1430,7 +1562,8 @@
       ],
       "appearances": 133,
       "concentration": 0.9925,
-      "district_agreement": 0.8797
+      "district_agreement": 0.8797,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/六張犁",
@@ -1441,7 +1574,8 @@
       ],
       "appearances": 132,
       "concentration": 0.947,
-      "district_agreement": 0.7556
+      "district_agreement": 0.7556,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/枋寮",
@@ -1452,7 +1586,8 @@
       ],
       "appearances": 132,
       "concentration": 0.9242,
-      "district_agreement": 0.9313
+      "district_agreement": 0.9313,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/善導寺",
@@ -1463,7 +1598,8 @@
       ],
       "appearances": 129,
       "concentration": 0.845,
-      "district_agreement": 0.8611
+      "district_agreement": 0.8611,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/大園工業區",
@@ -1474,7 +1610,8 @@
       ],
       "appearances": 127,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/辛亥",
@@ -1485,7 +1622,8 @@
       ],
       "appearances": 126,
       "concentration": 0.873,
-      "district_agreement": 0.7041
+      "district_agreement": 0.7041,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/後壁",
@@ -1496,7 +1634,8 @@
       ],
       "appearances": 125,
       "concentration": 0.944,
-      "district_agreement": 0.9593
+      "district_agreement": 0.9593,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/芝山",
@@ -1507,7 +1646,8 @@
       ],
       "appearances": 125,
       "concentration": 0.984,
-      "district_agreement": 0.9467
+      "district_agreement": 0.9467,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/樹谷園區",
@@ -1518,7 +1658,8 @@
       ],
       "appearances": 122,
       "concentration": 1.0,
-      "district_agreement": 0.9604
+      "district_agreement": 0.9604,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/新馬",
@@ -1529,7 +1670,8 @@
       ],
       "appearances": 116,
       "concentration": 0.7672,
-      "district_agreement": 0.967
+      "district_agreement": 0.967,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/造橋",
@@ -1540,7 +1682,8 @@
       ],
       "appearances": 115,
       "concentration": 0.8087,
-      "district_agreement": 0.8611
+      "district_agreement": 0.8611,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/南港軟體園區",
@@ -1551,7 +1694,8 @@
       ],
       "appearances": 112,
       "concentration": 0.8125,
-      "district_agreement": 0.875
+      "district_agreement": 0.875,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/亞東醫院",
@@ -1562,7 +1706,8 @@
       ],
       "appearances": 108,
       "concentration": 0.9259,
-      "district_agreement": 0.9103
+      "district_agreement": 0.9103,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/成功大學",
@@ -1573,7 +1718,8 @@
       ],
       "appearances": 108,
       "concentration": 0.75,
-      "district_agreement": 0.0
+      "district_agreement": 0.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/劍潭",
@@ -1584,7 +1730,8 @@
       ],
       "appearances": 104,
       "concentration": 0.9519,
-      "district_agreement": 0.8868
+      "district_agreement": 0.8868,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/竹南科學園區",
@@ -1595,7 +1742,8 @@
       ],
       "appearances": 103,
       "concentration": 0.8641,
-      "district_agreement": 0.9674
+      "district_agreement": 0.9674,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/山鼻",
@@ -1606,7 +1754,8 @@
       ],
       "appearances": 102,
       "concentration": 0.9314,
-      "district_agreement": 0.7647
+      "district_agreement": 0.7647,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/奇岩",
@@ -1617,7 +1766,8 @@
       ],
       "appearances": 98,
       "concentration": 0.898,
-      "district_agreement": 0.9692
+      "district_agreement": 0.9692,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/陽明山",
@@ -1628,7 +1778,8 @@
       ],
       "appearances": 96,
       "concentration": 0.9062,
-      "district_agreement": 0.6129
+      "district_agreement": 0.6129,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/象山",
@@ -1639,7 +1790,8 @@
       ],
       "appearances": 92,
       "concentration": 0.8804,
-      "district_agreement": 0.9306
+      "district_agreement": 0.9306,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/瑞穗",
@@ -1650,7 +1802,8 @@
       ],
       "appearances": 88,
       "concentration": 0.7273,
-      "district_agreement": 0.7711
+      "district_agreement": 0.7711,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/龍山寺",
@@ -1661,7 +1814,8 @@
       ],
       "appearances": 87,
       "concentration": 0.8621,
-      "district_agreement": 0.8167
+      "district_agreement": 0.8167,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/六輕",
@@ -1672,7 +1826,8 @@
       ],
       "appearances": 86,
       "concentration": 0.9535,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/重慶北路",
@@ -1683,7 +1838,8 @@
       ],
       "appearances": 84,
       "concentration": 0.9643,
-      "district_agreement": 0.8611
+      "district_agreement": 0.8611,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/百福",
@@ -1694,7 +1850,8 @@
       ],
       "appearances": 82,
       "concentration": 0.7439,
-      "district_agreement": 0.62
+      "district_agreement": 0.62,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/葫洲",
@@ -1705,7 +1862,8 @@
       ],
       "appearances": 82,
       "concentration": 0.939,
-      "district_agreement": 0.9298
+      "district_agreement": 0.9298,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/永靖",
@@ -1716,7 +1874,8 @@
       ],
       "appearances": 81,
       "concentration": 0.963,
-      "district_agreement": 0.975
+      "district_agreement": 0.975,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/阿里山",
@@ -1727,7 +1886,8 @@
       ],
       "appearances": 81,
       "concentration": 0.7531,
-      "district_agreement": 0.9104
+      "district_agreement": 0.9104,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/南部科學園區",
@@ -1739,7 +1899,8 @@
       ],
       "appearances": 80,
       "concentration": 0.825,
-      "district_agreement": 0.7742
+      "district_agreement": 0.7742,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/富岡",
@@ -1750,7 +1911,8 @@
       ],
       "appearances": 77,
       "concentration": 0.8182,
-      "district_agreement": 0.7727
+      "district_agreement": 0.7727,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/山佳",
@@ -1761,7 +1923,8 @@
       ],
       "appearances": 77,
       "concentration": 0.8701,
-      "district_agreement": 0.8
+      "district_agreement": 0.8,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/徐匯中學",
@@ -1772,7 +1935,8 @@
       ],
       "appearances": 77,
       "concentration": 0.9221,
-      "district_agreement": 0.8462
+      "district_agreement": 0.8462,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/關山",
@@ -1783,7 +1947,8 @@
       ],
       "appearances": 75,
       "concentration": 0.8267,
-      "district_agreement": 0.9841
+      "district_agreement": 0.9841,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/高雄長庚",
@@ -1794,7 +1959,8 @@
       ],
       "appearances": 72,
       "concentration": 0.9861,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/二水",
@@ -1805,7 +1971,8 @@
       ],
       "appearances": 71,
       "concentration": 0.8732,
-      "district_agreement": 0.8857
+      "district_agreement": 0.8857,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/唭哩岸",
@@ -1816,7 +1983,8 @@
       ],
       "appearances": 70,
       "concentration": 0.7143,
-      "district_agreement": 0.6935
+      "district_agreement": 0.6935,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/後驛",
@@ -1827,7 +1995,8 @@
       ],
       "appearances": 70,
       "concentration": 0.9429,
-      "district_agreement": 0.9333
+      "district_agreement": 0.9333,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/松山文創",
@@ -1838,7 +2007,8 @@
       ],
       "appearances": 69,
       "concentration": 0.9855,
-      "district_agreement": 0.8261
+      "district_agreement": 0.8261,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/銅鑼科學園區",
@@ -1849,7 +2019,8 @@
       ],
       "appearances": 69,
       "concentration": 0.9565,
-      "district_agreement": 0.9851
+      "district_agreement": 0.9851,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/駁二",
@@ -1860,7 +2031,8 @@
       ],
       "appearances": 68,
       "concentration": 0.9853,
-      "district_agreement": 0.65
+      "district_agreement": 0.65,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/文心崇德",
@@ -1871,7 +2043,8 @@
       ],
       "appearances": 66,
       "concentration": 0.9848,
-      "district_agreement": 0.9545
+      "district_agreement": 0.9545,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/三重國小",
@@ -1882,7 +2055,8 @@
       ],
       "appearances": 65,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/台中七期",
@@ -1893,7 +2067,8 @@
       ],
       "appearances": 65,
       "concentration": 1.0,
-      "district_agreement": 0.625
+      "district_agreement": 0.625,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/麥寮六輕",
@@ -1904,7 +2079,8 @@
       ],
       "appearances": 65,
       "concentration": 0.9385,
-      "district_agreement": 0.9683
+      "district_agreement": 0.9683,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/劍南路",
@@ -1915,7 +2091,8 @@
       ],
       "appearances": 64,
       "concentration": 0.9844,
-      "district_agreement": 0.6744
+      "district_agreement": 0.6744,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/劍湖山",
@@ -1926,7 +2103,8 @@
       ],
       "appearances": 64,
       "concentration": 0.7188,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/萬芳醫院",
@@ -1937,7 +2115,8 @@
       ],
       "appearances": 64,
       "concentration": 0.7812,
-      "district_agreement": 0.6429
+      "district_agreement": 0.6429,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/五堵",
@@ -1948,7 +2127,8 @@
       ],
       "appearances": 62,
       "concentration": 0.7097,
-      "district_agreement": 0.641
+      "district_agreement": 0.641,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/永安市場",
@@ -1959,7 +2139,8 @@
       ],
       "appearances": 61,
       "concentration": 0.8852,
-      "district_agreement": 0.5128
+      "district_agreement": 0.5128,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/高鐵桃園站",
@@ -1970,7 +2151,8 @@
       ],
       "appearances": 61,
       "concentration": 0.918,
-      "district_agreement": 0.5517
+      "district_agreement": 0.5517,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/南樹林",
@@ -1981,7 +2163,8 @@
       ],
       "appearances": 60,
       "concentration": 0.8667,
-      "district_agreement": 0.9811
+      "district_agreement": 0.9811,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/士林夜市",
@@ -1992,7 +2175,8 @@
       ],
       "appearances": 60,
       "concentration": 0.9167,
-      "district_agreement": 0.9322
+      "district_agreement": 0.9322,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/大安森林公園",
@@ -2003,7 +2187,8 @@
       ],
       "appearances": 59,
       "concentration": 0.9322,
-      "district_agreement": 0.5385
+      "district_agreement": 0.5385,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/新莊副都心",
@@ -2014,7 +2199,8 @@
       ],
       "appearances": 59,
       "concentration": 0.9661,
-      "district_agreement": 0.9661
+      "district_agreement": 0.9661,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/淡水老街",
@@ -2025,7 +2211,8 @@
       ],
       "appearances": 57,
       "concentration": 0.6316,
-      "district_agreement": 0.6429
+      "district_agreement": 0.6429,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/台北橋",
@@ -2036,7 +2223,8 @@
       ],
       "appearances": 55,
       "concentration": 0.8545,
-      "district_agreement": 0.931
+      "district_agreement": 0.931,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/新北投",
@@ -2047,7 +2235,8 @@
       ],
       "appearances": 55,
       "concentration": 0.9818,
-      "district_agreement": 0.9818
+      "district_agreement": 0.9818,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/泰山貴和",
@@ -2058,7 +2247,8 @@
       ],
       "appearances": 55,
       "concentration": 0.6545,
-      "district_agreement": 0.6667
+      "district_agreement": 0.6667,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/信義商圈",
@@ -2069,7 +2259,8 @@
       ],
       "appearances": 53,
       "concentration": 0.9245,
-      "district_agreement": 0.9608
+      "district_agreement": 0.9608,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/中科大",
@@ -2080,7 +2271,8 @@
       ],
       "appearances": 50,
       "concentration": 1.0,
-      "district_agreement": 0.0
+      "district_agreement": 0.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/頭前庄",
@@ -2091,7 +2283,8 @@
       ],
       "appearances": 50,
       "concentration": 0.98,
-      "district_agreement": 0.973
+      "district_agreement": 0.973,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/台中榮總",
@@ -2102,7 +2295,8 @@
       ],
       "appearances": 49,
       "concentration": 0.9592,
-      "district_agreement": 0.6
+      "district_agreement": 0.6,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/新烏日",
@@ -2113,7 +2307,8 @@
       ],
       "appearances": 45,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/樹谷",
@@ -2124,7 +2319,8 @@
       ],
       "appearances": 45,
       "concentration": 1.0,
-      "district_agreement": 0.9
+      "district_agreement": 0.9,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/小人國",
@@ -2135,7 +2331,8 @@
       ],
       "appearances": 44,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/舊社",
@@ -2146,7 +2343,8 @@
       ],
       "appearances": 44,
       "concentration": 0.7955,
-      "district_agreement": 0.8182
+      "district_agreement": 0.8182,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/中科后里",
@@ -2157,7 +2355,8 @@
       ],
       "appearances": 43,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/楠梓加工出口區",
@@ -2168,7 +2367,8 @@
       ],
       "appearances": 43,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/大橋頭",
@@ -2179,7 +2379,8 @@
       ],
       "appearances": 42,
       "concentration": 0.9524,
-      "district_agreement": 0.9375
+      "district_agreement": 0.9375,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/高鐵台中站",
@@ -2190,7 +2391,8 @@
       ],
       "appearances": 42,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/中山大學",
@@ -2201,7 +2403,8 @@
       ],
       "appearances": 40,
       "concentration": 0.625,
-      "district_agreement": 0.3636
+      "district_agreement": 0.3636,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/內湖科技園區",
@@ -2212,7 +2415,8 @@
       ],
       "appearances": 40,
       "concentration": 0.975,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/後勁",
@@ -2223,7 +2427,8 @@
       ],
       "appearances": 40,
       "concentration": 0.975,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/烏來",
@@ -2234,7 +2439,8 @@
       ],
       "appearances": 40,
       "concentration": 0.95,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/龍德工業區",
@@ -2245,7 +2451,8 @@
       ],
       "appearances": 37,
       "concentration": 0.973,
-      "district_agreement": 0.8919
+      "district_agreement": 0.8919,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/鹿野",
@@ -2256,7 +2463,8 @@
       ],
       "appearances": 35,
       "concentration": 0.9429,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/永安工業區",
@@ -2267,7 +2475,8 @@
       ],
       "appearances": 34,
       "concentration": 0.8529,
-      "district_agreement": 0.6111
+      "district_agreement": 0.6111,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/環河南路",
@@ -2278,7 +2487,8 @@
       ],
       "appearances": 34,
       "concentration": 0.6765,
-      "district_agreement": 0.5862
+      "district_agreement": 0.5862,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/美麗島",
@@ -2289,7 +2499,8 @@
       ],
       "appearances": 34,
       "concentration": 0.9412,
-      "district_agreement": 0.9375
+      "district_agreement": 0.9375,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/臨海工業區",
@@ -2300,7 +2511,8 @@
       ],
       "appearances": 33,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/永康工業區",
@@ -2311,7 +2523,8 @@
       ],
       "appearances": 32,
       "concentration": 0.9688,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/利澤",
@@ -2323,7 +2536,8 @@
       ],
       "appearances": 31,
       "concentration": 0.9677,
-      "district_agreement": 0.6875
+      "district_agreement": 0.6875,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/三多商圈",
@@ -2334,7 +2548,8 @@
       ],
       "appearances": 30,
       "concentration": 1.0,
-      "district_agreement": 0.5833
+      "district_agreement": 0.5833,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/文心中清",
@@ -2345,7 +2560,8 @@
       ],
       "appearances": 30,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/新左營",
@@ -2356,7 +2572,8 @@
       ],
       "appearances": 29,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/凹子底",
@@ -2367,7 +2584,8 @@
       ],
       "appearances": 28,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/水安宮",
@@ -2378,7 +2596,8 @@
       ],
       "appearances": 28,
       "concentration": 1.0,
-      "district_agreement": 0.875
+      "district_agreement": 0.875,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/獅甲",
@@ -2389,7 +2608,8 @@
       ],
       "appearances": 28,
       "concentration": 0.9286,
-      "district_agreement": 0.9231
+      "district_agreement": 0.9231,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/義大醫院",
@@ -2400,7 +2620,8 @@
       ],
       "appearances": 28,
       "concentration": 0.9643,
-      "district_agreement": 0.0769
+      "district_agreement": 0.0769,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/新竹車站",
@@ -2411,7 +2632,8 @@
       ],
       "appearances": 27,
       "concentration": 0.6667,
-      "district_agreement": 0.0
+      "district_agreement": 0.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/一中街",
@@ -2422,7 +2644,8 @@
       ],
       "appearances": 26,
       "concentration": 1.0,
-      "district_agreement": 0.0
+      "district_agreement": 0.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/新店區公所",
@@ -2433,7 +2656,8 @@
       ],
       "appearances": 26,
       "concentration": 0.6538,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/溪頭",
@@ -2444,7 +2668,8 @@
       ],
       "appearances": 26,
       "concentration": 0.7308,
-      "district_agreement": 0.5
+      "district_agreement": 0.5,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/長庚大學",
@@ -2455,7 +2680,8 @@
       ],
       "appearances": 26,
       "concentration": 0.8077,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/秋紅谷",
@@ -2466,7 +2692,8 @@
       ],
       "appearances": 25,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/北屯總站",
@@ -2477,7 +2704,8 @@
       ],
       "appearances": 24,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/南澳",
@@ -2488,7 +2716,8 @@
       ],
       "appearances": 24,
       "concentration": 0.9167,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/文心森林公園",
@@ -2499,7 +2728,8 @@
       ],
       "appearances": 24,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/復興崗",
@@ -2510,7 +2740,8 @@
       ],
       "appearances": 23,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/斗六工業區",
@@ -2521,7 +2752,8 @@
       ],
       "appearances": 23,
       "concentration": 0.9565,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/麟光",
@@ -2532,7 +2764,8 @@
       ],
       "appearances": 23,
       "concentration": 1.0,
-      "district_agreement": 0.8182
+      "district_agreement": 0.8182,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/三和國中",
@@ -2543,7 +2776,8 @@
       ],
       "appearances": 22,
       "concentration": 1.0,
-      "district_agreement": 0.0556
+      "district_agreement": 0.0556,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/中興新村",
@@ -2554,7 +2788,8 @@
       ],
       "appearances": 22,
       "concentration": 0.7727,
-      "district_agreement": 0.7222
+      "district_agreement": 0.7222,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/八堵",
@@ -2565,7 +2800,8 @@
       ],
       "appearances": 21,
       "concentration": 0.8095,
-      "district_agreement": 0.0
+      "district_agreement": 0.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/小東路",
@@ -2576,7 +2812,8 @@
       ],
       "appearances": 21,
       "concentration": 1.0,
-      "district_agreement": 0.0
+      "district_agreement": 0.0,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/瑞芳工業區",
@@ -2587,7 +2824,8 @@
       ],
       "appearances": 21,
       "concentration": 0.7619,
-      "district_agreement": 0.8
+      "district_agreement": 0.8,
+      "requires_occurrence_filter": false
     },
     {
       "id": "L5/林園工業區",
@@ -2598,7 +2836,333 @@
       ],
       "appearances": 20,
       "concentration": 1.0,
-      "district_agreement": 1.0
+      "district_agreement": 1.0,
+      "requires_occurrence_filter": false
+    },
+    {
+      "id": "L5/中山國小",
+      "surface": "中山國小",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中山區"
+      ],
+      "appearances": 224,
+      "concentration": 0.692,
+      "district_agreement": 0.1385,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 0.8667,
+        "sample_concentration": 0.2167,
+        "lift": 0.65,
+        "sampled": 60,
+        "accepted": 15
+      }
+    },
+    {
+      "id": "L5/文德",
+      "surface": "文德",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/內湖區"
+      ],
+      "appearances": 465,
+      "concentration": 0.4108,
+      "district_agreement": 0.3,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 1.0,
+        "sample_concentration": 0.35,
+        "lift": 0.65,
+        "sampled": 60,
+        "accepted": 20
+      }
+    },
+    {
+      "id": "L5/明德",
+      "surface": "明德",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/北投區"
+      ],
+      "appearances": 284,
+      "concentration": 0.4437,
+      "district_agreement": 0.4091,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 0.9444,
+        "sample_concentration": 0.3667,
+        "lift": 0.5777,
+        "sampled": 60,
+        "accepted": 18
+      }
+    },
+    {
+      "id": "L5/大直",
+      "surface": "大直",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中山區"
+      ],
+      "appearances": 2852,
+      "concentration": 0.4144,
+      "district_agreement": 0.1588,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 1.0,
+        "sample_concentration": 0.4333,
+        "lift": 0.5667,
+        "sampled": 60,
+        "accepted": 22
+      }
+    },
+    {
+      "id": "L5/海山",
+      "surface": "海山",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/土城區"
+      ],
+      "appearances": 225,
+      "concentration": 0.5467,
+      "district_agreement": 0.3141,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 0.9333,
+        "sample_concentration": 0.4833,
+        "lift": 0.45,
+        "sampled": 60,
+        "accepted": 15
+      }
+    },
+    {
+      "id": "L5/東門",
+      "surface": "東門",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "appearances": 617,
+      "concentration": 0.4036,
+      "district_agreement": 0.2279,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 0.8421,
+        "sample_concentration": 0.4,
+        "lift": 0.4421,
+        "sampled": 60,
+        "accepted": 19
+      }
+    },
+    {
+      "id": "L5/成大",
+      "surface": "成大",
+      "kind": "landmark",
+      "districts": [
+        "台南市/東區"
+      ],
+      "appearances": 341,
+      "concentration": 0.4927,
+      "district_agreement": 0.0,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 0.9333,
+        "sample_concentration": 0.55,
+        "lift": 0.3833,
+        "sampled": 60,
+        "accepted": 30
+      }
+    },
+    {
+      "id": "L5/新城",
+      "surface": "新城",
+      "kind": "tra_station",
+      "districts": [
+        "花蓮縣/新城鄉"
+      ],
+      "appearances": 449,
+      "concentration": 0.4967,
+      "district_agreement": 0.5045,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 1.0,
+        "sample_concentration": 0.6167,
+        "lift": 0.3833,
+        "sampled": 60,
+        "accepted": 29
+      }
+    },
+    {
+      "id": "L5/政大",
+      "surface": "政大",
+      "kind": "landmark",
+      "districts": [
+        "台北市/文山區"
+      ],
+      "appearances": 302,
+      "concentration": 0.5795,
+      "district_agreement": 0.3188,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 0.9231,
+        "sample_concentration": 0.5833,
+        "lift": 0.3398,
+        "sampled": 60,
+        "accepted": 26
+      }
+    },
+    {
+      "id": "L5/西門",
+      "surface": "西門",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/萬華區"
+      ],
+      "appearances": 1796,
+      "concentration": 0.4861,
+      "district_agreement": 0.2217,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 0.8077,
+        "sample_concentration": 0.5,
+        "lift": 0.3077,
+        "sampled": 60,
+        "accepted": 26
+      }
+    },
+    {
+      "id": "L5/文化路",
+      "surface": "文化路",
+      "kind": "arterial_road",
+      "districts": [
+        "新北市/板橋區",
+        "新北市/新莊區"
+      ],
+      "appearances": 543,
+      "concentration": 0.5359,
+      "district_agreement": 0.5235,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 0.8529,
+        "sample_concentration": 0.5667,
+        "lift": 0.2862,
+        "sampled": 60,
+        "accepted": 34
+      }
+    },
+    {
+      "id": "L5/竹圍",
+      "surface": "竹圍",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/淡水區"
+      ],
+      "appearances": 559,
+      "concentration": 0.5581,
+      "district_agreement": 0.3006,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 0.7222,
+        "sample_concentration": 0.45,
+        "lift": 0.2722,
+        "sampled": 60,
+        "accepted": 36
+      }
+    },
+    {
+      "id": "L5/中山北路",
+      "surface": "中山北路",
+      "kind": "arterial_road",
+      "districts": [
+        "台北市/中山區",
+        "台北市/士林區"
+      ],
+      "appearances": 735,
+      "concentration": 0.5252,
+      "district_agreement": 0.4841,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 0.775,
+        "sample_concentration": 0.5167,
+        "lift": 0.2583,
+        "sampled": 60,
+        "accepted": 40
+      }
+    },
+    {
+      "id": "L5/新埔",
+      "surface": "新埔",
+      "kind": "metro_station",
+      "districts": [
+        "新北市/板橋區"
+      ],
+      "appearances": 956,
+      "concentration": 0.4623,
+      "district_agreement": 0.4288,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 0.8,
+        "sample_concentration": 0.5667,
+        "lift": 0.2333,
+        "sampled": 60,
+        "accepted": 25
+      }
+    },
+    {
+      "id": "L5/永春",
+      "surface": "永春",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/信義區"
+      ],
+      "appearances": 463,
+      "concentration": 0.3801,
+      "district_agreement": 0.2152,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 0.6154,
+        "sample_concentration": 0.4167,
+        "lift": 0.1987,
+        "sampled": 60,
+        "accepted": 26
+      }
+    },
+    {
+      "id": "L5/公館",
+      "surface": "公館",
+      "kind": "metro_station",
+      "districts": [
+        "台北市/中正區"
+      ],
+      "appearances": 878,
+      "concentration": 0.4704,
+      "district_agreement": 0.1495,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 0.6136,
+        "sample_concentration": 0.45,
+        "lift": 0.1636,
+        "sampled": 60,
+        "accepted": 44
+      }
+    },
+    {
+      "id": "L5/大發",
+      "surface": "大發",
+      "kind": "industrial_park",
+      "districts": [
+        "高雄市/大寮區"
+      ],
+      "appearances": 229,
+      "concentration": 0.4891,
+      "district_agreement": 0.3881,
+      "requires_occurrence_filter": true,
+      "occurrence_filter": {
+        "accepted_concentration": 0.9762,
+        "sample_concentration": 0.8167,
+        "lift": 0.1595,
+        "sampled": 60,
+        "accepted": 42
+      }
     }
   ]
 }
