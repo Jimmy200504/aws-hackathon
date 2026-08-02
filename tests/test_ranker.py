@@ -175,6 +175,16 @@ class GraphIsolationTests(unittest.TestCase):
         self.assertEqual(day_one["behavior_job_global_seen"], 0.0)
         self.assertEqual(day_one["behavior_company_global_seen"], 0.0)
 
+    def test_graph_trace_keeps_canonical_ids_and_adds_display_names(self) -> None:
+        row = self.ranker.search("python", top_k=1)["results"][0]
+        trace = next(
+            item
+            for item in row["graph_trace"]
+            if "Skill:skill.python" in item["path"]
+        )
+        self.assertIn("Skill:skill.python", trace["path"])
+        self.assertIn("Skill:Python", trace["display_path"])
+
 
 class RemoteWorkFeatureTests(unittest.TestCase):
     def setUp(self) -> None:

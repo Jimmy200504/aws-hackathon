@@ -103,7 +103,9 @@ class GraphFeatureProvider:
     QUERY = """
     MATCH (source) WHERE id(source) IN $skill_ids
     MATCH (source)-[edge:RELATED_TO]-(target)
-    RETURN id(source) AS source_id, id(target) AS target_id, id(edge) AS edge_id,
+    RETURN id(source) AS source_id, source.label AS source_label,
+           id(target) AS target_id, target.label AS target_label,
+           id(edge) AS edge_id,
            type(edge) AS relation_type, edge.weight AS weight,
            edge.confidence AS confidence, edge.support_jobs AS support_jobs,
            edge.support_companies AS support_companies, edge.evidence AS evidence,
@@ -227,6 +229,8 @@ class GraphFeatureProvider:
                 if not source or not target:
                     continue
                 relations.setdefault(source, {})[target] = {
+                    "source_label": str(row.get("source_label", "")),
+                    "target_label": str(row.get("target_label", "")),
                     "edge_id": str(row.get("edge_id", "")),
                     "relation_type": str(row.get("relation_type", "RELATED_TO")),
                     "weight": float(row.get("weight", 0)),

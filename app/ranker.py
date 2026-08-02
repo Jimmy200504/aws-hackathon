@@ -290,6 +290,10 @@ class SkillWeaveRanker:
                 return "seed_occupation"
             return "technical"
 
+        def display_label(skill_id: str, fallback: Any = "") -> str:
+            label = self.skills.get(skill_id, {}).get("label")
+            return str(label or fallback or skill_id)
+
         job_skills = set(job.get("skills", []))
         direct_score = 0.0
         best_related = 0.0
@@ -311,6 +315,11 @@ class SkillWeaveRanker:
                         "path": [
                             f"Query:{intent.raw}",
                             f"Skill:{query_skill}",
+                            f"Job:{job['id']}",
+                        ],
+                        "display_path": [
+                            f"Query:{intent.raw}",
+                            f"Skill:{display_label(query_skill)}",
                             f"Job:{job['id']}",
                         ],
                         "edges": ["RESOLVES_TO", "REQUIRES"],
@@ -356,6 +365,12 @@ class SkillWeaveRanker:
                             f"Query:{intent.raw}",
                             f"Skill:{query_skill}",
                             f"Skill:{candidate_skill}",
+                            f"Job:{job['id']}",
+                        ],
+                        "display_path": [
+                            f"Query:{intent.raw}",
+                            f"Skill:{display_label(query_skill, relation_meta.get('source_label'))}",
+                            f"Skill:{display_label(candidate_skill, relation_meta.get('target_label'))}",
                             f"Job:{job['id']}",
                         ],
                         "edges": [

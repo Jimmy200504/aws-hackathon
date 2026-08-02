@@ -196,6 +196,9 @@ function renderTraceGraph(traces) {
   });
 
   visibleTraces.forEach((trace) => {
+    const displayPath = Array.isArray(trace.display_path) && trace.display_path.length === trace.path.length
+      ? trace.display_path
+      : trace.path;
     const keys = trace.path.map((label, index) => {
       const type = nodeType(label, index, trace.path.length);
       const columnIndex = type === "query" ? 0 : type === "job" ? 3 : relatedTargets.has(label) ? 2 : 1;
@@ -203,11 +206,14 @@ function renderTraceGraph(traces) {
       if (!nodeElements.has(key)) {
         const node = document.createElement("div");
         node.className = `graph-node ${type}`;
-        node.title = label;
+        const displayLabel = displayPath[index] || label;
+        node.title = displayLabel === label
+          ? label
+          : `${nodeLabel(displayLabel, type)} · ${label}`;
         const kind = document.createElement("span");
         kind.textContent = type.toUpperCase();
         const name = document.createElement("strong");
-        name.textContent = nodeLabel(label, type);
+        name.textContent = nodeLabel(displayLabel, type);
         node.append(kind, name);
         columns[columnIndex].append(node);
         nodeElements.set(key, node);
