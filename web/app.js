@@ -61,7 +61,7 @@ function setNormalizationLoading() {
 
 function renderNormalization(normalization, rawQuery) {
   normalizationPanel.replaceChildren();
-  if (!normalization?.normalized_query) {
+  if (!normalization?.source) {
     normalizationBadge.textContent = "NO DATA";
     normalizationBadge.classList.remove("active", "fallback");
     normalizationPanel.innerHTML = '<p class="panel-empty">這次回應沒有查詢正規化資料。</p>';
@@ -73,9 +73,10 @@ function renderNormalization(normalization, rawQuery) {
   normalizationBadge.classList.toggle("active", Boolean(source.active));
   normalizationBadge.classList.toggle("fallback", Boolean(source.fallback));
 
-  const flow = document.createElement("div");
-  flow.className = "normalization-flow";
-
+  // `normalized_query` is deliberately not shown. It is the retrieval string --
+  // the query with its own keywords repeated to raise their BM25 term
+  // frequency -- so it reads to a viewer as the input echoed back. What the
+  // model actually understood is the structured intent below.
   const input = document.createElement("div");
   input.className = "normalization-query input-query";
   const inputLabel = document.createElement("span");
@@ -83,21 +84,7 @@ function renderNormalization(normalization, rawQuery) {
   const inputValue = document.createElement("p");
   inputValue.textContent = rawQuery;
   input.append(inputLabel, inputValue);
-
-  const arrow = document.createElement("span");
-  arrow.className = "normalization-arrow";
-  arrow.setAttribute("aria-hidden", "true");
-  arrow.textContent = "↓";
-
-  const output = document.createElement("div");
-  output.className = "normalization-query output-query";
-  const outputLabel = document.createElement("span");
-  outputLabel.textContent = "NORMALIZED QUERY";
-  const outputValue = document.createElement("p");
-  outputValue.textContent = normalization.normalized_query;
-  output.append(outputLabel, outputValue);
-  flow.append(input, arrow, output);
-  normalizationPanel.append(flow);
+  normalizationPanel.append(input);
 
   const structuredIntent = normalization.structured_intent || {};
   const fields = Object.entries(intentLabels)
