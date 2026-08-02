@@ -46,7 +46,7 @@ for required in \
   web/index.html \
   web/app.js \
   web/styles.css \
-  artifacts/models/ltr-quality-remote-salary.trees.json; do
+  artifacts/models/ltr-quality-remote-salary-intent.trees.json; do
   .venv/bin/python - "$required" <<'PY'
 import sys, zipfile
 name = sys.argv[1]
@@ -93,7 +93,7 @@ current.update(
         # and the ranker silently disables reranking when the path is missing,
         # so pin the key here to keep code and configuration in lockstep.
         "LTR_MODEL_PATH": (
-            "/var/task/artifacts/models/ltr-quality-remote-salary.trees.json"
+            "/var/task/artifacts/models/ltr-quality-remote-salary-intent.trees.json"
         ),
     }
 )

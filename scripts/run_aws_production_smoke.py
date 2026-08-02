@@ -20,6 +20,11 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "release-manifest.json"
 OUTPUT = ROOT / "reports" / "aws-production-smoke.json"
 INDEX_VERSION = "demo-2026.06.05-v1"
+# The model the bundle ships, as the API reports it in `meta.ranking_model`
+# (the portable artifact's `source_model`). Hard-coding a single historical
+# name silently turned this gate into a check that the deployment had NOT been
+# updated, so keep it overridable and keep it in step with package_lambda.py.
+QUALITY_MODEL = "ltr-quality-remote-salary-intent.ubj"
 QUERIES = (
     "AWS Docker Kubernetes",
     "React 前端工程師",
@@ -263,9 +268,9 @@ def run_smoke(
         ),
         "quality_ltr_deployed": (
             graph_on.get("meta", {}).get("ranking_model")
-            == "ltr-quality-final.ubj"
+            == QUALITY_MODEL
             and graph_off.get("meta", {}).get("ranking_model")
-            == "ltr-quality-final.ubj"
+            == QUALITY_MODEL
         ),
         "real_bedrock_pilot_deployed": (
             meta.get("metadata", {})
@@ -363,7 +368,7 @@ def run_smoke(
         result["index_version"] == INDEX_VERSION for result in results
     )
     matching_model = sum(
-        result["ranking_model"] == "ltr-quality-final.ubj"
+        result["ranking_model"] == QUALITY_MODEL
         for result in results
     )
     graph_on_results = [result for result in results if result["graph_requested"]]
@@ -496,6 +501,11 @@ def main() -> int:
         help="Fail unless health and every graph-on request use Neptune Analytics",
     )
     parser.add_argument("--expected-graph-version")
+    parser.add_argument(
+        "--expected-ranking-model",
+        default=QUALITY_MODEL,
+        help="Model name the API must report in meta.ranking_model",
+    )
     parser.add_argument("--max-p95-ms", type=float, default=10_000.0)
     parser.add_argument(
         "--no-register-release-artifact",
@@ -503,6 +513,7 @@ def main() -> int:
         help="Do not update release-manifest.json with this smoke artifact",
     )
     args = parser.parse_args()
+    globals()["QUALITY_MODEL"] = args.expected_ranking_model
     if args.requests < 1 or args.concurrency < 1:
         parser.error("--requests and --concurrency must be positive")
     if args.concurrency > 10:

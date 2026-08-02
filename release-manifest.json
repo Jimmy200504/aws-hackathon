@@ -88,7 +88,7 @@
     "five_percent_gate_passed": true
   },
   "sha256": {
-    "dist/skillweave-lambda.zip": "a5030be6dfc7f76091f979f4be9b35d12764e29efb23312a64cd3de5fafee364",
+    "dist/skillweave-lambda.zip": "13ceabd5234f7b637f6afdf358f40dd007d8ec054dc745d0033dadb4d0ad8ec4",
     "dist/skillweave-demo-5min.mp4": "2c7ee08c5851ac8e3673d7f94d7116108846515edaa4ad47188d56cf17f8509a",
     "artifacts/models/ltr-graph-final.ubj": "d90693ac66358b847ba74cfb4dd0b1f3a4895fd28ecb061563d107f89ca1366e",
     "artifacts/models/ltr-graph-final.manifest.json": "f857cb7f05afbbaa7498a4f687a8fccce6d773074f1fd2870544fb1acf053f26",
@@ -101,7 +101,7 @@
     "reports/ltr-quality-remote-salary-test.json": "72d053f6fdd4518f41b74a735312ece3018f4c124d7b3852791d7ac74396da6d",
     "reports/ltr-remote-salary-vs-baseline-test.json": "861d973d2cccfbf5ecdf00ce7972c9bffe20550f09b3f70fc0b837f55ccbb298",
     "reports/portable-ltr-remote-salary-parity.json": "5d65b779a45df3a5760e194eb3ce69922923d7e520fb79fcf8810af26417f8f1",
-    "artifacts/demo-index.json": "c8184d4b814b0ba1af9f18de07c460d3636cb75c8fc3f68db326449861de21fa",
+    "artifacts/demo-index.json": "b29b2a5412842bfaf47ffd9b9026c6079e9eb6190f102fd3c68ed9a5573c3158",
     "reports/ltr-ablation-test.json": "76af3080dbb569860ada4e42fa72ab313bda450b6f54bc5a8e51c54d4e211daa",
     "reports/ltr-ablation-holdout-1-failed.json": "a9bd07f7436c27bf3eb1140c788b265005e5cd4c599536b31674ce2135c2c1d9",
     "reports/ltr-quality-confirmation.json": "11de11f52f0500f9c90e6566e99b2d835d21106f85d19184fcdec05e41d4b021",
@@ -127,7 +127,11 @@
     "reports/deterministic-graph-runtime-preflight.json": "9186a01caed199a6aa9783036c35b879a14160a67287cf88fad845b6f328e7df",
     "reports/ltr-quality-deterministic-v2.json": "6b39f718bebaa5e2d48b395a80200df6ca1cdf559e6f838f4ff1fcd85a2f9f58",
     "reports/skill-alias-index-v2.json": "defd3b33e4acd4cd9a1e3258312dea622236ff4831e78dbc936577ba10389ef2",
-    "reports/aws-production-smoke.json": "fa77cd75e2fb71b2a39222a0385dd43ea976f5f2620dd48bbb20bcdd6c5b1b35"
+    "reports/aws-production-smoke.json": "f6f9f93608ee96630117adaff460d6dfee214cdaa224d5393dc4a4abd31cea24",
+    "artifacts/models/ltr-quality-remote-salary-intent.trees.json": "7a6bc2125a2da59e80d00a3ec654923f23a2e9da33bf8541bc0130429d7112b9",
+    "artifacts/models/ltr-quality-remote-salary-intent.ubj": "cb07c70bc42b9cd2269bd97cb2b4e4b8b9b54cbd076e4ede7a9eb035d8b611fd",
+    "artifacts/models/ltr-quality-remote-salary-intent.manifest.json": "e8c5befa8b89da66da9c6492b88ed7c568874829e5b0da2da88673b8dfa90402",
+    "reports/ltr-quality-remote-salary-intent-confirmation.json": "edfda3a8a4e0839f9eac13925a18eea3d90ef34dd33242a04d844aaa814f12c0"
   },
   "external_deliverables": {
     "aws_url": "https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/",

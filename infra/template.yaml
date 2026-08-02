@@ -88,7 +88,7 @@ Globals:
     Environment:
       Variables:
         INDEX_PATH: /var/task/artifacts/demo-index.json
-        LTR_MODEL_PATH: /var/task/artifacts/models/ltr-quality-remote-salary.trees.json
+        LTR_MODEL_PATH: /var/task/artifacts/models/ltr-quality-remote-salary-intent.trees.json
         OPENSEARCH_ENDPOINT: !Ref OpenSearchEndpoint
         OPENSEARCH_SERVICE: !Ref OpenSearchService
         OPENSEARCH_INDEX: !Ref OpenSearchIndex

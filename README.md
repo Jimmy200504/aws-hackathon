@@ -79,11 +79,21 @@ bash scripts/deploy_lambda_code.sh
 
 ## 評測指標
 
+目前部署的 `ltr-quality-remote-salary-intent`，在 2026-06-07 holdout 的 1,991 個
+查詢上量測（`reports/ltr-quality-remote-salary-intent-confirmation.json`）：
+
 | 指標 | Graph OFF | Graph ON | 相對改善 |
 |---|---:|---:|---:|
-| NDCG@10 | 0.6023 | 0.6374 | **+5.83%** |
-| MRR | 0.4349 | 0.4629 | **+6.45%** |
-| Hit@1 | 0.2793 | 0.3054 | **+9.35%** |
+| NDCG@10 | 0.4489 | 0.4724 | **+5.24%** |
+| MRR | 0.4301 | 0.4637 | **+7.80%** |
+| Hit@1 | 0.2732 | 0.3059 | **+11.95%** |
+
+NDCG@10 的 paired bootstrap CI95 為 `[+0.0129, +0.0340]`，不含 0。
+
+這是 Graph ON 對 Graph OFF 的比較，不是對某個外部基準的比較，也不等同於實際轉換率。
+Query 正規化的 intent 特徵已納入排序，但**未宣稱帶來整體提升**：與不含這些特徵、
+其餘完全相同的模型相比，配對檢定為 `+0.0014`、CI95 `[-0.0026, +0.0054]`，跨過 0。
+可測得的效益集中在查詢文字指名地點的情境，而該情境在此 fixture 只佔 5.2%。
 
 可參考 [評估報告索引](reports/README.md)。
 
