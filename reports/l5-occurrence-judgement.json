@@ -10,88 +10,28 @@
     "min_concentration": 0.6
   },
   "pooled": {
-    "surfaces": 41,
-    "sampled": 2460,
-    "accepted": 965,
-    "concentration_before": 0.3463,
-    "concentration_after": 0.658,
-    "lift": 0.3117,
-    "rescued_surfaces": 17
+    "surfaces": 33,
+    "sampled": 1980,
+    "accepted": 905,
+    "concentration_before": 0.4495,
+    "concentration_after": 0.768,
+    "lift": 0.3185,
+    "rescued_surfaces": 19
   },
   "surfaces": [
     {
-      "surface": "光復",
+      "surface": "十分",
       "claimed_counties": [
-        "花蓮縣"
+        "新北市"
       ],
       "sampled": 60,
       "accepted": 2,
       "rejected": 58,
-      "sample_concentration": 0.0333,
-      "accepted_concentration": 1.0,
-      "rejected_concentration": 0.0,
-      "lift": 0.9667,
-      "corpus_baseline_concentration": 0.3698,
-      "rescued": false
-    },
-    {
-      "surface": "保安",
-      "claimed_counties": [
-        "台南市"
-      ],
-      "sampled": 60,
-      "accepted": 1,
-      "rejected": 59,
-      "sample_concentration": 0.0833,
-      "accepted_concentration": 1.0,
-      "rejected_concentration": 0.0678,
-      "lift": 0.9167,
-      "corpus_baseline_concentration": 0.2157,
-      "rescued": false
-    },
-    {
-      "surface": "成功",
-      "claimed_counties": [
-        "台中市"
-      ],
-      "sampled": 60,
-      "accepted": 1,
-      "rejected": 59,
-      "sample_concentration": 0.1167,
-      "accepted_concentration": 1.0,
-      "rejected_concentration": 0.1017,
-      "lift": 0.8833,
-      "corpus_baseline_concentration": 0.2607,
-      "rescued": false
-    },
-    {
-      "surface": "領航",
-      "claimed_counties": [
-        "桃園市"
-      ],
-      "sampled": 60,
-      "accepted": 5,
-      "rejected": 55,
-      "sample_concentration": 0.1667,
-      "accepted_concentration": 1.0,
-      "rejected_concentration": 0.0909,
-      "lift": 0.8333,
-      "corpus_baseline_concentration": 0.2233,
-      "rescued": false
-    },
-    {
-      "surface": "五權路",
-      "claimed_counties": [
-        "台中市"
-      ],
-      "sampled": 60,
-      "accepted": 14,
-      "rejected": 46,
       "sample_concentration": 0.2333,
       "accepted_concentration": 1.0,
-      "rejected_concentration": 0.0,
+      "rejected_concentration": 0.2069,
       "lift": 0.7667,
-      "corpus_baseline_concentration": 0.7033,
+      "corpus_baseline_concentration": 0.2337,
       "rescued": false
     },
     {
@@ -100,12 +40,12 @@
         "新北市"
       ],
       "sampled": 60,
-      "accepted": 4,
-      "rejected": 56,
-      "sample_concentration": 0.25,
+      "accepted": 2,
+      "rejected": 58,
+      "sample_concentration": 0.2333,
       "accepted_concentration": 1.0,
-      "rejected_concentration": 0.1964,
-      "lift": 0.75,
+      "rejected_concentration": 0.2069,
+      "lift": 0.7667,
       "corpus_baseline_concentration": 0.2126,
       "rescued": false
     },
@@ -115,59 +55,14 @@
         "嘉義縣"
       ],
       "sampled": 60,
-      "accepted": 14,
-      "rejected": 46,
-      "sample_concentration": 0.2,
-      "accepted_concentration": 0.8571,
-      "rejected_concentration": 0.0,
-      "lift": 0.6571,
-      "corpus_baseline_concentration": 0.2304,
-      "rescued": false
-    },
-    {
-      "surface": "中山國小",
-      "claimed_counties": [
-        "台北市"
-      ],
-      "sampled": 60,
       "accepted": 15,
       "rejected": 45,
-      "sample_concentration": 0.2167,
-      "accepted_concentration": 0.8667,
-      "rejected_concentration": 0.0,
-      "lift": 0.65,
-      "corpus_baseline_concentration": 0.692,
+      "sample_concentration": 0.25,
+      "accepted_concentration": 0.9333,
+      "rejected_concentration": 0.0222,
+      "lift": 0.6833,
+      "corpus_baseline_concentration": 0.2304,
       "rescued": true
-    },
-    {
-      "surface": "文德",
-      "claimed_counties": [
-        "台北市"
-      ],
-      "sampled": 60,
-      "accepted": 20,
-      "rejected": 40,
-      "sample_concentration": 0.35,
-      "accepted_concentration": 1.0,
-      "rejected_concentration": 0.025,
-      "lift": 0.65,
-      "corpus_baseline_concentration": 0.4108,
-      "rescued": true
-    },
-    {
-      "surface": "中原",
-      "claimed_counties": [
-        "新北市"
-      ],
-      "sampled": 60,
-      "accepted": 11,
-      "rejected": 49,
-      "sample_concentration": 0.2167,
-      "accepted_concentration": 0.8182,
-      "rejected_concentration": 0.0816,
-      "lift": 0.6015,
-      "corpus_baseline_concentration": 0.5038,
-      "rescued": false
     },
     {
       "surface": "明德",
@@ -175,43 +70,13 @@
         "台北市"
       ],
       "sampled": 60,
-      "accepted": 18,
-      "rejected": 42,
-      "sample_concentration": 0.3667,
-      "accepted_concentration": 0.9444,
-      "rejected_concentration": 0.119,
-      "lift": 0.5777,
-      "corpus_baseline_concentration": 0.4437,
-      "rescued": true
-    },
-    {
-      "surface": "大直",
-      "claimed_counties": [
-        "台北市"
-      ],
-      "sampled": 60,
-      "accepted": 22,
-      "rejected": 38,
-      "sample_concentration": 0.4333,
+      "accepted": 17,
+      "rejected": 43,
+      "sample_concentration": 0.3833,
       "accepted_concentration": 1.0,
-      "rejected_concentration": 0.1053,
-      "lift": 0.5667,
-      "corpus_baseline_concentration": 0.4144,
-      "rescued": true
-    },
-    {
-      "surface": "海山",
-      "claimed_counties": [
-        "新北市"
-      ],
-      "sampled": 60,
-      "accepted": 15,
-      "rejected": 45,
-      "sample_concentration": 0.4833,
-      "accepted_concentration": 0.9333,
-      "rejected_concentration": 0.3333,
-      "lift": 0.45,
-      "corpus_baseline_concentration": 0.5467,
+      "rejected_concentration": 0.1395,
+      "lift": 0.6167,
+      "corpus_baseline_concentration": 0.4437,
       "rescued": true
     },
     {
@@ -220,13 +85,28 @@
         "台北市"
       ],
       "sampled": 60,
-      "accepted": 19,
-      "rejected": 41,
-      "sample_concentration": 0.4,
-      "accepted_concentration": 0.8421,
-      "rejected_concentration": 0.1951,
-      "lift": 0.4421,
+      "accepted": 16,
+      "rejected": 44,
+      "sample_concentration": 0.3333,
+      "accepted_concentration": 0.875,
+      "rejected_concentration": 0.1364,
+      "lift": 0.5417,
       "corpus_baseline_concentration": 0.4036,
+      "rescued": true
+    },
+    {
+      "surface": "大直",
+      "claimed_counties": [
+        "台北市"
+      ],
+      "sampled": 60,
+      "accepted": 24,
+      "rejected": 36,
+      "sample_concentration": 0.5,
+      "accepted_concentration": 1.0,
+      "rejected_concentration": 0.1667,
+      "lift": 0.5,
+      "corpus_baseline_concentration": 0.4144,
       "rescued": true
     },
     {
@@ -235,73 +115,13 @@
         "台南市"
       ],
       "sampled": 60,
-      "accepted": 30,
-      "rejected": 30,
-      "sample_concentration": 0.55,
-      "accepted_concentration": 0.9333,
-      "rejected_concentration": 0.1667,
-      "lift": 0.3833,
-      "corpus_baseline_concentration": 0.4927,
-      "rescued": true
-    },
-    {
-      "surface": "新城",
-      "claimed_counties": [
-        "花蓮縣"
-      ],
-      "sampled": 60,
-      "accepted": 29,
-      "rejected": 31,
-      "sample_concentration": 0.6167,
-      "accepted_concentration": 1.0,
-      "rejected_concentration": 0.2581,
-      "lift": 0.3833,
-      "corpus_baseline_concentration": 0.4967,
-      "rescued": true
-    },
-    {
-      "surface": "政大",
-      "claimed_counties": [
-        "台北市"
-      ],
-      "sampled": 60,
       "accepted": 26,
       "rejected": 34,
-      "sample_concentration": 0.5833,
+      "sample_concentration": 0.4333,
       "accepted_concentration": 0.9231,
-      "rejected_concentration": 0.3235,
-      "lift": 0.3398,
-      "corpus_baseline_concentration": 0.5795,
-      "rescued": true
-    },
-    {
-      "surface": "北門",
-      "claimed_counties": [
-        "台北市"
-      ],
-      "sampled": 60,
-      "accepted": 9,
-      "rejected": 51,
-      "sample_concentration": 0.2167,
-      "accepted_concentration": 0.5556,
-      "rejected_concentration": 0.1569,
-      "lift": 0.3389,
-      "corpus_baseline_concentration": 0.3597,
-      "rescued": false
-    },
-    {
-      "surface": "西門",
-      "claimed_counties": [
-        "台北市"
-      ],
-      "sampled": 60,
-      "accepted": 26,
-      "rejected": 34,
-      "sample_concentration": 0.5,
-      "accepted_concentration": 0.8077,
-      "rejected_concentration": 0.2647,
-      "lift": 0.3077,
-      "corpus_baseline_concentration": 0.4861,
+      "rejected_concentration": 0.0588,
+      "lift": 0.4898,
+      "corpus_baseline_concentration": 0.4452,
       "rescued": true
     },
     {
@@ -310,133 +130,43 @@
         "新北市"
       ],
       "sampled": 60,
-      "accepted": 34,
-      "rejected": 26,
-      "sample_concentration": 0.5667,
-      "accepted_concentration": 0.8529,
-      "rejected_concentration": 0.1923,
-      "lift": 0.2862,
-      "corpus_baseline_concentration": 0.5359,
+      "accepted": 24,
+      "rejected": 36,
+      "sample_concentration": 0.4333,
+      "accepted_concentration": 0.9167,
+      "rejected_concentration": 0.1111,
+      "lift": 0.4834,
+      "corpus_baseline_concentration": 0.5272,
       "rescued": true
     },
     {
-      "surface": "竹圍",
+      "surface": "海山",
       "claimed_counties": [
         "新北市"
       ],
       "sampled": 60,
-      "accepted": 36,
-      "rejected": 24,
-      "sample_concentration": 0.45,
-      "accepted_concentration": 0.7222,
-      "rejected_concentration": 0.0417,
-      "lift": 0.2722,
-      "corpus_baseline_concentration": 0.5581,
+      "accepted": 18,
+      "rejected": 42,
+      "sample_concentration": 0.4667,
+      "accepted_concentration": 0.9444,
+      "rejected_concentration": 0.2619,
+      "lift": 0.4777,
+      "corpus_baseline_concentration": 0.5467,
       "rescued": true
     },
     {
-      "surface": "巨蛋",
+      "surface": "新城",
       "claimed_counties": [
-        "高雄市"
+        "花蓮縣"
       ],
       "sampled": 60,
-      "accepted": 25,
-      "rejected": 35,
-      "sample_concentration": 0.3,
-      "accepted_concentration": 0.56,
-      "rejected_concentration": 0.1143,
-      "lift": 0.26,
-      "corpus_baseline_concentration": 0.4874,
-      "rescued": false
-    },
-    {
-      "surface": "中山北路",
-      "claimed_counties": [
-        "台北市"
-      ],
-      "sampled": 60,
-      "accepted": 40,
-      "rejected": 20,
+      "accepted": 32,
+      "rejected": 28,
       "sample_concentration": 0.5167,
-      "accepted_concentration": 0.775,
+      "accepted_concentration": 0.9688,
       "rejected_concentration": 0.0,
-      "lift": 0.2583,
-      "corpus_baseline_concentration": 0.5252,
-      "rescued": true
-    },
-    {
-      "surface": "新埔",
-      "claimed_counties": [
-        "新北市"
-      ],
-      "sampled": 60,
-      "accepted": 25,
-      "rejected": 35,
-      "sample_concentration": 0.5667,
-      "accepted_concentration": 0.8,
-      "rejected_concentration": 0.4,
-      "lift": 0.2333,
-      "corpus_baseline_concentration": 0.4623,
-      "rescued": true
-    },
-    {
-      "surface": "興南",
-      "claimed_counties": [
-        "桃園市"
-      ],
-      "sampled": 60,
-      "accepted": 4,
-      "rejected": 56,
-      "sample_concentration": 0.0167,
-      "accepted_concentration": 0.25,
-      "rejected_concentration": 0.0,
-      "lift": 0.2333,
-      "corpus_baseline_concentration": 0.744,
-      "rescued": false
-    },
-    {
-      "surface": "永春",
-      "claimed_counties": [
-        "台北市"
-      ],
-      "sampled": 60,
-      "accepted": 26,
-      "rejected": 34,
-      "sample_concentration": 0.4167,
-      "accepted_concentration": 0.6154,
-      "rejected_concentration": 0.2647,
-      "lift": 0.1987,
-      "corpus_baseline_concentration": 0.3801,
-      "rescued": true
-    },
-    {
-      "surface": "公館",
-      "claimed_counties": [
-        "台北市"
-      ],
-      "sampled": 60,
-      "accepted": 44,
-      "rejected": 16,
-      "sample_concentration": 0.45,
-      "accepted_concentration": 0.6136,
-      "rejected_concentration": 0.0,
-      "lift": 0.1636,
-      "corpus_baseline_concentration": 0.4704,
-      "rescued": true
-    },
-    {
-      "surface": "大發",
-      "claimed_counties": [
-        "高雄市"
-      ],
-      "sampled": 60,
-      "accepted": 42,
-      "rejected": 18,
-      "sample_concentration": 0.8167,
-      "accepted_concentration": 0.9762,
-      "rejected_concentration": 0.4444,
-      "lift": 0.1595,
-      "corpus_baseline_concentration": 0.4891,
+      "lift": 0.4521,
+      "corpus_baseline_concentration": 0.5,
       "rescued": true
     },
     {
@@ -445,44 +175,179 @@
         "台北市"
       ],
       "sampled": 60,
-      "accepted": 14,
-      "rejected": 46,
-      "sample_concentration": 0.4167,
-      "accepted_concentration": 0.5714,
-      "rejected_concentration": 0.3696,
-      "lift": 0.1547,
+      "accepted": 12,
+      "rejected": 48,
+      "sample_concentration": 0.4833,
+      "accepted_concentration": 0.9167,
+      "rejected_concentration": 0.375,
+      "lift": 0.4334,
       "corpus_baseline_concentration": 0.3717,
       "rescued": false
     },
     {
-      "surface": "五權",
+      "surface": "大橋",
       "claimed_counties": [
-        "台中市"
+        "台南市"
       ],
       "sampled": 60,
-      "accepted": 17,
-      "rejected": 43,
-      "sample_concentration": 0.3833,
-      "accepted_concentration": 0.4706,
-      "rejected_concentration": 0.3488,
-      "lift": 0.0873,
-      "corpus_baseline_concentration": 0.5,
-      "rescued": false
+      "accepted": 19,
+      "rejected": 41,
+      "sample_concentration": 0.3333,
+      "accepted_concentration": 0.7368,
+      "rejected_concentration": 0.1463,
+      "lift": 0.4035,
+      "corpus_baseline_concentration": 0.3515,
+      "rescued": true
     },
     {
-      "surface": "民族路",
+      "surface": "新埔",
+      "claimed_counties": [
+        "新北市"
+      ],
+      "sampled": 60,
+      "accepted": 27,
+      "rejected": 33,
+      "sample_concentration": 0.3833,
+      "accepted_concentration": 0.7778,
+      "rejected_concentration": 0.0606,
+      "lift": 0.3945,
+      "corpus_baseline_concentration": 0.4623,
+      "rescued": true
+    },
+    {
+      "surface": "和美",
+      "claimed_counties": [
+        "彰化縣"
+      ],
+      "sampled": 60,
+      "accepted": 38,
+      "rejected": 22,
+      "sample_concentration": 0.65,
+      "accepted_concentration": 0.9737,
+      "rejected_concentration": 0.0909,
+      "lift": 0.3237,
+      "corpus_baseline_concentration": 0.5113,
+      "rescued": true
+    },
+    {
+      "surface": "大發",
       "claimed_counties": [
         "高雄市"
       ],
       "sampled": 60,
-      "accepted": 20,
-      "rejected": 40,
-      "sample_concentration": 0.05,
-      "accepted_concentration": 0.1,
-      "rejected_concentration": 0.025,
-      "lift": 0.05,
-      "corpus_baseline_concentration": 0.4407,
+      "accepted": 36,
+      "rejected": 24,
+      "sample_concentration": 0.7333,
+      "accepted_concentration": 1.0,
+      "rejected_concentration": 0.3333,
+      "lift": 0.2667,
+      "corpus_baseline_concentration": 0.4891,
+      "rescued": true
+    },
+    {
+      "surface": "政大",
+      "claimed_counties": [
+        "台北市"
+      ],
+      "sampled": 60,
+      "accepted": 24,
+      "rejected": 36,
+      "sample_concentration": 0.65,
+      "accepted_concentration": 0.875,
+      "rejected_concentration": 0.5,
+      "lift": 0.225,
+      "corpus_baseline_concentration": 0.5795,
+      "rescued": true
+    },
+    {
+      "surface": "中山北路",
+      "claimed_counties": [
+        "台北市"
+      ],
+      "sampled": 60,
+      "accepted": 43,
+      "rejected": 17,
+      "sample_concentration": 0.5333,
+      "accepted_concentration": 0.7442,
+      "rejected_concentration": 0.0,
+      "lift": 0.2109,
+      "corpus_baseline_concentration": 0.5252,
+      "rescued": true
+    },
+    {
+      "surface": "西門",
+      "claimed_counties": [
+        "台北市"
+      ],
+      "sampled": 60,
+      "accepted": 38,
+      "rejected": 22,
+      "sample_concentration": 0.6167,
+      "accepted_concentration": 0.8158,
+      "rejected_concentration": 0.2727,
+      "lift": 0.1991,
+      "corpus_baseline_concentration": 0.4877,
+      "rescued": true
+    },
+    {
+      "surface": "台北101",
+      "claimed_counties": [
+        "台北市"
+      ],
+      "sampled": 60,
+      "accepted": 39,
+      "rejected": 21,
+      "sample_concentration": 0.3833,
+      "accepted_concentration": 0.5385,
+      "rejected_concentration": 0.0952,
+      "lift": 0.1552,
+      "corpus_baseline_concentration": 0.4761,
       "rescued": false
+    },
+    {
+      "surface": "永春",
+      "claimed_counties": [
+        "台北市"
+      ],
+      "sampled": 60,
+      "accepted": 34,
+      "rejected": 26,
+      "sample_concentration": 0.3667,
+      "accepted_concentration": 0.5,
+      "rejected_concentration": 0.1923,
+      "lift": 0.1333,
+      "corpus_baseline_concentration": 0.3877,
+      "rescued": false
+    },
+    {
+      "surface": "關西",
+      "claimed_counties": [
+        "新竹縣"
+      ],
+      "sampled": 60,
+      "accepted": 49,
+      "rejected": 11,
+      "sample_concentration": 0.6167,
+      "accepted_concentration": 0.7347,
+      "rejected_concentration": 0.0909,
+      "lift": 0.118,
+      "corpus_baseline_concentration": 0.5581,
+      "rescued": true
+    },
+    {
+      "surface": "公館",
+      "claimed_counties": [
+        "台北市"
+      ],
+      "sampled": 60,
+      "accepted": 51,
+      "rejected": 9,
+      "sample_concentration": 0.6,
+      "accepted_concentration": 0.7059,
+      "rejected_concentration": 0.0,
+      "lift": 0.1059,
+      "corpus_baseline_concentration": 0.4704,
+      "rescued": true
     },
     {
       "surface": "和平",
@@ -490,43 +355,90 @@
         "花蓮縣"
       ],
       "sampled": 60,
-      "accepted": 14,
-      "rejected": 46,
-      "sample_concentration": 0.0333,
-      "accepted_concentration": 0.0714,
-      "rejected_concentration": 0.0217,
-      "lift": 0.0381,
+      "accepted": 18,
+      "rejected": 42,
+      "sample_concentration": 0.0833,
+      "accepted_concentration": 0.1667,
+      "rejected_concentration": 0.0476,
+      "lift": 0.0834,
       "corpus_baseline_concentration": 0.2945,
       "rescued": false
     },
     {
-      "surface": "體育大學",
+      "surface": "中原",
       "claimed_counties": [
+        "新北市",
         "桃園市"
       ],
       "sampled": 60,
-      "accepted": 51,
-      "rejected": 9,
-      "sample_concentration": 0.4667,
-      "accepted_concentration": 0.4706,
-      "rejected_concentration": 0.4444,
-      "lift": 0.0039,
-      "corpus_baseline_concentration": 0.5009,
+      "accepted": 31,
+      "rejected": 29,
+      "sample_concentration": 0.9333,
+      "accepted_concentration": 0.9677,
+      "rejected_concentration": 0.8966,
+      "lift": 0.0344,
+      "corpus_baseline_concentration": 0.5038,
+      "rescued": true
+    },
+    {
+      "surface": "竹圍",
+      "claimed_counties": [
+        "新北市",
+        "桃園市"
+      ],
+      "sampled": 60,
+      "accepted": 55,
+      "rejected": 5,
+      "sample_concentration": 0.9333,
+      "accepted_concentration": 0.9455,
+      "rejected_concentration": 0.8,
+      "lift": 0.0122,
+      "corpus_baseline_concentration": 0.5581,
+      "rescued": true
+    },
+    {
+      "surface": "三義",
+      "claimed_counties": [
+        "苗栗縣"
+      ],
+      "sampled": 60,
+      "accepted": 60,
+      "rejected": 0,
+      "sample_concentration": 0.65,
+      "accepted_concentration": 0.65,
+      "rejected_concentration": null,
+      "lift": 0.0,
+      "corpus_baseline_concentration": 0.5425,
       "rescued": false
     },
     {
-      "surface": "忠義",
+      "surface": "保安",
       "claimed_counties": [
-        "台北市"
+        "台南市"
       ],
       "sampled": 60,
       "accepted": 0,
       "rejected": 60,
-      "sample_concentration": 0.0333,
+      "sample_concentration": 0.0833,
       "accepted_concentration": null,
-      "rejected_concentration": 0.0333,
+      "rejected_concentration": 0.0833,
       "lift": null,
-      "corpus_baseline_concentration": 0.6007,
+      "corpus_baseline_concentration": 0.2161,
+      "rescued": false
+    },
+    {
+      "surface": "光復",
+      "claimed_counties": [
+        "花蓮縣"
+      ],
+      "sampled": 60,
+      "accepted": 0,
+      "rejected": 60,
+      "sample_concentration": 0.0167,
+      "accepted_concentration": null,
+      "rejected_concentration": 0.0167,
+      "lift": null,
+      "corpus_baseline_concentration": 0.3698,
       "rescued": false
     },
     {
@@ -538,8 +450,8 @@
       "sampled": 60,
       "accepted": 60,
       "rejected": 0,
-      "sample_concentration": 0.6667,
-      "accepted_concentration": 0.6667,
+      "sample_concentration": 0.7167,
+      "accepted_concentration": 0.7167,
       "rejected_concentration": null,
       "lift": 0.0,
       "corpus_baseline_concentration": 0.5405,
@@ -561,48 +473,18 @@
       "rescued": false
     },
     {
-      "surface": "青埔",
-      "claimed_counties": [
-        "高雄市"
-      ],
-      "sampled": 60,
-      "accepted": 36,
-      "rejected": 24,
-      "sample_concentration": 0.0,
-      "accepted_concentration": 0.0,
-      "rejected_concentration": 0.0,
-      "lift": 0.0,
-      "corpus_baseline_concentration": 0.9739,
-      "rescued": false
-    },
-    {
-      "surface": "三義",
-      "claimed_counties": [
-        "苗栗縣"
-      ],
-      "sampled": 60,
-      "accepted": 59,
-      "rejected": 1,
-      "sample_concentration": 0.5167,
-      "accepted_concentration": 0.5085,
-      "rejected_concentration": 1.0,
-      "lift": -0.0082,
-      "corpus_baseline_concentration": 0.5425,
-      "rescued": false
-    },
-    {
-      "surface": "台北101",
+      "surface": "民權西路",
       "claimed_counties": [
         "台北市"
       ],
       "sampled": 60,
-      "accepted": 59,
-      "rejected": 1,
-      "sample_concentration": 0.4833,
-      "accepted_concentration": 0.4746,
+      "accepted": 57,
+      "rejected": 3,
+      "sample_concentration": 0.5167,
+      "accepted_concentration": 0.4912,
       "rejected_concentration": 1.0,
-      "lift": -0.0087,
-      "corpus_baseline_concentration": 0.4806,
+      "lift": -0.0255,
+      "corpus_baseline_concentration": 0.4652,
       "rescued": false
     },
     {
@@ -611,28 +493,28 @@
         "桃園市"
       ],
       "sampled": 60,
-      "accepted": 25,
-      "rejected": 35,
-      "sample_concentration": 0.6667,
-      "accepted_concentration": 0.64,
-      "rejected_concentration": 0.6857,
-      "lift": -0.0267,
+      "accepted": 36,
+      "rejected": 24,
+      "sample_concentration": 0.6167,
+      "accepted_concentration": 0.5556,
+      "rejected_concentration": 0.7083,
+      "lift": -0.0611,
       "corpus_baseline_concentration": 0.5524,
       "rescued": false
     },
     {
-      "surface": "民權西路",
+      "surface": "成功",
       "claimed_counties": [
-        "台北市"
+        "台中市"
       ],
       "sampled": 60,
-      "accepted": 53,
-      "rejected": 7,
-      "sample_concentration": 0.3667,
-      "accepted_concentration": 0.3019,
-      "rejected_concentration": 0.8571,
-      "lift": -0.0648,
-      "corpus_baseline_concentration": 0.4652,
+      "accepted": 2,
+      "rejected": 58,
+      "sample_concentration": 0.15,
+      "accepted_concentration": 0.0,
+      "rejected_concentration": 0.1552,
+      "lift": -0.15,
+      "corpus_baseline_concentration": 0.2607,
       "rescued": false
     }
   ]

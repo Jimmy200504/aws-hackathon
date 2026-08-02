@@ -412,10 +412,19 @@ class L5TableTests(unittest.TestCase):
             )
 
     def test_a_surface_the_model_could_not_rescue_stays_out(self) -> None:
-        # 青埔 is a real 高雄 metro station, but in job text it means 桃園青埔,
-        # so the model accepts the mentions and they still land in the wrong
-        # county. Word-sense filtering cannot repair a wrong place claim.
-        self.assertEqual(self.graph.resolve_alias("青埔"), ())
+        # 民權西路 is accepted by the model on 57 of 60 mentions, so nothing is
+        # filtered and county consistency does not move (0.5167 -> 0.4912). A
+        # surface the model reads as a place everywhere gains nothing from
+        # word-sense filtering.
+        self.assertEqual(self.graph.resolve_alias("民權西路"), ())
+
+    def test_a_wrong_place_claim_is_fixed_in_the_table_not_by_the_model(self) -> None:
+        # 青埔 first named the 高雄 metro station and failed at 0.97 concentration
+        # in 桃園 - the model cannot repair that, because it is not a word-sense
+        # error. Correcting the entry to 桃園 is what published it.
+        self.assertEqual(
+            set(self.graph.resolve_alias("青埔")), {"桃園市/中壢區", "桃園市/大園區"}
+        )
 
     def test_the_source_table_is_never_loaded_directly(self) -> None:
         rejected = {entry["surface"] for entry in self.source["entries"]} - {
