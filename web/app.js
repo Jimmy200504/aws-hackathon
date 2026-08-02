@@ -6,6 +6,8 @@ const results = document.querySelector("#results");
 const loading = document.querySelector("#loading");
 const errorBox = document.querySelector("#error");
 const resultMeta = document.querySelector("#result-meta");
+const normalizationPanel = document.querySelector("#query-normalization");
+const normalizationBadge = document.querySelector("#normalization-badge");
 const graphPanel = document.querySelector("#intent-graph");
 const graphBadge = document.querySelector("#graph-badge");
 const template = document.querySelector("#result-template");
@@ -13,6 +15,124 @@ const submitButton = form.querySelector('button[type="submit"]');
 let redrawGraphLines = () => {};
 
 const escapeText = (value) => String(value ?? "");
+
+const intentLabels = {
+  intent_type: "意圖類型",
+  duty_categories: "職務分類",
+  locations: "地區",
+  employment_types: "僱用類型",
+  shifts: "班別",
+  salary_type: "薪資類型",
+  company: "公司",
+  keep_terms: "保留詞",
+  confidence: "信心分數",
+};
+
+function normalizationSource(source) {
+  if (source === "amazon_bedrock_cached") {
+    return { badge: "BEDROCK CACHE", label: "Amazon Bedrock · cached", active: true };
+  }
+  if (source === "amazon_bedrock") {
+    return { badge: "BEDROCK LIVE", label: "Amazon Bedrock · live", active: true };
+  }
+  if (source === "deterministic_fallback") {
+    return { badge: "SAFE FALLBACK", label: "Deterministic fallback", fallback: true };
+  }
+  return { badge: "LOCAL PARSER", label: "Deterministic parser" };
+}
+
+function intentValues(value, key) {
+  if (Array.isArray(value)) return value.filter(Boolean);
+  if (key === "confidence" && Number.isFinite(Number(value))) {
+    return [`${Math.round(Number(value) * 100)}%`];
+  }
+  return value ? [String(value)] : [];
+}
+
+function setNormalizationLoading() {
+  normalizationBadge.textContent = "NORMALIZING…";
+  normalizationBadge.classList.remove("active", "fallback");
+  normalizationPanel.replaceChildren();
+  const loadingState = document.createElement("div");
+  loadingState.className = "normalization-loading";
+  loadingState.innerHTML = "<i></i><span>Bedrock 正在解析搜尋意圖…</span>";
+  normalizationPanel.append(loadingState);
+}
+
+function renderNormalization(normalization, rawQuery) {
+  normalizationPanel.replaceChildren();
+  if (!normalization?.normalized_query) {
+    normalizationBadge.textContent = "NO DATA";
+    normalizationBadge.classList.remove("active", "fallback");
+    normalizationPanel.innerHTML = '<p class="panel-empty">這次回應沒有查詢正規化資料。</p>';
+    return;
+  }
+
+  const source = normalizationSource(normalization.source);
+  normalizationBadge.textContent = source.badge;
+  normalizationBadge.classList.toggle("active", Boolean(source.active));
+  normalizationBadge.classList.toggle("fallback", Boolean(source.fallback));
+
+  const flow = document.createElement("div");
+  flow.className = "normalization-flow";
+
+  const input = document.createElement("div");
+  input.className = "normalization-query input-query";
+  const inputLabel = document.createElement("span");
+  inputLabel.textContent = "ORIGINAL QUERY";
+  const inputValue = document.createElement("p");
+  inputValue.textContent = rawQuery;
+  input.append(inputLabel, inputValue);
+
+  const arrow = document.createElement("span");
+  arrow.className = "normalization-arrow";
+  arrow.setAttribute("aria-hidden", "true");
+  arrow.textContent = "↓";
+
+  const output = document.createElement("div");
+  output.className = "normalization-query output-query";
+  const outputLabel = document.createElement("span");
+  outputLabel.textContent = "NORMALIZED QUERY";
+  const outputValue = document.createElement("p");
+  outputValue.textContent = normalization.normalized_query;
+  output.append(outputLabel, outputValue);
+  flow.append(input, arrow, output);
+  normalizationPanel.append(flow);
+
+  const structuredIntent = normalization.structured_intent || {};
+  const fields = Object.entries(intentLabels)
+    .map(([key, label]) => ({ key, label, values: intentValues(structuredIntent[key], key) }))
+    .filter(({ values }) => values.length);
+
+  if (fields.length) {
+    const intent = document.createElement("dl");
+    intent.className = "structured-intent";
+    fields.forEach(({ label, values }) => {
+      const row = document.createElement("div");
+      const term = document.createElement("dt");
+      term.textContent = label;
+      const detail = document.createElement("dd");
+      values.forEach((value) => {
+        const chip = document.createElement("span");
+        chip.textContent = value;
+        detail.append(chip);
+      });
+      row.append(term, detail);
+      intent.append(row);
+    });
+    normalizationPanel.append(intent);
+  }
+
+  const provenance = document.createElement("div");
+  provenance.className = "normalization-provenance";
+  const sourceLabel = document.createElement("span");
+  sourceLabel.textContent = source.label;
+  const model = document.createElement("code");
+  model.textContent = normalization.model_id || "no model invoked";
+  model.title = normalization.model_id || "No Bedrock model was invoked";
+  provenance.append(sourceLabel, model);
+  normalizationPanel.append(provenance);
+}
 
 async function loadMeta() {
   try {
@@ -232,6 +352,7 @@ async function search(event) {
   submitButton.disabled = true;
   submitButton.querySelector(".button-label").textContent = "搜尋中";
   resultMeta.textContent = "RANKING…";
+  setNormalizationLoading();
   try {
     const payload = {
       query,
@@ -246,10 +367,14 @@ async function search(event) {
     });
     const body = await response.json();
     if (!response.ok) throw new Error(body.error?.message || "搜尋失敗");
+    renderNormalization(body.meta?.query_normalization, query);
     renderRows(body.result, query, graphEnabled);
     resultMeta.textContent =
       `${body.result.length} RESULTS · ${body.meta.latency_ms} MS · ${graphEnabled ? "GRAPH" : "BASELINE"}`;
   } catch (error) {
+    normalizationPanel.innerHTML = '<p class="panel-empty">搜尋失敗，無法取得正規化結果。</p>';
+    normalizationBadge.textContent = "UNAVAILABLE";
+    normalizationBadge.classList.remove("active", "fallback");
     errorBox.textContent = `無法完成搜尋：${error.message}`;
     errorBox.classList.remove("hidden");
     resultMeta.textContent = "ERROR";
