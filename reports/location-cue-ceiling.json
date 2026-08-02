@@ -1,0 +1,420 @@
+{
+  "metadata": {
+    "schema": "skillweave-location-cue-ceiling-v1",
+    "dataset_version": "1111-2026-06-01_2026-06-07",
+    "graph_cutoff": "2026-06-05 23:59:59.999000",
+    "leakage_policy": "only postings last modified on or before the graph cutoff",
+    "resolved_source": "job-districts.json",
+    "elapsed_seconds": 59.6
+  },
+  "corpus": {
+    "eligible": 961780,
+    "resolved_to_a_district": 267306,
+    "unresolved": 694474
+  },
+  "ceiling": {
+    "loose_cue": 156379,
+    "loose_share": 0.2252,
+    "loose_warning": "not usable: 路 matches 網路 and 通路, 內科 matches 內科醫師. Recorded because the loose figure overstates the ceiling by 11x and would have justified work that could not pay off",
+    "tight_cue": 12550,
+    "tight_share": 0.0181,
+    "tight_breakdown": {
+      "address": 5706,
+      "industrial_park": 2281,
+      "landmark": 5840
+    },
+    "no_cue_at_all": 681924,
+    "no_cue_share": 0.9819,
+    "reading": "the unresolved postings overwhelmingly do not state a location beyond 工作城市, so text extraction is near its ceiling and a larger place-name table cannot move coverage far"
+  },
+  "macro_surfaces": {
+    "rule": "L1 regions, L3 living areas and colloquial macro terms, counted over all eligible postings",
+    "reading": "most occurrences are sales territories rather than locations (駐區業務代表(中彰投)), and L1 is coarser than 工作城市 already is, which is why these layers are not scanned by the extractor",
+    "surfaces": [
+      {
+        "surface": "南崁",
+        "layer": "L3",
+        "postings": 2594,
+        "share_of_eligible": 0.0027,
+        "top_counties": {
+          "桃園市": 2461,
+          "新北市": 44,
+          "新竹縣": 31
+        }
+      },
+      {
+        "surface": "大台北",
+        "layer": "colloquial",
+        "postings": 2266,
+        "share_of_eligible": 0.00236,
+        "top_counties": {
+          "新北市": 1246,
+          "台北市": 875,
+          "桃園市": 100
+        }
+      },
+      {
+        "surface": "竹竹",
+        "layer": "L3",
+        "postings": 761,
+        "share_of_eligible": 0.00079,
+        "top_counties": {
+          "新竹縣": 423,
+          "新竹市": 102,
+          "台北市": 87
+        }
+      },
+      {
+        "surface": "高屏",
+        "layer": "L1",
+        "postings": 609,
+        "share_of_eligible": 0.00063,
+        "top_counties": {
+          "高雄市": 423,
+          "屏東縣": 102,
+          "台南市": 43
+        }
+      },
+      {
+        "surface": "大台中",
+        "layer": "colloquial",
+        "postings": 605,
+        "share_of_eligible": 0.00063,
+        "top_counties": {
+          "台中市": 579,
+          "彰化縣": 7,
+          "台北市": 4
+        }
+      },
+      {
+        "surface": "中彰投",
+        "layer": "L1",
+        "postings": 372,
+        "share_of_eligible": 0.00039,
+        "top_counties": {
+          "台中市": 288,
+          "彰化縣": 35,
+          "南投縣": 11
+        }
+      },
+      {
+        "surface": "南台灣",
+        "layer": "colloquial",
+        "postings": 317,
+        "share_of_eligible": 0.00033,
+        "top_counties": {
+          "高雄市": 121,
+          "台南市": 74,
+          "台北市": 38
+        }
+      },
+      {
+        "surface": "雲嘉南",
+        "layer": "L1",
+        "postings": 258,
+        "share_of_eligible": 0.00027,
+        "top_counties": {
+          "台南市": 113,
+          "台中市": 44,
+          "嘉義市": 34
+        }
+      },
+      {
+        "surface": "海線",
+        "layer": "L3",
+        "postings": 225,
+        "share_of_eligible": 0.00023,
+        "top_counties": {
+          "台中市": 93,
+          "桃園市": 85,
+          "新北市": 32
+        }
+      },
+      {
+        "surface": "北高雄",
+        "layer": "L3",
+        "postings": 190,
+        "share_of_eligible": 0.0002,
+        "top_counties": {
+          "高雄市": 153,
+          "台南市": 12,
+          "台中市": 7
+        }
+      },
+      {
+        "surface": "南高雄",
+        "layer": "L3",
+        "postings": 172,
+        "share_of_eligible": 0.00018,
+        "top_counties": {
+          "高雄市": 114,
+          "台南市": 29,
+          "台中市": 17
+        }
+      },
+      {
+        "surface": "大高雄",
+        "layer": "colloquial",
+        "postings": 155,
+        "share_of_eligible": 0.00016,
+        "top_counties": {
+          "高雄市": 149,
+          "台中市": 2,
+          "屏東縣": 1
+        }
+      },
+      {
+        "surface": "離島",
+        "layer": "L1",
+        "postings": 148,
+        "share_of_eligible": 0.00015,
+        "top_counties": {
+          "澎湖縣": 29,
+          "台北市": 25,
+          "金門縣": 23
+        }
+      },
+      {
+        "surface": "北北基桃",
+        "layer": "L1",
+        "postings": 133,
+        "share_of_eligible": 0.00014,
+        "top_counties": {
+          "新北市": 60,
+          "台北市": 44,
+          "桃園市": 19
+        }
+      },
+      {
+        "surface": "三鶯",
+        "layer": "L3",
+        "postings": 122,
+        "share_of_eligible": 0.00013,
+        "top_counties": {
+          "新北市": 104,
+          "桃園市": 17,
+          "台北市": 1
+        }
+      },
+      {
+        "surface": "北台灣",
+        "layer": "colloquial",
+        "postings": 102,
+        "share_of_eligible": 0.00011,
+        "top_counties": {
+          "桃園市": 43,
+          "新北市": 25,
+          "台北市": 21
+        }
+      },
+      {
+        "surface": "大新竹",
+        "layer": "L3",
+        "postings": 59,
+        "share_of_eligible": 6e-05,
+        "top_counties": {
+          "新竹市": 24,
+          "新竹縣": 23,
+          "桃園市": 10
+        }
+      },
+      {
+        "surface": "屏南",
+        "layer": "L3",
+        "postings": 56,
+        "share_of_eligible": 6e-05,
+        "top_counties": {
+          "屏東縣": 51,
+          "高雄市": 5
+        }
+      },
+      {
+        "surface": "中台灣",
+        "layer": "colloquial",
+        "postings": 49,
+        "share_of_eligible": 5e-05,
+        "top_counties": {
+          "台中市": 33,
+          "彰化縣": 4,
+          "台北市": 4
+        }
+      },
+      {
+        "surface": "北海岸",
+        "layer": "L3",
+        "postings": 40,
+        "share_of_eligible": 4e-05,
+        "top_counties": {
+          "新北市": 36,
+          "基隆市": 3,
+          "台北市": 1
+        }
+      },
+      {
+        "surface": "台中海線",
+        "layer": "L3",
+        "postings": 37,
+        "share_of_eligible": 4e-05,
+        "top_counties": {
+          "台中市": 36,
+          "高雄市": 1
+        }
+      },
+      {
+        "surface": "宜花東",
+        "layer": "L1",
+        "postings": 30,
+        "share_of_eligible": 3e-05,
+        "top_counties": {
+          "宜蘭縣": 7,
+          "花蓮縣": 7,
+          "台北市": 6
+        }
+      },
+      {
+        "surface": "南彰化",
+        "layer": "L3",
+        "postings": 30,
+        "share_of_eligible": 3e-05,
+        "top_counties": {
+          "彰化縣": 26,
+          "雲林縣": 2,
+          "台南市": 1
+        }
+      },
+      {
+        "surface": "屏北",
+        "layer": "L3",
+        "postings": 22,
+        "share_of_eligible": 2e-05,
+        "top_counties": {
+          "屏東縣": 21,
+          "台南市": 1
+        }
+      },
+      {
+        "surface": "臨港",
+        "layer": "L3",
+        "postings": 22,
+        "share_of_eligible": 2e-05,
+        "top_counties": {
+          "台中市": 21,
+          "台北市": 1
+        }
+      },
+      {
+        "surface": "北彰化",
+        "layer": "L3",
+        "postings": 11,
+        "share_of_eligible": 1e-05,
+        "top_counties": {
+          "彰化縣": 11
+        }
+      },
+      {
+        "surface": "花東縱谷",
+        "layer": "L3",
+        "postings": 10,
+        "share_of_eligible": 1e-05,
+        "top_counties": {
+          "花蓮縣": 8,
+          "台東縣": 2
+        }
+      },
+      {
+        "surface": "東北角",
+        "layer": "L3",
+        "postings": 9,
+        "share_of_eligible": 1e-05,
+        "top_counties": {
+          "台中市": 4,
+          "宜蘭縣": 2,
+          "新北市": 2
+        }
+      },
+      {
+        "surface": "桃園南區",
+        "layer": "L3",
+        "postings": 4,
+        "share_of_eligible": 0.0,
+        "top_counties": {
+          "桃園市": 4
+        }
+      },
+      {
+        "surface": "台中山線",
+        "layer": "L3",
+        "postings": 4,
+        "share_of_eligible": 0.0,
+        "top_counties": {
+          "台中市": 4
+        }
+      },
+      {
+        "surface": "南港內湖汐止",
+        "layer": "L3",
+        "postings": 3,
+        "share_of_eligible": 0.0,
+        "top_counties": {
+          "台北市": 2,
+          "新北市": 1
+        }
+      },
+      {
+        "surface": "宜蘭溪南",
+        "layer": "L3",
+        "postings": 3,
+        "share_of_eligible": 0.0,
+        "top_counties": {
+          "宜蘭縣": 3
+        }
+      },
+      {
+        "surface": "東台灣",
+        "layer": "colloquial",
+        "postings": 2,
+        "share_of_eligible": 0.0,
+        "top_counties": {
+          "花蓮縣": 1,
+          "台北市": 1
+        }
+      },
+      {
+        "surface": "台南溪北",
+        "layer": "L3",
+        "postings": 2,
+        "share_of_eligible": 0.0,
+        "top_counties": {
+          "台南市": 2
+        }
+      },
+      {
+        "surface": "台中屯區",
+        "layer": "L3",
+        "postings": 2,
+        "share_of_eligible": 0.0,
+        "top_counties": {
+          "台中市": 2
+        }
+      },
+      {
+        "surface": "桃園北區",
+        "layer": "L3",
+        "postings": 2,
+        "share_of_eligible": 0.0,
+        "top_counties": {
+          "桃園市": 2
+        }
+      },
+      {
+        "surface": "苗栗海線",
+        "layer": "L3",
+        "postings": 1,
+        "share_of_eligible": 0.0,
+        "top_counties": {
+          "苗栗縣": 1
+        }
+      }
+    ]
+  }
+}
