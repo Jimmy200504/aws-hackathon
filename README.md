@@ -103,7 +103,4 @@ docs/       runbooks 與設計文件
 
 - [AWS 部署與 rollback](docs/deployment.md)
 - [AWS 架構](docs/aws-architecture.md)
-- [資料卡與 leakage boundary](docs/data-card.md)
 - [Skill Graph schema](docs/graph-schema.md)
-- [GenAI 安全與降級](docs/genai-safety.md)
-- [Submission checklist](docs/submission-checklist.md)
