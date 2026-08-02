@@ -13,6 +13,7 @@ cd "$(dirname "$0")/.."
 FUNCTION_NAME="${SKILLWEAVE_FUNCTION_NAME:-}"
 AWS_REGION_NAME="${AWS_REGION:-us-east-1}"
 STACK_NAME="${SKILLWEAVE_STACK_NAME:-skillweave-demo}"
+ALIAS_NAME="${SKILLWEAVE_ALIAS_NAME:-live}"
 BUNDLE="dist/skillweave-lambda.zip"
 EXPECTED_AWS_ACCOUNT_ID="${SKILLWEAVE_EXPECTED_AWS_ACCOUNT_ID:-851558740348}"
 
@@ -57,8 +58,7 @@ echo "Updating code on ${FUNCTION_NAME}..."
 aws lambda update-function-code \
   --function-name "$FUNCTION_NAME" \
   --region "$AWS_REGION_NAME" \
-  --zip-file "fileb://$BUNDLE" \
-  --publish >/dev/null
+  --zip-file "fileb://$BUNDLE" >/dev/null
 aws lambda wait function-updated \
   --function-name "$FUNCTION_NAME" --region "$AWS_REGION_NAME"
 
@@ -97,6 +97,20 @@ aws lambda update-function-configuration \
   --environment "$MERGED" >/dev/null
 aws lambda wait function-updated \
   --function-name "$FUNCTION_NAME" --region "$AWS_REGION_NAME"
+
+# API Gateway invokes the stable alias, not $LATEST. Publish only after both
+# code and environment have converged so the immutable version contains the
+# complete release, then atomically move production traffic to it.
+PUBLISHED_VERSION="$(aws lambda publish-version \
+  --function-name "$FUNCTION_NAME" \
+  --region "$AWS_REGION_NAME" \
+  --query Version --output text)"
+aws lambda update-alias \
+  --function-name "$FUNCTION_NAME" \
+  --name "$ALIAS_NAME" \
+  --function-version "$PUBLISHED_VERSION" \
+  --region "$AWS_REGION_NAME" >/dev/null
+echo "Alias ${ALIAS_NAME} now points to version ${PUBLISHED_VERSION}."
 
 DEMO_URL="$(aws cloudformation describe-stacks \
   --stack-name "$STACK_NAME" --region "$AWS_REGION_NAME" \
