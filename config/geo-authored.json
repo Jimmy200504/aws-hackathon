@@ -16,37 +16,199 @@
   "regions": [
     {
       "id": "L1/北北基桃",
-      "counties": ["台北市", "新北市", "基隆市", "桃園市"]
+      "counties": [
+        "台北市",
+        "新北市",
+        "基隆市",
+        "桃園市"
+      ]
     },
     {
       "id": "L1/竹竹苗",
-      "counties": ["新竹市", "新竹縣", "苗栗縣"]
+      "counties": [
+        "新竹市",
+        "新竹縣",
+        "苗栗縣"
+      ]
     },
     {
       "id": "L1/中彰投",
-      "counties": ["台中市", "彰化縣", "南投縣"]
+      "counties": [
+        "台中市",
+        "彰化縣",
+        "南投縣"
+      ]
     },
     {
       "id": "L1/雲嘉南",
-      "counties": ["雲林縣", "嘉義市", "嘉義縣", "台南市"]
+      "counties": [
+        "雲林縣",
+        "嘉義市",
+        "嘉義縣",
+        "台南市"
+      ]
     },
     {
       "id": "L1/高屏",
-      "counties": ["高雄市", "屏東縣"]
+      "counties": [
+        "高雄市",
+        "屏東縣"
+      ]
     },
     {
       "id": "L1/宜花東",
-      "counties": ["宜蘭縣", "花蓮縣", "台東縣"]
+      "counties": [
+        "宜蘭縣",
+        "花蓮縣",
+        "台東縣"
+      ]
     },
     {
       "id": "L1/離島",
-      "counties": ["澎湖縣", "金門縣", "連江縣"]
+      "counties": [
+        "澎湖縣",
+        "金門縣",
+        "連江縣"
+      ]
     }
   ],
   "living_areas": [
     {
+      "id": "L3/三鶯",
+      "aliases": [
+        "三鶯"
+      ],
+      "districts": [
+        "新北市/三峽區",
+        "新北市/鶯歌區"
+      ],
+      "note": "The pair the 三鶯線 shortcut edge connects. Kept so the shortcut has a named grouping to attach to."
+    },
+    {
+      "id": "L3/北彰化",
+      "aliases": [
+        "北彰化"
+      ],
+      "districts": [
+        "彰化縣/彰化市",
+        "彰化縣/和美鎮",
+        "彰化縣/鹿港鎮",
+        "彰化縣/線西鄉",
+        "彰化縣/伸港鄉",
+        "彰化縣/花壇鄉",
+        "彰化縣/秀水鄉"
+      ]
+    },
+    {
+      "id": "L3/北海岸",
+      "aliases": [
+        "北海岸",
+        "台北北海岸"
+      ],
+      "districts": [
+        "新北市/淡水區",
+        "新北市/三芝區",
+        "新北市/石門區",
+        "新北市/金山區",
+        "新北市/萬里區"
+      ],
+      "note": "Authored from the map: these five are the contiguous north coast, joined by a single coastal road. The group is internally split - 淡水 faces 台北 while 金山/萬里 face 基隆 - so the pair detail in the validation report matters more here than the group verdict."
+    },
+    {
+      "id": "L3/北高雄",
+      "aliases": [
+        "北高雄"
+      ],
+      "districts": [
+        "高雄市/楠梓區",
+        "高雄市/左營區",
+        "高雄市/三民區",
+        "高雄市/鼓山區",
+        "高雄市/岡山區",
+        "高雄市/橋頭區",
+        "高雄市/仁武區",
+        "高雄市/大社區",
+        "高雄市/燕巢區"
+      ]
+    },
+    {
+      "id": "L3/南崁",
+      "aliases": [
+        "南崁"
+      ],
+      "districts": [
+        "桃園市/蘆竹區",
+        "桃園市/龜山區",
+        "桃園市/桃園區"
+      ],
+      "note": "南崁 is a settlement in 蘆竹區 whose labour market spills into 龜山 and 桃園."
+    },
+    {
+      "id": "L3/南彰化",
+      "aliases": [
+        "南彰化"
+      ],
+      "districts": [
+        "彰化縣/員林市",
+        "彰化縣/田中鎮",
+        "彰化縣/二林鎮",
+        "彰化縣/北斗鎮",
+        "彰化縣/溪湖鎮",
+        "彰化縣/永靖鄉",
+        "彰化縣/社頭鄉"
+      ]
+    },
+    {
+      "id": "L3/南高雄",
+      "aliases": [
+        "南高雄"
+      ],
+      "districts": [
+        "高雄市/前鎮區",
+        "高雄市/小港區",
+        "高雄市/苓雅區",
+        "高雄市/前金區",
+        "高雄市/新興區",
+        "高雄市/鹽埕區",
+        "高雄市/旗津區",
+        "高雄市/鳳山區",
+        "高雄市/大寮區",
+        "高雄市/林園區"
+      ]
+    },
+    {
+      "id": "L3/台中屯區",
+      "aliases": [
+        "台中屯區"
+      ],
+      "districts": [
+        "台中市/北屯區",
+        "台中市/西屯區",
+        "台中市/南屯區"
+      ]
+    },
+    {
+      "id": "L3/台中山線",
+      "aliases": [
+        "台中山線"
+      ],
+      "districts": [
+        "台中市/豐原區",
+        "台中市/后里區",
+        "台中市/神岡區",
+        "台中市/大雅區",
+        "台中市/潭子區",
+        "台中市/東勢區",
+        "台中市/石岡區",
+        "台中市/新社區"
+      ]
+    },
+    {
       "id": "L3/台中海線",
-      "aliases": ["海線", "台中海線"],
+      "aliases": [
+        "台中海線",
+        "海線"
+      ],
       "districts": [
         "台中市/大甲區",
         "台中市/外埔區",
@@ -60,14 +222,68 @@
       "note": "The colloquial name for the coastal strip west of 台中. No official code covers it."
     },
     {
+      "id": "L3/台南溪北",
+      "aliases": [
+        "台南溪北"
+      ],
+      "districts": [
+        "台南市/新營區",
+        "台南市/鹽水區",
+        "台南市/白河區",
+        "台南市/後壁區",
+        "台南市/東山區",
+        "台南市/柳營區",
+        "台南市/下營區",
+        "台南市/六甲區",
+        "台南市/官田區",
+        "台南市/麻豆區",
+        "台南市/佳里區",
+        "台南市/學甲區",
+        "台南市/西港區",
+        "台南市/七股區",
+        "台南市/將軍區",
+        "台南市/北門區"
+      ]
+    },
+    {
+      "id": "L3/台南溪南",
+      "aliases": [
+        "台南溪南"
+      ],
+      "districts": [
+        "台南市/中西區",
+        "台南市/東區",
+        "台南市/南區",
+        "台南市/北區",
+        "台南市/安平區",
+        "台南市/安南區",
+        "台南市/永康區",
+        "台南市/仁德區",
+        "台南市/歸仁區",
+        "台南市/新化區",
+        "台南市/善化區",
+        "台南市/新市區"
+      ]
+    },
+    {
       "id": "L3/基隆河谷走廊",
-      "aliases": ["南港內湖汐止"],
-      "districts": ["台北市/南港區", "台北市/內湖區", "新北市/汐止區"],
+      "aliases": [
+        "基隆河谷走廊",
+        "南港內湖汐止"
+      ],
+      "districts": [
+        "台北市/南港區",
+        "台北市/內湖區",
+        "新北市/汐止區"
+      ],
       "note": "Straddles the 台北市/新北市 line. Included to test whether a county boundary is visible in behaviour; it should not be."
     },
     {
       "id": "L3/大新竹",
-      "aliases": ["大新竹", "竹竹"],
+      "aliases": [
+        "大新竹",
+        "竹竹"
+      ],
       "districts": [
         "新竹市/東區",
         "新竹市/北區",
@@ -79,40 +295,163 @@
       "note": "Cross-county. The county-level graph already shows 新竹市/新竹縣 as the most symmetric pair in Taiwan (jaccard 0.39407)."
     },
     {
-      "id": "L3/南崁",
-      "aliases": ["南崁"],
-      "districts": ["桃園市/蘆竹區", "桃園市/龜山區", "桃園市/桃園區"],
-      "note": "南崁 is a settlement in 蘆竹區 whose labour market spills into 龜山 and 桃園."
+      "id": "L3/宜蘭溪北",
+      "aliases": [
+        "宜蘭溪北"
+      ],
+      "districts": [
+        "宜蘭縣/宜蘭市",
+        "宜蘭縣/頭城鎮",
+        "宜蘭縣/礁溪鄉",
+        "宜蘭縣/壯圍鄉",
+        "宜蘭縣/員山鄉"
+      ]
     },
     {
-      "id": "L3/三鶯",
-      "aliases": ["三鶯"],
-      "districts": ["新北市/三峽區", "新北市/鶯歌區"],
-      "note": "The pair the 三鶯線 shortcut edge connects. Kept so the shortcut has a named grouping to attach to."
+      "id": "L3/宜蘭溪南",
+      "aliases": [
+        "宜蘭溪南"
+      ],
+      "districts": [
+        "宜蘭縣/羅東鎮",
+        "宜蘭縣/蘇澳鎮",
+        "宜蘭縣/冬山鄉",
+        "宜蘭縣/五結鄉",
+        "宜蘭縣/三星鄉"
+      ]
+    },
+    {
+      "id": "L3/屏北",
+      "aliases": [
+        "屏北"
+      ],
+      "districts": [
+        "屏東縣/屏東市",
+        "屏東縣/內埔鄉",
+        "屏東縣/長治鄉",
+        "屏東縣/麟洛鄉",
+        "屏東縣/九如鄉",
+        "屏東縣/里港鄉",
+        "屏東縣/鹽埔鄉"
+      ]
+    },
+    {
+      "id": "L3/屏南",
+      "aliases": [
+        "屏南"
+      ],
+      "districts": [
+        "屏東縣/恆春鎮",
+        "屏東縣/枋寮鄉",
+        "屏東縣/車城鄉",
+        "屏東縣/滿州鄉"
+      ]
+    },
+    {
+      "id": "L3/東北角",
+      "aliases": [
+        "東北角"
+      ],
+      "districts": [
+        "新北市/瑞芳區",
+        "新北市/貢寮區",
+        "新北市/雙溪區",
+        "新北市/平溪區"
+      ]
+    },
+    {
+      "id": "L3/桃園北區",
+      "aliases": [
+        "桃園北區"
+      ],
+      "districts": [
+        "桃園市/桃園區",
+        "桃園市/龜山區",
+        "桃園市/蘆竹區",
+        "桃園市/大園區",
+        "桃園市/八德區"
+      ]
+    },
+    {
+      "id": "L3/桃園南區",
+      "aliases": [
+        "桃園南區"
+      ],
+      "districts": [
+        "桃園市/中壢區",
+        "桃園市/平鎮區",
+        "桃園市/楊梅區",
+        "桃園市/龍潭區",
+        "桃園市/觀音區",
+        "桃園市/新屋區",
+        "桃園市/大溪區"
+      ]
+    },
+    {
+      "id": "L3/花東縱谷",
+      "aliases": [
+        "花東縱谷"
+      ],
+      "districts": [
+        "花蓮縣/鳳林鎮",
+        "花蓮縣/玉里鎮",
+        "花蓮縣/瑞穗鄉",
+        "台東縣/關山鎮",
+        "台東縣/池上鄉",
+        "台東縣/鹿野鄉"
+      ]
+    },
+    {
+      "id": "L3/苗栗山線",
+      "aliases": [
+        "苗栗山線"
+      ],
+      "districts": [
+        "苗栗縣/苗栗市",
+        "苗栗縣/頭份市",
+        "苗栗縣/公館鄉",
+        "苗栗縣/大湖鄉",
+        "苗栗縣/卓蘭鎮",
+        "苗栗縣/銅鑼鄉",
+        "苗栗縣/三義鄉"
+      ]
+    },
+    {
+      "id": "L3/苗栗海線",
+      "aliases": [
+        "苗栗海線"
+      ],
+      "districts": [
+        "苗栗縣/竹南鎮",
+        "苗栗縣/後龍鎮",
+        "苗栗縣/通霄鎮",
+        "苗栗縣/苑裡鎮"
+      ]
     },
     {
       "id": "L3/高雄臨港",
-      "aliases": ["臨港", "高雄臨港"],
-      "districts": ["高雄市/前鎮區", "高雄市/小港區", "高雄市/鼓山區"]
-    },
-    {
-      "id": "L3/台北北海岸",
-      "aliases": ["北海岸"],
-      "districts": [
-        "新北市/淡水區",
-        "新北市/三芝區",
-        "新北市/石門區",
-        "新北市/金山區",
-        "新北市/萬里區"
+      "aliases": [
+        "高雄臨港",
+        "臨港"
       ],
-      "note": "Authored from the map: these five are the contiguous north coast, joined by a single coastal road. The group is internally split - 淡水 faces 台北 while 金山/萬里 face 基隆 - so the pair detail in the validation report matters more here than the group verdict."
+      "districts": [
+        "高雄市/前鎮區",
+        "高雄市/小港區",
+        "高雄市/鼓山區"
+      ]
     }
   ],
   "sites": [
     {
       "id": "L5/竹科",
-      "aliases": ["竹科", "新竹科學園區"],
-      "districts": ["新竹市/東區", "新竹縣/寶山鄉"],
+      "aliases": [
+        "竹科",
+        "新竹科學園區"
+      ],
+      "districts": [
+        "新竹市/東區",
+        "新竹縣/寶山鄉"
+      ],
       "alias_concentration": 0.6092,
       "top_county": "新竹市",
       "postings": 2257,
@@ -121,8 +460,15 @@
     },
     {
       "id": "L5/南科",
-      "aliases": ["南科", "南部科學園區"],
-      "districts": ["台南市/新市區", "台南市/善化區", "台南市/安定區"],
+      "aliases": [
+        "南科",
+        "南部科學園區"
+      ],
+      "districts": [
+        "台南市/新市區",
+        "台南市/善化區",
+        "台南市/安定區"
+      ],
       "alias_concentration": 0.8112,
       "top_county": "台南市",
       "postings": 2457,
@@ -130,8 +476,15 @@
     },
     {
       "id": "L5/中科",
-      "aliases": ["中科", "中部科學園區"],
-      "districts": ["台中市/西屯區", "台中市/大雅區", "台中市/后里區"],
+      "aliases": [
+        "中科",
+        "中部科學園區"
+      ],
+      "districts": [
+        "台中市/西屯區",
+        "台中市/大雅區",
+        "台中市/后里區"
+      ],
       "alias_concentration": 0.7395,
       "top_county": "台中市",
       "postings": 1555,
@@ -140,8 +493,14 @@
     },
     {
       "id": "L5/樹谷",
-      "aliases": ["樹谷", "樹谷園區"],
-      "districts": ["台南市/新市區", "台南市/善化區"],
+      "aliases": [
+        "樹谷",
+        "樹谷園區"
+      ],
+      "districts": [
+        "台南市/新市區",
+        "台南市/善化區"
+      ],
       "alias_concentration": 1.0,
       "top_county": "台南市",
       "postings": 99,
@@ -149,8 +508,13 @@
     },
     {
       "id": "L5/頂崁",
-      "aliases": ["頂崁", "頂崁工業區"],
-      "districts": ["新北市/新莊區"],
+      "aliases": [
+        "頂崁",
+        "頂崁工業區"
+      ],
+      "districts": [
+        "新北市/新莊區"
+      ],
       "alias_concentration": 1.0,
       "top_county": "新北市",
       "postings": 176,
@@ -158,8 +522,13 @@
     },
     {
       "id": "L5/大發",
-      "aliases": ["大發", "大發工業區"],
-      "districts": ["高雄市/大寮區"],
+      "aliases": [
+        "大發",
+        "大發工業區"
+      ],
+      "districts": [
+        "高雄市/大寮區"
+      ],
       "alias_concentration": 1.0,
       "top_county": "高雄市",
       "postings": 164,
@@ -167,8 +536,14 @@
     },
     {
       "id": "L5/利澤",
-      "aliases": ["利澤", "利澤工業區"],
-      "districts": ["宜蘭縣/五結鄉", "宜蘭縣/蘇澳鎮"],
+      "aliases": [
+        "利澤",
+        "利澤工業區"
+      ],
+      "districts": [
+        "宜蘭縣/五結鄉",
+        "宜蘭縣/蘇澳鎮"
+      ],
       "alias_concentration": 1.0,
       "top_county": "宜蘭縣",
       "postings": 121,
@@ -177,8 +552,12 @@
     },
     {
       "id": "L5/南勢角",
-      "aliases": ["南勢角"],
-      "districts": ["新北市/中和區"],
+      "aliases": [
+        "南勢角"
+      ],
+      "districts": [
+        "新北市/中和區"
+      ],
       "alias_concentration": 1.0,
       "top_county": "新北市",
       "postings": 67,
@@ -186,8 +565,14 @@
     },
     {
       "id": "L5/北車",
-      "aliases": ["北車", "台北車站"],
-      "districts": ["台北市/中正區", "台北市/大同區"],
+      "aliases": [
+        "北車",
+        "台北車站"
+      ],
+      "districts": [
+        "台北市/中正區",
+        "台北市/大同區"
+      ],
       "alias_concentration": 0.8642,
       "top_county": "台北市",
       "postings": 1230,
@@ -195,8 +580,14 @@
     },
     {
       "id": "L5/文心",
-      "aliases": ["文心"],
-      "districts": ["台中市/南屯區", "台中市/西屯區", "台中市/北屯區"],
+      "aliases": [
+        "文心"
+      ],
+      "districts": [
+        "台中市/南屯區",
+        "台中市/西屯區",
+        "台中市/北屯區"
+      ],
       "alias_concentration": 0.9179,
       "top_county": "台中市",
       "postings": 1583,
@@ -205,8 +596,12 @@
     },
     {
       "id": "L5/大墩",
-      "aliases": ["大墩"],
-      "districts": ["台中市/南屯區"],
+      "aliases": [
+        "大墩"
+      ],
+      "districts": [
+        "台中市/南屯區"
+      ],
       "alias_concentration": 0.9787,
       "top_county": "台中市",
       "postings": 564,
@@ -214,8 +609,12 @@
     },
     {
       "id": "L5/內科",
-      "aliases": ["內科"],
-      "districts": ["台北市/內湖區"],
+      "aliases": [
+        "內科"
+      ],
+      "districts": [
+        "台北市/內湖區"
+      ],
       "alias_concentration": 0.2584,
       "top_county": "台北市",
       "postings": 1436,
@@ -224,8 +623,12 @@
     },
     {
       "id": "L5/公益",
-      "aliases": ["公益"],
-      "districts": ["台中市/西區"],
+      "aliases": [
+        "公益"
+      ],
+      "districts": [
+        "台中市/西區"
+      ],
       "alias_concentration": 0.442,
       "top_county": "台中市",
       "postings": 1751,
@@ -234,8 +637,12 @@
     },
     {
       "id": "L5/嘉南",
-      "aliases": ["嘉南"],
-      "districts": ["台南市/仁德區"],
+      "aliases": [
+        "嘉南"
+      ],
+      "districts": [
+        "台南市/仁德區"
+      ],
       "alias_concentration": 0.4647,
       "top_county": "台南市",
       "postings": 624,
@@ -266,5 +673,6 @@
       "note": "三鶯線. Opens after the graph cutoff, so a graph built at 2026-06-01 must not contain it. This edge exists to prove the temporal filter fires, and is the one assertion in this file that the build is expected to drop.",
       "verifiable_in_dataset": false
     }
-  ]
+  ],
+  "layer_ownership": "This file owns L1 regions and L3 living areas. L5 landmarks live in config/geo-l5-table.json. A layer is defined in exactly one file: L3 was briefly defined in both, and the two validators returned different verdicts for 北海岸 while the graph registered it twice."
 }

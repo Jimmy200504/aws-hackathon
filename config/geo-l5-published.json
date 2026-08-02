@@ -14,18 +14,6 @@
   },
   "entries": [
     {
-      "id": "L5/竹北",
-      "surface": "竹北",
-      "kind": "tra_station",
-      "districts": [
-        "新竹縣/竹北市"
-      ],
-      "appearances": 5764,
-      "concentration": 0.7505,
-      "district_agreement": 0.8368,
-      "requires_occurrence_filter": false
-    },
-    {
       "id": "L5/楊梅",
       "surface": "楊梅",
       "kind": "tra_station",
@@ -35,6 +23,18 @@
       "appearances": 5402,
       "concentration": 0.93,
       "district_agreement": 0.953,
+      "requires_occurrence_filter": false
+    },
+    {
+      "id": "L5/竹北",
+      "surface": "竹北",
+      "kind": "tra_station",
+      "districts": [
+        "新竹縣/竹北市"
+      ],
+      "appearances": 5387,
+      "concentration": 0.7542,
+      "district_agreement": 0.8442,
       "requires_occurrence_filter": false
     },
     {

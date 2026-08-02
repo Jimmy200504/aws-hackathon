@@ -264,6 +264,18 @@ class GeoGraph:
             return
         self.metadata["l5_gate"] = payload.get("gate")
         for entry in payload.get("entries", []):
+            if "living_area" in (entry.get("kind") or ""):
+                # L3 is registered from config/geo-authored.json, which owns it.
+                # The L5 validator measures these surfaces for their text
+                # evidence; registering them here as well would put the same
+                # grouping in the graph twice under two different ids.
+                self.l5_evidence[entry["surface"]] = {
+                    "kind": entry.get("kind"),
+                    "appearances": entry.get("appearances"),
+                    "concentration": entry.get("concentration"),
+                    "registered_as": "L3",
+                }
+                continue
             members = [d for d in entry.get("districts", []) if d in self.districts]
             if not members:
                 continue

@@ -333,54 +333,24 @@ ROADS: dict[str, list[str]] = {
 # The measured risk is that they are often written as a sales territory rather
 # than a location ("駐區業務代表(中彰投)"), which the concentration gate cannot
 # distinguish - so they are proposed here and judged like everything else.
-LIVING_AREAS: dict[str, list[str]] = {
-    "台中山線": ["台中市/豐原區", "台中市/后里區", "台中市/神岡區", "台中市/大雅區",
-                "台中市/潭子區", "台中市/東勢區", "台中市/石岡區", "台中市/新社區"],
-    "台中海線": ["台中市/大甲區", "台中市/外埔區", "台中市/大安區", "台中市/清水區",
-                "台中市/沙鹿區", "台中市/梧棲區", "台中市/龍井區", "台中市/大肚區"],
-    "台中屯區": ["台中市/北屯區", "台中市/西屯區", "台中市/南屯區"],
-    "台南溪北": ["台南市/新營區", "台南市/鹽水區", "台南市/白河區", "台南市/後壁區",
-                "台南市/東山區", "台南市/柳營區", "台南市/下營區", "台南市/六甲區",
-                "台南市/官田區", "台南市/麻豆區", "台南市/佳里區", "台南市/學甲區",
-                "台南市/西港區", "台南市/七股區", "台南市/將軍區", "台南市/北門區"],
-    "台南溪南": ["台南市/中西區", "台南市/東區", "台南市/南區", "台南市/北區",
-                "台南市/安平區", "台南市/安南區", "台南市/永康區", "台南市/仁德區",
-                "台南市/歸仁區", "台南市/新化區", "台南市/善化區", "台南市/新市區"],
-    "北高雄": ["高雄市/楠梓區", "高雄市/左營區", "高雄市/三民區", "高雄市/鼓山區",
-              "高雄市/岡山區", "高雄市/橋頭區", "高雄市/仁武區", "高雄市/大社區",
-              "高雄市/燕巢區"],
-    "南高雄": ["高雄市/前鎮區", "高雄市/小港區", "高雄市/苓雅區", "高雄市/前金區",
-              "高雄市/新興區", "高雄市/鹽埕區", "高雄市/旗津區", "高雄市/鳳山區",
-              "高雄市/大寮區", "高雄市/林園區"],
-    "桃園北區": ["桃園市/桃園區", "桃園市/龜山區", "桃園市/蘆竹區", "桃園市/大園區",
-                "桃園市/八德區"],
-    "桃園南區": ["桃園市/中壢區", "桃園市/平鎮區", "桃園市/楊梅區", "桃園市/龍潭區",
-                "桃園市/觀音區", "桃園市/新屋區", "桃園市/大溪區"],
-    "宜蘭溪北": ["宜蘭縣/宜蘭市", "宜蘭縣/頭城鎮", "宜蘭縣/礁溪鄉", "宜蘭縣/壯圍鄉",
-                "宜蘭縣/員山鄉"],
-    "宜蘭溪南": ["宜蘭縣/羅東鎮", "宜蘭縣/蘇澳鎮", "宜蘭縣/冬山鄉", "宜蘭縣/五結鄉",
-                "宜蘭縣/三星鄉"],
-    "東北角": ["新北市/瑞芳區", "新北市/貢寮區", "新北市/雙溪區", "新北市/平溪區"],
-    "北海岸": ["新北市/淡水區", "新北市/三芝區", "新北市/石門區", "新北市/金山區",
-              "新北市/萬里區"],
-    "苗栗海線": ["苗栗縣/竹南鎮", "苗栗縣/後龍鎮", "苗栗縣/通霄鎮", "苗栗縣/苑裡鎮"],
-    "苗栗山線": ["苗栗縣/苗栗市", "苗栗縣/頭份市", "苗栗縣/公館鄉", "苗栗縣/大湖鄉",
-                "苗栗縣/卓蘭鎮", "苗栗縣/銅鑼鄉", "苗栗縣/三義鄉"],
-    "北彰化": ["彰化縣/彰化市", "彰化縣/和美鎮", "彰化縣/鹿港鎮", "彰化縣/線西鄉",
-              "彰化縣/伸港鄉", "彰化縣/花壇鄉", "彰化縣/秀水鄉"],
-    "南彰化": ["彰化縣/員林市", "彰化縣/田中鎮", "彰化縣/二林鎮", "彰化縣/北斗鎮",
-              "彰化縣/溪湖鎮", "彰化縣/永靖鄉", "彰化縣/社頭鄉"],
-    "屏北": ["屏東縣/屏東市", "屏東縣/內埔鄉", "屏東縣/長治鄉", "屏東縣/麟洛鄉",
-            "屏東縣/九如鄉", "屏東縣/里港鄉", "屏東縣/鹽埔鄉"],
-    "屏南": ["屏東縣/恆春鎮", "屏東縣/枋寮鄉", "屏東縣/車城鄉", "屏東縣/滿州鄉"],
-    "花東縱谷": ["花蓮縣/鳳林鎮", "花蓮縣/玉里鎮", "花蓮縣/瑞穗鄉", "台東縣/關山鎮",
-                "台東縣/池上鄉", "台東縣/鹿野鄉"],
-    "大新竹": ["新竹市/東區", "新竹市/北區", "新竹市/香山區", "新竹縣/竹北市",
-              "新竹縣/竹東鎮", "新竹縣/寶山鄉"],
-    "三鶯": ["新北市/三峽區", "新北市/鶯歌區"],
-    "南崁": ["桃園市/蘆竹區", "桃園市/龜山區", "桃園市/桃園區"],
-    "高雄臨港": ["高雄市/前鎮區", "高雄市/小港區", "高雄市/鼓山區"],
-}
+AUTHORED_LAYERS = ROOT / "config" / "geo-authored.json"
+
+
+def load_living_areas() -> dict[str, list[str]]:
+    """L3 membership, read from the file that owns it.
+
+    Both validators then score the same definitions: `validate_geo_authored.py`
+    asks whether searchers treat the districts as one market, and
+    `validate_l5_table.py` asks whether the name is used as a place in job text.
+    Those are different questions and a living area needs both answers.
+    """
+    payload = json.loads(AUTHORED_LAYERS.read_text(encoding="utf-8"))
+    areas: dict[str, list[str]] = {}
+    for area in payload.get("living_areas", []):
+        for alias in area.get("aliases", []) or [area["id"].split("/", 1)[1]]:
+            areas[alias] = area["districts"]
+    return areas
+
 
 # ------------------------------------------------------------ L5 expansion
 TRA_MORE: dict[str, list[str]] = {
@@ -570,7 +540,10 @@ def build() -> dict:
     add(PARKS_MORE, "industrial_park")
     add(LANDMARKS_MORE, "landmark")
     add(ROADS_MORE, "arterial_road")
-    add(LIVING_AREAS, "living_area")
+    # L3 is defined in config/geo-authored.json and read from there, never
+    # redefined here. It briefly lived in both files, and the two validators
+    # returned different verdicts for 北海岸 while the graph registered it twice.
+    add(load_living_areas(), "living_area")
 
     # Two sources can legitimately name the same surface (南科 is both a park and
     # a TRA station). Merge rather than emit duplicates.

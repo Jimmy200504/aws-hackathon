@@ -9,21 +9,21 @@
     "min_concentration": 0.6,
     "min_district_agreement": 0.5,
     "gate_calibration": "0.60 sits between the 0.2666 ceiling of the ten non-place control words and the 0.4647 of the highest rejected candidate in reports/region-alias-candidates.json",
-    "elapsed_seconds": 94.0
+    "elapsed_seconds": 89.6
   },
   "corpus": {
     "rows": 1218635,
     "eligible": 961780,
-    "postings_with_any_l5": 153084
+    "postings_with_any_l5": 153266
   },
   "summary": {
-    "authored": 660,
-    "ambiguous_surface": 54,
+    "authored": 666,
+    "ambiguous_surface": 56,
     "district_disputed": 59,
-    "misassigned_county": 26,
+    "misassigned_county": 27,
     "published": 346,
-    "unsupported": 175,
-    "published_share": 0.5242
+    "unsupported": 178,
+    "published_share": 0.5195
   },
   "entries": [
     {
@@ -282,6 +282,44 @@
         }
       },
       "example": "ison de win文公館 - 服務員 文公館 la maison d",
+      "verdict": "ambiguous_surface"
+    },
+    {
+      "surface": "竹竹",
+      "kind": "living_area",
+      "claimed_counties": [
+        "新竹市",
+        "新竹縣"
+      ],
+      "claimed_districts": [
+        "新竹市/東區",
+        "新竹市/北區",
+        "新竹市/香山區",
+        "新竹縣/竹北市",
+        "新竹縣/竹東鎮",
+        "新竹縣/寶山鄉"
+      ],
+      "appearances": 761,
+      "top_county": "新竹縣",
+      "concentration": 0.5558,
+      "county_distribution": {
+        "新竹縣": 423,
+        "新竹市": 102,
+        "台北市": 87,
+        "新北市": 53
+      },
+      "l4_cross_check": {
+        "postings_with_l4": 638,
+        "agreeing": 421,
+        "agreement": 0.6599,
+        "top_districts": {
+          "新竹縣/竹北市": 343,
+          "新竹縣/竹東鎮": 89,
+          "台北市/內湖區": 78,
+          "台北市/松山區": 69
+        }
+      },
+      "example": "體工程師(aoi , 新竹竹北) 1. c# coding (含ui主程",
       "verdict": "ambiguous_surface"
     },
     {
@@ -927,6 +965,45 @@
         }
       },
       "example": "【新北市板橋區】海山分校行政櫃檯 1.櫃台行政作業事務 2.協助",
+      "verdict": "ambiguous_surface"
+    },
+    {
+      "surface": "海線",
+      "kind": "living_area",
+      "claimed_counties": [
+        "台中市"
+      ],
+      "claimed_districts": [
+        "台中市/大甲區",
+        "台中市/外埔區",
+        "台中市/大安區",
+        "台中市/清水區",
+        "台中市/沙鹿區",
+        "台中市/梧棲區",
+        "台中市/龍井區",
+        "台中市/大肚區"
+      ],
+      "appearances": 225,
+      "top_county": "台中市",
+      "concentration": 0.4133,
+      "county_distribution": {
+        "台中市": 93,
+        "桃園市": 85,
+        "新北市": 32,
+        "彰化縣": 7
+      },
+      "l4_cross_check": {
+        "postings_with_l4": 183,
+        "agreeing": 53,
+        "agreement": 0.2896,
+        "top_districts": {
+          "桃園市/桃園區": 84,
+          "桃園市/中壢區": 82,
+          "桃園市/平鎮區": 82,
+          "桃園市/龜山區": 70
+        }
+      },
+      "example": "含雲林/彰化/台中市區/海線/南投/苗栗)配送 2.客戶服務(上下貨/代",
       "verdict": "ambiguous_surface"
     },
     {
@@ -1795,24 +1872,24 @@
         "新竹市/東區",
         "新竹縣/寶山鄉"
       ],
-      "appearances": 1620,
+      "appearances": 1578,
       "top_county": "新竹市",
-      "concentration": 0.6988,
+      "concentration": 0.6965,
       "county_distribution": {
-        "新竹市": 1132,
-        "新竹縣": 325,
+        "新竹市": 1099,
+        "新竹縣": 320,
         "桃園市": 39,
         "台南市": 38
       },
       "l4_cross_check": {
-        "postings_with_l4": 221,
+        "postings_with_l4": 219,
         "agreeing": 55,
-        "agreement": 0.2489,
+        "agreement": 0.2511,
         "top_districts": {
           "新竹縣/竹北市": 75,
-          "新竹縣/湖口鄉": 73,
+          "新竹縣/湖口鄉": 72,
           "新竹縣/寶山鄉": 55,
-          "新竹縣/竹東鎮": 46
+          "新竹縣/竹東鎮": 45
         }
       },
       "example": "區有:龍科、中科、南科、竹科 考核期滿薪資約40000~45000.",
@@ -4447,36 +4524,36 @@
       "verdict": "misassigned_county"
     },
     {
-      "surface": "竹北",
-      "kind": "tra_station",
+      "surface": "臨港",
+      "kind": "living_area",
       "claimed_counties": [
-        "新竹縣"
+        "高雄市"
       ],
       "claimed_districts": [
-        "新竹縣/竹北市"
+        "高雄市/前鎮區",
+        "高雄市/小港區",
+        "高雄市/鼓山區"
       ],
-      "appearances": 5764,
-      "top_county": "新竹縣",
-      "concentration": 0.7505,
+      "appearances": 22,
+      "top_county": "台中市",
+      "concentration": 0.9545,
       "county_distribution": {
-        "新竹縣": 4326,
-        "新竹市": 501,
-        "桃園市": 366,
-        "台北市": 223
+        "台中市": 21,
+        "台北市": 1
       },
       "l4_cross_check": {
-        "postings_with_l4": 5170,
-        "agreeing": 4326,
-        "agreement": 0.8368,
+        "postings_with_l4": 22,
+        "agreeing": 0,
+        "agreement": 0.0,
         "top_districts": {
-          "新竹縣/竹北市": 4326,
-          "桃園市/桃園區": 272,
-          "桃園市/中壢區": 240,
-          "桃園市/蘆竹區": 208
+          "台中市/龍井區": 18,
+          "台中市/大雅區": 8,
+          "台中市/梧棲區": 2,
+          "台中市/清水區": 1
         }
       },
-      "example": "工程師(aoi , 新竹竹北) 1. c# coding (含ui主程式",
-      "verdict": "published"
+      "example": "工作地點:台中市清水區臨港路六段2巷38號",
+      "verdict": "misassigned_county"
     },
     {
       "surface": "楊梅",
@@ -4508,6 +4585,38 @@
         }
       },
       "example": "楊梅現場機台操作人員 1. 依生產需求進行機台生",
+      "verdict": "published"
+    },
+    {
+      "surface": "竹北",
+      "kind": "tra_station",
+      "claimed_counties": [
+        "新竹縣"
+      ],
+      "claimed_districts": [
+        "新竹縣/竹北市"
+      ],
+      "appearances": 5387,
+      "top_county": "新竹縣",
+      "concentration": 0.7542,
+      "county_distribution": {
+        "新竹縣": 4063,
+        "新竹市": 490,
+        "桃園市": 354,
+        "台北市": 189
+      },
+      "l4_cross_check": {
+        "postings_with_l4": 4813,
+        "agreeing": 4063,
+        "agreement": 0.8442,
+        "top_districts": {
+          "新竹縣/竹北市": 4063,
+          "桃園市/桃園區": 265,
+          "桃園市/中壢區": 239,
+          "桃園市/蘆竹區": 208
+        }
+      },
+      "example": "行政班導師(竹北校) 1.具愛心、耐心,帶班相關事宜及招生處",
       "verdict": "published"
     },
     {
@@ -18142,6 +18251,39 @@
       "verdict": "unsupported"
     },
     {
+      "surface": "南港內湖汐止",
+      "kind": "living_area",
+      "claimed_counties": [
+        "台北市",
+        "新北市"
+      ],
+      "claimed_districts": [
+        "台北市/南港區",
+        "台北市/內湖區",
+        "新北市/汐止區"
+      ],
+      "appearances": 3,
+      "top_county": "台北市",
+      "concentration": 0.6667,
+      "county_distribution": {
+        "台北市": 2,
+        "新北市": 1
+      },
+      "l4_cross_check": {
+        "postings_with_l4": 3,
+        "agreeing": 3,
+        "agreement": 1.0,
+        "top_districts": {
+          "台北市/內湖區": 2,
+          "台北市/南港區": 2,
+          "台北市/信義區": 1,
+          "新北市/汐止區": 1
+        }
+      },
+      "example": "5,000/月、歡迎信義南港內湖汐止求職者投遞履歷 | bis_202",
+      "verdict": "unsupported"
+    },
+    {
       "surface": "南港軟體園區二期",
       "kind": "industrial_park",
       "claimed_counties": [
@@ -19094,6 +19236,27 @@
       "verdict": "unsupported"
     },
     {
+      "surface": "台北北海岸",
+      "kind": "living_area",
+      "claimed_counties": [
+        "新北市"
+      ],
+      "claimed_districts": [
+        "新北市/淡水區",
+        "新北市/三芝區",
+        "新北市/石門區",
+        "新北市/金山區",
+        "新北市/萬里區"
+      ],
+      "appearances": 0,
+      "top_county": null,
+      "concentration": 0.0,
+      "county_distribution": {},
+      "l4_cross_check": null,
+      "example": null,
+      "verdict": "unsupported"
+    },
+    {
       "surface": "台南林百貨",
       "kind": "landmark",
       "claimed_counties": [
@@ -19163,6 +19326,26 @@
       ],
       "claimed_districts": [
         "新北市/土城區"
+      ],
+      "appearances": 0,
+      "top_county": null,
+      "concentration": 0.0,
+      "county_distribution": {},
+      "l4_cross_check": null,
+      "example": null,
+      "verdict": "unsupported"
+    },
+    {
+      "surface": "基隆河谷走廊",
+      "kind": "living_area",
+      "claimed_counties": [
+        "台北市",
+        "新北市"
+      ],
+      "claimed_districts": [
+        "台北市/南港區",
+        "台北市/內湖區",
+        "新北市/汐止區"
       ],
       "appearances": 0,
       "top_county": null,
