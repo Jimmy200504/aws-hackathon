@@ -24,7 +24,10 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from app.query_normalizer import BedrockQueryNormalizer  # noqa: E402
+from app.query_normalizer import (  # noqa: E402
+    BedrockQueryNormalizer,
+    QueryIntentVocabulary,
+)
 
 
 TOP_QUERIES = ROOT / "config" / "top-queries.json"
@@ -61,8 +64,14 @@ def main() -> None:
     queries = json.loads(args.top_queries.read_text(encoding="utf-8"))["queries"]
     queries = queries[: max(1, args.limit)]
 
+    # The vocabulary has to be supplied explicitly: the constructor defaults it
+    # to None, and `enabled` requires both a model id and a vocabulary, so
+    # omitting it here made this script exit before issuing a single request.
     normalizer = BedrockQueryNormalizer(
-        args.model_id, max_batch=args.max_batch, cache_size=len(queries) * 2 + 1024
+        args.model_id,
+        max_batch=args.max_batch,
+        cache_size=len(queries) * 2 + 1024,
+        vocabulary=QueryIntentVocabulary.load(),
     )
     if not normalizer.enabled:
         raise SystemExit(
