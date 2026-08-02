@@ -396,6 +396,76 @@ function showRegionTrace(trace) {
   });
 }
 
+// Renders meta.geo_trace, the district-level layer. Appended below the county
+// expansions rather than replacing them: the two answer different questions,
+// and a county-only search carries region_trace alone.
+function showGeoTrace(trace) {
+  if (!trace) return;
+  const heading = document.createElement("small");
+  heading.className = "panel-empty";
+  const from = trace.resolved_from || {};
+  const fromText = (from.query_text || []).map(shortNode);
+  const fromCodes = (from.filter_codes || []).map(shortNode);
+  if (fromText.length) {
+    heading.textContent = `行政區層：從查詢文字讀出 ${fromText.join("、")}`;
+  } else if (fromCodes.length) {
+    heading.textContent = `行政區層：從地區條件讀出 ${fromCodes.join("、")}`;
+  } else {
+    heading.textContent = "行政區層：查詢文字中的地區詞彙未通過發布門檻，本次不展開";
+  }
+  regionPanel.append(heading);
+
+  (trace.query_text_matches || [])
+    .filter((note) => note.skipped)
+    .forEach((note) => {
+      const skipped = document.createElement("small");
+      skipped.className = "panel-empty";
+      skipped.textContent = `「${note.surface}」未展開：${geoSkipReason(note)}`;
+      regionPanel.append(skipped);
+    });
+
+  (trace.expansions || []).forEach((expansion) => {
+    const item = document.createElement("div");
+    item.className = "trace-path";
+    const rail = document.createElement("div");
+    rail.className = "trace-rail";
+    const dot = document.createElement("span");
+    dot.className = "trace-dot";
+    rail.append(dot);
+    const copy = document.createElement("div");
+    copy.className = "trace-copy";
+    const title = document.createElement("strong");
+    title.textContent = shortNode(expansion.district);
+    const detail = document.createElement("small");
+    const share = Number(expansion.substitutability || 0);
+    detail.textContent = `可替代度 ${(share * 100).toFixed(1)}%${
+      expansion.explanation ? ` · ${expansion.explanation}` : ""
+    }`;
+    copy.append(title, detail);
+    item.append(rail, copy);
+    regionPanel.append(item);
+  });
+}
+
+const shortNode = (node) => String(node ?? "").split("/").pop();
+
+// Why a place the searcher typed produced no expansion. Each branch names the
+// gate that stopped it, so the panel never just goes quiet.
+function geoSkipReason(note) {
+  const share = Number(note.job_corpus_precision || 0);
+  const measured = `職缺文本中僅 ${(share * 100).toFixed(1)}% 確實位於該區`;
+  if (note.skipped === "ambiguous") {
+    return `同名行政區存在於 ${(note.counties || []).join("、")}，缺少縣市線索`;
+  }
+  if (note.skipped === "word_collision") {
+    return `此字串多為路名或一般詞彙（${measured}）`;
+  }
+  if (note.skipped === "generic_word") {
+    return `此正式名稱多作一般詞彙使用（${measured}）`;
+  }
+  return note.reason || note.skipped;
+}
+
 function renderRows(rows, query, graphEnabled) {
   results.replaceChildren();
   if (!rows.length) {
@@ -461,6 +531,7 @@ async function search(event) {
     renderNormalization(body.meta?.query_normalization, query);
     renderRows(body.result, query, graphEnabled);
     showRegionTrace(body.meta?.region_trace);
+    showGeoTrace(body.meta?.geo_trace);
     resultMeta.textContent =
       `${body.result.length} RESULTS · ${body.meta.latency_ms} MS · ${graphEnabled ? "GRAPH" : "BASELINE"}`;
   } catch (error) {

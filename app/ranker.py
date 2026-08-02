@@ -359,6 +359,25 @@ class SkillWeaveRanker:
                 names.add(normalize(name))
         return names
 
+    def county_hints(self, intent: QueryIntent) -> tuple[str, ...]:
+        """County names this request has already committed to.
+
+        `app/geo_graph.py` needs these to read a district out of query text: 東區
+        names a district in four counties, and the only evidence for choosing one
+        is what the rest of the request already said. Two sources qualify, in
+        this order of authority - the county behind an explicit filter code, then
+        the location the query normalizer read out of the text.
+
+        Sorted within each source, because the caller's output has to be
+        reproducible for a given index version and `_filter_names` returns a set.
+        """
+        names = dict.fromkeys(
+            sorted(self._filter_names(intent.location_codes, self.locations))
+        )
+        for name in intent.inferred_locations:
+            names.setdefault(name, None)
+        return tuple(names)
+
     def _graph_feature(
         self,
         intent: QueryIntent,

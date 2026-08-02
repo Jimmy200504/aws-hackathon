@@ -39,6 +39,7 @@ import json
 import logging
 import math
 import os
+import re
 import statistics
 from dataclasses import dataclass
 from datetime import date
@@ -54,6 +55,42 @@ DEFAULT_AUTHORED = ROOT / "config" / "geo-authored.json"
 # graph by surviving scripts/validate_l5_table.py, not by being written down.
 DEFAULT_L5 = ROOT / "config" / "geo-l5-published.json"
 DEFAULT_ADJACENCY = ROOT / "config" / "geo-adjacency.json"
+# District name surfaces, for reading a place out of the query text rather than
+# out of a filter code. Built by scripts/build_l4_table.py.
+DEFAULT_L4 = ROOT / "config" / "geo-l4-districts.json"
+
+# Surfaces read as ordinary words rather than place references, with the job
+# corpus precision that supports the reading. Precision is the share of postings
+# containing the string that sit in a county holding that district, taken from
+# reports/job-district-extraction.json.
+#
+# These are excluded by judgement, not by a threshold. Each is a common word or
+# one of Taiwan's commonest street names, so a searcher typing it bare is
+# usually not naming the district. Precision is corroboration, not the
+# criterion: 林口 (0.5386) and 萬華 (0.6956) score no better and are
+# unambiguously place names, which is why no precision cut-off is applied here.
+# No query-side labels exist, so calling this measured would overstate it.
+#
+# The job-side extractor rejects 58 short forms; only these are rejected here.
+# It also drops 七美, 北竿 and the other offshore names for having almost no
+# postings to judge, which is a sample-size verdict rather than a word-collision
+# one. A searcher who types 七美鄉 means 七美鄉, so those stay usable.
+WORD_COLLISION_SURFACES: Mapping[str, float] = {
+    "成功": 0.0058,
+    "和平": 0.0863,
+    "中西": 0.0804,
+    "中正": 0.1217,
+    "復興": 0.2207,
+    "中山": 0.2309,
+    "大同": 0.2586,
+    "三民": 0.4181,
+}
+# Official names that read as a generic noun rather than a place: 北區 is usually
+# a sales territory and 新社區 usually a newly built residential block. 東區
+# (0.7899) and 南區 (0.6055) are left out of this list on purpose. They are real
+# district names whose only problem is naming several counties at once, which the
+# county-hint rule already handles.
+GENERIC_FULL_NAMES: Mapping[str, float] = {"北區": 0.3591, "新社區": 0.1571}
 
 # The graph is built as of the first evaluation day, so an edge that only comes
 # into existence later must not be present. Passed to `build_geo_graph`.
@@ -179,6 +216,7 @@ class GeoGraph:
         authored_path: Path | None = None,
         l5_path: Path | None = None,
         adjacency_path: Path | None = None,
+        l4_path: Path | None = None,
         *,
         cutoff_date: str = DEFAULT_CUTOFF,
         max_cost: float = DEFAULT_MAX_COST,
@@ -189,6 +227,7 @@ class GeoGraph:
         self.authored_path = Path(authored_path or DEFAULT_AUTHORED)
         self.l5_path = Path(l5_path or DEFAULT_L5)
         self.adjacency_path = Path(adjacency_path or DEFAULT_ADJACENCY)
+        self.l4_path = Path(l4_path or DEFAULT_L4)
         self.cutoff_date = cutoff_date
         self.max_cost = float(max_cost)
         self.limit = max(0, int(limit))
@@ -204,6 +243,13 @@ class GeoGraph:
         self.excluded_edges: list[dict[str, Any]] = []
         self.corroborated: list[dict[str, Any]] = []
         self.l5_evidence: dict[str, dict[str, Any]] = {}
+        # Query-text surfaces: surface -> {county: district node}. A surface with
+        # more than one county needs a hint before it can resolve.
+        self.text_surfaces: dict[str, dict[str, str]] = {}
+        # Surfaces that are matched but never resolved, so that a longer blocked
+        # form cannot be defeated by a shorter allowed one. surface -> note.
+        self.blocked_surfaces: dict[str, dict[str, Any]] = {}
+        self._text_pattern: re.Pattern[str] | None = None
         self._adjacency: dict[str, dict[str, GeoEdge]] = {}
         self._load()
 
@@ -215,11 +261,13 @@ class GeoGraph:
         authored = os.getenv("GEO_AUTHORED_PATH")
         l5 = os.getenv("GEO_L5_PATH")
         adjacency = os.getenv("GEO_ADJACENCY_PATH")
+        l4 = os.getenv("GEO_L4_PATH")
         return cls(
             Path(override) if override else None,
             Path(authored) if authored else None,
             Path(l5) if l5 else None,
             Path(adjacency) if adjacency else None,
+            Path(l4) if l4 else None,
             cutoff_date=os.getenv("GEO_GRAPH_CUTOFF", DEFAULT_CUTOFF),
             max_cost=float(os.getenv("GEO_GRAPH_MAX_COST", DEFAULT_MAX_COST)),
             limit=int(os.getenv("GEO_GRAPH_LIMIT", DEFAULT_LIMIT)),
@@ -261,6 +309,100 @@ class GeoGraph:
             self._load_authored()
             self._load_l5()
             self._load_adjacency()
+        self._load_text_surfaces()
+
+    def _load_text_surfaces(self) -> None:
+        """Index the surfaces a searcher might type, so text can name a district.
+
+        `resolve` only reads filter codes, which leaves the commonest way of
+        naming a place unhandled: typing it. This builds the surface index for
+        that, from official district names plus every alias the authored and L5
+        layers already registered.
+
+        Two exclusions apply, documented on WORD_COLLISION_SURFACES and
+        GENERIC_FULL_NAMES. An excluded surface is still put in the match pattern
+        and resolved to nothing, because removing it outright does not exclude it:
+        every text containing 新社區 also contains 新社, so dropping the long form
+        while keeping the short one would let the block through unchanged. Keeping
+        it in the pattern lets longest-match consume it and report why.
+        """
+        surfaces: dict[str, dict[str, str]] = {}
+        blocked: dict[str, dict[str, Any]] = {}
+
+        def add(surface: str, county: str, district: str) -> None:
+            node = f"{county}/{district}"
+            if surface and node in self.districts:
+                surfaces.setdefault(surface, {})[county] = node
+
+        def block(surface: str, reason: str, precision: float) -> None:
+            blocked.setdefault(
+                surface,
+                {
+                    "surface": surface,
+                    "skipped": reason,
+                    "job_corpus_precision": precision,
+                    "source": "reports/job-district-extraction.json",
+                },
+            )
+
+        # The graph's own node names are always indexed, so a deployment without
+        # the L4 config still resolves official names and a test fixture does not
+        # need the real table to exercise this path.
+        for node, meta in self.districts.items():
+            county, district = meta.get("county", ""), meta.get("district", "")
+            if not county or not district:
+                continue
+            if district in GENERIC_FULL_NAMES:
+                block(district, "generic_word", GENERIC_FULL_NAMES[district])
+                continue
+            add(district, county, district)
+
+        # The table adds the suffix-dropped forms, which the node names do not
+        # carry, and is the source of record for cross-county fan-out.
+        try:
+            payload = json.loads(self.l4_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            LOGGER.warning("L4 surface table unavailable: %s", type(exc).__name__)
+            payload = {}
+        layers = payload.get("surfaces", {})
+        for layer, excluded, reason in (
+            ("full_name", GENERIC_FULL_NAMES, "generic_word"),
+            ("suffix_dropped", WORD_COLLISION_SURFACES, "word_collision"),
+        ):
+            for surface, per_county in (layers.get(layer) or {}).items():
+                if surface in excluded:
+                    block(surface, reason, excluded[surface])
+                    continue
+                for county, district in per_county.items():
+                    add(surface, county, district)
+
+        # A blocked string that some other layer also registers as a resolvable
+        # surface stays resolvable: the alias and full-name layers each passed a
+        # gate of their own, and the block is about one spelling, not the place.
+        for surface in tuple(blocked):
+            if surface in surfaces or surface in self.aliases:
+                blocked.pop(surface)
+
+        self.text_surfaces = surfaces
+        self.blocked_surfaces = blocked
+        # L3 living areas and L5 landmarks are matched too, but they are not part
+        # of the county-keyed index and are never treated as ambiguous. 東區
+        # naming a different district in four counties is ambiguity; 竹科 naming
+        # 新竹市東區 and 新竹縣寶山鄉 is one place that spans two, and 北海岸 spans
+        # five districts of a single county. Collapsing those by county would
+        # silently keep whichever member happened to be read last.
+        #
+        # The 19 entries flagged requires_occurrence_filter are usable here: that
+        # flag is about matching a bare substring in job text, not about a
+        # searcher naming the place.
+        ordered = sorted(
+            set(surfaces) | set(self.aliases) | set(blocked), key=len, reverse=True
+        )
+        self._text_pattern = (
+            re.compile("|".join(re.escape(surface) for surface in ordered))
+            if ordered
+            else None
+        )
 
     def _load_adjacency(self) -> None:
         """Fill gaps in the behaviour graph with hand-authored land borders.
@@ -501,6 +643,88 @@ class GeoGraph:
                 resolved.setdefault(node, None)
         return tuple(resolved)
 
+    def resolve_text(
+        self, text: str, counties: Iterable[str] = ()
+    ) -> tuple[tuple[str, ...], list[dict[str, Any]]]:
+        """Districts named in free query text, plus what was skipped and why.
+
+        Returns `(districts, notes)`. Longest surface wins at each position, so
+        八里區 is read as the district rather than as the 八里 short form.
+
+        A surface naming districts in several counties does not resolve unless a
+        hint narrows it: 東區 exists in four counties, and picking one would put
+        a place in the searcher's mouth. `counties` accepts whatever the request
+        already knows, such as the county behind a filter code or the location
+        the normalizer read out of the text.
+
+        Every skip is reported in `notes` rather than dropped silently, so the
+        response can say why a place the searcher clearly typed did not expand.
+        """
+        if not self.enabled or not self._text_pattern or not text:
+            return (), []
+        hint = {name for name in counties if name}
+        resolved: dict[str, None] = {}
+        notes: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for match in self._text_pattern.finditer(text):
+            surface = match.group(0)
+            if surface in seen:
+                continue
+            seen.add(surface)
+            # Consulted before anything can resolve, and matched at full length
+            # so a shorter allowed form inside a blocked one cannot defeat it.
+            # A county hint does not lift a block. The hint for 新社區 業務 is
+            # 台中市, but the normalizer read that county out of 新社區 itself, so
+            # treating it as corroboration would just be the same reading twice.
+            blocked = self.blocked_surfaces.get(surface)
+            if blocked is not None:
+                notes.append(dict(blocked))
+                continue
+            # A named group resolves to all of its members. It is one place, so
+            # spanning several districts is the answer rather than a conflict.
+            members = self.resolve_alias(surface)
+            if members:
+                for node in members:
+                    resolved.setdefault(node, None)
+                notes.append(
+                    {
+                        "surface": surface,
+                        "districts": list(members),
+                        "groups": list(self.aliases.get(surface, ())),
+                        "evidence": self.l5_evidence.get(surface),
+                    }
+                )
+                continue
+            per_county = self.text_surfaces.get(surface, {})
+            narrowed = {
+                county: node for county, node in per_county.items() if county in hint
+            }
+            candidates = narrowed or per_county
+            if len(candidates) > 1:
+                notes.append(
+                    {
+                        "surface": surface,
+                        "skipped": "ambiguous",
+                        "counties": sorted(candidates),
+                        "reason": "names a district in more than one county and no hint narrowed it",
+                    }
+                )
+                continue
+            for node in candidates.values():
+                resolved.setdefault(node, None)
+                notes.append(
+                    {
+                        "surface": surface,
+                        "district": node,
+                        # True when the surface named several counties and the
+                        # hint picked one, so a reader can tell an unambiguous
+                        # name from a choice the request made on their behalf.
+                        "narrowed_by_hint": len(per_county) > 1 and bool(narrowed),
+                        "evidence": self.l5_evidence.get(surface),
+                    }
+                )
+        return tuple(resolved), notes
+
     def members_of(self, group_id: str) -> tuple[str, ...]:
         """Districts inside an L1/L3/L5 container. Level is not a distance."""
         group = self.groups.get(group_id)
@@ -583,16 +807,48 @@ class GeoGraph:
         self,
         codes: Iterable[str] | None,
         locations: Mapping[str, Sequence[str]] | None = None,
+        *,
+        query: str = "",
+        counties: Iterable[str] = (),
     ) -> dict[str, Any] | None:
-        """Geo expansion payload for `meta.geo_trace`, or None when not applicable."""
+        """Geo expansion payload for `meta.geo_trace`, or None when not applicable.
+
+        A district can arrive two ways. `codes` is the filter the caller sent,
+        which only resolves when it is district-level. `query` is the text the
+        searcher typed, which is how a place is usually named and which no code
+        path can see.
+
+        A payload is also returned when nothing resolved but a skip was recorded,
+        because "東區 names four counties, so it was not expanded" is the answer
+        to a question the searcher just asked. Silence would read as the graph
+        having no opinion.
+        """
         if not self.enabled:
             return None
-        searched = self.resolve(codes, locations)
-        if not searched:
+        # Callers hand over whatever the request knows about location, which
+        # includes 台灣 and district names as well as counties. Only county names
+        # can narrow a surface, and a field called county_hint should not report
+        # anything else.
+        hint = tuple(
+            dict.fromkeys(name for name in counties if name in self.county_districts)
+        )
+        from_codes = self.resolve(codes, locations)
+        from_text, text_notes = self.resolve_text(query, hint)
+        searched = tuple(dict.fromkeys((*from_codes, *from_text)))
+        skipped = [note for note in text_notes if note.get("skipped")]
+        if not searched and not skipped:
             return None
         expansions = self.expand(searched)
         return {
             "schema": "skillweave-geo-graph-v1",
+            "resolved_from": {
+                "filter_codes": list(from_codes),
+                "query_text": list(from_text),
+            },
+            "query_text_matches": text_notes,
+            # Echoed so a hint-narrowed resolution can be checked against what
+            # the request actually supplied, rather than taken on trust.
+            "county_hint": list(hint),
             "dataset_version": self.metadata.get("dataset_version"),
             "graph_cutoff": self.metadata.get("graph_cutoff"),
             "cutoff_date": self.cutoff_date,

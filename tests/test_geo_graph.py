@@ -8,7 +8,13 @@ from pathlib import Path
 from unittest.mock import patch
 
 import app.lambda_handler as lambda_handler
-from app.geo_graph import GeoGraph, build_geo_graph, get_expanded_locations
+from app.geo_graph import (
+    GENERIC_FULL_NAMES,
+    WORD_COLLISION_SURFACES,
+    GeoGraph,
+    build_geo_graph,
+    get_expanded_locations,
+)
 from app.lambda_handler import handler
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -668,6 +674,256 @@ class SpecInterfaceTests(unittest.TestCase):
         early = fixture_graph(cutoff_date="2026-01-01")
         self.assertNotIn(
             "乙縣/己區", {r.district for r in early.expand(["甲市/一區"])}
+        )
+
+
+class QueryTextResolutionTests(unittest.TestCase):
+    """A searcher names a place by typing it far more often than by sending a code.
+
+    Two things this has to keep apart, because conflating them was the original
+    bug. A surface naming a *different* district in several counties is ambiguous
+    and must not resolve on a guess. A surface naming *one place that spans*
+    several districts is not ambiguous at all, and every member is the answer.
+    """
+
+    def test_a_node_name_in_the_query_resolves(self) -> None:
+        districts, _ = fixture_graph().resolve_text("一區 銀行辦事員")
+        self.assertEqual(districts, ("甲市/一區",))
+
+    def test_a_group_alias_resolves_to_every_member(self) -> None:
+        # 通過園區 spans two districts in two counties. Keying the surface index
+        # by county collapsed this to whichever member was read last.
+        districts, _ = fixture_graph().resolve_text("通過園區 工程師")
+        self.assertEqual(set(districts), {"甲市/乙區", "乙縣/丁區"})
+
+    def test_a_living_area_alias_resolves_to_every_member(self) -> None:
+        districts, _ = fixture_graph().resolve_text("測試生活圈 服務員")
+        self.assertEqual(set(districts), {"甲市/一區", "甲市/乙區"})
+
+    def test_a_rejected_site_alias_stays_unresolvable_from_text(self) -> None:
+        districts, _ = fixture_graph().resolve_text("退回園區 作業員")
+        self.assertEqual(districts, ())
+
+    def test_text_with_no_place_name_resolves_to_nothing(self) -> None:
+        districts, notes = fixture_graph().resolve_text("銀行辦事員")
+        self.assertEqual(districts, ())
+        self.assertEqual(notes, [])
+
+    def test_longest_surface_wins_at_a_position(self) -> None:
+        graph = fixture_graph()
+        # 通過園區 must be read as the site rather than as a bare 園區 fragment.
+        districts, notes = graph.resolve_text("通過園區")
+        self.assertEqual({note["surface"] for note in notes}, {"通過園區"})
+        self.assertEqual(set(districts), {"甲市/乙區", "乙縣/丁區"})
+
+    def test_trace_records_which_source_produced_each_district(self) -> None:
+        graph = fixture_graph()
+        trace = graph.trace(["900101"], query="通過園區")
+        self.assertEqual(trace["resolved_from"]["filter_codes"], ["甲市/一區"])
+        self.assertEqual(
+            set(trace["resolved_from"]["query_text"]), {"甲市/乙區", "乙縣/丁區"}
+        )
+        # A district reached by both routes is not searched twice.
+        self.assertEqual(
+            len(trace["searched_districts"]), len(set(trace["searched_districts"]))
+        )
+
+    def test_disabled_graph_resolves_no_text(self) -> None:
+        graph = GeoGraph(ROOT / "artifacts" / "definitely-absent.json")
+        self.assertEqual(graph.resolve_text("一區"), ((), []))
+
+
+class QueryTextArtifactTests(unittest.TestCase):
+    """The real surface index, including the exclusions the corpus measured."""
+
+    def setUp(self) -> None:
+        if not ARTIFACT.is_file() or not L4_TABLE.is_file():
+            self.skipTest("geo artifacts not present")
+        self.graph = build_geo_graph(ARTIFACT, AUTHORED)
+
+    def test_the_spec_example_resolves_from_text_alone(self) -> None:
+        districts, _ = self.graph.resolve_text("八里區 銀行辦事員")
+        self.assertEqual(districts, ("新北市/八里區",))
+
+    def test_the_suffix_dropped_form_also_resolves(self) -> None:
+        districts, _ = self.graph.resolve_text("八里 銀行辦事員")
+        self.assertEqual(districts, ("新北市/八里區",))
+
+    def test_a_park_alias_spanning_two_counties_resolves_to_both(self) -> None:
+        districts, _ = self.graph.resolve_text("竹科 工程師")
+        self.assertEqual(set(districts), {"新竹市/東區", "新竹縣/寶山鄉"})
+
+    def test_a_living_area_resolves_to_all_five_of_its_districts(self) -> None:
+        districts, _ = self.graph.resolve_text("北海岸 服務員")
+        self.assertEqual(
+            set(districts),
+            {
+                "新北市/淡水區",
+                "新北市/三芝區",
+                "新北市/石門區",
+                "新北市/金山區",
+                "新北市/萬里區",
+            },
+        )
+
+    def test_a_name_shared_by_several_counties_needs_a_hint(self) -> None:
+        # 東區 is a district in 台中, 台南, 嘉義 and 新竹. Picking one would put a
+        # place in the searcher's mouth.
+        districts, notes = self.graph.resolve_text("東區 店員")
+        self.assertEqual(districts, ())
+        skipped = [note for note in notes if note.get("skipped") == "ambiguous"]
+        self.assertEqual([note["surface"] for note in skipped], ["東區"])
+        self.assertGreater(len(skipped[0]["counties"]), 1)
+
+    def test_the_hint_resolves_the_shared_name(self) -> None:
+        districts, notes = self.graph.resolve_text("東區 店員", ("台南市",))
+        self.assertEqual(districts, ("台南市/東區",))
+        # Flagged, because a reader has to be able to tell a name that stood on
+        # its own from one the request chose on the searcher's behalf.
+        self.assertIs(notes[0]["narrowed_by_hint"], True)
+
+    def test_an_unambiguous_name_is_not_marked_as_hint_narrowed(self) -> None:
+        _, notes = self.graph.resolve_text("八里區 銀行辦事員", ("新北市",))
+        self.assertIs(notes[0]["narrowed_by_hint"], False)
+
+    def test_word_collision_surfaces_never_resolve(self) -> None:
+        # Ordinary words or the commonest street names in Taiwan, not places.
+        for surface in WORD_COLLISION_SURFACES:
+            districts, notes = self.graph.resolve_text(f"{surface} 業務")
+            self.assertEqual(districts, (), surface)
+            self.assertEqual(
+                [note["skipped"] for note in notes], ["word_collision"], surface
+            )
+
+    def test_a_word_collision_still_resolves_at_its_full_official_name(self) -> None:
+        # The block is on one spelling, not on the place. 中山 is a road name
+        # everywhere; 中山區 is a district, ambiguous only across two counties.
+        districts, _ = self.graph.resolve_text("中山區 業務", ("台北市",))
+        self.assertEqual(districts, ("台北市/中山區",))
+
+    def test_a_generic_official_name_is_excluded_outright(self) -> None:
+        for surface in GENERIC_FULL_NAMES:
+            districts, notes = self.graph.resolve_text(f"{surface} 業務")
+            self.assertEqual(districts, (), surface)
+            self.assertEqual(
+                [note["skipped"] for note in notes], ["generic_word"], surface
+            )
+
+    def test_a_block_is_not_defeated_by_a_shorter_form_inside_it(self) -> None:
+        # The bug this guards: 新社區 was dropped from the index instead of being
+        # blocked in the pattern, so every 新社區 matched the surviving 新社 and
+        # resolved anyway. 新社 on its own is a place name and stays usable.
+        blocked, notes = self.graph.resolve_text("新社區 業務")
+        self.assertEqual(blocked, ())
+        self.assertEqual([note["surface"] for note in notes], ["新社區"])
+        allowed, _ = self.graph.resolve_text("新社 農場")
+        self.assertEqual(allowed, ("台中市/新社區",))
+
+    def test_every_blocked_surface_carries_its_measured_precision(self) -> None:
+        report = json.loads(
+            (ROOT / "reports" / "job-district-extraction.json").read_text("utf-8")
+        )
+        measured = {
+            row["surface"]: row["precision"]
+            for key in ("suffix_dropped_rejected", "full_name_rejected")
+            for row in report[key]
+        }
+        self.assertTrue(self.graph.blocked_surfaces)
+        for surface, note in self.graph.blocked_surfaces.items():
+            # A number in a comment that the checked-in report does not carry is
+            # a claim about the data that nobody can audit.
+            self.assertIn(surface, measured, surface)
+            self.assertAlmostEqual(
+                note["job_corpus_precision"], measured[surface], places=4, msg=surface
+            )
+
+    def test_no_blocked_surface_is_also_resolvable(self) -> None:
+        overlap = set(self.graph.blocked_surfaces) & (
+            set(self.graph.text_surfaces) | set(self.graph.aliases)
+        )
+        self.assertEqual(overlap, set())
+
+    def test_a_rural_name_the_job_side_gate_rejected_still_resolves(self) -> None:
+        # 七美鄉 was rejected for the job corpus on one posting of evidence, which
+        # is a sample-size verdict rather than a word-collision one. A searcher
+        # who types it means it.
+        districts, _ = self.graph.resolve_text("七美鄉 廚師")
+        self.assertEqual(districts, ("澎湖縣/七美鄉",))
+
+    def test_text_resolution_reaches_the_expansion_the_spec_predicts(self) -> None:
+        trace = self.graph.trace(None, query="八里區 銀行辦事員")
+        self.assertEqual(trace["resolved_from"]["query_text"], ["新北市/八里區"])
+        self.assertEqual(trace["resolved_from"]["filter_codes"], [])
+        nearest = trace["expansions"][0]
+        self.assertEqual(nearest["district"], "新北市/淡水區")
+        self.assertIs(trace["applied_to_ranking"], False)
+
+
+class QueryTextContractTests(unittest.TestCase):
+    def search(self, body: dict) -> dict:
+        result = handler(event("POST", "/api/v1/jobs/search", body), None)
+        self.assertEqual(result["statusCode"], 200)
+        return json.loads(result["body"])
+
+    def test_a_typed_district_produces_a_geo_trace(self) -> None:
+        if not lambda_handler.GEO_GRAPH.enabled:
+            self.skipTest("district graph artifact not available")
+        body = self.search({"query": "八里區 銀行辦事員", "top_k": 5})
+        self.assertIn("request_id", body)
+        self.assertIn("empStr", body)
+        trace = body["meta"]["geo_trace"]
+        self.assertEqual(trace["resolved_from"]["query_text"], ["新北市/八里區"])
+        self.assertIs(trace["applied_to_ranking"], False)
+
+    def test_an_ambiguous_typed_name_expands_nothing_but_says_why(self) -> None:
+        if not lambda_handler.GEO_GRAPH.enabled:
+            self.skipTest("district graph artifact not available")
+        trace = self.search({"query": "東區 店員"})["meta"]["geo_trace"]
+        self.assertEqual(trace["searched_districts"], [])
+        self.assertEqual(trace["expansions"], [])
+        note = trace["query_text_matches"][0]
+        self.assertEqual(note["surface"], "東區")
+        self.assertEqual(note["skipped"], "ambiguous")
+        self.assertGreater(len(note["counties"]), 1)
+
+    def test_a_query_naming_no_place_carries_no_geo_trace(self) -> None:
+        if not lambda_handler.GEO_GRAPH.enabled:
+            self.skipTest("district graph artifact not available")
+        self.assertNotIn("geo_trace", self.search({"query": "銀行辦事員"})["meta"])
+
+    def test_a_county_filter_narrows_an_ambiguous_typed_name(self) -> None:
+        """The filter code supplies the county the text could not.
+
+        100600 is 新竹市, which is a county code and so resolves no district of
+        its own. It is still the evidence that decides which 東區 was meant, and
+        that only works if `Ranker.county_hints` and the graph's county keys
+        agree on spelling after normalisation.
+        """
+        if not lambda_handler.GEO_GRAPH.enabled:
+            self.skipTest("district graph artifact not available")
+        trace = self.search({"query": "東區 店員", "location_code": ["100600"]})["meta"][
+            "geo_trace"
+        ]
+        # 台灣 and 東區 also arrive from the request; neither is a county, and a
+        # field named county_hint must not report them as one.
+        self.assertEqual(trace["county_hint"], ["新竹市"])
+        self.assertEqual(trace["resolved_from"]["filter_codes"], [])
+        self.assertEqual(trace["resolved_from"]["query_text"], ["新竹市/東區"])
+        self.assertIs(trace["query_text_matches"][0]["narrowed_by_hint"], True)
+
+    def test_ranking_is_unchanged_by_text_resolution(self) -> None:
+        if not lambda_handler.GEO_GRAPH.enabled:
+            self.skipTest("district graph artifact not available")
+        body = {"query": "八里區 銀行辦事員", "top_k": 10}
+        with_graph = self.search(body)
+        self.assertIn("geo_trace", with_graph["meta"])
+        disabled = GeoGraph(ROOT / "artifacts" / "definitely-absent.json")
+        with patch.object(lambda_handler, "GEO_GRAPH", disabled):
+            without_graph = self.search(body)
+        self.assertNotIn("geo_trace", without_graph["meta"])
+        self.assertEqual(
+            [row["job_id"] for row in with_graph["result"]],
+            [row["job_id"] for row in without_graph["result"]],
         )
 
 

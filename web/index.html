@@ -58,15 +58,30 @@
               <span>地區</span>
               <select id="location">
                 <option value="">全台灣</option>
-                <option value="100100">台北市</option>
-                <option value="100200">新北市</option>
-                <option value="100500">桃園市</option>
-                <option value="100600">新竹市</option>
-                <option value="100700">新竹縣</option>
-                <option value="100300">基隆市</option>
-                <option value="102000">屏東縣</option>
-                <option value="100900">台中市</option>
-                <option value="101800">高雄市</option>
+                <optgroup label="縣市">
+                  <option value="100100">台北市</option>
+                  <option value="100200">新北市</option>
+                  <option value="100500">桃園市</option>
+                  <option value="100600">新竹市</option>
+                  <option value="100700">新竹縣</option>
+                  <option value="100300">基隆市</option>
+                  <option value="102000">屏東縣</option>
+                  <option value="100900">台中市</option>
+                  <option value="101800">高雄市</option>
+                </optgroup>
+                <!-- District codes are what the geo graph resolves; a
+                     county-level code carries region_trace only. -->
+                <optgroup label="行政區">
+                  <option value="100226">新北市 八里區</option>
+                  <option value="100227">新北市 淡水區</option>
+                  <option value="100217">新北市 三峽區</option>
+                  <option value="100203">新北市 板橋區</option>
+                  <option value="100110">台北市 內湖區</option>
+                  <option value="100601">新竹市 東區</option>
+                  <option value="100508">桃園市 龜山區</option>
+                  <option value="100907">台中市 西屯區</option>
+                  <option value="101808">高雄市 三民區</option>
+                </optgroup>
               </select>
             </label>
             <label>
@@ -91,6 +106,9 @@
           <button data-query="門市人員">門市人員</button>
           <button data-query="資料分析 SQL">資料分析 SQL</button>
           <button data-query="AWS Docker Kubernetes">AWS 雲端技能</button>
+          <button data-query="八里區 銀行辦事員">八里區 銀行辦事員</button>
+          <button data-query="竹科 工程師">竹科 工程師</button>
+          <button data-query="北海岸 服務員">北海岸 服務員</button>
           <button data-query="React 前端工程師">React 前端工程師</button>
         </div>
       </section>

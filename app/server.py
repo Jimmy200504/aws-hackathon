@@ -176,9 +176,15 @@ class Handler(BaseHTTPRequestHandler):
             region_trace = self.region_graph.trace(location, self.ranker.locations)
             if region_trace is not None:
                 response["meta"]["region_trace"] = region_trace
-            # District level, same additive rule: omitted unless a searched code
-            # is a district code. County-only searches carry region_trace alone.
-            geo_trace = self.geo_graph.trace(location, self.ranker.locations)
+            # District level, same additive rule. A district can arrive either as
+            # a district filter code or as text the searcher typed, so both are
+            # offered; the county hint disambiguates surfaces such as 東區.
+            geo_trace = self.geo_graph.trace(
+                location,
+                self.ranker.locations,
+                query=query,
+                counties=self.ranker.county_hints(result["intent"]),
+            )
             if geo_trace is not None:
                 response["meta"]["geo_trace"] = geo_trace
             if path == "/api/v1/graph/trace":

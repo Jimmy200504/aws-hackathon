@@ -156,7 +156,17 @@ def search(event: dict[str, Any], trace: bool = False) -> dict[str, Any]:
     region_trace = REGION_GRAPH.trace(location, RANKER.locations)
     if region_trace is not None:
         payload["meta"]["region_trace"] = region_trace
-    geo_trace = GEO_GRAPH.trace(location, RANKER.locations)
+    # The searcher usually names a place by typing it, not by sending a
+    # district code, so the raw query is passed in as a second source. The
+    # county hint lets an ambiguous surface resolve: 東區 names a district in
+    # four counties, and 台南市 in the filter or the normalizer's reading is
+    # what decides which one was meant.
+    geo_trace = GEO_GRAPH.trace(
+        location,
+        RANKER.locations,
+        query=query,
+        counties=RANKER.county_hints(ranked["intent"]),
+    )
     if geo_trace is not None:
         payload["meta"]["geo_trace"] = geo_trace
     if trace:
