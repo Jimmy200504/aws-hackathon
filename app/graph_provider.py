@@ -1,12 +1,25 @@
-"""Online alias resolution and one-hop Neptune Analytics graph features."""
+"""Online alias resolution and one-hop graph features.
+
+Two backends implement the same one-hop RELATED_TO expansion contract
+(``expand(query, fallback_ids) -> GraphExpansion``):
+
+- ``GraphFeatureProvider``: queries Neptune Analytics live (AWS deployment).
+- ``LocalGraphProvider``: queries a local SQLite index built by
+  ``scripts/build_local_graph_index.py`` from a full deterministic Skill
+  Graph build, so a user who never deploys AWS still gets the full
+  production-scale graph instead of the 63-node bootstrap fixture embedded
+  in ``artifacts/demo-index.json``. See the README for the fallback order.
+"""
 from __future__ import annotations
 
 import json
 import logging
 import os
 import re
+import sqlite3
 import unicodedata
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Iterable
 
 from app.retrieval import OpenSearchRetriever
@@ -265,3 +278,153 @@ class GraphFeatureProvider:
                 version=self.graph_version,
                 degraded_components=[*degraded, "neptune"],
             )
+
+
+class LocalGraphProvider:
+    """One-hop RELATED_TO expansion from a local SQLite index.
+
+    Reads the compact index produced by ``scripts/build_local_graph_index.py``
+    (downloaded via ``scripts/download_local_graph_index.py``). This gives a
+    non-AWS user the full statistically-derived skill graph instead of the
+    63-node bootstrap fixture, while remaining a plain-file, dependency-free
+    read (``sqlite3`` is part of the Python standard library).
+
+    The index stores RELATED_TO edges directionally as extracted
+    (``source_id -> target_id``), one row per ordered pair. Neptune's live
+    query is undirected (``-[edge:RELATED_TO]-``), so this provider mirrors
+    that behavior by looking up both directions and reporting the match
+    fields from whichever row exists.
+    """
+
+    def __init__(self, index_path: str | Path, *, graph_version: str = "") -> None:
+        self.index_path = Path(index_path)
+        if not self.index_path.is_file():
+            raise ValueError(f"local graph index does not exist: {self.index_path}")
+        self.connection = sqlite3.connect(str(self.index_path), check_same_thread=False)
+        self.connection.row_factory = sqlite3.Row
+        self.graph_version = graph_version or self._read_metadata("graph_version") or ""
+
+    def _read_metadata(self, key: str) -> Any:
+        row = self.connection.execute(
+            "SELECT value FROM metadata WHERE key = ?", (key,)
+        ).fetchone()
+        if row is None:
+            return None
+        try:
+            return json.loads(row["value"])
+        except (TypeError, ValueError):
+            return row["value"]
+
+    @classmethod
+    def from_environment(cls) -> "LocalGraphProvider | None":
+        index_path = os.getenv("LOCAL_GRAPH_INDEX_PATH", "").strip()
+        if not index_path:
+            return None
+        path = Path(index_path)
+        if not path.is_file():
+            LOGGER.warning(
+                "LOCAL_GRAPH_INDEX_PATH is set but the file does not exist: %s. "
+                "Run scripts/download_local_graph_index.py or "
+                "scripts/build_local_graph_index.py to create it.",
+                path,
+            )
+            return None
+        try:
+            return cls(path, graph_version=os.getenv("GRAPH_VERSION", ""))
+        except Exception as exc:
+            LOGGER.warning(
+                "Failed to open local graph index %s: %s", path, type(exc).__name__
+            )
+            return None
+
+    def _related_rows(self, skill_id: str) -> list[sqlite3.Row]:
+        return self.connection.execute(
+            """
+            SELECT source_id, target_id, edge_id, weight, confidence,
+                   support_jobs, support_companies, evidence,
+                   rules_version, corpus_hash
+            FROM relations
+            WHERE source_id = ? OR target_id = ?
+            """,
+            (skill_id, skill_id),
+        ).fetchall()
+
+    def expand(self, query: str, fallback_ids: Iterable[str] = ()) -> GraphExpansion:
+        ids = tuple(dict.fromkeys(fallback_ids))[:8]
+        if not ids:
+            return GraphExpansion(
+                backend="local_sqlite_index",
+                version=self.graph_version,
+            )
+        try:
+            relations: dict[str, dict[str, dict[str, Any]]] = {}
+            for skill_id in ids:
+                for row in self._related_rows(skill_id):
+                    source = str(row["source_id"])
+                    target = str(row["target_id"])
+                    # Mirror both directions so a lookup from either endpoint
+                    # finds the edge, matching Neptune's undirected query.
+                    other = target if source == skill_id else source
+                    if not other or other == skill_id:
+                        continue
+                    payload = {
+                        "edge_id": str(row["edge_id"]),
+                        "relation_type": "RELATED_TO",
+                        "weight": float(row["weight"]),
+                        "confidence": float(row["confidence"]),
+                        "support_jobs": int(row["support_jobs"]),
+                        "support_companies": int(row["support_companies"]),
+                        "evidence": self._decode_evidence(row["evidence"]),
+                        "rules_version": str(row["rules_version"]),
+                        "corpus_hash": str(row["corpus_hash"]),
+                        "provenance": {},
+                    }
+                    relations.setdefault(skill_id, {})[other] = payload
+            return GraphExpansion(
+                canonical_ids=ids,
+                relations=relations,
+                backend="local_sqlite_index",
+                version=self.graph_version,
+            )
+        except Exception as exc:
+            LOGGER.warning(
+                "Local graph index expansion failed safely: %s: %s",
+                type(exc).__name__,
+                exc,
+            )
+            return GraphExpansion(
+                canonical_ids=ids,
+                backend="local_sqlite_index",
+                version=self.graph_version,
+                degraded_components=["local_graph_index"],
+            )
+
+    @staticmethod
+    def _decode_evidence(value: Any) -> Any:
+        if not isinstance(value, str):
+            return value if value is not None else []
+        try:
+            return json.loads(value)
+        except (TypeError, ValueError):
+            return value
+
+
+def resolve_graph_provider() -> "GraphFeatureProvider | LocalGraphProvider | None":
+    """Pick a live one-hop RELATED_TO expansion backend by environment config.
+
+    Priority order (config-driven, no code change needed to switch tiers):
+
+    1. ``NEPTUNE_GRAPH_ID`` set -> ``GraphFeatureProvider`` (AWS deployment).
+    2. ``LOCAL_GRAPH_INDEX_PATH`` set and the file exists ->
+       ``LocalGraphProvider`` (full statistically-derived graph, no AWS
+       required; see scripts/download_local_graph_index.py).
+    3. Neither configured -> ``None``. Callers must treat ``None`` the same
+       way as before: ``app.ranker.SkillWeaveRanker.search`` falls back to
+       the 63-node bootstrap fixture embedded in the demo index
+       (``self.skills[...]["related"]``) whenever ``external_relations`` is
+       not supplied.
+    """
+    provider = GraphFeatureProvider.from_environment()
+    if provider is not None:
+        return provider
+    return LocalGraphProvider.from_environment()

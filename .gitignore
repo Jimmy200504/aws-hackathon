@@ -40,6 +40,13 @@ artifacts/skill-graph-full-v2/release/runs/*/*/neptune/
 artifacts/skill-graph-full-v2/release/runs/*/*/nodes/
 artifacts/skill-graph-full-v2/release/runs/*/*/review/
 artifacts/models/*
+
+# Locally-built or downloaded RELATED_TO skill graph index for
+# LocalGraphProvider (see scripts/build_local_graph_index.py and
+# scripts/download_local_graph_index.py). Distributed as a GitHub Release
+# asset, not committed to the repository.
+artifacts/skill-graph-local-index.sqlite3
+artifacts/skill-graph-local-index.sqlite3.manifest.json
 !artifacts/models/ltr-graph-final.ubj
 !artifacts/models/ltr-graph-final.manifest.json
 !artifacts/models/ltr-quality-final.ubj
@@ -67,6 +74,35 @@ snapshots/
 # Throwaway resume helper generated during an interrupted index run.
 RESUME-INDEX.sh
 .agents/
+
+# AI assistant workspace state; not part of the deployable project.
+.kiro/
+.claude/
+
+# Hackathon submission/evaluation evidence; not needed to clone, deploy, or
+# run the project. See docs/README-equivalent links for what remains.
+reports/
+video/
+skills-lock.json
+
+# Dataset walkthrough/cleaning notes for the organizer-provided CSVs; the
+# CSVs themselves are already excluded above. Not referenced by any script.
+data/dataset/README.md
+data/dataset/clean_search_log.py
+data/dataset/cleaning_report.txt
+
+# Hackathon submission-only docs; not linked from README.md and not needed
+# to deploy or operate the project.
+docs/business-case.md
+docs/demo-script.md
+docs/evidence-index.md
+docs/graph-coverage.md
+docs/judge-pitch.md
+docs/kiro-evidence.md
+docs/reference_link.md
+docs/rubric-gap-analysis.md
+docs/submission-checklist.md
+docs/submission-packet.md
 
 # Internal development notes; not part of the judged submission.
 notes/

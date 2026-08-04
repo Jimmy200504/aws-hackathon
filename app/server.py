@@ -12,6 +12,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
+from app.graph_provider import GraphExpansion, GraphFeatureProvider, resolve_graph_provider
 from app.query_normalizer import BedrockQueryNormalizer
 from app.ranker import SkillWeaveRanker
 from app.retrieval import OpenSearchRetriever, hybrid_retrieval_meta
@@ -31,6 +32,7 @@ FULL_CORPUS_JOB_COUNT = max(
 class Handler(BaseHTTPRequestHandler):
     ranker: SkillWeaveRanker
     query_normalizer: BedrockQueryNormalizer
+    graph_provider: "GraphFeatureProvider | object | None" = None
     server_version = "SkillWeave/0.1"
 
     def _json(self, body: dict, status: int = HTTPStatus.OK) -> None:
@@ -69,6 +71,13 @@ class Handler(BaseHTTPRequestHandler):
                     ),
                     "full_corpus_retrieval": self.ranker.candidate_retriever is not None,
                     "bedrock_query_normalization": self.query_normalizer.enabled,
+                    "graph_backend": (
+                        "neptune_analytics"
+                        if isinstance(self.graph_provider, GraphFeatureProvider)
+                        else "local_sqlite_index"
+                        if self.graph_provider is not None
+                        else "embedded_artifact"
+                    ),
                     "query_intent_cache": self.query_normalizer.batch_stats,
                 }
             )
@@ -134,6 +143,18 @@ class Handler(BaseHTTPRequestHandler):
             if not isinstance(include_graph, bool):
                 raise ValueError("use_graph must be boolean")
             normalization = self.query_normalizer.normalize(query)
+            embedded_graph_version = self.ranker.metadata.get(
+                "graph_version", self.ranker.metadata.get("index_version", "")
+            )
+            graph = GraphExpansion(
+                backend="embedded_artifact",
+                version=str(embedded_graph_version),
+            )
+            if include_graph and self.graph_provider is not None:
+                fallback_ids = self.ranker.parse_intent(
+                    query, location, duty, normalized_query=normalization.query
+                ).skills
+                graph = self.graph_provider.expand(normalization.query, fallback_ids)
             result = self.ranker.search(
                 query=query,
                 location_code=location,
@@ -141,6 +162,10 @@ class Handler(BaseHTTPRequestHandler):
                 top_k=top_k,
                 include_graph=include_graph,
                 normalized_query=normalization.query,
+                resolved_skill_ids=graph.canonical_ids or None,
+                external_relations=(
+                    graph.relations if self.graph_provider is not None else None
+                ),
                 structured_intent=normalization.intent,
             )
             request_id = "req_" + uuid.uuid4().hex[:16]
@@ -154,12 +179,14 @@ class Handler(BaseHTTPRequestHandler):
                     "count": len(rows),
                     "latency_ms": elapsed_ms,
                     "graph_enabled": include_graph,
+                    "graph_backend": graph.backend if include_graph else "disabled",
+                    "graph_version": graph.version,
                     "resolved_skills": list(result["intent"].skills),
                     "index_version": self.ranker.metadata.get("index_version"),
                     "candidate_source": result["candidate_source"],
                     "retrieval_mode": result.get("retrieval_mode", "embedded_index"),
                     "degraded_components": normalization.merge_degraded_components(
-                        result["degraded_components"]
+                        [*result["degraded_components"], *graph.degraded_components]
                     ),
                     "query_normalization": normalization.metadata(),
                 },
@@ -242,6 +269,7 @@ def main() -> None:
         ltr_model_path=args.ltr_model,
         candidate_retriever=OpenSearchRetriever.from_environment(),
     )
+    Handler.graph_provider = resolve_graph_provider()
     # This process serves many concurrent requests, which is the only shape
     # where coalescing pays off: the library default is tuned for Lambda, where
     # one invocation serves one request and a long window is pure added latency.
