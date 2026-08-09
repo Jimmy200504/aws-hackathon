@@ -89,9 +89,31 @@ aws sts get-caller-identity
 | `LTR_MODEL_PATH` | `artifacts/models/ltr-quality-final.trees.json` | 本機可攜式 LTR 模型 |
 | `OPENSEARCH_ENDPOINT` | 空值 | 設定後改查完整職缺索引 |
 | `OPENSEARCH_INDEX` | `skillweave-jobs-v1` | OpenSearch index 名稱 |
-| `NEPTUNE_GRAPH_ID` | 空值 | Lambda 使用的 Neptune Analytics graph；未設定時改用內嵌圖譜 |
+| `NEPTUNE_GRAPH_ID` | 空值 | Lambda 使用的 Neptune Analytics graph；未設定時改用下一層 fallback |
+| `LOCAL_GRAPH_INDEX_PATH` | 空值 | 本機 SQLite 圖譜索引路徑；`NEPTUNE_GRAPH_ID` 未設定時的第二層 fallback |
 | `GRAPH_VERSION` | 空值 | API 回應與發行驗證使用的圖譜版本 |
 | `GRAPH_QUERY_TIMEOUT_MS` | `150` | Neptune 查詢逾時毫秒數 |
+
+### Skill Graph 三層 fallback（不部署 AWS 也能用完整圖譜）
+
+`app/graph_provider.py::resolve_graph_provider()` 依環境變數決定要用哪個 backend，不需要改程式碼：
+
+1. 設定了 `NEPTUNE_GRAPH_ID` → `GraphFeatureProvider`，即時查詢 AWS Neptune Analytics（正式環境用）。
+2. 沒設 `NEPTUNE_GRAPH_ID`，但 `LOCAL_GRAPH_INDEX_PATH` 指到存在的檔案 → `LocalGraphProvider`，改讀本機 SQLite 索引；內容是同一份完整的統計 `RELATED_TO` 圖譜（見「版本對照」的正式環境圖譜列），只是不需要部署 AWS。
+3. 兩者都沒設 → 回退到 `artifacts/demo-index.json` 內嵌的 63-node bootstrap fixture。
+
+沒有 AWS 帳號、只想在本機測滿版圖譜效果時，下載發行版附的索引檔並指過去即可：
+
+```bash
+python scripts/download_local_graph_index.py \
+  --index-url <GitHub Release 上 skill-graph-local-index.sqlite3 的網址> \
+  --sha256 <該次 release 附的 SHA-256>
+
+export LOCAL_GRAPH_INDEX_PATH=artifacts/skill-graph-local-index.sqlite3
+make demo
+```
+
+下載腳本會核對 SHA-256，檔案不符時會直接刪除並報錯，不會留下半個檔案。想自己從一次完整圖譜建置產生索引，改用 `scripts/build_local_graph_index.py`（輸入是 `run_full_graph_build.py` 的輸出）。
 
 ## 執行與 API 範例
 
@@ -346,7 +368,6 @@ tests/      單元與整合測試
 docs/       架構、data card、schema、操作手冊
 ```
 
-- [評估報告索引](reports/README.md)
 - [資料卡與限制](docs/data-card.md)
 - [AWS 架構](docs/aws-architecture.md)
 - [Skill Graph schema](docs/graph-schema.md)
