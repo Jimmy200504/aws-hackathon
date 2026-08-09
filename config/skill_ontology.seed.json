@@ -3,388 +3,1301 @@
   "provenance": {
     "kind": "reviewed-bootstrap",
     "purpose": "Highest-priority reviewed serving ontology for deterministic extraction",
-    "warning": "Production merges require a unique exact reviewed alias. Unknown surfaces remain review candidates and never enter the serving graph."
+    "warning": "Production merges require a unique exact reviewed alias. Unknown surfaces remain review candidates and never enter the serving graph.",
+    "expansion": {
+      "kind": "reviewed-statistical-candidates",
+      "source": "review/surface-candidates from the deterministic full-corpus build",
+      "corpus": "1111-2026-06-01_2026-06-07 (1,218,635 jobs)",
+      "method": "human review of statistically supported surfaces; no LLM or embedding involved"
+    }
   },
   "skills": {
     "occupation.admin": {
       "type": "Occupation",
       "label": "行政",
-      "aliases": ["行政人員", "行政助理", "行政專員", "administration"],
-      "related": {"skill.office": 0.82, "skill.document": 0.84, "occupation.hr": 0.48}
+      "aliases": [
+        "行政人員",
+        "行政助理",
+        "行政專員",
+        "administration"
+      ],
+      "related": {
+        "skill.office": 0.82,
+        "skill.document": 0.84,
+        "occupation.hr": 0.48
+      }
     },
     "occupation.driver": {
       "type": "Occupation",
       "label": "司機",
-      "aliases": ["送貨司機", "大貨車司機", "小貨車司機", "職業駕駛", "driver"],
-      "related": {"skill.delivery": 0.9, "skill.forklift": 0.35}
+      "aliases": [
+        "送貨司機",
+        "大貨車司機",
+        "小貨車司機",
+        "職業駕駛",
+        "driver"
+      ],
+      "related": {
+        "skill.delivery": 0.9,
+        "skill.forklift": 0.35
+      }
     },
     "occupation.operator": {
       "type": "Occupation",
       "label": "作業員",
-      "aliases": ["包裝員", "產線作業員", "生產作業員", "技術員", "operator"],
-      "related": {"skill.packaging": 0.89, "skill.quality": 0.45, "skill.forklift": 0.34}
+      "aliases": [
+        "包裝員",
+        "產線作業員",
+        "生產作業員",
+        "技術員",
+        "operator"
+      ],
+      "related": {
+        "skill.packaging": 0.89,
+        "skill.quality": 0.45,
+        "skill.forklift": 0.34
+      }
     },
     "occupation.retail": {
       "type": "Occupation",
       "label": "門市人員",
-      "aliases": ["店員", "門市店員", "專櫃人員", "門市／店員／專櫃人員", "retail"],
-      "related": {"skill.customer_service": 0.87, "skill.pos": 0.83, "skill.sales": 0.62}
+      "aliases": [
+        "店員",
+        "門市店員",
+        "專櫃人員",
+        "門市／店員／專櫃人員",
+        "retail"
+      ],
+      "related": {
+        "skill.customer_service": 0.87,
+        "skill.pos": 0.83,
+        "skill.sales": 0.62
+      }
     },
     "occupation.food_service": {
       "type": "Occupation",
       "label": "餐飲服務",
-      "aliases": ["餐飲服務人員", "服務員", "外場人員", "內場人員", "餐廚助手"],
-      "related": {"skill.customer_service": 0.61, "skill.food_safety": 0.86, "skill.pos": 0.42}
+      "aliases": [
+        "餐飲服務人員",
+        "服務員",
+        "外場人員",
+        "內場人員",
+        "餐廚助手"
+      ],
+      "related": {
+        "skill.customer_service": 0.61,
+        "skill.food_safety": 0.86,
+        "skill.pos": 0.42
+      }
     },
     "occupation.security": {
       "type": "Occupation",
       "label": "保全",
-      "aliases": ["保全人員", "警衛", "駐衛保全", "security guard"],
-      "related": {"skill.surveillance": 0.88, "skill.customer_service": 0.32}
+      "aliases": [
+        "保全人員",
+        "警衛",
+        "駐衛保全",
+        "security guard"
+      ],
+      "related": {
+        "skill.surveillance": 0.88,
+        "skill.customer_service": 0.32
+      }
     },
     "occupation.nurse": {
       "type": "Occupation",
       "label": "護理師",
-      "aliases": ["護士", "護理人員", "registered nurse", "rn"],
-      "related": {"skill.patient_care": 0.94, "skill.clinic": 0.72}
+      "aliases": [
+        "護士",
+        "護理人員",
+        "registered nurse",
+        "rn"
+      ],
+      "related": {
+        "skill.patient_care": 0.94,
+        "skill.clinic": 0.72
+      }
     },
     "occupation.accounting": {
       "type": "Occupation",
       "label": "會計",
-      "aliases": ["會計人員", "會計助理", "記帳人員", "出納", "accountant"],
-      "related": {"skill.accounting": 0.96, "skill.excel": 0.73, "skill.erp": 0.55}
+      "aliases": [
+        "會計人員",
+        "會計助理",
+        "記帳人員",
+        "出納",
+        "accountant"
+      ],
+      "related": {
+        "skill.accounting": 0.96,
+        "skill.excel": 0.73,
+        "skill.erp": 0.55
+      }
     },
     "occupation.sales": {
       "type": "Occupation",
       "label": "業務",
-      "aliases": ["業務人員", "國內業務", "業務專員", "sales"],
-      "related": {"skill.sales": 0.96, "skill.crm": 0.7, "skill.customer_service": 0.64}
+      "aliases": [
+        "業務人員",
+        "國內業務",
+        "業務專員",
+        "sales"
+      ],
+      "related": {
+        "skill.sales": 0.96,
+        "skill.crm": 0.7,
+        "skill.customer_service": 0.64
+      }
     },
     "occupation.software": {
       "type": "Occupation",
       "label": "軟體工程師",
-      "aliases": ["程式設計師", "軟體開發", "software engineer", "developer"],
-      "related": {"occupation.backend": 0.75, "occupation.frontend": 0.75, "skill.git": 0.68}
+      "aliases": [
+        "程式設計師",
+        "軟體開發",
+        "software engineer",
+        "developer"
+      ],
+      "related": {
+        "occupation.backend": 0.75,
+        "occupation.frontend": 0.75,
+        "skill.git": 0.68
+      }
     },
     "occupation.backend": {
       "type": "Occupation",
       "label": "後端工程師",
-      "aliases": ["後端", "backend engineer", "backend developer", "server-side engineer"],
-      "related": {"skill.nodejs": 0.78, "skill.python": 0.74, "skill.java": 0.73, "skill.sql": 0.84, "skill.aws": 0.61}
+      "aliases": [
+        "後端",
+        "backend engineer",
+        "backend developer",
+        "server-side engineer"
+      ],
+      "related": {
+        "skill.nodejs": 0.78,
+        "skill.python": 0.74,
+        "skill.java": 0.73,
+        "skill.sql": 0.84,
+        "skill.aws": 0.61
+      }
     },
     "occupation.frontend": {
       "type": "Occupation",
       "label": "前端工程師",
-      "aliases": ["前端", "frontend engineer", "front-end developer", "web前端"],
-      "related": {"skill.react": 0.9, "skill.javascript": 0.9, "skill.typescript": 0.78, "skill.css": 0.77}
+      "aliases": [
+        "前端",
+        "frontend engineer",
+        "front-end developer",
+        "web前端"
+      ],
+      "related": {
+        "skill.react": 0.9,
+        "skill.javascript": 0.9,
+        "skill.typescript": 0.78,
+        "skill.css": 0.77
+      }
     },
     "occupation.data": {
       "type": "Occupation",
       "label": "資料分析",
-      "aliases": ["資料分析師", "數據分析", "data analyst", "business intelligence"],
-      "related": {"skill.sql": 0.91, "skill.python": 0.72, "skill.excel": 0.69, "skill.powerbi": 0.76}
+      "aliases": [
+        "資料分析師",
+        "數據分析",
+        "data analyst",
+        "business intelligence"
+      ],
+      "related": {
+        "skill.sql": 0.91,
+        "skill.python": 0.72,
+        "skill.excel": 0.69,
+        "skill.powerbi": 0.76
+      }
     },
     "occupation.ai": {
       "type": "Occupation",
       "label": "AI工程師",
-      "aliases": ["人工智慧工程師", "機器學習工程師", "ml engineer", "ai engineer"],
-      "related": {"skill.python": 0.9, "skill.machine_learning": 0.96, "skill.aws": 0.48}
+      "aliases": [
+        "人工智慧工程師",
+        "機器學習工程師",
+        "ml engineer",
+        "ai engineer"
+      ],
+      "related": {
+        "skill.python": 0.9,
+        "skill.machine_learning": 0.96,
+        "skill.aws": 0.48
+      }
     },
     "skill.office": {
       "type": "Skill",
       "label": "Microsoft Office",
-      "aliases": ["microsoft office", "ms office", "office", "文書處理"],
-      "related": {"skill.excel": 0.9, "skill.word": 0.85, "skill.powerpoint": 0.82, "skill.document": 0.72}
+      "aliases": [
+        "microsoft office",
+        "ms office",
+        "office",
+        "文書處理"
+      ],
+      "related": {
+        "skill.excel": 0.9,
+        "skill.word": 0.85,
+        "skill.powerpoint": 0.82,
+        "skill.document": 0.72,
+        "skill.outlook": 0.88
+      }
     },
     "skill.word": {
       "type": "Skill",
       "label": "Microsoft Word",
-      "aliases": ["microsoft word", "ms word", "word"],
-      "related": {"skill.office": 0.85}
+      "aliases": [
+        "microsoft word",
+        "ms word",
+        "word"
+      ],
+      "related": {
+        "skill.office": 0.85
+      }
     },
     "skill.powerpoint": {
       "type": "Skill",
       "label": "Microsoft PowerPoint",
-      "aliases": ["microsoft powerpoint", "powerpoint", "ppt"],
-      "related": {"skill.office": 0.82}
+      "aliases": [
+        "microsoft powerpoint",
+        "powerpoint",
+        "ppt"
+      ],
+      "related": {
+        "skill.office": 0.82,
+        "skill.product_presentation": 0.6
+      }
     },
     "skill.excel": {
       "type": "Skill",
       "label": "Excel",
-      "aliases": ["microsoft excel", "試算表"],
-      "related": {"skill.office": 0.9, "skill.accounting": 0.58, "skill.powerbi": 0.55}
+      "aliases": [
+        "microsoft excel",
+        "試算表"
+      ],
+      "related": {
+        "skill.office": 0.9,
+        "skill.accounting": 0.58,
+        "skill.powerbi": 0.55,
+        "skill.bookkeeping": 0.68,
+        "skill.sales_reporting": 0.66
+      }
     },
     "skill.document": {
       "type": "Skill",
       "label": "文件管理",
-      "aliases": ["文件管理", "檔案管理", "資料建檔", "文書作業"],
-      "related": {"skill.office": 0.72}
+      "aliases": [
+        "文件管理",
+        "檔案管理",
+        "資料建檔",
+        "文書作業",
+        "文書處理與排版",
+        "文件或檔案資料處理",
+        "文件處理"
+      ],
+      "related": {
+        "skill.office": 0.72,
+        "skill.admin_support": 0.8,
+        "skill.acrobat": 0.72
+      }
     },
     "skill.delivery": {
       "type": "Skill",
       "label": "配送",
-      "aliases": ["配送", "送貨", "物流配送", "貨物運送"],
-      "related": {"skill.forklift": 0.38}
+      "aliases": [
+        "配送",
+        "送貨",
+        "物流配送",
+        "貨物運送"
+      ],
+      "related": {
+        "skill.forklift": 0.38
+      }
     },
     "skill.forklift": {
       "type": "Skill",
       "label": "堆高機",
-      "aliases": ["堆高機", "forklift"],
-      "related": {"skill.delivery": 0.38, "skill.packaging": 0.32}
+      "aliases": [
+        "堆高機",
+        "forklift"
+      ],
+      "related": {
+        "skill.delivery": 0.38,
+        "skill.packaging": 0.32,
+        "skill.forklift_cert": 0.92,
+        "skill.warehouse_ops": 0.75
+      }
     },
     "skill.packaging": {
       "type": "Skill",
       "label": "包裝作業",
-      "aliases": ["包裝", "理貨", "揀貨"],
-      "blocked_phrases": ["包裝設計", "包裝目錄設計"],
-      "related": {"skill.quality": 0.49}
+      "aliases": [
+        "包裝",
+        "理貨",
+        "揀貨"
+      ],
+      "blocked_phrases": [
+        "包裝設計",
+        "包裝目錄設計"
+      ],
+      "related": {
+        "skill.quality": 0.49,
+        "skill.warehouse_ops": 0.7
+      }
     },
     "skill.quality": {
       "type": "Skill",
       "label": "品質檢驗",
-      "aliases": ["品檢", "品質檢驗", "品質管理", "qc"],
-      "related": {"skill.packaging": 0.49}
+      "aliases": [
+        "品檢",
+        "品質檢驗",
+        "品質管理",
+        "qc"
+      ],
+      "related": {
+        "skill.packaging": 0.49,
+        "skill.engineering_quality": 0.82
+      }
     },
     "skill.customer_service": {
       "type": "Skill",
       "label": "顧客服務",
-      "aliases": ["顧客服務", "客戶服務", "customer service", "客服"],
-      "related": {"skill.sales": 0.64, "skill.pos": 0.52}
+      "aliases": [
+        "顧客服務",
+        "客戶服務",
+        "customer service",
+        "客服"
+      ],
+      "related": {
+        "skill.sales": 0.64,
+        "skill.pos": 0.52,
+        "skill.customer_relationship": 0.9,
+        "skill.complaint_handling": 0.86
+      }
     },
     "skill.pos": {
       "type": "Skill",
       "label": "POS／收銀",
-      "aliases": ["pos", "收銀", "結帳"],
-      "related": {"skill.customer_service": 0.52}
+      "aliases": [
+        "pos",
+        "收銀",
+        "結帳"
+      ],
+      "related": {
+        "skill.customer_service": 0.52
+      }
     },
     "skill.food_safety": {
       "type": "Skill",
       "label": "食品安全",
-      "aliases": ["食品安全", "食品衛生", "餐飲衛生", "haccp"],
-      "related": {}
+      "aliases": [
+        "食品安全",
+        "食品衛生",
+        "餐飲衛生",
+        "haccp"
+      ],
+      "related": {
+        "skill.food_prep": 0.85,
+        "skill.chinese_cuisine_cert": 0.72
+      }
     },
     "skill.surveillance": {
       "type": "Skill",
       "label": "安全監控",
-      "aliases": ["安全監控", "門禁", "巡邏", "監視器"],
+      "aliases": [
+        "安全監控",
+        "門禁",
+        "巡邏",
+        "監視器"
+      ],
       "related": {}
     },
     "skill.patient_care": {
       "type": "Skill",
       "label": "病患照護",
-      "aliases": ["病患照護", "臨床照護", "護理照護", "patient care"],
-      "related": {"skill.clinic": 0.65}
+      "aliases": [
+        "病患照護",
+        "臨床照護",
+        "護理照護",
+        "patient care"
+      ],
+      "related": {
+        "skill.clinic": 0.65,
+        "skill.nurse_license": 0.9,
+        "skill.nurse_aide_license": 0.88,
+        "skill.caregiver_cert": 0.85
+      }
     },
     "skill.clinic": {
       "type": "Skill",
       "label": "診所流程",
-      "aliases": ["診所", "掛號", "跟診", "clinic"],
-      "related": {"skill.patient_care": 0.65}
+      "aliases": [
+        "診所",
+        "掛號",
+        "跟診",
+        "clinic"
+      ],
+      "related": {
+        "skill.patient_care": 0.65,
+        "skill.nurse_license": 0.75,
+        "skill.pharmacist_license": 0.7
+      }
     },
     "skill.accounting": {
       "type": "Skill",
       "label": "帳務處理",
-      "aliases": ["帳務", "記帳", "應收應付", "財務報表"],
-      "related": {"skill.excel": 0.58, "skill.erp": 0.61}
+      "aliases": [
+        "帳務",
+        "記帳",
+        "應收應付",
+        "財務報表"
+      ],
+      "related": {
+        "skill.excel": 0.58,
+        "skill.erp": 0.61,
+        "skill.bookkeeping": 0.9,
+        "skill.digiwin_erp": 0.6
+      }
     },
     "skill.erp": {
       "type": "Skill",
       "label": "ERP",
-      "aliases": ["erp"],
-      "related": {"skill.accounting": 0.61}
+      "aliases": [
+        "erp"
+      ],
+      "related": {
+        "skill.accounting": 0.61,
+        "skill.digiwin_erp": 0.9
+      }
     },
     "skill.sales": {
       "type": "Skill",
       "label": "銷售",
-      "aliases": ["銷售", "客戶開發", "業務開發", "sales"],
-      "blocked_phrases": ["銷售面積"],
-      "related": {"skill.crm": 0.77, "skill.customer_service": 0.64}
+      "aliases": [
+        "銷售",
+        "客戶開發",
+        "業務開發",
+        "sales"
+      ],
+      "blocked_phrases": [
+        "銷售面積"
+      ],
+      "related": {
+        "skill.crm": 0.77,
+        "skill.customer_service": 0.64,
+        "skill.business_development": 0.88,
+        "skill.product_presentation": 0.82,
+        "skill.sales_reporting": 0.78
+      }
     },
     "skill.crm": {
       "type": "Skill",
       "label": "CRM",
-      "aliases": ["crm", "客戶關係管理"],
-      "related": {"skill.sales": 0.77}
+      "aliases": [
+        "crm",
+        "客戶關係管理"
+      ],
+      "related": {
+        "skill.sales": 0.77,
+        "skill.customer_relationship": 0.85
+      }
     },
     "skill.nodejs": {
       "type": "Skill",
       "label": "Node.js",
-      "aliases": ["node.js", "nodejs", "node js"],
-      "related": {"skill.javascript": 0.88, "skill.typescript": 0.79, "skill.sql": 0.55}
+      "aliases": [
+        "node.js",
+        "nodejs",
+        "node js"
+      ],
+      "related": {
+        "skill.javascript": 0.88,
+        "skill.typescript": 0.79,
+        "skill.sql": 0.55
+      }
     },
     "skill.nestjs": {
       "type": "Skill",
       "label": "NestJS",
-      "aliases": ["nestjs", "nest.js", "nest js"],
-      "related": {"skill.nodejs": 0.78, "skill.typescript": 0.8}
+      "aliases": [
+        "nestjs",
+        "nest.js",
+        "nest js"
+      ],
+      "related": {
+        "skill.nodejs": 0.78,
+        "skill.typescript": 0.8
+      }
     },
     "skill.expressjs": {
       "type": "Skill",
       "label": "Express.js",
-      "aliases": ["express.js", "expressjs", "express js"],
-      "related": {"skill.nodejs": 0.78, "skill.javascript": 0.72}
+      "aliases": [
+        "express.js",
+        "expressjs",
+        "express js"
+      ],
+      "related": {
+        "skill.nodejs": 0.78,
+        "skill.javascript": 0.72
+      }
     },
     "skill.react": {
       "type": "Skill",
       "label": "React",
-      "aliases": ["react", "reactjs", "react.js"],
-      "related": {"skill.javascript": 0.9, "skill.typescript": 0.81, "skill.css": 0.66, "skill.nextjs": 0.8}
+      "aliases": [
+        "react",
+        "reactjs",
+        "react.js"
+      ],
+      "related": {
+        "skill.javascript": 0.9,
+        "skill.typescript": 0.81,
+        "skill.css": 0.66,
+        "skill.nextjs": 0.8
+      }
     },
     "skill.nextjs": {
       "type": "Skill",
       "label": "Next.js",
-      "aliases": ["next.js", "nextjs", "next js"],
-      "related": {"skill.react": 0.8, "skill.javascript": 0.72, "skill.typescript": 0.74}
+      "aliases": [
+        "next.js",
+        "nextjs",
+        "next js"
+      ],
+      "related": {
+        "skill.react": 0.8,
+        "skill.javascript": 0.72,
+        "skill.typescript": 0.74
+      }
     },
     "skill.javascript": {
       "type": "Skill",
       "label": "JavaScript",
-      "aliases": ["javascript", "js", "ecmascript"],
-      "related": {"skill.typescript": 0.86, "skill.react": 0.9, "skill.nodejs": 0.88}
+      "aliases": [
+        "javascript",
+        "js",
+        "ecmascript"
+      ],
+      "related": {
+        "skill.typescript": 0.86,
+        "skill.react": 0.9,
+        "skill.nodejs": 0.88
+      }
     },
     "skill.typescript": {
       "type": "Skill",
       "label": "TypeScript",
-      "aliases": ["typescript", "ts"],
-      "related": {"skill.javascript": 0.86, "skill.react": 0.81, "skill.nodejs": 0.79}
+      "aliases": [
+        "typescript",
+        "ts"
+      ],
+      "related": {
+        "skill.javascript": 0.86,
+        "skill.react": 0.81,
+        "skill.nodejs": 0.79
+      }
     },
     "skill.python": {
       "type": "Skill",
       "label": "Python",
-      "aliases": ["python"],
-      "related": {"skill.machine_learning": 0.73, "skill.sql": 0.61, "skill.aws": 0.46, "skill.django": 0.72}
+      "aliases": [
+        "python"
+      ],
+      "related": {
+        "skill.machine_learning": 0.73,
+        "skill.sql": 0.61,
+        "skill.aws": 0.46,
+        "skill.django": 0.72
+      }
     },
     "skill.django": {
       "type": "Skill",
       "label": "Django",
-      "aliases": ["django"],
-      "related": {"skill.python": 0.72}
+      "aliases": [
+        "django"
+      ],
+      "related": {
+        "skill.python": 0.72
+      }
     },
     "skill.fastapi": {
       "type": "Skill",
       "label": "FastAPI",
-      "aliases": ["fastapi", "fast api"],
-      "related": {"skill.python": 0.72}
+      "aliases": [
+        "fastapi",
+        "fast api"
+      ],
+      "related": {
+        "skill.python": 0.72
+      }
     },
     "skill.flask": {
       "type": "Skill",
       "label": "Flask",
-      "aliases": ["flask"],
-      "related": {"skill.python": 0.68}
+      "aliases": [
+        "flask"
+      ],
+      "related": {
+        "skill.python": 0.68
+      }
     },
     "skill.java": {
       "type": "Skill",
       "label": "Java",
-      "aliases": ["java"],
-      "related": {"skill.sql": 0.57, "skill.aws": 0.43}
+      "aliases": [
+        "java"
+      ],
+      "related": {
+        "skill.sql": 0.57,
+        "skill.aws": 0.43
+      }
     },
     "skill.spring_boot": {
       "type": "Skill",
       "label": "Spring Boot",
-      "aliases": ["spring boot", "springboot"],
-      "related": {"skill.java": 0.8}
+      "aliases": [
+        "spring boot",
+        "springboot"
+      ],
+      "related": {
+        "skill.java": 0.8
+      }
     },
     "skill.jvm": {
       "type": "Skill",
       "label": "JVM",
-      "aliases": ["jvm", "java virtual machine"],
-      "related": {"skill.java": 0.78}
+      "aliases": [
+        "jvm",
+        "java virtual machine"
+      ],
+      "related": {
+        "skill.java": 0.78
+      }
     },
     "skill.sql": {
       "type": "Skill",
       "label": "SQL",
-      "aliases": ["sql"],
-      "related": {"skill.python": 0.61, "skill.powerbi": 0.58, "skill.postgresql": 0.75}
+      "aliases": [
+        "sql"
+      ],
+      "related": {
+        "skill.python": 0.61,
+        "skill.powerbi": 0.58,
+        "skill.postgresql": 0.75
+      }
     },
     "skill.postgresql": {
       "type": "Skill",
       "label": "PostgreSQL",
-      "aliases": ["postgresql", "postgres"],
-      "related": {"skill.sql": 0.75}
+      "aliases": [
+        "postgresql",
+        "postgres"
+      ],
+      "related": {
+        "skill.sql": 0.75
+      }
     },
     "skill.mysql": {
       "type": "Skill",
       "label": "MySQL",
-      "aliases": ["mysql"],
-      "related": {"skill.sql": 0.72}
+      "aliases": [
+        "mysql"
+      ],
+      "related": {
+        "skill.sql": 0.72
+      }
     },
     "skill.aws": {
       "type": "Skill",
       "label": "AWS",
-      "aliases": ["aws", "amazon web services"],
-      "related": {"skill.docker": 0.64, "skill.kubernetes": 0.55}
+      "aliases": [
+        "aws",
+        "amazon web services"
+      ],
+      "related": {
+        "skill.docker": 0.64,
+        "skill.kubernetes": 0.55
+      }
     },
     "skill.aws_ec2": {
       "type": "Skill",
       "label": "Amazon EC2",
-      "aliases": ["amazon ec2", "aws ec2", "ec2"],
-      "related": {"skill.aws": 0.82}
+      "aliases": [
+        "amazon ec2",
+        "aws ec2",
+        "ec2"
+      ],
+      "related": {
+        "skill.aws": 0.82
+      }
     },
     "skill.aws_lambda": {
       "type": "Skill",
       "label": "AWS Lambda",
-      "aliases": ["aws lambda", "amazon lambda"],
-      "related": {"skill.aws": 0.82}
+      "aliases": [
+        "aws lambda",
+        "amazon lambda"
+      ],
+      "related": {
+        "skill.aws": 0.82
+      }
     },
     "skill.aws_s3": {
       "type": "Skill",
       "label": "Amazon S3",
-      "aliases": ["amazon s3", "aws s3"],
-      "related": {"skill.aws": 0.82}
+      "aliases": [
+        "amazon s3",
+        "aws s3"
+      ],
+      "related": {
+        "skill.aws": 0.82
+      }
     },
     "skill.docker": {
       "type": "Skill",
       "label": "Docker",
-      "aliases": ["docker", "container", "容器化"],
-      "related": {"skill.kubernetes": 0.78, "skill.aws": 0.64}
+      "aliases": [
+        "docker",
+        "container",
+        "容器化"
+      ],
+      "related": {
+        "skill.kubernetes": 0.78,
+        "skill.aws": 0.64
+      }
     },
     "skill.kubernetes": {
       "type": "Skill",
       "label": "Kubernetes",
-      "aliases": ["kubernetes", "k8s"],
-      "related": {"skill.docker": 0.78, "skill.aws": 0.55}
+      "aliases": [
+        "kubernetes",
+        "k8s"
+      ],
+      "related": {
+        "skill.docker": 0.78,
+        "skill.aws": 0.55
+      }
     },
     "skill.aws_eks": {
       "type": "Skill",
       "label": "Amazon EKS",
-      "aliases": ["amazon eks", "aws eks", "eks"],
-      "related": {"skill.aws": 0.78, "skill.kubernetes": 0.82}
+      "aliases": [
+        "amazon eks",
+        "aws eks",
+        "eks"
+      ],
+      "related": {
+        "skill.aws": 0.78,
+        "skill.kubernetes": 0.82
+      }
     },
     "skill.git": {
       "type": "Skill",
       "label": "Git",
-      "aliases": ["git", "版本控制"],
-      "related": {"skill.github": 0.76}
+      "aliases": [
+        "git",
+        "版本控制"
+      ],
+      "related": {
+        "skill.github": 0.76
+      }
     },
     "skill.github": {
       "type": "Skill",
       "label": "GitHub",
-      "aliases": ["github"],
-      "related": {"skill.git": 0.76}
+      "aliases": [
+        "github"
+      ],
+      "related": {
+        "skill.git": 0.76
+      }
     },
     "skill.gitlab": {
       "type": "Skill",
       "label": "GitLab",
-      "aliases": ["gitlab"],
-      "related": {"skill.git": 0.72}
+      "aliases": [
+        "gitlab"
+      ],
+      "related": {
+        "skill.git": 0.72
+      }
     },
     "skill.css": {
       "type": "Skill",
       "label": "CSS",
-      "aliases": ["css"],
-      "related": {"skill.react": 0.66}
+      "aliases": [
+        "css"
+      ],
+      "related": {
+        "skill.react": 0.66
+      }
     },
     "skill.machine_learning": {
       "type": "Skill",
       "label": "機器學習",
-      "aliases": ["機器學習", "machine learning", "深度學習"],
-      "related": {"skill.python": 0.73}
+      "aliases": [
+        "機器學習",
+        "machine learning",
+        "深度學習"
+      ],
+      "related": {
+        "skill.python": 0.73
+      }
     },
     "skill.powerbi": {
       "type": "Skill",
       "label": "Power BI",
-      "aliases": ["power bi", "powerbi", "bi報表"],
-      "related": {"skill.sql": 0.58, "skill.excel": 0.55}
+      "aliases": [
+        "power bi",
+        "powerbi",
+        "bi報表"
+      ],
+      "related": {
+        "skill.sql": 0.58,
+        "skill.excel": 0.55
+      }
+    },
+    "skill.outlook": {
+      "type": "Skill",
+      "label": "Microsoft Outlook",
+      "aliases": [
+        "outlook",
+        "ms outlook",
+        "電子郵件軟體"
+      ],
+      "related": {
+        "skill.office": 0.88,
+        "skill.document": 0.6
+      }
+    },
+    "skill.ms_project": {
+      "type": "Skill",
+      "label": "Microsoft Project",
+      "aliases": [
+        "ms project",
+        "microsoft project"
+      ],
+      "related": {
+        "skill.office": 0.7,
+        "skill.project_management": 0.78
+      }
+    },
+    "skill.autocad": {
+      "type": "Skill",
+      "label": "AutoCAD",
+      "aliases": [
+        "autocad",
+        "auto cad",
+        "autocad 2d",
+        "autocad 3d"
+      ],
+      "related": {
+        "skill.drafting": 0.85,
+        "skill.solidworks": 0.6
+      }
+    },
+    "skill.photoshop": {
+      "type": "Skill",
+      "label": "Adobe Photoshop",
+      "aliases": [
+        "photoshop",
+        "adobe photoshop",
+        "ps"
+      ],
+      "related": {
+        "skill.illustrator": 0.82,
+        "skill.graphic_design": 0.86
+      }
+    },
+    "skill.illustrator": {
+      "type": "Skill",
+      "label": "Adobe Illustrator",
+      "aliases": [
+        "illustrator",
+        "adobe illustrator",
+        "ai"
+      ],
+      "related": {
+        "skill.photoshop": 0.82,
+        "skill.graphic_design": 0.86
+      }
+    },
+    "skill.acrobat": {
+      "type": "Skill",
+      "label": "Adobe Acrobat",
+      "aliases": [
+        "adobe acrobat",
+        "adobe acrobat dc",
+        "acrobat"
+      ],
+      "related": {
+        "skill.document": 0.72,
+        "skill.office": 0.55
+      }
+    },
+    "skill.solidworks": {
+      "type": "Skill",
+      "label": "SolidWorks",
+      "aliases": [
+        "solidworks",
+        "solid works"
+      ],
+      "related": {
+        "skill.autocad": 0.6,
+        "skill.drafting": 0.8
+      }
+    },
+    "skill.sketchup": {
+      "type": "Skill",
+      "label": "SketchUp",
+      "aliases": [
+        "sketchup",
+        "sketch up"
+      ],
+      "related": {
+        "skill.autocad": 0.62,
+        "skill.drafting": 0.72
+      }
+    },
+    "skill.drafting": {
+      "type": "Skill",
+      "label": "繪圖與製圖",
+      "aliases": [
+        "繪圖工具及軟體操作",
+        "製圖",
+        "圖面繪製"
+      ],
+      "related": {
+        "skill.autocad": 0.85,
+        "skill.solidworks": 0.8
+      }
+    },
+    "skill.graphic_design": {
+      "type": "Skill",
+      "label": "平面設計",
+      "aliases": [
+        "平面設計",
+        "美術設計",
+        "視覺設計"
+      ],
+      "related": {
+        "skill.photoshop": 0.86,
+        "skill.illustrator": 0.86
+      }
+    },
+    "skill.admin_support": {
+      "type": "Skill",
+      "label": "行政事務處理",
+      "aliases": [
+        "行政事務處理能力",
+        "行政事務",
+        "電話接聽與人員接待",
+        "文件收發與檔案管理能力"
+      ],
+      "related": {
+        "skill.document": 0.8,
+        "skill.office": 0.75
+      }
+    },
+    "skill.business_development": {
+      "type": "Skill",
+      "label": "業務通路開發",
+      "aliases": [
+        "業務開發╱通路開發",
+        "通路開發",
+        "業務銷售能力",
+        "業務接洽與訂單處理",
+        "蒐集客戶情報"
+      ],
+      "related": {
+        "skill.sales": 0.88,
+        "skill.crm": 0.7
+      }
+    },
+    "skill.product_presentation": {
+      "type": "Skill",
+      "label": "產品介紹與解說銷售",
+      "aliases": [
+        "產品介紹與解說銷售",
+        "產品解說",
+        "提案及簡報技巧"
+      ],
+      "related": {
+        "skill.sales": 0.82,
+        "skill.powerpoint": 0.6
+      }
+    },
+    "skill.customer_relationship": {
+      "type": "Skill",
+      "label": "顧客關係管理",
+      "aliases": [
+        "顧客關係管理能力",
+        "顧客接待與需求服務",
+        "客戶資料更新及維護",
+        "提供客戶服務並維護客戶關係",
+        "客戶問題的解決及解答"
+      ],
+      "related": {
+        "skill.crm": 0.85,
+        "skill.customer_service": 0.9
+      }
+    },
+    "skill.complaint_handling": {
+      "type": "Skill",
+      "label": "客訴處理",
+      "aliases": [
+        "客訴事件處理",
+        "客訴處理",
+        "抱怨處理"
+      ],
+      "related": {
+        "skill.customer_service": 0.86,
+        "skill.customer_relationship": 0.78
+      }
+    },
+    "skill.sales_reporting": {
+      "type": "Skill",
+      "label": "業績管理與報表",
+      "aliases": [
+        "業績目標分配及績效達成",
+        "撰寫業績和管理報表",
+        "業績管理"
+      ],
+      "related": {
+        "skill.sales": 0.78,
+        "skill.excel": 0.66
+      }
+    },
+    "skill.marketing": {
+      "type": "Skill",
+      "label": "行銷推廣",
+      "aliases": [
+        "品牌行銷推廣與管理",
+        "行銷推廣",
+        "網路活動規劃及執行"
+      ],
+      "related": {
+        "skill.social_media": 0.82,
+        "skill.sales": 0.6
+      }
+    },
+    "skill.social_media": {
+      "type": "Skill",
+      "label": "社群媒體經營",
+      "aliases": [
+        "社群媒體經營",
+        "社群經營",
+        "社群行銷"
+      ],
+      "related": {
+        "skill.marketing": 0.82
+      }
+    },
+    "skill.project_management": {
+      "type": "Skill",
+      "label": "專案管理",
+      "aliases": [
+        "專案管理",
+        "工程協調及問題處理"
+      ],
+      "related": {
+        "skill.ms_project": 0.78
+      }
+    },
+    "skill.hr": {
+      "type": "Skill",
+      "label": "人力資源",
+      "aliases": [
+        "人力資源相關知識",
+        "人力資源",
+        "人資"
+      ],
+      "related": {
+        "skill.admin_support": 0.62
+      }
+    },
+    "occupation.hr": {
+      "type": "Occupation",
+      "label": "人力資源專員",
+      "aliases": [
+        "人資專員",
+        "人事專員",
+        "hr",
+        "human resources"
+      ],
+      "related": {
+        "skill.hr": 0.9,
+        "occupation.admin": 0.48
+      }
+    },
+    "skill.bookkeeping": {
+      "type": "Skill",
+      "label": "會計核算與帳務",
+      "aliases": [
+        "會計核算與帳務處理",
+        "編制會計相關表單及帳務報表",
+        "具備會計或審計專業知識"
+      ],
+      "related": {
+        "skill.accounting": 0.9,
+        "skill.excel": 0.68,
+        "skill.erp": 0.6
+      }
+    },
+    "skill.warehouse_ops": {
+      "type": "Skill",
+      "label": "倉儲作業",
+      "aliases": [
+        "揀貨╱理貨╱補貨作業",
+        "倉庫貨物標示╱盤點╱置放",
+        "倉儲作業"
+      ],
+      "related": {
+        "skill.forklift": 0.75,
+        "skill.packaging": 0.7
+      }
+    },
+    "skill.construction_supervision": {
+      "type": "Skill",
+      "label": "工程施工管理",
+      "aliases": [
+        "工程施工管理監督",
+        "工程施工管理",
+        "施工監督"
+      ],
+      "related": {
+        "skill.engineering_quality": 0.8,
+        "skill.project_management": 0.7
+      }
+    },
+    "skill.engineering_quality": {
+      "type": "Skill",
+      "label": "工程品質管理",
+      "aliases": [
+        "工程品質管理"
+      ],
+      "related": {
+        "skill.quality": 0.82,
+        "skill.construction_supervision": 0.8
+      }
+    },
+    "skill.occupational_safety": {
+      "type": "Skill",
+      "label": "職業安全衛生",
+      "aliases": [
+        "職業安全衛生管理乙級技術士",
+        "職業安全衛生",
+        "工安"
+      ],
+      "related": {
+        "skill.engineering_quality": 0.6
+      }
+    },
+    "skill.food_prep": {
+      "type": "Skill",
+      "label": "食材處理與備料",
+      "aliases": [
+        "使用適當的處理技術準備食物",
+        "食材的庫存管理",
+        "廚房用具使用",
+        "食材處理"
+      ],
+      "related": {
+        "skill.food_safety": 0.85,
+        "skill.chinese_cuisine_cert": 0.7
+      }
+    },
+    "skill.chinese_cuisine_cert": {
+      "type": "Skill",
+      "label": "中餐烹調技術士",
+      "aliases": [
+        "丙級中餐烹調技術士",
+        "中餐烹調技術士",
+        "中餐丙級"
+      ],
+      "related": {
+        "skill.food_prep": 0.7,
+        "skill.food_safety": 0.72
+      }
+    },
+    "skill.nurse_license": {
+      "type": "Skill",
+      "label": "護理師執照",
+      "aliases": [
+        "高考護理師執照",
+        "護理師執照",
+        "護理師"
+      ],
+      "related": {
+        "skill.patient_care": 0.9,
+        "skill.clinic": 0.75
+      }
+    },
+    "skill.nurse_aide_license": {
+      "type": "Skill",
+      "label": "護士執照",
+      "aliases": [
+        "普考護士執照",
+        "護士執照",
+        "護士"
+      ],
+      "related": {
+        "skill.patient_care": 0.88,
+        "skill.nurse_license": 0.8
+      }
+    },
+    "skill.caregiver_cert": {
+      "type": "Skill",
+      "label": "照顧服務員證照",
+      "aliases": [
+        "照顧服務員結業證書",
+        "照顧服務員單一級(丙)技術士",
+        "照顧服務員"
+      ],
+      "related": {
+        "skill.patient_care": 0.85
+      }
+    },
+    "skill.pharmacist_license": {
+      "type": "Skill",
+      "label": "藥師執照",
+      "aliases": [
+        "高考藥師",
+        "藥師執照",
+        "藥師"
+      ],
+      "related": {
+        "skill.clinic": 0.7,
+        "skill.patient_care": 0.6
+      }
+    },
+    "skill.forklift_cert": {
+      "type": "Skill",
+      "label": "堆高機操作技術士",
+      "aliases": [
+        "堆高機操作技術士(單一級)",
+        "堆高機操作技術士"
+      ],
+      "related": {
+        "skill.forklift": 0.92,
+        "skill.warehouse_ops": 0.75
+      }
+    },
+    "skill.digiwin_erp": {
+      "type": "Skill",
+      "label": "鼎新 ERP",
+      "aliases": [
+        "鼎新 erp",
+        "鼎新erp",
+        "鼎新"
+      ],
+      "related": {
+        "skill.erp": 0.9,
+        "skill.accounting": 0.62
+      }
     }
   }
 }
