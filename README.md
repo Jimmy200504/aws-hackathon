@@ -229,7 +229,7 @@ shasum -a 256 \
 四行雜湊應為以下內容，順序同上：
 
 ```text
-7150555eb606434a06eab66f6d75a72c834954dc4d47e77c78fd1d09d74cebc9
+49637f332e52f5d845c3a6f4448d7321e3f63a9da645501258679ec846ddbe5c
 8471ccea48e37cca65dfe763092ab76600ed39ab27004f6253c136b0bffa8328
 ca163ccbb4bab4da47fd2fd85453d38538ceb77a387af0b8bc784505681c8c17
 19f6d2f031134a7e1e35d346214fb9533071f9a15c5691c9f50ed1dd83d1bdcf
@@ -304,7 +304,7 @@ Pipeline 會記錄每個階段的 checkpoint。只要參數沒變、輸出也完
 | Schema fingerprint | `1ae7d6bfbf96c1ba` | 正式環境與展示版共用 |
 | 正式環境圖譜 | `deterministic-v2-rules-v3-latest` | 1,219,438 個 nodes、7,710,984 條 edges，其中 1,218,635 個是 job nodes；805 條統計 `RELATED_TO` |
 | 評測圖譜 | `deterministic-v2-rules-v3-evaluation-cutoff` | 固定的離線 benchmark 專用，不可換成 production `latest`；781 條統計 `RELATED_TO` |
-| Graph manifest | `e25130e3063c9eafd01e03444a40b809fcafd7c3a37d03ca65cf24c996da8339` | Production latest 宣告的 manifest hash |
+| Graph manifest | `f5246fdc2fc6c1be16bb3b5827013dcb54b4fd6cd5a6d5a5a7e9999e9efab753` | Production latest 宣告的 manifest hash |
 | 審閱 ontology | 115 個節點（82 Skill、33 Occupation） | `config/skill_ontology.seed.json`；ontology hash `76127e5915bfbfb3a731d0bd309a29fcf249ff7ceb20d8d391c8e49c2afc013e` |
 | 內嵌展示索引 | `demo-2026.06.07-full-v2` | 收錄 12,000 筆職缺，供本機展示與 Lambda fallback 使用 |
 | 正式搜尋索引 | `skillweave-jobs-v1` | OpenSearch 全量索引，共 1,218,635 筆職缺 |

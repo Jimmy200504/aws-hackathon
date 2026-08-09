@@ -49,8 +49,8 @@
   "min_child_weight": 12.0,
   "learning_rate": 0.05,
   "train_sources": [
-    "artifacts/quality/primary/ltr/train.jsonl",
-    "artifacts/quality/primary/ltr/validation.jsonl"
+    "artifacts/quality/primary/ltr-overlay/train.jsonl",
+    "artifacts/quality/primary/ltr-overlay/validation.jsonl"
   ],
   "best_iteration": 39,
   "xgboost_version": "3.2.0"

@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from pipeline.build_graph import export_stage, read_jsonl, resolve_stage
+from pipeline.deterministic_extract import EXTRACTOR_VERSION
 
 
 class GraphPipelineIntegrationTests(unittest.TestCase):
@@ -51,7 +52,10 @@ class GraphPipelineIntegrationTests(unittest.TestCase):
             self.assertEqual(quality["silent_loss"], 0)
             self.assertTrue(quality["referential_integrity"])
             self.assertEqual(manifest["graph_version"], "cutoff-v1")
-            self.assertEqual(manifest["extractor"], "deterministic-v1")
+            # Assert against the constant so a deliberate extractor bump does
+            # not require editing the test, while an accidental change to the
+            # published field still fails.
+            self.assertEqual(manifest["extractor"], EXTRACTOR_VERSION)
             self.assertIsNone(manifest["model_id"])
             self.assertEqual(manifest["llm_requests"], 0)
             self.assertTrue((scope_root / "neptune/nodes.csv").is_file())

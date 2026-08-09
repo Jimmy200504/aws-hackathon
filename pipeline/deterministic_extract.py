@@ -15,8 +15,30 @@ from pathlib import Path
 from typing import Any, Iterable, Iterator
 
 
-EXTRACTOR_VERSION = "deterministic-v1"
-RULES_VERSION = "deterministic-extraction-rules-v2"
+EXTRACTOR_VERSION = "deterministic-v2"
+RULES_VERSION = "deterministic-extraction-rules-v3"
+# Matching semantics that change extraction output. Hashing these rather than
+# only the version string means a silent parameter change cannot reuse an old
+# rules_hash, and a resumed run with different semantics is rejected by the
+# checkpoint comparison instead of producing a mixed artifact.
+RULES_SEMANTICS = {
+    "rules_version": RULES_VERSION,
+    "extractor": EXTRACTOR_VERSION,
+    "normalization": ["NFKC", "casefold", "collapse_whitespace", "臺_to_台"],
+    "match": "longest_exact_reviewed_alias",
+    "matched_node_types": ["Skill", "Occupation"],
+    "alias_namespace": "per_node_type",
+    "ambiguous_alias_policy": "drop_within_type",
+    "requirement_levels": ["required", "preferred", "mentioned"],
+    "negation_excluded": True,
+}
+
+
+def rules_hash() -> str:
+    payload = json.dumps(
+        RULES_SEMANTICS, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    return hashlib.sha256(payload.encode()).hexdigest()
 DEFAULT_CUTOFF = "2026-06-05 23:59:59.999"
 PART_SIZE = 1000
 
@@ -547,7 +569,7 @@ def run_csv_extraction(
     configuration = {
         "extractor": EXTRACTOR_VERSION,
         "rules_version": RULES_VERSION,
-        "rules_hash": hashlib.sha256(RULES_VERSION.encode()).hexdigest(),
+        "rules_hash": rules_hash(),
         "input_hash": input_hash,
         "ontology_hash": ontology_hash,
         "duty_taxonomy_hash": duty_hash,

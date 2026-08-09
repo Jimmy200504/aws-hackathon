@@ -28,12 +28,14 @@ artifacts/quality/
 artifacts/quality-*/
 artifacts/bedrock-pilot/
 artifacts/quality-v2/
+# Intermediate deterministic graph build trees. Only the release manifests
+# under artifacts/skill-graph-full-v2/release/ are tracked; every working
+# directory is multi-gigabyte and fully rebuildable from the CSVs.
+artifacts/skill-graph-*/
+!artifacts/skill-graph-full-v2/
 artifacts/skill-graph-canary/
 artifacts/skill-graph-full/
 artifacts/skill-graph-review/
-artifacts/skill-graph-expanded/
-artifacts/skill-graph-occ/
-artifacts/skill-graph-occ2/
 artifacts/skill-graph-full-v2/extraction/
 artifacts/skill-graph-full-v2/relations/
 artifacts/skill-graph-full-v2/resolved/

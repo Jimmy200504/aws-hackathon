@@ -1,12 +1,12 @@
 {
   "schema": "skillweave-graph-serving-pointer-v2",
-  "updated_at_utc": "2026-08-09T12:00:00Z",
+  "updated_at_utc": "2026-08-09T13:30:00Z",
   "dataset_version": "1111-2026-06-01_2026-06-07",
   "run_id": "deterministic-v2-rules-v3-full",
   "scope": "latest",
   "graph_version": "deterministic-v2-rules-v3-latest",
-  "manifest_hash": "e25130e3063c9eafd01e03444a40b809fcafd7c3a37d03ca65cf24c996da8339",
-  "manifest_sha256": "a0184d875a2d7a098cce935e7c64eac03c56ee3591171dc321f1a0b687b056b7",
+  "manifest_hash": "f5246fdc2fc6c1be16bb3b5827013dcb54b4fd6cd5a6d5a5a7e9999e9efab753",
+  "manifest_sha256": "ccf3fc154ac4989eb4a7ccb9867e71a5c6b491f4f30755f66db2d3bec8de6ec7",
   "job_nodes": 1218635,
   "nodes": 1219438,
   "edges": 7710984,
@@ -27,5 +27,8 @@
     "edges": 5249573,
     "statistical_related_to_edges": 225,
     "reviewed_ontology_nodes": 63
-  }
+  },
+  "extractor": "deterministic-v2",
+  "rules_version": "deterministic-extraction-rules-v3",
+  "rules_hash": "26eaf7271dbc60debe61f0733b5401be1642c22c12f885b5fec320b497b5bdf7"
 }

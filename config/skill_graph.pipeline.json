@@ -1,5 +1,5 @@
 {
-  "schema_version": "skillgraph-deterministic-v1",
+  "schema_version": "skillgraph-deterministic-v2",
   "region": "ap-northeast-1",
   "input": {
     "expected_jobs": 1218635,
