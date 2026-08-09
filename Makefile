@@ -1,4 +1,4 @@
-.PHONY: setup demo test verify release audit coverage business sam-smoke aws-smoke video submission external-preflight index benchmark quality package opensearch-local-up opensearch-local-down full-index-local full-demo-local query-artifacts graph-full-plan graph-full-build graph-review graph-review-score
+.PHONY: setup demo test verify release audit coverage business sam-smoke aws-smoke video submission external-preflight index benchmark quality package opensearch-local-up opensearch-local-down full-index-local full-demo-local query-artifacts graph-full-plan graph-full-build graph-review graph-review-score verify-inputs clean-search-log
 
 PYTHON ?= .venv/bin/python
 AWS_REGION ?= us-east-1
@@ -6,6 +6,16 @@ BEDROCK_QUERY_MODEL_ID ?= global.anthropic.claude-haiku-4-5-20251001-v1:0
 
 setup:
 	./scripts/setup_local.sh
+
+# Confirm every developer builds from byte-identical inputs. The deterministic
+# pipeline only reproduces identical artifacts when these match.
+verify-inputs:
+	$(PYTHON) scripts/verify_dataset_inputs.py
+
+# Remove SEO spam and URL queries from the organizer search log. Required
+# before quality/index builds, which read userSearchLog_cleaned.csv.
+clean-search-log:
+	$(PYTHON) scripts/clean_search_log.py
 
 # Build inputs for query normalization and the behavior-aware index.
 query-artifacts:

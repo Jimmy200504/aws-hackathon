@@ -49,7 +49,11 @@ def main() -> None:
     # pre-warming never spends Bedrock requests on SEO spam.
     source = args.data_dir / "userSearchLog_cleaned.csv"
     if not source.is_file():
-        source = args.data_dir / "userSearchLog_20260601_20260607.csv"
+        raise SystemExit(
+            f"Missing {source}. Run: python3 scripts/clean_search_log.py\n"
+            "Pre-warming from the raw log would spend Bedrock requests on SEO "
+            "spam queries."
+        )
     with source.open(encoding="utf-8-sig", newline="") as handle:
         for row in csv.DictReader(handle):
             rows += 1

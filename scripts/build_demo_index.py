@@ -248,9 +248,16 @@ def schema_fingerprint(data_dir: Path) -> str:
         "職缺瀏覽_20260601_20260607.csv",
         "主動應徵_0601-0607.csv",
     ]
+    # The cleaned log is required, not preferred. Silently falling back to the
+    # raw log produced a different index with no warning, which is exactly how
+    # two developers end up with artifacts that disagree.
     search_log = data_dir / "userSearchLog_cleaned.csv"
     if not search_log.is_file():
-        search_log = data_dir / "userSearchLog_20260601_20260607.csv"
+        raise SystemExit(
+            f"Missing {search_log}. Run: python3 scripts/clean_search_log.py\n"
+            "The cleaned search log removes SEO spam and URL queries; building "
+            "from the raw log yields a different index and schema fingerprint."
+        )
     for name in names:
         path = data_dir / name
         with path.open("rb") as handle:

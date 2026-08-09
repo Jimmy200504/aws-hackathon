@@ -185,6 +185,20 @@ bash scripts/deploy_lambda_code.sh
 
 執行前，確認 `data/dataset/` 內有這六個檔案：`職缺.csv`、`職務對照表.csv`、`城市對照表.csv`、`userSearchLog_20260601_20260607.csv`、`職缺瀏覽_20260601_20260607.csv`、`主動應徵_0601-0607.csv`。行為資料含有假名化識別碼，請勿放進公開 artifact。
 
+接著清理搜尋日誌並核對輸入指紋。清理會移除 SEO spam 與 URL 查詢，產生
+`userSearchLog_cleaned.csv`；benchmark fixture 與展示索引都只讀這份清理後的日誌，
+所以這一步是必要的，不是選用的：
+
+```bash
+make clean-search-log
+make verify-inputs
+```
+
+`make verify-inputs` 比對 `config/dataset-fingerprints.json` 記錄的 SHA-256、大小與
+行數。因為 pipeline 是決定性的，輸入相同就會產生位元相同的圖譜與 benchmark 產物，
+所以版控只追蹤指紋，不散布數十 GB 的衍生檔案。指紋不符時代表你的產物無法與團隊
+比對，先解決差異再建置。
+
 ```bash
 make setup
 .venv/bin/python -m pip install -r requirements-ltr.lock
