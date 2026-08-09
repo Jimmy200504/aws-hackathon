@@ -214,15 +214,17 @@ jq '{
 jq . reports/verify-quality-release.json
 ```
 
-### 2. 重現文末的 deterministic-v2 固定結果
+### 2. 重現文末的 deterministic-v3 固定結果
 
-文末表格使用 `evaluation-cutoff` graph manifest，qrels 與模型也已固定。先核對四個 artifact 的 SHA-256：
+文末表格使用 `evaluation-cutoff` graph manifest，qrels 與模型也已固定。這些產物由上一節的
+`make quality` 與下方的 overlay 步驟產生（`artifacts/` 下的評測目錄不進版控，需在本機重建）。
+先核對四個 artifact 的 SHA-256：
 
 ```bash
 shasum -a 256 \
-  artifacts/quality-v2/deterministic/benchmark-index.json \
-  artifacts/quality-v2/source/temporal-eval.json \
-  artifacts/quality-v2/deterministic/ltr/test.jsonl \
+  artifacts/quality/primary/overlay-index.json \
+  artifacts/quality/primary/temporal-eval.json \
+  artifacts/quality/primary/ltr-overlay/test.jsonl \
   artifacts/models/ltr-quality-final.ubj
 ```
 
@@ -240,10 +242,10 @@ ca163ccbb4bab4da47fd2fd85453d38538ceb77a387af0b8bc784505681c8c17
 ```bash
 .venv/bin/python pipeline/evaluate_ltr.py \
   --graph-model artifacts/models/ltr-quality-final.ubj \
-  --pairs artifacts/quality-v2/deterministic/ltr/test.jsonl \
-  --qrels artifacts/quality-v2/source/temporal-eval.json \
-  --graph-binding-manifest artifacts/quality-v2/deterministic/benchmark-index.manifest.json \
-  --output reports/ltr-quality-deterministic-v2-reproduced.json \
+  --pairs artifacts/quality/primary/ltr-overlay/test.jsonl \
+  --qrels artifacts/quality/primary/temporal-eval.json \
+  --graph-binding-manifest artifacts/quality/primary/overlay-index.manifest.json \
+  --output reports/ltr-quality-deterministic-v3-reproduced.json \
   --split test \
   --confidence-gate none
 
@@ -253,7 +255,7 @@ jq '{
   relative_lift,
   paired_bootstrap_ndcg,
   release_gates
-}' reports/ltr-quality-deterministic-v2-reproduced.json
+}' reports/ltr-quality-deterministic-v3-reproduced.json
 ```
 
 若要從原始職缺重建同版本的圖譜中間檔，請使用發行版本的參數。這一步會掃描 1,218,635 筆職缺，比單純重新計分更花時間和磁碟空間：
@@ -273,24 +275,25 @@ jq '{
   --cutoff '2026-06-05 23:59:59.999'
 ```
 
-圖譜完成後，重建 benchmark overlay 和 LTR rows：
+圖譜完成後，重建 benchmark overlay 和 LTR rows。overlay 會把統計 `RELATED_TO` 邊綁進
+`make quality` 產生的 base index，取代 ontology 內的審閱提示權重：
 
 ```bash
 .venv/bin/python scripts/build_v2_ranking_overlay.py \
-  --base-index artifacts/quality-v2/source/benchmark-index.json \
-  --qrels artifacts/quality-v2/source/temporal-eval.json \
+  --base-index artifacts/quality/primary/benchmark-index.json \
+  --qrels artifacts/quality/primary/temporal-eval.json \
   --graph-manifest artifacts/skill-graph-full-v2/release/runs/deterministic-v2-rules-v3-full/evaluation-cutoff/manifest.json \
   --nodes artifacts/skill-graph-full-v2/resolved/evaluation-cutoff/nodes.jsonl \
   --resolved-jobs artifacts/skill-graph-full-v2/resolved/evaluation-cutoff/jobs.jsonl \
   --job-edges artifacts/skill-graph-full-v2/resolved/evaluation-cutoff/job-skill-edges.jsonl \
   --relation-edges artifacts/skill-graph-full-v2/relations/evaluation-cutoff/relation-edges.jsonl \
   --reviewed-ontology config/skill_ontology.seed.json \
-  --output artifacts/quality-v2/deterministic/benchmark-index.json
+  --output artifacts/quality/primary/overlay-index.json
 
 .venv/bin/python pipeline/build_ltr_pairs.py \
-  --index artifacts/quality-v2/deterministic/benchmark-index.json \
-  --qrels artifacts/quality-v2/source/temporal-eval.json \
-  --output-dir artifacts/quality-v2/deterministic/ltr
+  --index artifacts/quality/primary/overlay-index.json \
+  --qrels artifacts/quality/primary/temporal-eval.json \
+  --output-dir artifacts/quality/primary/ltr-overlay
 ```
 
 Pipeline 會記錄每個階段的 checkpoint。只要參數沒變、輸出也完整，重跑時會略過已完成的階段。完成後請核對 graph manifest、index sidecar 和上述 SHA-256，確認產物沒有漂移。
