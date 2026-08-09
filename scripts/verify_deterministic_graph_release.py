@@ -20,12 +20,12 @@ from pipeline.graph_release import evaluate_release_gates
 DEFAULT_RELEASE_ROOT = (
     ROOT
     / "artifacts/skill-graph-full-v2/release/runs"
-    / "deterministic-v1-rules-v2-full/evaluation-cutoff"
+    / "deterministic-v2-rules-v3-full/evaluation-cutoff"
 )
 DEFAULT_QUALITY = DEFAULT_RELEASE_ROOT / "quality-report.json"
 DEFAULT_GRAPH_MANIFEST = DEFAULT_RELEASE_ROOT / "manifest.json"
-DEFAULT_GOLD = ROOT / "reports/deterministic-graph-gold-v2.json"
-DEFAULT_RANKING = ROOT / "reports/ltr-quality-deterministic-v2.json"
+DEFAULT_GOLD = ROOT / "reports/deterministic-graph-gold.json"
+DEFAULT_RANKING = ROOT / "reports/ltr-quality-deterministic-v3-reproduced.json"
 DEFAULT_RUNTIME = ROOT / "reports/deterministic-graph-managed-runtime.json"
 DEFAULT_FALLBACK = ROOT / "reports/deterministic-graph-runtime-preflight.json"
 DEFAULT_INVENTORY = ROOT / "reports/deterministic-corpus-inventory.json"

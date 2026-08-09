@@ -100,7 +100,7 @@ aws sts get-caller-identity
 
 1. 設定了 `NEPTUNE_GRAPH_ID` → `GraphFeatureProvider`，即時查詢 AWS Neptune Analytics（正式環境用）。
 2. 沒設 `NEPTUNE_GRAPH_ID`，但 `LOCAL_GRAPH_INDEX_PATH` 指到存在的檔案 → `LocalGraphProvider`，改讀本機 SQLite 索引；內容是同一份完整的統計 `RELATED_TO` 圖譜（見「版本對照」的正式環境圖譜列），只是不需要部署 AWS。
-3. 兩者都沒設 → 回退到 `artifacts/demo-index.json` 內嵌的 63-node bootstrap fixture。
+3. 兩者都沒設 → 回退到 `artifacts/demo-index.json` 內嵌的 115-node bootstrap fixture。
 
 沒有 AWS 帳號、只想在本機測滿版圖譜效果時，下載發行版附的索引檔並指過去即可：
 
@@ -182,7 +182,6 @@ curl --fail --request POST \
 ```bash
 make test       # unit + integration tests
 make sam-smoke  # packaged Lambda on SAM runtime
-make release    # release gates、hash 與 artifact contract
 make aws-smoke  # public production API / trace / bounded load smoke
 ```
 
@@ -338,7 +337,7 @@ Pipeline 會記錄每個階段的 checkpoint。只要參數沒變、輸出也完
 
 | 類型 | 目前版本／artifact | 說明 |
 |---|---|---|
-| 發行版本 | `skillweave-2026.07.28-rc6` | 綁定資訊與 SHA-256 記錄在 `release-manifest.json` |
+| 發行版本 | `skillweave-2026.07.28-rc6` | 圖譜/模型版本記錄在 `release-manifest.json` |
 | 資料集 | `1111-2026-06-01_2026-06-07` | 1,218,635 筆職缺、6,139,952 次搜尋、8,241,233 次瀏覽、225,999 次應徵 |
 | Schema fingerprint | `1ae7d6bfbf96c1ba` | 正式環境與展示版共用 |
 | 正式環境圖譜 | `deterministic-v2-rules-v3-latest` | 1,219,438 個 nodes、7,710,984 條 edges，其中 1,218,635 個是 job nodes；805 條統計 `RELATED_TO` |

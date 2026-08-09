@@ -7,7 +7,7 @@ Two backends implement the same one-hop RELATED_TO expansion contract
 - ``LocalGraphProvider``: queries a local SQLite index built by
   ``scripts/build_local_graph_index.py`` from a full deterministic Skill
   Graph build, so a user who never deploys AWS still gets the full
-  production-scale graph instead of the 63-node bootstrap fixture embedded
+  production-scale graph instead of the 115-node bootstrap fixture embedded
   in ``artifacts/demo-index.json``. See the README for the fallback order.
 """
 from __future__ import annotations
@@ -286,7 +286,7 @@ class LocalGraphProvider:
     Reads the compact index produced by ``scripts/build_local_graph_index.py``
     (downloaded via ``scripts/download_local_graph_index.py``). This gives a
     non-AWS user the full statistically-derived skill graph instead of the
-    63-node bootstrap fixture, while remaining a plain-file, dependency-free
+    115-node bootstrap fixture, while remaining a plain-file, dependency-free
     read (``sqlite3`` is part of the Python standard library).
 
     The index stores RELATED_TO edges directionally as extracted
@@ -420,7 +420,7 @@ def resolve_graph_provider() -> "GraphFeatureProvider | LocalGraphProvider | Non
        required; see scripts/download_local_graph_index.py).
     3. Neither configured -> ``None``. Callers must treat ``None`` the same
        way as before: ``app.ranker.SkillWeaveRanker.search`` falls back to
-       the 63-node bootstrap fixture embedded in the demo index
+       the 115-node bootstrap fixture embedded in the demo index
        (``self.skills[...]["related"]``) whenever ``external_relations`` is
        not supplied.
     """

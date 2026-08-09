@@ -24,7 +24,7 @@ from app.query_normalizer import QueryNormalization
 DEFAULT_MANIFEST = (
     ROOT
     / "artifacts/skill-graph-full-v2/release/runs/"
-    "deterministic-v1-rules-v2-full/evaluation-cutoff/manifest.json"
+    "deterministic-v2-rules-v3-full/evaluation-cutoff/manifest.json"
 )
 DEFAULT_OUTPUT = ROOT / "reports/deterministic-graph-runtime-preflight.json"
 

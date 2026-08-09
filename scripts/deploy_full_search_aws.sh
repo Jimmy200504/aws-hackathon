@@ -124,8 +124,14 @@ OPENSEARCH_INDEX="$INDEX_NAME" \
 AWS_REGION="$AWS_REGION_NAME" \
   ./scripts/deploy_compact_aws.sh
 
-"$PYTHON" scripts/run_aws_production_smoke.py --require-full-corpus
-"$PYTHON" scripts/verify_release.py
+DEMO_URL="$(
+  aws cloudformation describe-stacks \
+    --stack-name "$DEMO_STACK_NAME" \
+    --region "$AWS_REGION_NAME" \
+    --query "Stacks[0].Outputs[?OutputKey=='DemoUrl'].OutputValue | [0]" \
+    --output text
+)"
+"$PYTHON" scripts/run_aws_production_smoke.py --url "$DEMO_URL" --require-full-corpus
 
 echo
 echo "Full-corpus search deployed."

@@ -7,7 +7,7 @@
     "expected_cutoff_eligible_jobs": 967377
   },
   "extraction": {
-    "extractor": "deterministic-v1",
+    "extractor": "deterministic-v2",
     "model_id": null,
     "part_size": 1000,
     "normalization": ["NFKC", "casefold", "collapse_whitespace", "臺_to_台"],

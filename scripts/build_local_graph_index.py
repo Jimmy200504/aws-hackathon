@@ -14,7 +14,7 @@ loading the full multi-gigabyte export into memory. The output is meant to be
 distributed as a GitHub Release asset (see
 ``scripts/download_local_graph_index.py``) so a user who never deploys AWS
 can still get the production-scale skill graph locally, instead of the
-63-node bootstrap fixture embedded in ``artifacts/demo-index.json``.
+115-node bootstrap fixture embedded in ``artifacts/demo-index.json``.
 """
 from __future__ import annotations
 
@@ -181,7 +181,7 @@ def main() -> None:
     parser.add_argument(
         "--graph-version",
         required=True,
-        help="graph version label to record in metadata, e.g. deterministic-v1-rules-v2-latest",
+        help="graph version label to record in metadata, e.g. deterministic-v2-rules-v3-latest",
     )
     parser.add_argument(
         "--manifest",

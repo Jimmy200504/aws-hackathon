@@ -278,8 +278,8 @@ def build_ranking_graph_overlay(
     )
     base["metadata"].update(
         {
-            "index_version": f"{base['metadata']['index_version']}-deterministic-v2-cutoff",
-            "graph_builder": "deterministic-v1-rules-v2",
+            "index_version": f"{base['metadata']['index_version']}-deterministic-v3-cutoff",
+            "graph_builder": "deterministic-v2-rules-v3",
             "graph_version": graph_manifest["graph_version"],
             "graph_manifest_hash": graph_manifest_hash,
             "graph_overlay": {

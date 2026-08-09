@@ -1,4 +1,4 @@
-.PHONY: setup demo test verify release audit coverage business sam-smoke aws-smoke video submission external-preflight index benchmark quality package opensearch-local-up opensearch-local-down full-index-local full-demo-local query-artifacts graph-full-plan graph-full-build graph-review graph-review-score verify-inputs clean-search-log
+.PHONY: setup demo test coverage sam-smoke aws-smoke video index benchmark quality package opensearch-local-up opensearch-local-down full-index-local full-demo-local query-artifacts graph-full-plan graph-full-build graph-review graph-review-score verify-inputs clean-search-log
 
 PYTHON ?= .venv/bin/python
 AWS_REGION ?= us-east-1
@@ -31,20 +31,8 @@ test:
 	$(PYTHON) -m py_compile app/*.py pipeline/*.py scripts/*.py tests/*.py
 	$(PYTHON) -m unittest discover -s tests -v
 
-verify:
-	$(PYTHON) scripts/verify_release.py
-
-release:
-	./scripts/release_gate.sh
-
-audit:
-	$(PYTHON) scripts/audit_submission.py
-
 coverage:
 	$(PYTHON) scripts/report_graph_coverage.py
-
-business:
-	$(PYTHON) scripts/report_business_impact.py
 
 sam-smoke:
 	$(PYTHON) scripts/run_sam_local_smoke.py
@@ -54,12 +42,6 @@ aws-smoke:
 
 video:
 	$(PYTHON) scripts/render_demo_video.py
-
-submission:
-	$(PYTHON) scripts/build_submission_packet.py
-
-external-preflight:
-	$(PYTHON) scripts/external_release_preflight.py
 
 index:
 	$(PYTHON) scripts/build_demo_index.py

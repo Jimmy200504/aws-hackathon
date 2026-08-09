@@ -4,13 +4,13 @@
 This is the counterpart to ``scripts/build_local_graph_index.py``. It lets a
 user who does not deploy AWS (no Neptune Analytics) fetch a prebuilt,
 production-scale RELATED_TO skill graph index and use it locally instead of
-the 63-node bootstrap fixture embedded in ``artifacts/demo-index.json``. See
+the 115-node bootstrap fixture embedded in ``artifacts/demo-index.json``. See
 ``app/graph_provider.py::LocalGraphProvider`` for how the index is queried,
 and the README for the three-tier fallback order (Neptune -> local index ->
 embedded fixture).
 
-Zero third-party dependencies: uses ``urllib.request`` only, consistent with
-the local-demo zero-dependency requirement in .kiro/steering/tech.md.
+Zero third-party dependencies: uses ``urllib.request`` only, so the local
+demo keeps working without an extra `pip install`.
 """
 from __future__ import annotations
 

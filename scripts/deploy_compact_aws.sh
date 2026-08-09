@@ -14,7 +14,7 @@ OPENSEARCH_SERVICE_VALUE="${OPENSEARCH_SERVICE:-none}"
 BEDROCK_QUERY_MODEL_ID_VALUE="${BEDROCK_QUERY_MODEL_ID:-us.anthropic.claude-sonnet-4-6}"
 NEPTUNE_GRAPH_ID_VALUE="${NEPTUNE_GRAPH_ID:-}"
 NEPTUNE_GRAPH_REGION_VALUE="${NEPTUNE_GRAPH_REGION:-$AWS_REGION_NAME}"
-GRAPH_VERSION_VALUE="${GRAPH_VERSION:-deterministic-v1-rules-v2-latest}"
+GRAPH_VERSION_VALUE="${GRAPH_VERSION:-deterministic-v2-rules-v3-latest}"
 SKILL_ALIAS_INDEX_VALUE="${SKILL_ALIAS_INDEX:-skillweave-skill-alias-v1}"
 
 if [[ -n "$OPENSEARCH_ENDPOINT_VALUE" || -n "$OPENSEARCH_COLLECTION_ARN_VALUE" ]]; then
@@ -43,7 +43,6 @@ if [[ -n "$OPENSEARCH_ENDPOINT_VALUE" ]]; then
   )
 fi
 
-./scripts/release_gate.sh
 sam validate --lint --template-file infra/template.yaml
 sam build --template-file infra/template.yaml
 sam deploy \
@@ -80,8 +79,6 @@ if [[ -n "$NEPTUNE_GRAPH_ID_VALUE" ]]; then
   VERIFY_ARGS+=(--require-neptune --expected-graph-version "$GRAPH_VERSION_VALUE")
 fi
 .venv/bin/python scripts/verify_app_deployment.py "${VERIFY_ARGS[@]}"
-python3 scripts/update_release_urls.py --aws-url "$DEMO_URL"
-python3 scripts/verify_release.py
 
 echo
 echo "SkillWeave compact demo deployed: $DEMO_URL"

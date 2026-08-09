@@ -156,7 +156,7 @@ def score_review_packet(packet_dir: Path) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Score a completed graph review packet")
-    parser.add_argument("--packet", type=Path, default=Path("artifacts/skill-graph-review/deterministic-v1-full"))
+    parser.add_argument("--packet", type=Path, default=Path("artifacts/skill-graph-review/deterministic-v2-rules-v3-full"))
     parser.add_argument("--output", type=Path, default=Path("reports/deterministic-graph-gold.json"))
     args = parser.parse_args()
     try:

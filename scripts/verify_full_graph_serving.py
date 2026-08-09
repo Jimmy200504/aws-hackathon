@@ -20,11 +20,11 @@ from app.ranker import SkillWeaveRanker
 from scripts.index_full_opensearch import SignedOpenSearchClient
 
 
-RUN_ID = "deterministic-v1-rules-v2-full"
-GRAPH_VERSION = "deterministic-v1-rules-v2-latest"
+RUN_ID = "deterministic-v2-rules-v3-full"
+GRAPH_VERSION = "deterministic-v2-rules-v3-latest"
 EXPECTED_JOBS = 1_218_635
-EXPECTED_NODES = 1_219_372
-EXPECTED_EDGES = 5_249_573
+EXPECTED_NODES = 1_219_438
+EXPECTED_EDGES = 7_710_984
 POST_CUTOFF_JOB_ID = "113042386"
 POST_CUTOFF_QUERY = "I186 Node.js後端工程師 可遠端工作"
 BUCKET = "skillweave-provisioned-search-snapshotbucket-rigq6j18z9ma"

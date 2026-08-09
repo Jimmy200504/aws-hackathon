@@ -4,9 +4,8 @@
 The deterministic graph build emits ``review/surface-candidates`` — normalized
 surface forms seen in real job postings that did NOT resolve to a reviewed
 ontology node. They are deliberately not serving-eligible: a human must review
-them before they become graph nodes (see .kiro/steering/product.md — the
-production graph build uses no LLM or embedding, and only reviewed aliases
-resolve).
+them before they become graph nodes — the production graph build uses no LLM
+or embedding, and only reviewed aliases resolve.
 
 This script ranks those candidates by corpus support and filters out ones that
 would collide with existing reviewed aliases, so a reviewer can work from a
