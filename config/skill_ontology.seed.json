@@ -24,7 +24,9 @@
       "related": {
         "skill.office": 0.82,
         "skill.document": 0.84,
-        "occupation.hr": 0.48
+        "occupation.hr": 0.48,
+        "occupation.assistant": 0.7,
+        "occupation.receptionist": 0.6
       }
     },
     "occupation.driver": {
@@ -39,7 +41,8 @@
       ],
       "related": {
         "skill.delivery": 0.9,
-        "skill.forklift": 0.35
+        "skill.forklift": 0.35,
+        "occupation.logistics": 0.6
       }
     },
     "occupation.operator": {
@@ -55,7 +58,8 @@
       "related": {
         "skill.packaging": 0.89,
         "skill.quality": 0.45,
-        "skill.forklift": 0.34
+        "skill.forklift": 0.34,
+        "occupation.qc": 0.55
       }
     },
     "occupation.retail": {
@@ -71,7 +75,8 @@
       "related": {
         "skill.customer_service": 0.87,
         "skill.pos": 0.83,
-        "skill.sales": 0.62
+        "skill.sales": 0.62,
+        "occupation.service_staff": 0.65
       }
     },
     "occupation.food_service": {
@@ -87,7 +92,9 @@
       "related": {
         "skill.customer_service": 0.61,
         "skill.food_safety": 0.86,
-        "skill.pos": 0.42
+        "skill.pos": 0.42,
+        "occupation.chef": 0.66,
+        "occupation.service_staff": 0.7
       }
     },
     "occupation.security": {
@@ -115,7 +122,9 @@
       ],
       "related": {
         "skill.patient_care": 0.94,
-        "skill.clinic": 0.72
+        "skill.clinic": 0.72,
+        "occupation.caregiver": 0.6,
+        "occupation.dental_assistant": 0.5
       }
     },
     "occupation.accounting": {
@@ -161,7 +170,8 @@
       "related": {
         "occupation.backend": 0.75,
         "occupation.frontend": 0.75,
-        "skill.git": 0.68
+        "skill.git": 0.68,
+        "occupation.engineer": 0.6
       }
     },
     "occupation.backend": {
@@ -358,7 +368,8 @@
       ],
       "related": {
         "skill.packaging": 0.49,
-        "skill.engineering_quality": 0.82
+        "skill.engineering_quality": 0.82,
+        "occupation.qc": 0.9
       }
     },
     "skill.customer_service": {
@@ -374,7 +385,9 @@
         "skill.sales": 0.64,
         "skill.pos": 0.52,
         "skill.customer_relationship": 0.9,
-        "skill.complaint_handling": 0.86
+        "skill.complaint_handling": 0.86,
+        "occupation.service_staff": 0.85,
+        "occupation.receptionist": 0.78
       }
     },
     "skill.pos": {
@@ -427,7 +440,9 @@
         "skill.clinic": 0.65,
         "skill.nurse_license": 0.9,
         "skill.nurse_aide_license": 0.88,
-        "skill.caregiver_cert": 0.85
+        "skill.caregiver_cert": 0.85,
+        "occupation.caregiver": 0.85,
+        "occupation.social_worker": 0.6
       }
     },
     "skill.clinic": {
@@ -442,7 +457,9 @@
       "related": {
         "skill.patient_care": 0.65,
         "skill.nurse_license": 0.75,
-        "skill.pharmacist_license": 0.7
+        "skill.pharmacist_license": 0.7,
+        "occupation.dental_assistant": 0.85,
+        "occupation.pharmacy_assistant": 0.7
       }
     },
     "skill.accounting": {
@@ -896,7 +913,8 @@
       ],
       "related": {
         "skill.drafting": 0.85,
-        "skill.solidworks": 0.6
+        "skill.solidworks": 0.6,
+        "occupation.drafter": 0.88
       }
     },
     "skill.photoshop": {
@@ -972,7 +990,8 @@
       ],
       "related": {
         "skill.autocad": 0.85,
-        "skill.solidworks": 0.8
+        "skill.solidworks": 0.8,
+        "occupation.drafter": 0.9
       }
     },
     "skill.graphic_design": {
@@ -985,7 +1004,8 @@
       ],
       "related": {
         "skill.photoshop": 0.86,
-        "skill.illustrator": 0.86
+        "skill.illustrator": 0.86,
+        "occupation.designer": 0.9
       }
     },
     "skill.admin_support": {
@@ -999,7 +1019,9 @@
       ],
       "related": {
         "skill.document": 0.8,
-        "skill.office": 0.75
+        "skill.office": 0.75,
+        "occupation.assistant": 0.82,
+        "occupation.receptionist": 0.8
       }
     },
     "skill.business_development": {
@@ -1081,7 +1103,8 @@
       ],
       "related": {
         "skill.social_media": 0.82,
-        "skill.sales": 0.6
+        "skill.sales": 0.6,
+        "occupation.marketing": 0.9
       }
     },
     "skill.social_media": {
@@ -1157,7 +1180,8 @@
       ],
       "related": {
         "skill.forklift": 0.75,
-        "skill.packaging": 0.7
+        "skill.packaging": 0.7,
+        "occupation.logistics": 0.88
       }
     },
     "skill.construction_supervision": {
@@ -1207,7 +1231,8 @@
       ],
       "related": {
         "skill.food_safety": 0.85,
-        "skill.chinese_cuisine_cert": 0.7
+        "skill.chinese_cuisine_cert": 0.7,
+        "occupation.chef": 0.85
       }
     },
     "skill.chinese_cuisine_cert": {
@@ -1220,7 +1245,8 @@
       ],
       "related": {
         "skill.food_prep": 0.7,
-        "skill.food_safety": 0.72
+        "skill.food_safety": 0.72,
+        "occupation.chef": 0.8
       }
     },
     "skill.nurse_license": {
@@ -1258,7 +1284,8 @@
         "照顧服務員"
       ],
       "related": {
-        "skill.patient_care": 0.85
+        "skill.patient_care": 0.85,
+        "occupation.caregiver": 0.9
       }
     },
     "skill.pharmacist_license": {
@@ -1297,6 +1324,259 @@
       "related": {
         "skill.erp": 0.9,
         "skill.accounting": 0.62
+      }
+    },
+    "occupation.childcare": {
+      "type": "Occupation",
+      "label": "教保員",
+      "aliases": [
+        "教保人員",
+        "托育人員",
+        "幼教老師",
+        "保育員"
+      ],
+      "related": {
+        "skill.patient_care": 0.55,
+        "occupation.teacher": 0.62
+      }
+    },
+    "occupation.teacher": {
+      "type": "Occupation",
+      "label": "教師",
+      "aliases": [
+        "老師",
+        "補習班老師",
+        "安親班老師",
+        "teacher"
+      ],
+      "related": {
+        "occupation.childcare": 0.62
+      }
+    },
+    "occupation.social_worker": {
+      "type": "Occupation",
+      "label": "社工",
+      "aliases": [
+        "社工師",
+        "社會工作師",
+        "social worker"
+      ],
+      "related": {
+        "skill.patient_care": 0.6,
+        "occupation.caregiver": 0.58
+      }
+    },
+    "occupation.caregiver": {
+      "type": "Occupation",
+      "label": "照顧服務員",
+      "aliases": [
+        "照服員",
+        "看護",
+        "居家照顧員",
+        "caregiver"
+      ],
+      "related": {
+        "skill.caregiver_cert": 0.9,
+        "skill.patient_care": 0.85,
+        "occupation.nurse": 0.6
+      }
+    },
+    "occupation.dental_assistant": {
+      "type": "Occupation",
+      "label": "牙醫助理",
+      "aliases": [
+        "牙助",
+        "牙科助理",
+        "dental assistant"
+      ],
+      "related": {
+        "skill.clinic": 0.85,
+        "skill.patient_care": 0.7,
+        "occupation.nurse": 0.5
+      }
+    },
+    "occupation.pharmacy_assistant": {
+      "type": "Occupation",
+      "label": "藥局助理",
+      "aliases": [
+        "藥助",
+        "藥局門市人員",
+        "調劑助理"
+      ],
+      "related": {
+        "skill.pharmacist_license": 0.62,
+        "skill.clinic": 0.7,
+        "skill.pos": 0.5
+      }
+    },
+    "occupation.chef": {
+      "type": "Occupation",
+      "label": "廚師",
+      "aliases": [
+        "主廚",
+        "廚工",
+        "料理人員",
+        "chef",
+        "cook"
+      ],
+      "related": {
+        "skill.chinese_cuisine_cert": 0.8,
+        "skill.food_prep": 0.85,
+        "skill.food_safety": 0.78,
+        "occupation.food_service": 0.66
+      }
+    },
+    "occupation.receptionist": {
+      "type": "Occupation",
+      "label": "櫃檯人員",
+      "aliases": [
+        "櫃檯",
+        "櫃台",
+        "接待人員",
+        "receptionist",
+        "front desk"
+      ],
+      "related": {
+        "skill.admin_support": 0.8,
+        "skill.customer_service": 0.78,
+        "skill.pos": 0.58
+      }
+    },
+    "occupation.cleaner": {
+      "type": "Occupation",
+      "label": "清潔人員",
+      "aliases": [
+        "清潔員",
+        "環境清潔",
+        "housekeeping",
+        "清潔工"
+      ],
+      "related": {
+        "skill.food_safety": 0.4
+      }
+    },
+    "occupation.assistant": {
+      "type": "Occupation",
+      "label": "助理",
+      "aliases": [
+        "助理人員",
+        "assistant"
+      ],
+      "related": {
+        "skill.admin_support": 0.82,
+        "skill.document": 0.7,
+        "occupation.admin": 0.7
+      }
+    },
+    "occupation.apprentice": {
+      "type": "Occupation",
+      "label": "學徒",
+      "aliases": [
+        "實習生",
+        "見習生",
+        "apprentice",
+        "trainee"
+      ],
+      "related": {}
+    },
+    "occupation.engineer": {
+      "type": "Occupation",
+      "label": "工程師",
+      "aliases": [
+        "技術人員",
+        "engineer"
+      ],
+      "related": {
+        "occupation.software": 0.6,
+        "skill.engineering_quality": 0.6,
+        "skill.construction_supervision": 0.55
+      }
+    },
+    "occupation.logistics": {
+      "type": "Occupation",
+      "label": "物流人員",
+      "aliases": [
+        "物流",
+        "倉儲人員",
+        "倉管",
+        "logistics"
+      ],
+      "related": {
+        "skill.warehouse_ops": 0.88,
+        "skill.delivery": 0.75,
+        "skill.forklift": 0.7,
+        "occupation.driver": 0.6
+      }
+    },
+    "occupation.service_staff": {
+      "type": "Occupation",
+      "label": "服務人員",
+      "aliases": [
+        "服務生",
+        "service staff"
+      ],
+      "related": {
+        "skill.customer_service": 0.85,
+        "occupation.food_service": 0.7,
+        "occupation.retail": 0.65
+      }
+    },
+    "occupation.qc": {
+      "type": "Occupation",
+      "label": "品管人員",
+      "aliases": [
+        "品管",
+        "品保人員",
+        "qc",
+        "quality control"
+      ],
+      "related": {
+        "skill.quality": 0.9,
+        "skill.engineering_quality": 0.75,
+        "occupation.operator": 0.55
+      }
+    },
+    "occupation.marketing": {
+      "type": "Occupation",
+      "label": "行銷企劃",
+      "aliases": [
+        "行銷人員",
+        "企劃人員",
+        "marketing"
+      ],
+      "related": {
+        "skill.marketing": 0.9,
+        "skill.social_media": 0.8,
+        "skill.powerpoint": 0.55
+      }
+    },
+    "occupation.designer": {
+      "type": "Occupation",
+      "label": "設計師",
+      "aliases": [
+        "美術設計人員",
+        "美編",
+        "graphic designer",
+        "designer"
+      ],
+      "related": {
+        "skill.graphic_design": 0.9,
+        "skill.photoshop": 0.85,
+        "skill.illustrator": 0.85
+      }
+    },
+    "occupation.drafter": {
+      "type": "Occupation",
+      "label": "製圖人員",
+      "aliases": [
+        "繪圖人員",
+        "cad工程師",
+        "drafter"
+      ],
+      "related": {
+        "skill.drafting": 0.9,
+        "skill.autocad": 0.88,
+        "skill.solidworks": 0.7
       }
     }
   }

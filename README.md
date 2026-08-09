@@ -5,7 +5,7 @@ SkillWeave 是一套職缺搜尋系統。它先用 OpenSearch 從全量職缺找
 - 線上展示：<https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/>
 - 發行版本：`skillweave-2026.07.28-rc6`
 - 正式環境資料量：1,218,635 筆職缺
-- 正式環境圖譜：`deterministic-v1-rules-v2-latest`
+- 正式環境圖譜：`deterministic-v2-rules-v3-latest`
 - OpenAPI：[docs/openapi.yaml](docs/openapi.yaml)
 
 ## 系統架構與資料流
@@ -148,8 +148,8 @@ curl --fail --request POST \
   "meta": {
     "graph_enabled": true,
     "graph_backend": "neptune_analytics",
-    "graph_version": "deterministic-v1-rules-v2-latest",
-    "index_version": "demo-2026.06.07-full-v1",
+    "graph_version": "deterministic-v2-rules-v3-latest",
+    "index_version": "demo-2026.06.07-full-v2",
     "degraded_components": []
   }
 }
@@ -174,7 +174,7 @@ bash scripts/deploy_lambda_code.sh
   --url https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/ \
   --require-full-corpus \
   --require-neptune \
-  --expected-graph-version deterministic-v1-rules-v2-latest
+  --expected-graph-version deterministic-v2-rules-v3-latest
 ```
 
 第一次建立 stack、寫入 OpenSearch 全量索引或清理資源前，請先看 [deployment runbook](docs/deployment.md)。
@@ -229,10 +229,10 @@ shasum -a 256 \
 四行雜湊應為以下內容，順序同上：
 
 ```text
-21509499a0d924ec5c72a956f66c1725dc7225f13d3600a157f47885265d8306
+7150555eb606434a06eab66f6d75a72c834954dc4d47e77c78fd1d09d74cebc9
 8471ccea48e37cca65dfe763092ab76600ed39ab27004f6253c136b0bffa8328
-7074e5715ed6b042f9824fe810d77b36a4a14423eb87bfa7d7cbc1105907d592
-d280a0952e7604934d669eee3aacb1a2f158793f0187e35ef34ce1725656bced
+ca163ccbb4bab4da47fd2fd85453d38538ceb77a387af0b8bc784505681c8c17
+19f6d2f031134a7e1e35d346214fb9533071f9a15c5691c9f50ed1dd83d1bdcf
 ```
 
 核對完成後重新計分，並帶入圖譜來源資訊：
@@ -261,15 +261,15 @@ jq '{
 ```bash
 .venv/bin/python scripts/run_full_graph_build.py \
   --work-root artifacts/skill-graph-full-v2 \
-  --run-id deterministic-v1-rules-v2-full \
-  --graph-version deterministic-v1-rules-v2 \
+  --run-id deterministic-v2-rules-v3-full \
+  --graph-version deterministic-v2-rules-v3 \
   --cutoff '2026-06-05 23:59:59.999' \
   --dry-run
 
 .venv/bin/python scripts/run_full_graph_build.py \
   --work-root artifacts/skill-graph-full-v2 \
-  --run-id deterministic-v1-rules-v2-full \
-  --graph-version deterministic-v1-rules-v2 \
+  --run-id deterministic-v2-rules-v3-full \
+  --graph-version deterministic-v2-rules-v3 \
   --cutoff '2026-06-05 23:59:59.999'
 ```
 
@@ -279,7 +279,7 @@ jq '{
 .venv/bin/python scripts/build_v2_ranking_overlay.py \
   --base-index artifacts/quality-v2/source/benchmark-index.json \
   --qrels artifacts/quality-v2/source/temporal-eval.json \
-  --graph-manifest artifacts/skill-graph-full-v2/release/runs/deterministic-v1-rules-v2-full/evaluation-cutoff/manifest.json \
+  --graph-manifest artifacts/skill-graph-full-v2/release/runs/deterministic-v2-rules-v3-full/evaluation-cutoff/manifest.json \
   --nodes artifacts/skill-graph-full-v2/resolved/evaluation-cutoff/nodes.jsonl \
   --resolved-jobs artifacts/skill-graph-full-v2/resolved/evaluation-cutoff/jobs.jsonl \
   --job-edges artifacts/skill-graph-full-v2/resolved/evaluation-cutoff/job-skill-edges.jsonl \
@@ -301,16 +301,17 @@ Pipeline 會記錄每個階段的 checkpoint。只要參數沒變、輸出也完
 |---|---|---|
 | 發行版本 | `skillweave-2026.07.28-rc6` | 綁定資訊與 SHA-256 記錄在 `release-manifest.json` |
 | 資料集 | `1111-2026-06-01_2026-06-07` | 1,218,635 筆職缺、6,139,952 次搜尋、8,241,233 次瀏覽、225,999 次應徵 |
-| Schema fingerprint | `1b0ec3b465981ea2` | 正式環境與展示版共用；benchmark overlay 的 fingerprint 是 `105f60c88cdef8a3` |
-| 正式環境圖譜 | `deterministic-v1-rules-v2-latest` | Neptune graph `g-ndf9sijo15`；1,219,372 個 nodes、5,249,573 條 edges，其中 1,218,635 個是 job nodes |
-| 評測圖譜 | `deterministic-v1-rules-v2-evaluation-cutoff` | 固定的離線 benchmark 專用，不可換成 production `latest` |
-| Graph manifest | `44d46505292696204b160e014b2cb7c8c38e49ac80057481cb014bd091223911` | Production latest 宣告的 manifest hash |
-| 內嵌展示索引 | `demo-2026.06.07-full-v1` | 收錄 12,000 筆職缺，供本機展示與 Lambda fallback 使用 |
+| Schema fingerprint | `1ae7d6bfbf96c1ba` | 正式環境與展示版共用 |
+| 正式環境圖譜 | `deterministic-v2-rules-v3-latest` | 1,219,438 個 nodes、7,710,984 條 edges，其中 1,218,635 個是 job nodes；805 條統計 `RELATED_TO` |
+| 評測圖譜 | `deterministic-v2-rules-v3-evaluation-cutoff` | 固定的離線 benchmark 專用，不可換成 production `latest`；781 條統計 `RELATED_TO` |
+| Graph manifest | `e25130e3063c9eafd01e03444a40b809fcafd7c3a37d03ca65cf24c996da8339` | Production latest 宣告的 manifest hash |
+| 審閱 ontology | 115 個節點（82 Skill、33 Occupation） | `config/skill_ontology.seed.json`；ontology hash `76127e5915bfbfb3a731d0bd309a29fcf249ff7ceb20d8d391c8e49c2afc013e` |
+| 內嵌展示索引 | `demo-2026.06.07-full-v2` | 收錄 12,000 筆職缺，供本機展示與 Lambda fallback 使用 |
 | 正式搜尋索引 | `skillweave-jobs-v1` | OpenSearch 全量索引，共 1,218,635 筆職缺 |
 | Benchmark 基礎索引 | `benchmark-2026.06.05-v1` | Temporal fixture 產生的原始索引 |
-| 固定版 benchmark overlay | `benchmark-2026.06.05-v1-deterministic-v2-cutoff` | 已綁定 deterministic evaluation graph |
+| 固定版 benchmark overlay | `benchmark-2026.06.05-v1-deterministic-v3-cutoff` | 已綁定 deterministic evaluation graph；overlay sidecar 記錄 base index、qrels 與 graph manifest 的 SHA-256 |
 | 線上 LTR 模型 | `ltr-quality-remote-salary-intent` | XGBoost 3.2.0、40 trees；UBJ SHA-256 `cb07c70b…11fd` |
-| Benchmark LTR 模型 | `ltr-quality-final` | XGBoost 3.2.0、`rank:ndcg`、seed 1111；UBJ SHA-256 `d280a095…bced` |
+| Benchmark LTR 模型 | `ltr-quality-final` | XGBoost 3.2.0、`rank:ndcg`、seed 1111；UBJ SHA-256 `19f6d2f0…bdcf` |
 
 正式環境的 serving pointer 記錄在 `artifacts/skill-graph-full-v2/release/production-manifest.json`。[Data card](docs/data-card.md) 說明資料治理、欄位缺值、join contract、資料洩漏和偏差限制；模型 manifest 則保存 features、超參數、訓練來源與 XGBoost 版本。比對 benchmark 時，dataset、qrels、index、model 和 graph manifest hash 必須全部一致。
 
@@ -337,16 +338,16 @@ docs/       架構、data card、schema、操作手冊
 
 ## 有無 Skill Graph 的指標差異
 
-下表取自 `reports/ltr-quality-deterministic-v2.json`，評測資料是 2026-06-07 保留的 1,991 筆查詢。兩組使用相同的 candidate rows、seed 1111 和 `ltr-quality-final` 模型；Graph OFF 在推論時把圖譜特徵歸零，Graph ON 則讀取 `deterministic-v1-rules-v2-evaluation-cutoff` 的特徵。
+下表取自 `reports/ltr-quality-confirmation.json`，評測資料是 2026-06-07 保留的 1,991 筆查詢。兩組使用相同的 candidate rows、seed 1111 和 `ltr-quality-final` 模型；Graph OFF 在推論時把圖譜特徵歸零，Graph ON 則讀取 `deterministic-v2-rules-v3-evaluation-cutoff` 的 781 條統計 `RELATED_TO` 邊。
 
 | 指標 | 無 Skill Graph | 有 Skill Graph | 絕對差異 | 相對改善 |
 |---|---:|---:|---:|---:|
-| NDCG@10 | 0.4494 | 0.4726 | +0.0232 | **+5.16%** |
-| MRR | 0.4349 | 0.4579 | +0.0230 | **+5.30%** |
-| Hit@1 | 0.2793 | 0.2988 | +0.0196 | **+7.01%** |
-| Hit@10 | 0.8267 | 0.8599 | +0.0331 | **+4.01%** |
-| Precision@10 | 0.1636 | 0.1726 | +0.0090 | **+5.53%** |
+| NDCG@10 | 0.4469 | 0.4738 | +0.0269 | **+6.02%** |
+| MRR | 0.4313 | 0.4633 | +0.0320 | **+7.43%** |
+| Hit@1 | 0.2737 | 0.3084 | +0.0347 | **+12.66%** |
+| Hit@10 | 0.8257 | 0.8538 | +0.0281 | **+3.41%** |
+| Precision@10 | 0.1624 | 0.1726 | +0.0102 | **+6.28%** |
 
-NDCG@10 的 paired mean delta 是 `+0.02317`，paired bootstrap CI95 為 `[+0.01278, +0.03334]`，區間不含 0。相關 release gates 全部通過，包括至少 +5% NDCG、所有指標不下降，以及 locked graph binding。
+NDCG@10 的 paired mean delta 是 `+0.02692`，paired bootstrap CI95 為 `[+0.01633, +0.03747]`，區間不含 0。獨立的 replication bucket（`reports/ltr-quality-replication.json`，1,992 筆互不重疊的查詢、同一個 frozen model）也達到 `+5.61%`，paired CI95 `[+0.01470, +0.03521]`。`scripts/verify_quality_release.py` 的 12 項 release gate 全部通過，包括兩組都至少 +5% NDCG、所有指標不下降，以及 locked graph binding。
 
 這份數據只代表離線 reranking ablation，不能當成線上 A/B test 或轉換率預估。Qrels 取自既有曝光資料，因此仍受 position bias 影響。

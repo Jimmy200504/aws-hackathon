@@ -27,8 +27,9 @@
     "min_companies": 5,
     "min_lift": 2.0,
     "min_npmi": 0.15,
-    "candidate_neighbor_cap": 20,
-    "published_degree_cap": 20,
+    "candidate_neighbor_cap": 36,
+    "published_degree_cap": 36,
+    "degree_cap_note": "Raised from 20 when the reviewed ontology grew from 63 to 115 nodes; at 20 the cap evicted established skill-to-skill edges instead of letting the statistical thresholds decide.",
     "confidence_formula": "0.6*normalized_npmi + 0.3*normalized_lift + 0.1*min(support_jobs/100,1)",
     "normalization": {
       "npmi": "clip((npmi-0.15)/0.85,0,1)",

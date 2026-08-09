@@ -109,23 +109,52 @@ class OntologyTerm:
 
 
 class ExactAliasMatcher:
-    """Longest exact alias matching with seed-first collision handling."""
+    """Longest exact alias matching with seed-first collision handling.
+
+    Skill and Occupation aliases live in separate namespaces, mirroring
+    ``ExactEntityResolver.resolve(node_type=...)``. The seed ontology
+    deliberately reuses some surfaces across types (for example "sales" is both
+    ``occupation.sales`` and ``skill.sales``), so collapsing both types into one
+    alias map would make those surfaces ambiguous and silently drop them.
+    Ambiguity is therefore evaluated per node type.
+    """
+
+    MATCHED_TYPES = ("Skill", "Occupation")
 
     def __init__(self, terms: Iterable[OntologyTerm]) -> None:
         materialized = tuple(terms)
         self.terms = {term.node_id: term for term in materialized}
-        aliases: dict[str, list[str]] = defaultdict(list)
+        aliases: dict[str, dict[str, list[str]]] = {
+            node_type: defaultdict(list) for node_type in self.MATCHED_TYPES
+        }
         for term in materialized:
-            if term.node_type != "Skill":
+            if term.node_type not in self.MATCHED_TYPES:
                 continue
+            bucket = aliases[term.node_type]
             for raw_alias in (term.label, *term.aliases):
                 alias = normalize_surface(raw_alias)
-                if alias and term.node_id not in aliases[alias]:
-                    aliases[alias].append(term.node_id)
-        self.ambiguous_aliases = frozenset(alias for alias, ids in aliases.items() if len(ids) != 1)
-        self.alias_to_node = {
-            alias: ids[0] for alias, ids in aliases.items() if len(ids) == 1
+                if alias and term.node_id not in bucket[alias]:
+                    bucket[alias].append(term.node_id)
+        self.ambiguous_aliases = frozenset(
+            alias
+            for bucket in aliases.values()
+            for alias, ids in bucket.items()
+            if len(ids) != 1
+        )
+        # Per-type resolution keeps cross-type reuse usable; within a type an
+        # ambiguous surface is still dropped rather than guessed.
+        self.alias_to_node_by_type: dict[str, dict[str, str]] = {
+            node_type: {
+                alias: ids[0] for alias, ids in bucket.items() if len(ids) == 1
+            }
+            for node_type, bucket in aliases.items()
         }
+        # Skills win a surface when both types claim it, preserving the
+        # pre-existing behaviour for shared surfaces such as "sales".
+        merged: dict[str, str] = {}
+        for node_type in reversed(self.MATCHED_TYPES):
+            merged.update(self.alias_to_node_by_type[node_type])
+        self.alias_to_node = merged
         self.aliases = tuple(sorted(self.alias_to_node, key=lambda value: (-len(value), value)))
         self.pattern = re.compile("|".join(re.escape(alias) for alias in self.aliases)) if self.aliases else None
 

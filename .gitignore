@@ -25,11 +25,15 @@ artifacts/benchmark-index.json
 artifacts/temporal-eval.json
 artifacts/ltr/
 artifacts/quality/
+artifacts/quality-*/
 artifacts/bedrock-pilot/
 artifacts/quality-v2/
 artifacts/skill-graph-canary/
 artifacts/skill-graph-full/
 artifacts/skill-graph-review/
+artifacts/skill-graph-expanded/
+artifacts/skill-graph-occ/
+artifacts/skill-graph-occ2/
 artifacts/skill-graph-full-v2/extraction/
 artifacts/skill-graph-full-v2/relations/
 artifacts/skill-graph-full-v2/resolved/
