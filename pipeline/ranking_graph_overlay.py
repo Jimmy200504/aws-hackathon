@@ -60,15 +60,25 @@ def _active_skill_nodes(
 
     output: dict[str, dict[str, Any]] = {}
     for node in _read_jsonl(nodes_path):
+        node_id = str(node.get("id", ""))
+        node_type = node.get("type")
+        # Reviewed Occupation nodes (occupation.*) participate in ranking the
+        # same way skills do: they are exact-alias matched from the reviewed
+        # ontology and carry statistical RELATED_TO edges. Duty-taxonomy
+        # occupations (duty.<code>) are organizer reference data supplied
+        # separately by the fixture and are intentionally excluded here.
+        is_reviewed_skill = node_type == "Skill" and node_id.startswith("skill.")
+        is_reviewed_occupation = node_type == "Occupation" and node_id.startswith(
+            "occupation."
+        )
         if (
-            node.get("type") != "Skill"
+            not (is_reviewed_skill or is_reviewed_occupation)
             or node.get("status") != "active"
-            or not str(node.get("id", "")).startswith("skill.")
         ):
             continue
-        skill_id = str(node["id"])
+        skill_id = node_id
         spec = {
-            "type": "Skill",
+            "type": "Skill" if is_reviewed_skill else "Occupation",
             "label": node.get("label", skill_id),
             "aliases": list(node.get("aliases", [])),
             "related": {},
@@ -78,7 +88,7 @@ def _active_skill_nodes(
             spec["blocked_phrases"] = blocked[skill_id]
         output[skill_id] = spec
     if not output:
-        raise ValueError(f"no active Skill nodes found in {nodes_path}")
+        raise ValueError(f"no active reviewed Skill/Occupation nodes found in {nodes_path}")
     return output
 
 
@@ -95,7 +105,9 @@ def _relation_map(
         source = str(edge["source_id"])
         target = str(edge["target_id"])
         if source not in active_skill_ids or target not in active_skill_ids:
-            raise ValueError(f"relation references inactive skill: {source} -> {target}")
+            raise ValueError(
+                f"relation references inactive reviewed node: {source} -> {target}"
+            )
         key = "\0".join(sorted((source, target)))
         if key in seen:
             raise ValueError(f"duplicate undirected relation: {source} <-> {target}")
@@ -231,8 +243,12 @@ def build_ranking_graph_overlay(
             if target not in active_skills:
                 raise ValueError(f"REQUIRES references inactive skill {target}")
         elif edge_type == "INSTANCE_OF":
-            if target not in preserved_duties:
-                raise ValueError(f"INSTANCE_OF references unknown duty {target}")
+            # A job is an instance of either an organizer duty-taxonomy code or
+            # a reviewed occupation node; both are valid INSTANCE_OF targets.
+            if target not in preserved_duties and target not in active_skills:
+                raise ValueError(
+                    f"INSTANCE_OF references unknown duty or occupation {target}"
+                )
         else:
             raise ValueError(f"unsupported job edge type: {edge_type}")
         job = jobs_by_id[job_id]
@@ -262,8 +278,8 @@ def build_ranking_graph_overlay(
     )
     base["metadata"].update(
         {
-            "index_version": f"{base['metadata']['index_version']}-deterministic-v2-cutoff",
-            "graph_builder": "deterministic-v1-rules-v2",
+            "index_version": f"{base['metadata']['index_version']}-deterministic-v3-cutoff",
+            "graph_builder": "deterministic-v2-rules-v3",
             "graph_version": graph_manifest["graph_version"],
             "graph_manifest_hash": graph_manifest_hash,
             "graph_overlay": {

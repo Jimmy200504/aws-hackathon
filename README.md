@@ -5,7 +5,7 @@ SkillWeave 是一套職缺搜尋系統。它先用 OpenSearch 從全量職缺找
 - 線上展示：<https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/>
 - 發行版本：`skillweave-2026.07.28-rc6`
 - 正式環境資料量：1,218,635 筆職缺
-- 正式環境圖譜：`deterministic-v1-rules-v2-latest`
+- 正式環境圖譜：`deterministic-v2-rules-v3-latest`
 - OpenAPI：[docs/openapi.yaml](docs/openapi.yaml)
 
 ## 系統架構與資料流
@@ -89,9 +89,31 @@ aws sts get-caller-identity
 | `LTR_MODEL_PATH` | `artifacts/models/ltr-quality-final.trees.json` | 本機可攜式 LTR 模型 |
 | `OPENSEARCH_ENDPOINT` | 空值 | 設定後改查完整職缺索引 |
 | `OPENSEARCH_INDEX` | `skillweave-jobs-v1` | OpenSearch index 名稱 |
-| `NEPTUNE_GRAPH_ID` | 空值 | Lambda 使用的 Neptune Analytics graph；未設定時改用內嵌圖譜 |
+| `NEPTUNE_GRAPH_ID` | 空值 | Lambda 使用的 Neptune Analytics graph；未設定時改用下一層 fallback |
+| `LOCAL_GRAPH_INDEX_PATH` | 空值 | 本機 SQLite 圖譜索引路徑；`NEPTUNE_GRAPH_ID` 未設定時的第二層 fallback |
 | `GRAPH_VERSION` | 空值 | API 回應與發行驗證使用的圖譜版本 |
 | `GRAPH_QUERY_TIMEOUT_MS` | `150` | Neptune 查詢逾時毫秒數 |
+
+### Skill Graph 三層 fallback（不部署 AWS 也能用完整圖譜）
+
+`app/graph_provider.py::resolve_graph_provider()` 依環境變數決定要用哪個 backend，不需要改程式碼：
+
+1. 設定了 `NEPTUNE_GRAPH_ID` → `GraphFeatureProvider`，即時查詢 AWS Neptune Analytics（正式環境用）。
+2. 沒設 `NEPTUNE_GRAPH_ID`，但 `LOCAL_GRAPH_INDEX_PATH` 指到存在的檔案 → `LocalGraphProvider`，改讀本機 SQLite 索引；內容是同一份完整的統計 `RELATED_TO` 圖譜（見「版本對照」的正式環境圖譜列），只是不需要部署 AWS。
+3. 兩者都沒設 → 回退到 `artifacts/demo-index.json` 內嵌的 115-node bootstrap fixture。
+
+沒有 AWS 帳號、只想在本機測滿版圖譜效果時，下載發行版附的索引檔並指過去即可：
+
+```bash
+python scripts/download_local_graph_index.py \
+  --index-url <GitHub Release 上 skill-graph-local-index.sqlite3 的網址> \
+  --sha256 <該次 release 附的 SHA-256>
+
+export LOCAL_GRAPH_INDEX_PATH=artifacts/skill-graph-local-index.sqlite3
+make demo
+```
+
+下載腳本會核對 SHA-256，檔案不符時會直接刪除並報錯，不會留下半個檔案。想自己從一次完整圖譜建置產生索引，改用 `scripts/build_local_graph_index.py`（輸入是 `run_full_graph_build.py` 的輸出）。
 
 ## 執行與 API 範例
 
@@ -148,8 +170,8 @@ curl --fail --request POST \
   "meta": {
     "graph_enabled": true,
     "graph_backend": "neptune_analytics",
-    "graph_version": "deterministic-v1-rules-v2-latest",
-    "index_version": "demo-2026.06.07-full-v1",
+    "graph_version": "deterministic-v2-rules-v3-latest",
+    "index_version": "demo-2026.06.07-full-v2",
     "degraded_components": []
   }
 }
@@ -160,7 +182,6 @@ curl --fail --request POST \
 ```bash
 make test       # unit + integration tests
 make sam-smoke  # packaged Lambda on SAM runtime
-make release    # release gates、hash 與 artifact contract
 make aws-smoke  # public production API / trace / bounded load smoke
 ```
 
@@ -174,7 +195,7 @@ bash scripts/deploy_lambda_code.sh
   --url https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/ \
   --require-full-corpus \
   --require-neptune \
-  --expected-graph-version deterministic-v1-rules-v2-latest
+  --expected-graph-version deterministic-v2-rules-v3-latest
 ```
 
 第一次建立 stack、寫入 OpenSearch 全量索引或清理資源前，請先看 [deployment runbook](docs/deployment.md)。
@@ -185,6 +206,20 @@ bash scripts/deploy_lambda_code.sh
 
 執行前，確認 `data/dataset/` 內有這六個檔案：`職缺.csv`、`職務對照表.csv`、`城市對照表.csv`、`userSearchLog_20260601_20260607.csv`、`職缺瀏覽_20260601_20260607.csv`、`主動應徵_0601-0607.csv`。行為資料含有假名化識別碼，請勿放進公開 artifact。
 
+接著清理搜尋日誌並核對輸入指紋。清理會移除 SEO spam 與 URL 查詢，產生
+`userSearchLog_cleaned.csv`；benchmark fixture 與展示索引都只讀這份清理後的日誌，
+所以這一步是必要的，不是選用的：
+
+```bash
+make clean-search-log
+make verify-inputs
+```
+
+`make verify-inputs` 比對 `config/dataset-fingerprints.json` 記錄的 SHA-256、大小與
+行數。因為 pipeline 是決定性的，輸入相同就會產生位元相同的圖譜與 benchmark 產物，
+所以版控只追蹤指紋，不散布數十 GB 的衍生檔案。指紋不符時代表你的產物無法與團隊
+比對，先解決差異再建置。
+
 ```bash
 make setup
 .venv/bin/python -m pip install -r requirements-ltr.lock
@@ -194,12 +229,11 @@ WORK_DIR=artifacts/quality \
 make quality
 ```
 
-腳本會建立 primary fixture 和 grouped LTR rows，以固定超參數訓練並比較 Graph OFF/ON。它也會輸出可攜式模型、檢查推論結果是否一致，最後用互不重疊的 hash bucket 再跑一次 replication。輸出檔案如下：
+腳本評測的是**已經 commit 進 repo 的既有模型**(`artifacts/models/ltr-quality-final.ubj`，只有幾十 KB，不含私有資料，可以安心放進公開 repo)，不會重新訓練它——如果這個檔案不存在會直接失敗並印出訓練指令，不會靜默訓練一個新模型出來蓋掉它。腳本會先確認完整統計 Skill Graph 是否已建置好，沒有的話就先掃描全部 1,218,635 筆職缺建置（`GRAPH_WORK_ROOT`／`GRAPH_RUN_ID`／`GRAPH_VERSION` 可覆寫位置與版本，預設值同下方版本對照表），再把統計 `RELATED_TO` 邊綁進 benchmark index、建立 primary fixture 和 grouped LTR rows，用既有模型評測 Graph OFF/ON、檢查可攜式推論結果是否一致，最後用互不重疊的 hash bucket 再跑一次 replication。圖譜已存在時會自動略過重建，只有第一次執行或指向新的 `GRAPH_WORK_ROOT` 才會花這筆額外時間和磁碟空間。輸出檔案如下：
 
 - `reports/ltr-quality-confirmation.json`：primary bucket `[2400, 3400)`，1,991 queries
 - `reports/ltr-quality-replication.json`：replication bucket `[3400, 4400)`，1,992 queries
 - `reports/verify-quality-release.json`：兩組至少 +5% 且 paired CI95 大於 0 的 gate
-- `artifacts/models/ltr-quality-final.{ubj,trees.json,manifest.json}`
 
 ```bash
 jq '{
@@ -214,25 +248,28 @@ jq '{
 jq . reports/verify-quality-release.json
 ```
 
-### 2. 重現文末的 deterministic-v2 固定結果
+### 2. 核對文末的 deterministic-v3 固定結果
 
-文末表格使用 `evaluation-cutoff` graph manifest，qrels 與模型也已固定。先核對四個 artifact 的 SHA-256：
+上一步 `make quality` 已經是用套了完整統計 Skill Graph 的 `evaluation-cutoff` graph manifest
+訓練出來的模型，文末表格就是直接讀它輸出的 `reports/ltr-quality-confirmation.json` 和
+`reports/ltr-quality-replication.json`，不需要另外重建。如果想額外確認重建出來的 artifact
+跟釘住的發行版本完全一致，可以核對四個檔案的 SHA-256：
 
 ```bash
 shasum -a 256 \
-  artifacts/quality-v2/deterministic/benchmark-index.json \
-  artifacts/quality-v2/source/temporal-eval.json \
-  artifacts/quality-v2/deterministic/ltr/test.jsonl \
+  artifacts/quality/primary/overlay-index.json \
+  artifacts/quality/primary/temporal-eval.json \
+  artifacts/quality/primary/ltr-overlay/test.jsonl \
   artifacts/models/ltr-quality-final.ubj
 ```
 
 四行雜湊應為以下內容，順序同上：
 
 ```text
-21509499a0d924ec5c72a956f66c1725dc7225f13d3600a157f47885265d8306
+49637f332e52f5d845c3a6f4448d7321e3f63a9da645501258679ec846ddbe5c
 8471ccea48e37cca65dfe763092ab76600ed39ab27004f6253c136b0bffa8328
-7074e5715ed6b042f9824fe810d77b36a4a14423eb87bfa7d7cbc1105907d592
-d280a0952e7604934d669eee3aacb1a2f158793f0187e35ef34ce1725656bced
+ca163ccbb4bab4da47fd2fd85453d38538ceb77a387af0b8bc784505681c8c17
+19f6d2f031134a7e1e35d346214fb9533071f9a15c5691c9f50ed1dd83d1bdcf
 ```
 
 核對完成後重新計分，並帶入圖譜來源資訊：
@@ -240,10 +277,10 @@ d280a0952e7604934d669eee3aacb1a2f158793f0187e35ef34ce1725656bced
 ```bash
 .venv/bin/python pipeline/evaluate_ltr.py \
   --graph-model artifacts/models/ltr-quality-final.ubj \
-  --pairs artifacts/quality-v2/deterministic/ltr/test.jsonl \
-  --qrels artifacts/quality-v2/source/temporal-eval.json \
-  --graph-binding-manifest artifacts/quality-v2/deterministic/benchmark-index.manifest.json \
-  --output reports/ltr-quality-deterministic-v2-reproduced.json \
+  --pairs artifacts/quality/primary/ltr-overlay/test.jsonl \
+  --qrels artifacts/quality/primary/temporal-eval.json \
+  --graph-binding-manifest artifacts/quality/primary/overlay-index.manifest.json \
+  --output reports/ltr-quality-deterministic-v3-reproduced.json \
   --split test \
   --confidence-gate none
 
@@ -253,64 +290,59 @@ jq '{
   relative_lift,
   paired_bootstrap_ndcg,
   release_gates
-}' reports/ltr-quality-deterministic-v2-reproduced.json
+}' reports/ltr-quality-deterministic-v3-reproduced.json
 ```
 
-若要從原始職缺重建同版本的圖譜中間檔，請使用發行版本的參數。這一步會掃描 1,218,635 筆職缺，比單純重新計分更花時間和磁碟空間：
+`make quality` 會記錄圖譜建置與 overlay 每個階段的 checkpoint。只要參數沒變、輸出也完整，重跑時會略過已完成的階段；若懷疑產物漂移，重跑一次 `make quality` 並比對上方 SHA-256 即可。
+
+### 3. 重新訓練模型（選用，不是重現 benchmark 的必要步驟）
+
+`make quality` 不會自動訓練模型，只評測既有的 `artifacts/models/ltr-quality-final.ubj`。真的要更新模型時才手動執行：
 
 ```bash
-.venv/bin/python scripts/run_full_graph_build.py \
-  --work-root artifacts/skill-graph-full-v2 \
-  --run-id deterministic-v1-rules-v2-full \
-  --graph-version deterministic-v1-rules-v2 \
-  --cutoff '2026-06-05 23:59:59.999' \
-  --dry-run
-
-.venv/bin/python scripts/run_full_graph_build.py \
-  --work-root artifacts/skill-graph-full-v2 \
-  --run-id deterministic-v1-rules-v2-full \
-  --graph-version deterministic-v1-rules-v2 \
-  --cutoff '2026-06-05 23:59:59.999'
+.venv/bin/python pipeline/train_ltr.py \
+  --train artifacts/quality/primary/ltr-overlay/train.jsonl \
+  --train-extra artifacts/quality/primary/ltr-overlay/validation.jsonl \
+  --validation artifacts/quality/primary/ltr-overlay/validation.jsonl \
+  --output artifacts/models/ltr-quality-final.ubj \
+  --feature-set quality_minimal \
+  --n-estimators 40 \
+  --max-depth 4 \
+  --min-child-weight 12 \
+  --learning-rate 0.05 \
+  --early-stopping-rounds 0
 ```
 
-圖譜完成後，重建 benchmark overlay 和 LTR rows：
+**重新訓練不保證跟現有模型一樣好，甚至可能更差。**實測過：即使 seed、超參數、程式碼都沒變，重新產生一份 `ltr-overlay` 訓練資料再訓練，測出來的 replication NDCG@10 提升是 +4.82%（現有模型是 +5.61%），沒過 release gate 的 5% 門檻。目前還沒有找到確切根因——`build_benchmark_fixture.py` 已驗證兩次全新重跑雜湊完全一致，訓練本身在輸入相同時也是 deterministic 的，但整條鏈重新跑一輪產生的模型就是測得比原本差。所以重新訓練後**務必**用 `make quality` 重新評測、跟舊模型的 `reports/ltr-quality-*.json` 比對過，確認沒有退步才 commit 新模型；不要假設重新訓練＝安全的等價操作。
+
+### 4. 重現 `make coverage` 用到的 `ltr-graph-final` 模型
+
+`make coverage`（`scripts/report_graph_coverage.py`）預設讀取 `artifacts/models/ltr-graph-final.ubj`，這是一個只用 `behavior_graph` feature set 訓練的較小模型，用來量化圖譜特徵在不同子群的覆蓋率與影響，跟上面 benchmark／重新訓練用的 `ltr-quality-final` 是不同模型、不同用途。重現它：
 
 ```bash
-.venv/bin/python scripts/build_v2_ranking_overlay.py \
-  --base-index artifacts/quality-v2/source/benchmark-index.json \
-  --qrels artifacts/quality-v2/source/temporal-eval.json \
-  --graph-manifest artifacts/skill-graph-full-v2/release/runs/deterministic-v1-rules-v2-full/evaluation-cutoff/manifest.json \
-  --nodes artifacts/skill-graph-full-v2/resolved/evaluation-cutoff/nodes.jsonl \
-  --resolved-jobs artifacts/skill-graph-full-v2/resolved/evaluation-cutoff/jobs.jsonl \
-  --job-edges artifacts/skill-graph-full-v2/resolved/evaluation-cutoff/job-skill-edges.jsonl \
-  --relation-edges artifacts/skill-graph-full-v2/relations/evaluation-cutoff/relation-edges.jsonl \
-  --reviewed-ontology config/skill_ontology.seed.json \
-  --output artifacts/quality-v2/deterministic/benchmark-index.json
-
-.venv/bin/python pipeline/build_ltr_pairs.py \
-  --index artifacts/quality-v2/deterministic/benchmark-index.json \
-  --qrels artifacts/quality-v2/source/temporal-eval.json \
-  --output-dir artifacts/quality-v2/deterministic/ltr
+make ltr-ablation
 ```
 
-Pipeline 會記錄每個階段的 checkpoint。只要參數沒變、輸出也完整，重跑時會略過已完成的階段。完成後請核對 graph manifest、index sidecar 和上述 SHA-256，確認產物沒有漂移。
+等同執行 `scripts/run_ltr_ablation.sh`：建立獨立的 benchmark fixture、訓練 `ltr-graph-final.ubj`，再用 `pipeline/evaluate_ltr.py` 產出 `reports/ltr-ablation-*.json`。跟 `ltr-quality-final` 一樣，這個腳本會直接覆寫已 commit 的模型檔案，只有真的要更新它時才執行，並在 commit 前確認 `make coverage` 的輸出沒有退步。
 
 ## 版本對照
 
 | 類型 | 目前版本／artifact | 說明 |
 |---|---|---|
-| 發行版本 | `skillweave-2026.07.28-rc6` | 綁定資訊與 SHA-256 記錄在 `release-manifest.json` |
+| 發行版本 | `skillweave-2026.07.28-rc6` | 圖譜/模型版本記錄在 `release-manifest.json` |
 | 資料集 | `1111-2026-06-01_2026-06-07` | 1,218,635 筆職缺、6,139,952 次搜尋、8,241,233 次瀏覽、225,999 次應徵 |
-| Schema fingerprint | `1b0ec3b465981ea2` | 正式環境與展示版共用；benchmark overlay 的 fingerprint 是 `105f60c88cdef8a3` |
-| 正式環境圖譜 | `deterministic-v1-rules-v2-latest` | Neptune graph `g-ndf9sijo15`；1,219,372 個 nodes、5,249,573 條 edges，其中 1,218,635 個是 job nodes |
-| 評測圖譜 | `deterministic-v1-rules-v2-evaluation-cutoff` | 固定的離線 benchmark 專用，不可換成 production `latest` |
-| Graph manifest | `44d46505292696204b160e014b2cb7c8c38e49ac80057481cb014bd091223911` | Production latest 宣告的 manifest hash |
-| 內嵌展示索引 | `demo-2026.06.07-full-v1` | 收錄 12,000 筆職缺，供本機展示與 Lambda fallback 使用 |
+| Schema fingerprint | `1ae7d6bfbf96c1ba` | 正式環境與展示版共用 |
+| 正式環境圖譜 | `deterministic-v2-rules-v3-latest` | 1,219,438 個 nodes、7,710,984 條 edges，其中 1,218,635 個是 job nodes；805 條統計 `RELATED_TO` |
+| 評測圖譜 | `deterministic-v2-rules-v3-evaluation-cutoff` | 固定的離線 benchmark 專用，不可換成 production `latest`；781 條統計 `RELATED_TO` |
+| Graph manifest | `f5246fdc2fc6c1be16bb3b5827013dcb54b4fd6cd5a6d5a5a7e9999e9efab753` | Production latest 宣告的 manifest hash |
+| 審閱 ontology | 115 個節點（82 Skill、33 Occupation） | `config/skill_ontology.seed.json`；ontology hash `76127e5915bfbfb3a731d0bd309a29fcf249ff7ceb20d8d391c8e49c2afc013e` |
+| 內嵌展示索引 | `demo-2026.06.07-full-v2` | 收錄 12,000 筆職缺，供本機展示與 Lambda fallback 使用 |
 | 正式搜尋索引 | `skillweave-jobs-v1` | OpenSearch 全量索引，共 1,218,635 筆職缺 |
 | Benchmark 基礎索引 | `benchmark-2026.06.05-v1` | Temporal fixture 產生的原始索引 |
-| 固定版 benchmark overlay | `benchmark-2026.06.05-v1-deterministic-v2-cutoff` | 已綁定 deterministic evaluation graph |
+| 固定版 benchmark overlay | `benchmark-2026.06.05-v1-deterministic-v3-cutoff` | 已綁定 deterministic evaluation graph；overlay sidecar 記錄 base index、qrels 與 graph manifest 的 SHA-256 |
 | 線上 LTR 模型 | `ltr-quality-remote-salary-intent` | XGBoost 3.2.0、40 trees；UBJ SHA-256 `cb07c70b…11fd` |
-| Benchmark LTR 模型 | `ltr-quality-final` | XGBoost 3.2.0、`rank:ndcg`、seed 1111；UBJ SHA-256 `d280a095…bced` |
+| Benchmark LTR 模型 | `ltr-quality-final` | XGBoost 3.2.0、`rank:ndcg`、seed 1111；UBJ SHA-256 `19f6d2f0…bdcf` |
+| Graph coverage 模型 | `ltr-graph-final` | XGBoost 3.2.0、`behavior_graph` feature set、seed 1111；UBJ SHA-256 `d90693ac…1366e` |
 
 正式環境的 serving pointer 記錄在 `artifacts/skill-graph-full-v2/release/production-manifest.json`。[Data card](docs/data-card.md) 說明資料治理、欄位缺值、join contract、資料洩漏和偏差限制；模型 manifest 則保存 features、超參數、訓練來源與 XGBoost 版本。比對 benchmark 時，dataset、qrels、index、model 和 graph manifest hash 必須全部一致。
 
@@ -328,7 +360,6 @@ tests/      單元與整合測試
 docs/       架構、data card、schema、操作手冊
 ```
 
-- [評估報告索引](reports/README.md)
 - [資料卡與限制](docs/data-card.md)
 - [AWS 架構](docs/aws-architecture.md)
 - [Skill Graph schema](docs/graph-schema.md)
@@ -337,16 +368,16 @@ docs/       架構、data card、schema、操作手冊
 
 ## 有無 Skill Graph 的指標差異
 
-下表取自 `reports/ltr-quality-deterministic-v2.json`，評測資料是 2026-06-07 保留的 1,991 筆查詢。兩組使用相同的 candidate rows、seed 1111 和 `ltr-quality-final` 模型；Graph OFF 在推論時把圖譜特徵歸零，Graph ON 則讀取 `deterministic-v1-rules-v2-evaluation-cutoff` 的特徵。
+下表取自 `reports/ltr-quality-confirmation.json`，評測資料是 2026-06-07 保留的 1,991 筆查詢。兩組使用相同的 candidate rows、seed 1111 和 `ltr-quality-final` 模型；Graph OFF 在推論時把圖譜特徵歸零，Graph ON 則讀取 `deterministic-v2-rules-v3-evaluation-cutoff` 的 781 條統計 `RELATED_TO` 邊。
 
 | 指標 | 無 Skill Graph | 有 Skill Graph | 絕對差異 | 相對改善 |
 |---|---:|---:|---:|---:|
-| NDCG@10 | 0.4494 | 0.4726 | +0.0232 | **+5.16%** |
-| MRR | 0.4349 | 0.4579 | +0.0230 | **+5.30%** |
-| Hit@1 | 0.2793 | 0.2988 | +0.0196 | **+7.01%** |
-| Hit@10 | 0.8267 | 0.8599 | +0.0331 | **+4.01%** |
-| Precision@10 | 0.1636 | 0.1726 | +0.0090 | **+5.53%** |
+| NDCG@10 | 0.4469 | 0.4738 | +0.0269 | **+6.02%** |
+| MRR | 0.4313 | 0.4633 | +0.0320 | **+7.43%** |
+| Hit@1 | 0.2737 | 0.3084 | +0.0347 | **+12.66%** |
+| Hit@10 | 0.8257 | 0.8538 | +0.0281 | **+3.41%** |
+| Precision@10 | 0.1624 | 0.1726 | +0.0102 | **+6.28%** |
 
-NDCG@10 的 paired mean delta 是 `+0.02317`，paired bootstrap CI95 為 `[+0.01278, +0.03334]`，區間不含 0。相關 release gates 全部通過，包括至少 +5% NDCG、所有指標不下降，以及 locked graph binding。
+NDCG@10 的 paired mean delta 是 `+0.02692`，paired bootstrap CI95 為 `[+0.01633, +0.03747]`，區間不含 0。獨立的 replication bucket（`reports/ltr-quality-replication.json`，1,992 筆互不重疊的查詢、同一個 frozen model）也達到 `+5.61%`，paired CI95 `[+0.01470, +0.03521]`。`scripts/verify_quality_release.py` 的 12 項 release gate 全部通過，包括兩組都至少 +5% NDCG、所有指標不下降，以及 locked graph binding。
 
 這份數據只代表離線 reranking ablation，不能當成線上 A/B test 或轉換率預估。Qrels 取自既有曝光資料，因此仍受 position bias 影響。

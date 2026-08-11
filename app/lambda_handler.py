@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import unquote
 
-from app.graph_provider import GraphExpansion, GraphFeatureProvider
+from app.graph_provider import GraphExpansion, GraphFeatureProvider, resolve_graph_provider
 from app.query_normalizer import BedrockQueryNormalizer
 from app.ranker import SkillWeaveRanker
 from app.retrieval import OpenSearchRetriever, hybrid_retrieval_meta
@@ -31,7 +31,7 @@ RANKER = SkillWeaveRanker(
     candidate_retriever=OpenSearchRetriever.from_environment(),
 )
 QUERY_NORMALIZER = BedrockQueryNormalizer.from_environment()
-GRAPH_PROVIDER = GraphFeatureProvider.from_environment()
+GRAPH_PROVIDER = resolve_graph_provider()
 FULL_CORPUS_JOB_COUNT = max(
     0, int(os.getenv("OPENSEARCH_DOCUMENT_COUNT", "0"))
 )
@@ -205,7 +205,11 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
                     "full_corpus_retrieval": RANKER.candidate_retriever is not None,
                     "bedrock_query_normalization": QUERY_NORMALIZER.enabled,
                     "graph_backend": (
-                        "neptune_analytics" if GRAPH_PROVIDER is not None else "embedded_artifact"
+                        "neptune_analytics"
+                        if isinstance(GRAPH_PROVIDER, GraphFeatureProvider)
+                        else "local_sqlite_index"
+                        if GRAPH_PROVIDER is not None
+                        else "embedded_artifact"
                     ),
                 },
             )

@@ -41,6 +41,14 @@ def write_jsonl(path: Path, rows: Iterable[dict[str, Any]]) -> None:
 
 
 def seed_nodes(path: Path, icap_path: Path | None = None) -> list[CanonicalNode]:
+    """Materialize reviewed Skill and Occupation nodes for the serving graph.
+
+    Occupations are included so that reviewed occupation surfaces (助理, 廚師,
+    櫃檯…) resolve to graph nodes and take part in RELATED_TO co-occurrence.
+    Duty-taxonomy occupations remain separate ``duty.<code>`` nodes emitted by
+    the resolve stage; these ``occupation.*`` nodes come from the reviewed
+    ontology and are matched by exact alias like skills are.
+    """
     return [
         CanonicalNode(
             term.node_id,
@@ -55,7 +63,7 @@ def seed_nodes(path: Path, icap_path: Path | None = None) -> list[CanonicalNode]
             },
         )
         for term in load_ontology(path, icap_path)
-        if term.node_type == "Skill"
+        if term.node_type in {"Skill", "Occupation"}
     ]
 
 
@@ -203,11 +211,20 @@ def resolve_stage(
             skill_evidence: dict[str, str] = {}
             job_edges: dict[str, dict[str, Any]] = {}
             for mention in row.get("mentions", []):
-                resolution = resolver.resolve(str(mention.get("surface", "")), "Skill")
+                # A mention carries the node id the extractor matched, which
+                # tells us whether to resolve it in the Skill or Occupation
+                # namespace (the two are separate; see ExactAliasMatcher).
+                claimed_id = str(mention.get("node_id", ""))
+                mention_type = (
+                    "Occupation" if claimed_id.startswith("occupation.") else "Skill"
+                )
+                resolution = resolver.resolve(
+                    str(mention.get("surface", "")), mention_type
+                )
                 buffers["resolutions"].append(_json_line(resolution.__dict__))
                 if resolution.node_id is None:
                     continue
-                claimed = str(mention.get("node_id", resolution.node_id))
+                claimed = claimed_id or resolution.node_id
                 if claimed != resolution.node_id:
                     buffers["resolutions"].append(_json_line({
                         "surface": mention.get("surface", ""),
@@ -218,13 +235,18 @@ def resolve_stage(
                     continue
                 skill_ids.append(resolution.node_id)
                 skill_evidence[resolution.node_id] = str(mention.get("evidence", ""))
-                raw_edge = f"{source_id}\0REQUIRES\0{resolution.node_id}"
-                edge_id = "requires:" + hashlib.sha256(raw_edge.encode()).hexdigest()[:20]
+                # A job is an instance of an occupation but requires a skill.
+                relation = (
+                    "INSTANCE_OF" if mention_type == "Occupation" else "REQUIRES"
+                )
+                prefix = "instance:" if relation == "INSTANCE_OF" else "requires:"
+                raw_edge = f"{source_id}\0{relation}\0{resolution.node_id}"
+                edge_id = prefix + hashlib.sha256(raw_edge.encode()).hexdigest()[:20]
                 job_edges[edge_id] = {
                     "id": edge_id,
                     "source_id": source_id,
                     "target_id": resolution.node_id,
-                    "type": "REQUIRES",
+                    "type": relation,
                     "weight": float(mention.get("confidence", 0)),
                     "confidence": float(mention.get("confidence", 0)),
                     "requirement_level": mention.get("requirement_level", "mentioned"),
@@ -316,9 +338,24 @@ def resolve_stage(
         path.unlink(missing_ok=True)
 
 
-def relations_stage(jobs_path: Path, output_dir: Path) -> None:
-    candidates = relation_candidates(iter_jsonl(jobs_path))
-    accepted, rejected = publish_relations(candidates)
+def relations_stage(
+    jobs_path: Path,
+    output_dir: Path,
+    *,
+    neighbor_cap: int = 36,
+    degree_cap: int = 36,
+) -> None:
+    """Publish statistical RELATED_TO edges.
+
+    ``degree_cap`` bounds how many relations any single node may publish. The
+    original value of 20 was set for a 63-node reviewed ontology; at 115 nodes
+    that cap became the binding constraint rather than the statistical
+    thresholds, and newly eligible occupation relations evicted established
+    skill-to-skill edges (measured: 42 original edges dropped, capped nodes
+    rising from 10 to 21). The cap scales with ontology size for that reason.
+    """
+    candidates = relation_candidates(iter_jsonl(jobs_path), neighbor_cap=neighbor_cap)
+    accepted, rejected = publish_relations(candidates, degree_cap=degree_cap)
     write_jsonl(output_dir / "relation-candidates.jsonl", (row.__dict__ for row in candidates))
     write_jsonl(output_dir / "relation-edges.jsonl", ({
         **row.__dict__,

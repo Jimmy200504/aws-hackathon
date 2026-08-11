@@ -1,24 +1,34 @@
 {
   "schema": "skillweave-graph-serving-pointer-v2",
-  "updated_at_utc": "2026-08-02T04:17:08Z",
+  "updated_at_utc": "2026-08-09T13:30:00Z",
   "dataset_version": "1111-2026-06-01_2026-06-07",
-  "run_id": "deterministic-v1-rules-v2-full",
+  "run_id": "deterministic-v2-rules-v3-full",
   "scope": "latest",
-  "graph_id": "g-ndf9sijo15",
-  "graph_version": "deterministic-v1-rules-v2-latest",
-  "manifest_hash": "44d46505292696204b160e014b2cb7c8c38e49ac80057481cb014bd091223911",
-  "manifest_sha256": "61bb72249e7acdd4385847ed1393fc2643560c98896fc864aacc26980dbdd5f3",
+  "graph_version": "deterministic-v2-rules-v3-latest",
+  "manifest_hash": "f5246fdc2fc6c1be16bb3b5827013dcb54b4fd6cd5a6d5a5a7e9999e9efab753",
+  "manifest_sha256": "ccf3fc154ac4989eb4a7ccb9867e71a5c6b491f4f30755f66db2d3bec8de6ec7",
   "job_nodes": 1218635,
-  "nodes": 1219372,
-  "edges": 5249573,
-  "neptune_import_task": "t-3bl28qmjj8",
-  "neptune_import_status": "SUCCEEDED",
-  "opensearch_graph_eligible_jobs": 1218635,
-  "opensearch_graph_ineligible_jobs": 0,
-  "artifact_source": "s3://skillweave-provisioned-search-snapshotbucket-rigq6j18z9ma/graph-artifacts/deterministic-v1-rules-v2-full/latest/neptune/",
+  "nodes": 1219438,
+  "edges": 7710984,
+  "statistical_related_to_edges": 805,
+  "reviewed_ontology_nodes": 115,
+  "reviewed_ontology_hash": "76127e5915bfbfb3a731d0bd309a29fcf249ff7ceb20d8d391c8e49c2afc013e",
+  "serving": {
+    "graph_id": null,
+    "neptune_import_task": null,
+    "neptune_import_status": "NOT_DEPLOYED",
+    "note": "The deterministic build output is the source of truth and is produced entirely offline. This pointer records a locally rebuilt graph that has not been uploaded to Neptune Analytics; graph_id and the import task are null until a deployment runs scripts/verify_full_graph_serving.py against a live graph."
+  },
   "previous": {
-    "graph_id": "g-tew85zms65",
-    "graph_version": "deterministic-v1-rules-v2-evaluation-cutoff",
-    "scope": "evaluation-cutoff"
-  }
+    "run_id": "deterministic-v1-rules-v2-full",
+    "graph_version": "deterministic-v1-rules-v2-latest",
+    "manifest_hash": "44d46505292696204b160e014b2cb7c8c38e49ac80057481cb014bd091223911",
+    "nodes": 1219372,
+    "edges": 5249573,
+    "statistical_related_to_edges": 225,
+    "reviewed_ontology_nodes": 63
+  },
+  "extractor": "deterministic-v2",
+  "rules_version": "deterministic-extraction-rules-v3",
+  "rules_hash": "26eaf7271dbc60debe61f0733b5401be1642c22c12f885b5fec320b497b5bdf7"
 }

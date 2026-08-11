@@ -154,7 +154,7 @@ fi
 if [[ "${SKILLWEAVE_REQUIRE_NEPTUNE:-yes}" == "yes" ]]; then
   VERIFY_ARGS+=(--require-neptune)
 fi
-EXPECTED_GRAPH_VERSION="${SKILLWEAVE_EXPECTED_GRAPH_VERSION-deterministic-v1-rules-v2-latest}"
+EXPECTED_GRAPH_VERSION="${SKILLWEAVE_EXPECTED_GRAPH_VERSION-deterministic-v2-rules-v3-latest}"
 if [[ -n "$EXPECTED_GRAPH_VERSION" ]]; then
   VERIFY_ARGS+=(--expected-graph-version "$EXPECTED_GRAPH_VERSION")
 fi

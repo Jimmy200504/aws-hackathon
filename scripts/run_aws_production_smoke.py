@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import math
 import statistics
@@ -17,9 +16,8 @@ from urllib.request import Request, urlopen
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / "release-manifest.json"
 OUTPUT = ROOT / "reports" / "aws-production-smoke.json"
-INDEX_VERSION = "demo-2026.06.07-full-v1"
+INDEX_VERSION = "demo-2026.06.07-full-v2"
 # The model the bundle ships, as the API reports it in `meta.ranking_model`
 # (the portable artifact's `source_model`). Hard-coding a single historical
 # name silently turned this gate into a check that the deployment had NOT been
@@ -32,13 +30,6 @@ QUERIES = (
     "資料工程師 Python",
     "行政助理",
 )
-
-
-def load_object(path: Path) -> dict[str, Any]:
-    value = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(value, dict):
-        raise ValueError(f"{path} must contain a JSON object")
-    return value
 
 
 def endpoint(base_url: str, relative: str) -> str:
@@ -275,7 +266,7 @@ def run_smoke(
         "latest_graph_metadata_deployed": (
             meta.get("metadata", {}).get("graph_scope") == "latest"
             and meta.get("metadata", {}).get("graph_version")
-            == "deterministic-v1-rules-v2-latest"
+            == "deterministic-v2-rules-v3-latest"
             and meta.get("metadata", {})
             .get("stats", {})
             .get("future_modified_excluded_from_graph")
@@ -506,11 +497,6 @@ def main() -> int:
         help="Model name the API must report in meta.ranking_model",
     )
     parser.add_argument("--max-p95-ms", type=float, default=10_000.0)
-    parser.add_argument(
-        "--no-register-release-artifact",
-        action="store_true",
-        help="Do not update release-manifest.json with this smoke artifact",
-    )
     args = parser.parse_args()
     globals()["QUALITY_MODEL"] = args.expected_ranking_model
     if args.requests < 1 or args.concurrency < 1:
@@ -518,13 +504,9 @@ def main() -> int:
     if args.concurrency > 10:
         parser.error("--concurrency must not exceed the compact demo limit of 10")
 
-    manifest = load_object(MANIFEST)
-    registered_url = manifest.get("external_deliverables", {}).get("aws_url")
-    base_url = args.url or registered_url
-    if not isinstance(base_url, str) or not base_url.startswith("https://"):
-        parser.error("a public HTTPS --url or registered aws_url is required")
-    if registered_url and base_url.rstrip("/") != str(registered_url).rstrip("/"):
-        parser.error("--url must match the release manifest aws_url")
+    if not isinstance(args.url, str) or not args.url.startswith("https://"):
+        parser.error("a public HTTPS --url is required")
+    base_url = args.url
 
     report = run_smoke(
         base_url,
@@ -540,18 +522,6 @@ def main() -> int:
         json.dumps(report, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
-    try:
-        relative = args.output.resolve().relative_to(ROOT).as_posix()
-    except ValueError:
-        relative = None
-    if relative and not args.no_register_release_artifact:
-        manifest.setdefault("sha256", {})[relative] = hashlib.sha256(
-            args.output.read_bytes()
-        ).hexdigest()
-        MANIFEST.write_text(
-            json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0 if report["passed"] else 1
 

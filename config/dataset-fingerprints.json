@@ -1,0 +1,46 @@
+{
+  "schema": "skillweave-dataset-fingerprints-v1",
+  "dataset_version": "1111-2026-06-01_2026-06-07",
+  "purpose": "Verify that every developer builds from byte-identical inputs. The deterministic pipeline reproduces the same graph and benchmark artifacts only when these inputs match, so this file is checked instead of distributing the multi-gigabyte derived artifacts.",
+  "privacy": "The CSVs themselves carry pseudonymized identifiers and must not be published as public artifacts. Only these fingerprints are tracked.",
+  "derived": {
+    "userSearchLog_cleaned.csv": "produced by scripts/clean_search_log.py"
+  },
+  "files": {
+    "職缺.csv": {
+      "sha256": "53937f7bf076789c4cd7e3be34fb89875336108d57707b5a93182181e1087089",
+      "bytes": 1285945103,
+      "lines": 1218636
+    },
+    "職務對照表.csv": {
+      "sha256": "51654e460e17a49bde42a3a4e867a21656158799173a68330b7dcc8295a41619",
+      "bytes": 436511,
+      "lines": 691
+    },
+    "城市對照表.csv": {
+      "sha256": "6fb964a02a5700df3e31235b1d9adf72f353a0c4885e52ab200e9bf0cf2bab4a",
+      "bytes": 45738,
+      "lines": 1077
+    },
+    "userSearchLog_20260601_20260607.csv": {
+      "sha256": "10a84a79730f6593ddfcddf259ddb2020e10618dc7f0ea6f5566e73f464c6d1d",
+      "bytes": 2414277235,
+      "lines": 6154167
+    },
+    "userSearchLog_cleaned.csv": {
+      "sha256": "0ae3aacfe9fefc008ccdd3927a3ea233b8b4fd99831c1774fb102e6261083fdd",
+      "bytes": 2418402933,
+      "lines": 6137892
+    },
+    "職缺瀏覽_20260601_20260607.csv": {
+      "sha256": "84f67f1f635b0265fa3e56ec15aff2d717094316fa327db1a907a4deeac63e8f",
+      "bytes": 407791469,
+      "lines": 8241234
+    },
+    "主動應徵_0601-0607.csv": {
+      "sha256": "2eae843e02e9ea0026f75eafc95e8091f5f81e4f3e40598121425e8173a7c767",
+      "bytes": 20732898,
+      "lines": 226000
+    }
+  }
+}

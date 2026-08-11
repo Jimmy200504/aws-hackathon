@@ -15,8 +15,30 @@ from pathlib import Path
 from typing import Any, Iterable, Iterator
 
 
-EXTRACTOR_VERSION = "deterministic-v1"
-RULES_VERSION = "deterministic-extraction-rules-v2"
+EXTRACTOR_VERSION = "deterministic-v2"
+RULES_VERSION = "deterministic-extraction-rules-v3"
+# Matching semantics that change extraction output. Hashing these rather than
+# only the version string means a silent parameter change cannot reuse an old
+# rules_hash, and a resumed run with different semantics is rejected by the
+# checkpoint comparison instead of producing a mixed artifact.
+RULES_SEMANTICS = {
+    "rules_version": RULES_VERSION,
+    "extractor": EXTRACTOR_VERSION,
+    "normalization": ["NFKC", "casefold", "collapse_whitespace", "臺_to_台"],
+    "match": "longest_exact_reviewed_alias",
+    "matched_node_types": ["Skill", "Occupation"],
+    "alias_namespace": "per_node_type",
+    "ambiguous_alias_policy": "drop_within_type",
+    "requirement_levels": ["required", "preferred", "mentioned"],
+    "negation_excluded": True,
+}
+
+
+def rules_hash() -> str:
+    payload = json.dumps(
+        RULES_SEMANTICS, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    return hashlib.sha256(payload.encode()).hexdigest()
 DEFAULT_CUTOFF = "2026-06-05 23:59:59.999"
 PART_SIZE = 1000
 
@@ -109,23 +131,52 @@ class OntologyTerm:
 
 
 class ExactAliasMatcher:
-    """Longest exact alias matching with seed-first collision handling."""
+    """Longest exact alias matching with seed-first collision handling.
+
+    Skill and Occupation aliases live in separate namespaces, mirroring
+    ``ExactEntityResolver.resolve(node_type=...)``. The seed ontology
+    deliberately reuses some surfaces across types (for example "sales" is both
+    ``occupation.sales`` and ``skill.sales``), so collapsing both types into one
+    alias map would make those surfaces ambiguous and silently drop them.
+    Ambiguity is therefore evaluated per node type.
+    """
+
+    MATCHED_TYPES = ("Skill", "Occupation")
 
     def __init__(self, terms: Iterable[OntologyTerm]) -> None:
         materialized = tuple(terms)
         self.terms = {term.node_id: term for term in materialized}
-        aliases: dict[str, list[str]] = defaultdict(list)
+        aliases: dict[str, dict[str, list[str]]] = {
+            node_type: defaultdict(list) for node_type in self.MATCHED_TYPES
+        }
         for term in materialized:
-            if term.node_type != "Skill":
+            if term.node_type not in self.MATCHED_TYPES:
                 continue
+            bucket = aliases[term.node_type]
             for raw_alias in (term.label, *term.aliases):
                 alias = normalize_surface(raw_alias)
-                if alias and term.node_id not in aliases[alias]:
-                    aliases[alias].append(term.node_id)
-        self.ambiguous_aliases = frozenset(alias for alias, ids in aliases.items() if len(ids) != 1)
-        self.alias_to_node = {
-            alias: ids[0] for alias, ids in aliases.items() if len(ids) == 1
+                if alias and term.node_id not in bucket[alias]:
+                    bucket[alias].append(term.node_id)
+        self.ambiguous_aliases = frozenset(
+            alias
+            for bucket in aliases.values()
+            for alias, ids in bucket.items()
+            if len(ids) != 1
+        )
+        # Per-type resolution keeps cross-type reuse usable; within a type an
+        # ambiguous surface is still dropped rather than guessed.
+        self.alias_to_node_by_type: dict[str, dict[str, str]] = {
+            node_type: {
+                alias: ids[0] for alias, ids in bucket.items() if len(ids) == 1
+            }
+            for node_type, bucket in aliases.items()
         }
+        # Skills win a surface when both types claim it, preserving the
+        # pre-existing behaviour for shared surfaces such as "sales".
+        merged: dict[str, str] = {}
+        for node_type in reversed(self.MATCHED_TYPES):
+            merged.update(self.alias_to_node_by_type[node_type])
+        self.alias_to_node = merged
         self.aliases = tuple(sorted(self.alias_to_node, key=lambda value: (-len(value), value)))
         self.pattern = re.compile("|".join(re.escape(alias) for alias in self.aliases)) if self.aliases else None
 
@@ -518,7 +569,7 @@ def run_csv_extraction(
     configuration = {
         "extractor": EXTRACTOR_VERSION,
         "rules_version": RULES_VERSION,
-        "rules_hash": hashlib.sha256(RULES_VERSION.encode()).hexdigest(),
+        "rules_hash": rules_hash(),
         "input_hash": input_hash,
         "ontology_hash": ontology_hash,
         "duty_taxonomy_hash": duty_hash,

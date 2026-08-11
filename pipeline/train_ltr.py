@@ -236,7 +236,7 @@ def main() -> None:
         lambdarank_pair_method="topk",
         lambdarank_num_pair_per_sample=12,
         random_state=1111,
-        n_jobs=-1,
+        n_jobs=1,
         early_stopping_rounds=(
             args.early_stopping_rounds if args.early_stopping_rounds > 0 else None
         ),

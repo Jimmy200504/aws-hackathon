@@ -14,6 +14,7 @@ AWS_REGION_NAME="${AWS_REGION:-us-east-1}"
 COLLECTION_NAME="${SKILLWEAVE_COLLECTION_NAME:-skillweave-jobs}"
 COLLECTION_GROUP_NAME="${SKILLWEAVE_COLLECTION_GROUP_NAME:-skillweave-search}"
 INDEX_NAME="${OPENSEARCH_INDEX:-skillweave-jobs-v1}"
+SKILL_ALIAS_INDEX_VALUE="${SKILL_ALIAS_INDEX:-skillweave-skill-alias-v1}"
 PYTHON="${PYTHON:-.venv/bin/python}"
 INDEX_BATCH_SIZE="${SKILLWEAVE_INDEX_BATCH_SIZE:-2000}"
 INDEX_WORKERS="${SKILLWEAVE_INDEX_WORKERS:-4}"
@@ -118,14 +119,29 @@ AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY_VALUE" \
 AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN_VALUE" \
   "$PYTHON" scripts/index_full_opensearch.py "${INDEXER_ARGS[@]}"
 
+AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID_VALUE" \
+AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY_VALUE" \
+AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN_VALUE" \
+  "$PYTHON" scripts/index_skill_aliases.py \
+    --endpoint "$COLLECTION_ENDPOINT" \
+    --index "$SKILL_ALIAS_INDEX_VALUE" \
+    --region "$AWS_REGION_NAME"
+
 OPENSEARCH_ENDPOINT="$COLLECTION_ENDPOINT" \
 OPENSEARCH_COLLECTION_ARN="$COLLECTION_ARN" \
 OPENSEARCH_INDEX="$INDEX_NAME" \
+SKILL_ALIAS_INDEX="$SKILL_ALIAS_INDEX_VALUE" \
 AWS_REGION="$AWS_REGION_NAME" \
   ./scripts/deploy_compact_aws.sh
 
-"$PYTHON" scripts/run_aws_production_smoke.py --require-full-corpus
-"$PYTHON" scripts/verify_release.py
+DEMO_URL="$(
+  aws cloudformation describe-stacks \
+    --stack-name "$DEMO_STACK_NAME" \
+    --region "$AWS_REGION_NAME" \
+    --query "Stacks[0].Outputs[?OutputKey=='DemoUrl'].OutputValue | [0]" \
+    --output text
+)"
+"$PYTHON" scripts/run_aws_production_smoke.py --url "$DEMO_URL" --require-full-corpus
 
 echo
 echo "Full-corpus search deployed."

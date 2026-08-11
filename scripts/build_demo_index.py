@@ -248,9 +248,16 @@ def schema_fingerprint(data_dir: Path) -> str:
         "職缺瀏覽_20260601_20260607.csv",
         "主動應徵_0601-0607.csv",
     ]
+    # The cleaned log is required, not preferred. Silently falling back to the
+    # raw log produced a different index with no warning, which is exactly how
+    # two developers end up with artifacts that disagree.
     search_log = data_dir / "userSearchLog_cleaned.csv"
     if not search_log.is_file():
-        search_log = data_dir / "userSearchLog_20260601_20260607.csv"
+        raise SystemExit(
+            f"Missing {search_log}. Run: python3 scripts/clean_search_log.py\n"
+            "The cleaned search log removes SEO spam and URL queries; building "
+            "from the raw log yields a different index and schema fingerprint."
+        )
     for name in names:
         path = data_dir / name
         with path.open("rb") as handle:
@@ -295,6 +302,19 @@ def main() -> None:
         ),
     )
     parser.add_argument("--skip-behavior", action="store_true")
+    parser.add_argument(
+        "--graph-rules-version",
+        default="deterministic-v2-rules-v3",
+        help=(
+            "graph rules version recorded in metadata.graph_version; must match "
+            "the deterministic build that produced the serving graph"
+        ),
+    )
+    parser.add_argument(
+        "--index-version",
+        default=None,
+        help="override metadata.index_version (defaults to demo-2026.06.07-full-v2)",
+    )
     args = parser.parse_args()
 
     ontology = json.loads(args.ontology.read_text(encoding="utf-8"))
@@ -342,15 +362,19 @@ def main() -> None:
     artifact = {
         "metadata": {
             "index_version": (
-                "demo-2026.06.07-full-v1"
-                if args.graph_scope == "latest"
-                else "demo-2026.06.05-v1"
+                args.index_version
+                if args.index_version
+                else (
+                    "demo-2026.06.07-full-v2"
+                    if args.graph_scope == "latest"
+                    else "demo-2026.06.05-v2"
+                )
             ),
             "dataset_version": "1111-2026-06-01_2026-06-07",
             "schema_fingerprint": schema_fingerprint(args.data_dir),
             "graph_train_cutoff": TRAIN_CUTOFF.isoformat(sep=" "),
             "graph_scope": args.graph_scope,
-            "graph_version": f"deterministic-v1-rules-v2-{args.graph_scope}",
+            "graph_version": f"{args.graph_rules_version}-{args.graph_scope}",
             "graph_builder": (
                 "reviewed-bootstrap-fixture+validated-extraction"
                 if extraction_nodes

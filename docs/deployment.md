@@ -16,17 +16,7 @@ Neptune/SageMaker production 架構另見 `aws-architecture.md`。
 - region 支援 `python3.13` Lambda runtime
 
 本機已驗證工具版本：AWS CLI `2.36.9`、SAM CLI `1.164.0`、GitHub CLI
-`2.96.0`。工具已就緒，但 release manifest 不會把「已安裝」誤寫成「已登入／
-已部署」。
-
-先用唯讀 preflight 檢查 credentials、release tag、影片 hash、Git remote 與
-敏感資料：
-
-```bash
-python3 scripts/external_release_preflight.py
-# 登入後需要把未通過狀態視為錯誤時：
-python3 scripts/external_release_preflight.py --require-ready
-```
+`2.96.0`。
 
 ## Package
 
@@ -68,16 +58,14 @@ export AWS_REGION=us-east-1
 bash scripts/deploy_lambda_code.sh
 ```
 
-只有建立新的 compact stack 時才使用完整 release gate 與 SAM deployment：
+只有建立新的 compact stack 時才需要完整 SAM deployment：
 
 ```bash
-./scripts/release_gate.sh
 ./scripts/deploy_compact_aws.sh
 ```
 
 `deploy_compact_aws.sh` 會 package、驗證、部署、讀取 CloudFormation `DemoUrl`、執行
-external health/search smoke，最後把真實 AWS URL 寫入 `release-manifest.json`。
-可用 `SKILLWEAVE_STACK_NAME`、`AWS_REGION`、`SKILLWEAVE_STAGE_NAME` 與
+external health/search smoke。可用 `SKILLWEAVE_STACK_NAME`、`AWS_REGION`、`SKILLWEAVE_STAGE_NAME` 與
 `SKILLWEAVE_RESERVED_CONCURRENCY` 覆寫預設值。Reserved concurrency 預設
 為 `0`（不建立 function-level reservation，使用帳號共用 concurrency），以支援
 新帳號的最低 quota；提高 account quota 後可設為 `10` 或更高。
@@ -105,21 +93,9 @@ aws cloudformation describe-stacks \
   --output table
 ```
 
-目前已驗證的 public judge URL：
+目前已驗證的 public 展示 URL：
 
 `https://m97uj2vc55.execute-api.us-east-1.amazonaws.com/prod/`
-
-GitHub 與影片完成後只接受 public HTTPS URL：
-
-```bash
-python3 scripts/update_release_urls.py \
-  --github-url "https://github.com/ORG/REPO/releases/tag/TAG" \
-  --demo-video-url "https://VIDEO_HOST/VIDEO_ID"
-python3 scripts/verify_release.py
-```
-
-`update_release_urls.py` 會同步重建 submission audit 與它在 manifest 內的
-SHA-256，避免 URL 已完成但 audit 仍顯示舊 blocker。
 
 ## Full-corpus judge deployment
 
@@ -152,8 +128,9 @@ export SKILLWEAVE_INGESTION_PRINCIPAL_ARN=arn:aws:iam::ACCOUNT:role/ROLE
 2. 建立最低 OCU=0 的 NextGen collection group、security policies 與 SEARCH collection。
 3. 將 `職缺.csv` 每一列匯入 OpenSearch；有沒有技能命中都必須匯入。
 4. 等待 index refresh，使用 `_count` 驗證文件總數。
-5. 更新 Lambda 的 endpoint、index 與最小讀取 IAM 權限。
-6. 重跑 health/search smoke。
+5. 將 reviewed ontology 的 exact alias 發佈到同一 collection 內的 `skillweave-skill-alias-v1` index（`scripts/index_skill_aliases.py`），供 Neptune-backed alias 解析使用。
+6. 更新 Lambda 的 endpoint、index、skill-alias index 與最小讀取 IAM 權限。
+7. 重跑 health/search smoke。
 
 OpenSearch Serverless endpoint 可從公網到達，但文件 API 仍要求 SigV4 與 data
 access policy。正式企業環境應改用 VPC endpoint；黑客松版本採這個設定是為了讓
@@ -248,16 +225,7 @@ gh release create skillweave-2026.07.28-rc6 \
   --notes "Verified AWS hackathon judge release."
 ```
 
-GitHub release asset 同時作為公開影片 URL：
-
-```bash
-python3 scripts/update_release_urls.py \
-  --github-url "https://github.com/OWNER/REPO/releases/tag/skillweave-2026.07.28-rc6" \
-  --demo-video-url "https://github.com/OWNER/REPO/releases/download/skillweave-2026.07.28-rc6/skillweave-demo-5min.mp4"
-```
-
-接著執行 AWS deploy。三個 URL 都通過 clean-session smoke 後，將更新後的
-manifest、audit 與 verifier report commit 並 push 到 `main`。
+GitHub release asset 同時可作為公開影片 URL。
 
 ## External smoke
 
@@ -282,7 +250,7 @@ curl -fsS -X POST "$DEMO_URL/api/v1/jobs/search" \
 可重現的 bounded production smoke：
 
 ```bash
-python3 scripts/run_aws_production_smoke.py --requests 30 --concurrency 5
+python3 scripts/run_aws_production_smoke.py --url "$DEMO_URL" --requests 30 --concurrency 5
 ```
 
 它以無 AWS session 的 public HTTPS client 檢查 UI、relative assets、health、
