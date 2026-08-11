@@ -229,12 +229,11 @@ WORK_DIR=artifacts/quality \
 make quality
 ```
 
-腳本會建立 primary fixture 和 grouped LTR rows，以固定超參數訓練並比較 Graph OFF/ON。它也會輸出可攜式模型、檢查推論結果是否一致，最後用互不重疊的 hash bucket 再跑一次 replication。輸出檔案如下：
+腳本評測的是**已經 commit 進 repo 的既有模型**(`artifacts/models/ltr-quality-final.ubj`，只有幾十 KB，不含私有資料，可以安心放進公開 repo)，不會重新訓練它——如果這個檔案不存在會直接失敗並印出訓練指令，不會靜默訓練一個新模型出來蓋掉它。腳本會先確認完整統計 Skill Graph 是否已建置好，沒有的話就先掃描全部 1,218,635 筆職缺建置（`GRAPH_WORK_ROOT`／`GRAPH_RUN_ID`／`GRAPH_VERSION` 可覆寫位置與版本，預設值同下方版本對照表），再把統計 `RELATED_TO` 邊綁進 benchmark index、建立 primary fixture 和 grouped LTR rows，用既有模型評測 Graph OFF/ON、檢查可攜式推論結果是否一致，最後用互不重疊的 hash bucket 再跑一次 replication。圖譜已存在時會自動略過重建，只有第一次執行或指向新的 `GRAPH_WORK_ROOT` 才會花這筆額外時間和磁碟空間。輸出檔案如下：
 
 - `reports/ltr-quality-confirmation.json`：primary bucket `[2400, 3400)`，1,991 queries
 - `reports/ltr-quality-replication.json`：replication bucket `[3400, 4400)`，1,992 queries
 - `reports/verify-quality-release.json`：兩組至少 +5% 且 paired CI95 大於 0 的 gate
-- `artifacts/models/ltr-quality-final.{ubj,trees.json,manifest.json}`
 
 ```bash
 jq '{
@@ -249,11 +248,12 @@ jq '{
 jq . reports/verify-quality-release.json
 ```
 
-### 2. 重現文末的 deterministic-v3 固定結果
+### 2. 核對文末的 deterministic-v3 固定結果
 
-文末表格使用 `evaluation-cutoff` graph manifest，qrels 與模型也已固定。這些產物由上一節的
-`make quality` 與下方的 overlay 步驟產生（`artifacts/` 下的評測目錄不進版控，需在本機重建）。
-先核對四個 artifact 的 SHA-256：
+上一步 `make quality` 已經是用套了完整統計 Skill Graph 的 `evaluation-cutoff` graph manifest
+訓練出來的模型，文末表格就是直接讀它輸出的 `reports/ltr-quality-confirmation.json` 和
+`reports/ltr-quality-replication.json`，不需要另外重建。如果想額外確認重建出來的 artifact
+跟釘住的發行版本完全一致，可以核對四個檔案的 SHA-256：
 
 ```bash
 shasum -a 256 \
@@ -293,45 +293,27 @@ jq '{
 }' reports/ltr-quality-deterministic-v3-reproduced.json
 ```
 
-若要從原始職缺重建同版本的圖譜中間檔，請使用發行版本的參數。這一步會掃描 1,218,635 筆職缺，比單純重新計分更花時間和磁碟空間：
+`make quality` 會記錄圖譜建置與 overlay 每個階段的 checkpoint。只要參數沒變、輸出也完整，重跑時會略過已完成的階段；若懷疑產物漂移，重跑一次 `make quality` 並比對上方 SHA-256 即可。
+
+### 3. 重新訓練模型（選用，不是重現 benchmark 的必要步驟）
+
+`make quality` 不會自動訓練模型，只評測既有的 `artifacts/models/ltr-quality-final.ubj`。真的要更新模型時才手動執行：
 
 ```bash
-.venv/bin/python scripts/run_full_graph_build.py \
-  --work-root artifacts/skill-graph-full-v2 \
-  --run-id deterministic-v2-rules-v3-full \
-  --graph-version deterministic-v2-rules-v3 \
-  --cutoff '2026-06-05 23:59:59.999' \
-  --dry-run
-
-.venv/bin/python scripts/run_full_graph_build.py \
-  --work-root artifacts/skill-graph-full-v2 \
-  --run-id deterministic-v2-rules-v3-full \
-  --graph-version deterministic-v2-rules-v3 \
-  --cutoff '2026-06-05 23:59:59.999'
+.venv/bin/python pipeline/train_ltr.py \
+  --train artifacts/quality/primary/ltr-overlay/train.jsonl \
+  --train-extra artifacts/quality/primary/ltr-overlay/validation.jsonl \
+  --validation artifacts/quality/primary/ltr-overlay/validation.jsonl \
+  --output artifacts/models/ltr-quality-final.ubj \
+  --feature-set quality_minimal \
+  --n-estimators 40 \
+  --max-depth 4 \
+  --min-child-weight 12 \
+  --learning-rate 0.05 \
+  --early-stopping-rounds 0
 ```
 
-圖譜完成後，重建 benchmark overlay 和 LTR rows。overlay 會把統計 `RELATED_TO` 邊綁進
-`make quality` 產生的 base index，取代 ontology 內的審閱提示權重：
-
-```bash
-.venv/bin/python scripts/build_v2_ranking_overlay.py \
-  --base-index artifacts/quality/primary/benchmark-index.json \
-  --qrels artifacts/quality/primary/temporal-eval.json \
-  --graph-manifest artifacts/skill-graph-full-v2/release/runs/deterministic-v2-rules-v3-full/evaluation-cutoff/manifest.json \
-  --nodes artifacts/skill-graph-full-v2/resolved/evaluation-cutoff/nodes.jsonl \
-  --resolved-jobs artifacts/skill-graph-full-v2/resolved/evaluation-cutoff/jobs.jsonl \
-  --job-edges artifacts/skill-graph-full-v2/resolved/evaluation-cutoff/job-skill-edges.jsonl \
-  --relation-edges artifacts/skill-graph-full-v2/relations/evaluation-cutoff/relation-edges.jsonl \
-  --reviewed-ontology config/skill_ontology.seed.json \
-  --output artifacts/quality/primary/overlay-index.json
-
-.venv/bin/python pipeline/build_ltr_pairs.py \
-  --index artifacts/quality/primary/overlay-index.json \
-  --qrels artifacts/quality/primary/temporal-eval.json \
-  --output-dir artifacts/quality/primary/ltr-overlay
-```
-
-Pipeline 會記錄每個階段的 checkpoint。只要參數沒變、輸出也完整，重跑時會略過已完成的階段。完成後請核對 graph manifest、index sidecar 和上述 SHA-256，確認產物沒有漂移。
+**重新訓練不保證跟現有模型一樣好，甚至可能更差。**實測過：即使 seed、超參數、程式碼都沒變，重新產生一份 `ltr-overlay` 訓練資料再訓練，測出來的 replication NDCG@10 提升是 +4.82%（現有模型是 +5.61%），沒過 release gate 的 5% 門檻。目前還沒有找到確切根因——`build_benchmark_fixture.py` 已驗證兩次全新重跑雜湊完全一致，訓練本身在輸入相同時也是 deterministic 的，但整條鏈重新跑一輪產生的模型就是測得比原本差。所以重新訓練後**務必**用 `make quality` 重新評測、跟舊模型的 `reports/ltr-quality-*.json` 比對過，確認沒有退步才 commit 新模型；不要假設重新訓練＝安全的等價操作。
 
 ## 版本對照
 
