@@ -58,12 +58,9 @@ artifacts/skill-graph-local-index.sqlite3.manifest.json
 !artifacts/models/ltr-quality-final.ubj
 !artifacts/models/ltr-quality-final.manifest.json
 !artifacts/models/ltr-quality-final.trees.json
-!artifacts/models/ltr-quality-remote-salary.ubj
-!artifacts/models/ltr-quality-remote-salary.manifest.json
 !artifacts/models/ltr-quality-remote-salary-intent.ubj
 !artifacts/models/ltr-quality-remote-salary-intent.manifest.json
 !artifacts/models/ltr-quality-remote-salary-intent.trees.json
-!artifacts/models/ltr-quality-remote-salary.trees.json
 
 # Local model-selection traces are retained for diagnosis, not submitted as
 # authoritative evidence. Locked confirmations are tracked explicitly.

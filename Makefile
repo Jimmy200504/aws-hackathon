@@ -1,4 +1,4 @@
-.PHONY: setup demo test coverage sam-smoke aws-smoke video index benchmark quality package opensearch-local-up opensearch-local-down full-index-local full-demo-local query-artifacts graph-full-plan graph-full-build graph-review graph-review-score verify-inputs clean-search-log
+.PHONY: setup demo test coverage sam-smoke aws-smoke video index benchmark ltr-ablation quality package opensearch-local-up opensearch-local-down full-index-local full-demo-local query-artifacts graph-full-plan graph-full-build graph-review graph-review-score verify-inputs clean-search-log
 
 PYTHON ?= .venv/bin/python
 AWS_REGION ?= us-east-1
@@ -48,6 +48,12 @@ index:
 
 benchmark:
 	./scripts/run_ablation.sh
+
+# Reproduces artifacts/models/ltr-graph-final.ubj, the model `make coverage`
+# evaluates by default. Overwrites the committed model with a freshly trained
+# one; only run this when deliberately updating it.
+ltr-ablation:
+	./scripts/run_ltr_ablation.sh
 
 quality:
 	./scripts/run_quality_confirmation.sh

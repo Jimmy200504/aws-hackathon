@@ -315,6 +315,16 @@ jq '{
 
 **重新訓練不保證跟現有模型一樣好，甚至可能更差。**實測過：即使 seed、超參數、程式碼都沒變，重新產生一份 `ltr-overlay` 訓練資料再訓練，測出來的 replication NDCG@10 提升是 +4.82%（現有模型是 +5.61%），沒過 release gate 的 5% 門檻。目前還沒有找到確切根因——`build_benchmark_fixture.py` 已驗證兩次全新重跑雜湊完全一致，訓練本身在輸入相同時也是 deterministic 的，但整條鏈重新跑一輪產生的模型就是測得比原本差。所以重新訓練後**務必**用 `make quality` 重新評測、跟舊模型的 `reports/ltr-quality-*.json` 比對過，確認沒有退步才 commit 新模型；不要假設重新訓練＝安全的等價操作。
 
+### 4. 重現 `make coverage` 用到的 `ltr-graph-final` 模型
+
+`make coverage`（`scripts/report_graph_coverage.py`）預設讀取 `artifacts/models/ltr-graph-final.ubj`，這是一個只用 `behavior_graph` feature set 訓練的較小模型，用來量化圖譜特徵在不同子群的覆蓋率與影響，跟上面 benchmark／重新訓練用的 `ltr-quality-final` 是不同模型、不同用途。重現它：
+
+```bash
+make ltr-ablation
+```
+
+等同執行 `scripts/run_ltr_ablation.sh`：建立獨立的 benchmark fixture、訓練 `ltr-graph-final.ubj`，再用 `pipeline/evaluate_ltr.py` 產出 `reports/ltr-ablation-*.json`。跟 `ltr-quality-final` 一樣，這個腳本會直接覆寫已 commit 的模型檔案，只有真的要更新它時才執行，並在 commit 前確認 `make coverage` 的輸出沒有退步。
+
 ## 版本對照
 
 | 類型 | 目前版本／artifact | 說明 |
@@ -332,6 +342,7 @@ jq '{
 | 固定版 benchmark overlay | `benchmark-2026.06.05-v1-deterministic-v3-cutoff` | 已綁定 deterministic evaluation graph；overlay sidecar 記錄 base index、qrels 與 graph manifest 的 SHA-256 |
 | 線上 LTR 模型 | `ltr-quality-remote-salary-intent` | XGBoost 3.2.0、40 trees；UBJ SHA-256 `cb07c70b…11fd` |
 | Benchmark LTR 模型 | `ltr-quality-final` | XGBoost 3.2.0、`rank:ndcg`、seed 1111；UBJ SHA-256 `19f6d2f0…bdcf` |
+| Graph coverage 模型 | `ltr-graph-final` | XGBoost 3.2.0、`behavior_graph` feature set、seed 1111；UBJ SHA-256 `d90693ac…1366e` |
 
 正式環境的 serving pointer 記錄在 `artifacts/skill-graph-full-v2/release/production-manifest.json`。[Data card](docs/data-card.md) 說明資料治理、欄位缺值、join contract、資料洩漏和偏差限制；模型 manifest 則保存 features、超參數、訓練來源與 XGBoost 版本。比對 benchmark 時，dataset、qrels、index、model 和 graph manifest hash 必須全部一致。
 

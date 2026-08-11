@@ -128,8 +128,9 @@ export SKILLWEAVE_INGESTION_PRINCIPAL_ARN=arn:aws:iam::ACCOUNT:role/ROLE
 2. 建立最低 OCU=0 的 NextGen collection group、security policies 與 SEARCH collection。
 3. 將 `職缺.csv` 每一列匯入 OpenSearch；有沒有技能命中都必須匯入。
 4. 等待 index refresh，使用 `_count` 驗證文件總數。
-5. 更新 Lambda 的 endpoint、index 與最小讀取 IAM 權限。
-6. 重跑 health/search smoke。
+5. 將 reviewed ontology 的 exact alias 發佈到同一 collection 內的 `skillweave-skill-alias-v1` index（`scripts/index_skill_aliases.py`），供 Neptune-backed alias 解析使用。
+6. 更新 Lambda 的 endpoint、index、skill-alias index 與最小讀取 IAM 權限。
+7. 重跑 health/search smoke。
 
 OpenSearch Serverless endpoint 可從公網到達，但文件 API 仍要求 SigV4 與 data
 access policy。正式企業環境應改用 VPC endpoint；黑客松版本採這個設定是為了讓
